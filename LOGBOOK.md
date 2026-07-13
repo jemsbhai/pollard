@@ -99,3 +99,20 @@ Adversary review:
 - The run only supports mock-token accounting claims.
 - No README performance number was added from this pass.
 - No local model, wall-clock, dollar, or joule claim should cite this entry.
+
+## 2026-07-13 REC-005 Plan
+
+Purpose: verify each Phase 5 live recipe once against the external stack it
+documents.
+
+Protocol:
+
+- Run the five scripts under `docs/recipes/` with user-owned provider clients
+  or an MCP session.
+- Record package versions, model id, exit status, root id, and redacted console
+  output.
+- Do not treat syntax compilation or frozen adapter fixtures as a live provider
+  verification.
+
+Status: pending user credentials and a selected MCP server. No live result is
+claimed by this entry.

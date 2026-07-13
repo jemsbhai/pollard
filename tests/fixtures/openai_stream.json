@@ -1,0 +1,18 @@
+[
+  {
+    "id": "chatcmpl_stream_fixture",
+    "model": "gpt-5.5",
+    "choices": [{"index": 0, "finish_reason": null, "delta": {"role": "assistant", "content": "fix"}}]
+  },
+  {
+    "id": "chatcmpl_stream_fixture",
+    "model": "gpt-5.5",
+    "choices": [{"index": 0, "finish_reason": "stop", "delta": {"content": "ture"}}]
+  },
+  {
+    "id": "chatcmpl_stream_fixture",
+    "model": "gpt-5.5",
+    "choices": [],
+    "usage": {"prompt_tokens": 6, "completion_tokens": 2, "total_tokens": 8}
+  }
+]

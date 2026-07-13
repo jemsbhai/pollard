@@ -3,6 +3,7 @@ from pathlib import Path
 import pytest
 
 from pollard import Budget, BudgetExceeded, MemoryStore, Runtime, SQLiteStore
+from pollard.meters import StepMeter, TokenMeter
 
 
 class FakeMeasurement:
@@ -183,3 +184,94 @@ def test_branch_budget_refuses_inside_branch_without_moving_parent() -> None:
     with run.branch(attempt=1, budget=Budget(steps=0)) as branch, pytest.raises(BudgetExceeded):
         branch.model_call({"model": "mock-1"}, fn=lambda _payload: {"text": "x"})
     assert run.cursor_id == original
+
+
+def test_stream_forwards_chunks_settles_once_and_keeps_chunks() -> None:
+    forwarded: list[dict[str, object]] = []
+
+    def stream(_payload: dict[str, object]):  # type: ignore[no-untyped-def]
+        yield {"delta": {"text": "hel"}}
+        yield {"delta": {"text": "lo"}}
+        yield {
+            "result": {
+                "text": "hello",
+                "usage": {"input_tokens": 2, "output_tokens": 3},
+            }
+        }
+
+    run = Runtime(MemoryStore()).run("stream")
+    node = run.model_call(
+        {"model": "mock-1"},
+        fn=stream,
+        on_delta=forwarded.append,
+        keep_chunks=True,
+    )
+
+    assert [chunk.get("delta") for chunk in forwarded[:2]] == [
+        {"text": "hel"},
+        {"text": "lo"},
+    ]
+    assert node.result["text"] == "hello"
+    assert node.result["chunks"] == forwarded
+    assert node.meta["charges"]["steps"] == 1
+    assert node.meta["charges"]["tokens"] == 5
+
+
+def test_stream_and_non_stream_calls_have_same_identity() -> None:
+    payload = {"model": "mock-1", "messages": []}
+    direct = Runtime(MemoryStore()).run("identity").model_call(
+        payload,
+        fn=lambda _payload: {"text": "ok"},
+    )
+
+    def stream(_payload: dict[str, object]):  # type: ignore[no-untyped-def]
+        yield {"result": {"text": "ok"}}
+
+    streamed = Runtime(MemoryStore()).run("identity").model_call(payload, fn=stream)
+    assert direct.id == streamed.id
+
+
+def test_replay_reemits_retained_chunks_without_calling_fn() -> None:
+    store = MemoryStore()
+
+    def stream(_payload: dict[str, object]):  # type: ignore[no-untyped-def]
+        yield {"delta": {"text": "a"}}
+        yield {"result": {"text": "a", "usage": {"input_tokens": 1, "output_tokens": 1}}}
+
+    Runtime(store, mode="record").run("stream-replay").model_call(
+        {"model": "mock-1"}, fn=stream, keep_chunks=True
+    )
+    seen: list[dict[str, object]] = []
+    replay = Runtime(store, mode="replay").run("stream-replay")
+    node = replay.model_call(
+        {"model": "mock-1"},
+        fn=lambda _payload: (_ for _ in ()).throw(AssertionError("called")),
+        on_delta=seen.append,
+    )
+    assert seen == node.result["chunks"]
+
+
+def test_estimator_refusal_is_marked_and_fn_is_not_called() -> None:
+    class FixedEstimator:
+        def estimate_input_tokens(self, payload: dict[str, object]) -> int:
+            del payload
+            return 10
+
+    called = False
+
+    def fn(_payload: dict[str, object]) -> dict[str, object]:
+        nonlocal called
+        called = True
+        return {}
+
+    runtime = Runtime(
+        MemoryStore(),
+        meters=[StepMeter(), TokenMeter(FixedEstimator(), reserved_output_tokens=5)],
+    )
+    run = runtime.run("estimated-refusal", budget=Budget(tokens=14))
+    with pytest.raises(BudgetExceeded) as exc_info:
+        run.model_call({"model": "mock-1"}, fn=fn)
+    refusal = run.store.get(exc_info.value.refusal_id)
+    assert refusal.payload["estimated"] == "true"
+    assert refusal.payload["requested"] == "15"
+    assert not called

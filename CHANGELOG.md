@@ -4,6 +4,20 @@ All notable changes to pollard will be documented in this file.
 
 The format is based on Keep a Changelog, and this project follows Semantic Versioning.
 
+## [0.5.0] - 2026-07-13
+
+### Added
+
+- Add sync and async stream consumption with ordered delta callbacks, optional
+  retained chunks, replay re-emission, and one settle at stream completion.
+- Add input token estimators with explicit output reservations and estimated
+  budget-refusal markers.
+- Add OpenAI, Anthropic, and LiteLLM adapters behind optional extras, tested
+  against frozen response fixtures.
+- Add a tiktoken-backed OpenAI estimator and an Anthropic count-tokens estimator.
+- Add live cookbook recipes for provider tool loops, LangGraph, pydantic-ai,
+  and MCP registry gating.
+
 ## [0.4.0] - 2026-07-13
 
 ### Added

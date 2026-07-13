@@ -1,0 +1,22 @@
+{
+  "id": "chatcmpl_tool_fixture",
+  "model": "gpt-5.5",
+  "choices": [
+    {
+      "index": 0,
+      "finish_reason": "tool_calls",
+      "message": {
+        "role": "assistant",
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_weather",
+            "type": "function",
+            "function": {"name": "weather", "arguments": "{\"city\":\"Boston\"}"}
+          }
+        ]
+      }
+    }
+  ],
+  "usage": {"prompt_tokens": 9, "completion_tokens": 5, "total_tokens": 14}
+}

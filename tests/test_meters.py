@@ -48,6 +48,30 @@ def test_token_meter_warns_once_for_missing_usage() -> None:
     assert caught == []
 
 
+def test_token_meter_uses_input_estimator_and_output_reservation() -> None:
+    class FixedEstimator:
+        def estimate_input_tokens(self, payload: dict[str, object]) -> int:
+            assert payload["model"] == "mock-1"
+            return 7
+
+    meter = TokenMeter(FixedEstimator(), reserved_output_tokens=5)
+    assert meter.precheck_estimate("model_call", {"model": "mock-1"}) == 12
+    assert meter.precheck_estimate("tool_call", {}) is None
+    assert meter.precheck_is_estimate is True
+
+
+def test_token_meter_rejects_invalid_estimates() -> None:
+    class BadEstimator:
+        def estimate_input_tokens(self, payload: dict[str, object]) -> int:
+            del payload
+            return -1
+
+    with pytest.raises(ValueError, match="non-negative"):
+        TokenMeter(BadEstimator()).precheck_estimate("model_call", {})
+    with pytest.raises(ValueError, match="reserved_output_tokens"):
+        TokenMeter(reserved_output_tokens=-1)
+
+
 def test_cost_meter_uses_decimal_arithmetic() -> None:
     meter = CostMeter({"mock-1": {"input_per_1m": "2.00", "output_per_1m": "6.00"}})
     assert meter.charge(

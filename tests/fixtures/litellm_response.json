@@ -1,0 +1,8 @@
+{
+  "id": "chatcmpl_litellm_fixture",
+  "model": "anthropic/claude-sonnet-4-6",
+  "choices": [
+    {"index": 0, "finish_reason": "stop", "message": {"role": "assistant", "content": "litellm fixture", "tool_calls": null}}
+  ],
+  "usage": {"prompt_tokens": 8, "completion_tokens": 3, "total_tokens": 11}
+}

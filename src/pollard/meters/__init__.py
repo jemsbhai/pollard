@@ -27,6 +27,12 @@ class Meter(Protocol):
     def precheck_estimate(self, node_kind: str, payload: dict[str, Any]) -> ChargeAmount | None: ...
 
 
+class Estimator(Protocol):
+    """Approximate the input tokens for a model-call identity payload."""
+
+    def estimate_input_tokens(self, payload: dict[str, Any]) -> int | None: ...
+
+
 class StepMeter:
     name = "steps"
 
@@ -85,8 +91,18 @@ class WallClockMeter:
 class TokenMeter:
     name = "tokens"
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        estimator: Estimator | None = None,
+        *,
+        reserved_output_tokens: int = 0,
+    ) -> None:
+        if isinstance(reserved_output_tokens, bool) or reserved_output_tokens < 0:
+            raise ValueError("reserved_output_tokens must be a non-negative int")
+        self._estimator = estimator
+        self._reserved_output_tokens = reserved_output_tokens
         self._warned_missing_usage = False
+        self.precheck_is_estimate = estimator is not None
 
     def charge(
         self,
@@ -111,9 +127,15 @@ class TokenMeter:
             return 0
         return input_tokens + output_tokens
 
-    def precheck_estimate(self, node_kind: str, payload: dict[str, Any]) -> None:
-        del node_kind, payload
-        return None
+    def precheck_estimate(self, node_kind: str, payload: dict[str, Any]) -> int | None:
+        if node_kind != "model_call" or self._estimator is None:
+            return None
+        estimate = self._estimator.estimate_input_tokens(payload)
+        if estimate is None:
+            return None
+        if isinstance(estimate, bool) or not isinstance(estimate, int) or estimate < 0:
+            raise ValueError("token estimator must return a non-negative int or None")
+        return estimate + self._reserved_output_tokens
 
     def _warn_missing_usage_once(self) -> None:
         if self._warned_missing_usage:
