@@ -80,7 +80,7 @@ def main() -> None:
             fn=call_openai,
         )
         print(final.result["text"])
-        print("root:", run.root_id)
+        print("inspect:", f"pollard show openai-tool-loop.db {run.root_id}")
 
 
 if __name__ == "__main__":

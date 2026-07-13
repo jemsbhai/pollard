@@ -1,0 +1,33 @@
+[
+  {"messageStart": {"role": "assistant"}},
+  {"contentBlockDelta": {"contentBlockIndex": 0, "delta": {"text": "bed"}}},
+  {"contentBlockDelta": {"contentBlockIndex": 0, "delta": {"text": "rock"}}},
+  {
+    "contentBlockStart": {
+      "contentBlockIndex": 1,
+      "start": {
+        "toolUse": {"toolUseId": "tooluse_stream", "name": "weather"}
+      }
+    }
+  },
+  {
+    "contentBlockDelta": {
+      "contentBlockIndex": 1,
+      "delta": {"toolUse": {"input": "{\"city\":"}}
+    }
+  },
+  {
+    "contentBlockDelta": {
+      "contentBlockIndex": 1,
+      "delta": {"toolUse": {"input": "\"Boston\"}"}}
+    }
+  },
+  {"contentBlockStop": {"contentBlockIndex": 1}},
+  {"messageStop": {"stopReason": "tool_use"}},
+  {
+    "metadata": {
+      "usage": {"inputTokens": 9, "outputTokens": 5, "totalTokens": 14},
+      "metrics": {"latencyMs": 35}
+    }
+  }
+]

@@ -58,6 +58,12 @@ class HashRopeStore:
         for child_id in self.children(root_id):
             yield from self.walk(child_id)
 
+    def roots(self) -> list[str]:
+        return sorted(
+            (node_id for node_id, node in self._nodes.items() if node.parent is None),
+            key=lambda item: (str(self._nodes[item].payload.get("run", "")), item),
+        )
+
     def to_bytes(self) -> bytes:
         """Return the current append-only log bytes."""
 

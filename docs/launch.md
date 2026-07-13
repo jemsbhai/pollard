@@ -55,3 +55,44 @@ Disallowed claims until measured:
 - Local model speed.
 - GPU joules.
 - Hosted-provider cost savings.
+
+## Wave 5: v0.5
+
+Audience: practitioners bringing an existing model client or agent stack.
+
+Angle: "pollard now speaks your stack." Show provider adapters, streaming,
+precheck estimates, and runnable stack recipes. The cost figures in REC-005 may
+be cited only as the measured cost of that release verification, not as a
+general savings claim.
+
+Demo sources:
+
+- `docs/recipes/openai_tool_loop.py`.
+- `docs/recipes/anthropic_tool_loop.py`.
+- `docs/recipes/langgraph_node.py`.
+- `docs/recipes/pydantic_ai_wrap.py`.
+- `docs/recipes/mcp_registry.py`.
+
+## Wave 6: v0.6
+
+Audience: operators who need to inspect or export an agent audit trail.
+
+Angle: "see every step your agent took." Show the content-free ASCII tree,
+then the self-contained HTML export and the same topology in OpenTelemetry.
+
+Demo commands:
+
+```powershell
+pollard show runs.db <root-id>
+pollard show runs.db <root-id> --html run.html
+pollard verify runs.db --json
+```
+
+Allowed claims:
+
+- The default CLI and HTML output does not include payload or result content.
+- HTML export is self-contained and has no JavaScript or remote assets.
+- Offline OpenTelemetry export preserves Pollard parent-child topology.
+- Direct Bedrock, Azure OpenAI, Azure AI, Vertex AI, and LiteLLM paths are
+  documented and tested with frozen or local fixtures unless a live run is
+  explicitly identified in `LOGBOOK.md`.

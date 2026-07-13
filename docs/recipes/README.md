@@ -8,6 +8,9 @@ use credentials configured by the user.
 |---|---|
 | `openai_tool_loop.py` | `pip install "pollard[openai]"` |
 | `anthropic_tool_loop.py` | `pip install "pollard[anthropic]"` |
+| `azure_openai.py` | `pip install "pollard[openai]"` |
+| `bedrock_converse.py` | `pip install "pollard[bedrock]"` |
+| `litellm_cloud.py` | `pip install "pollard[litellm]"` plus the selected provider dependency |
 | `langgraph_node.py` | `pip install "pollard[openai]" langgraph` |
 | `pydantic_ai_wrap.py` | `pip install pollard pydantic-ai` |
 | `mcp_registry.py` | `pip install "pollard[mcp]"` |
@@ -15,6 +18,13 @@ use credentials configured by the user.
 The provider recipes make live calls and may incur provider charges. Review the
 payload, model, and budget before running them. The checked-in examples disable
 SDK retries and cap each provider response at 128 output tokens.
+
+Azure OpenAI uses the existing OpenAI adapter because its current v1 endpoint
+uses the standard OpenAI client contract. Bedrock has a direct Converse adapter.
+The LiteLLM recipe covers Vertex AI, Azure AI, SageMaker, OCI, Watsonx,
+Databricks, and the other routes supported by LiteLLM. See
+[`docs/cloud-providers.md`](../cloud-providers.md) for the support and credential
+matrix.
 
 The MCP recipe accepts either a Streamable HTTP URL or a local stdio command.
 The repository includes a credential-free local server for a complete smoke
@@ -26,5 +36,5 @@ python docs\recipes\mcp_registry.py --stdio `
   python search '{\"query\":\"pollard\"}'
 ```
 
-Phase 6 adds the `pollard show` command. Until then, each script prints the root
-id that the command will inspect.
+Every recipe writes a SQLite recording and prints the exact `pollard show`
+command for inspecting it.

@@ -85,7 +85,7 @@ def main() -> None:
             fn=call_anthropic,
         )
         print(final.result["text"])
-        print("root:", run.root_id)
+        print("inspect:", f"pollard show anthropic-tool-loop.db {run.root_id}")
 
 
 if __name__ == "__main__":

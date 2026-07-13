@@ -106,6 +106,12 @@ class SQLiteStore:
         for child_id in self.children(root_id):
             yield from self.walk(child_id)
 
+    def roots(self) -> list[str]:
+        rows = self._conn.execute(
+            "SELECT id FROM nodes WHERE parent IS NULL ORDER BY payload ASC, id ASC"
+        ).fetchall()
+        return [str(row[0]) for row in rows]
+
     def _get_optional(self, node_id: str) -> Node | None:
         row = self._conn.execute(
             """

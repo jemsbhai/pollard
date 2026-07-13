@@ -49,6 +49,14 @@ def test_walk_is_depth_first_and_deterministic(store: Store) -> None:
     assert walked == [root.id, *store.children(root.id)]
 
 
+def test_roots_are_sorted_by_run_label_then_id(store: Store) -> None:
+    second = Node.make(kind=NodeKind.ROOT, parent=None, payload={"run": "z-last"})
+    first = Node.make(kind=NodeKind.ROOT, parent=None, payload={"run": "a-first"})
+    store.put(second)
+    store.put(first)
+    assert store.roots() == [first.id, second.id]
+
+
 def test_result_conflict_keeps_first_result_and_records_conflict(store: Store) -> None:
     root = Node.make(kind=NodeKind.ROOT, parent=None, payload={"run": "r"})
     store.put(root)

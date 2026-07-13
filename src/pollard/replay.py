@@ -78,6 +78,24 @@ def avoided_charges(
     return charges
 
 
+def record_avoided_charges(
+    store: Store,
+    node_id: str,
+    charges: dict[str, int | float],
+) -> None:
+    """Accumulate replay savings in mutable node metadata for offline reports."""
+
+    if not charges:
+        return
+    node = store.get(node_id)
+    existing = node.meta.get("avoided", {})
+    totals: dict[str, int | float] = dict(existing) if isinstance(existing, dict) else {}
+    for name, amount in charges.items():
+        total = charge_to_decimal(totals.get(name, 0)) + charge_to_decimal(amount)
+        totals[name] = charge_to_json(total)
+    store.update_meta(node_id, {"avoided": totals})
+
+
 def _raise_missing(
     candidate: Node,
     kind: str,

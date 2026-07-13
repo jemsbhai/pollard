@@ -20,8 +20,11 @@ with Runtime("runs.db").run("triage", budget=Budget(tokens=20_000)) as run:
 pollard is a runtime primitive, not an agent framework. It records each step as a node in a content-addressed tree. Node identity is a hash of the step inputs, parent identity, kind, and attempt number, so the tree gives you a control-flow ledger without owning your model client, tools, prompts, or loop.
 
 The client above belongs to your code. Pollard does not read credentials or
-construct provider clients. Anthropic and LiteLLM adapters follow the same
-pattern through `pollard[anthropic]` and `pollard[litellm]`.
+construct provider clients. Anthropic, Amazon Bedrock, and LiteLLM adapters
+follow the same pattern through `pollard[anthropic]`, `pollard[bedrock]`, and
+`pollard[litellm]`. Azure OpenAI uses the OpenAI adapter with an Azure-configured
+client. See [Cloud-hosted model providers](docs/cloud-providers.md) for direct
+AWS and Azure examples plus Vertex AI and other LiteLLM routes.
 
 What you get:
 
@@ -33,7 +36,7 @@ What you get:
 
 Budget semantics are honest about what can be controlled. If a precheck estimate proves a step would exceed budget, pollard records a refusal node and does not call your function. If the actual result charge exceeds budget after the function returns, that node still stands because the spend already happened; later steps are refused.
 
-Limits in v0.5:
+Current limits:
 
 - Replay of sampled model calls serves the recorded output. It does not re-check that a provider would return that output again.
 - Hosted API energy use is not measured. The NVML energy meter is for local GPU inference only.
@@ -81,6 +84,25 @@ meter = TokenMeter(OpenAITokenEstimator(), reserved_output_tokens=1024)
 ```
 
 See `docs/recipes/` for full tool loops and integration patterns.
+
+## Observability
+
+The core package includes an offline CLI for SQLite recordings:
+
+```powershell
+pollard runs runs.db
+pollard show runs.db <root-id>
+pollard report runs.db <root-id> --json
+pollard verify runs.db
+pollard show runs.db <root-id> --html run.html
+```
+
+`show` defaults to an ASCII, content-free tree. Payloads and results require an
+explicit `--payloads` flag. The HTML export is one static file with no remote
+assets. The optional `pollard[otel]` bridge exports the same node topology to a
+caller-configured OpenTelemetry tracer without placing prompt or result content
+on spans. See [Observability](docs/observability.md) for CLI exit codes, JSON
+forms, seals, HTML, and OpenTelemetry examples.
 
 ## Branch, Rollback, And Shared Prefixes
 

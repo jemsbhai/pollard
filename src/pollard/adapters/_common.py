@@ -30,4 +30,6 @@ def int_field(value: Any, *names: str) -> int:
 
 
 def merge_request(defaults: dict[str, Any], payload: dict[str, Any]) -> dict[str, Any]:
-    return {**defaults, **payload}
+    request = {**defaults, **payload}
+    request.pop("_pollard", None)
+    return request

@@ -231,3 +231,36 @@ Live findings and corrections:
 
 REC-005 passed. All five live recipes produced governed roots, and measured
 provider cost stayed far below the user's 5 USD limit on each account.
+
+## 2026-07-13 v0.6.0 Offline Release Checkpoint
+
+Scope:
+
+- Added a direct Amazon Bedrock Converse adapter with frozen non-streaming and
+  streaming fixtures, tool-use assembly, normalized token usage, and opt-in
+  CountTokens prechecks.
+- Documented Azure OpenAI through the OpenAI v1 client path, Azure AI and
+  Vertex AI through LiteLLM, and the broader cloud-provider boundary.
+- Added the core observability CLI, static HTML export, and optional
+  OpenTelemetry bridge.
+
+Verification:
+
+- Full suite: 173 tests passed.
+- Coverage: 91.54 percent against a 90 percent floor.
+- Ruff: passed.
+- Mypy strict mode: passed for 32 source files.
+- Writing-standards scan: passed.
+- Wheel and source distribution: built successfully and passed Twine checks.
+- Clean wheel install: imported successfully and exposed the `pollard` CLI with
+  `show`, `report`, `verify`, `seal`, and `runs`.
+
+Cloud-provider live scope:
+
+- No AWS, Azure, Google Cloud, OpenAI, or Anthropic model request was made for
+  this checkpoint.
+- Bedrock behavior is fixture-tested against the documented Converse,
+  ConverseStream, and CountTokens shapes.
+- Azure OpenAI and LiteLLM cloud examples compile but remain live-unverified
+  because no AWS, Azure, or Google Cloud credential was supplied for this work.
+- Provider spend for this checkpoint: 0 USD.

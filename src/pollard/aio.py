@@ -17,6 +17,7 @@ from .policy import Decision, Policy, PolicyContext
 from .registry import ActionSpec, Registry
 from .replay import ReplayMode
 from .runtime import (
+    NodeCallback,
     Run,
     RunBranch,
     Runtime,
@@ -49,6 +50,7 @@ class AsyncRuntime(Runtime):
         policies: list[Policy] | None = None,
         dry_run: bool = False,
         mode: str | ReplayMode = ReplayMode.RECORD,
+        on_node: NodeCallback | None = None,
     ) -> None:
         super().__init__(
             store,
@@ -57,14 +59,12 @@ class AsyncRuntime(Runtime):
             policies=policies,
             dry_run=dry_run,
             mode=mode,
+            on_node=on_node,
         )
 
     def run(self, label: str, *, budget: Budget | None = None, attempt: int = 0) -> AsyncRun:
         root = Node.make(kind=NodeKind.ROOT, parent=None, payload={"run": label}, attempt=attempt)
-        if not self.store.exists(root.id):
-            self.store.put(root)
-        else:
-            root = self.store.get(root.id)
+        root = self._put(root) if not self.store.exists(root.id) else self.store.get(root.id)
         self._bind_registry(root.id)
         scopes = [] if budget is None else [_BudgetScope(budget=budget, anchor_id=root.id)]
         return AsyncRun(
@@ -156,7 +156,7 @@ class AsyncRun(Run):
             attempt=attempt,
             meta={"created_at": _now_utc()},
         )
-        self.store.put(anchor)
+        anchor = self._runtime._put(anchor)
         scopes = [*_copy_scopes(self._budget_scopes)]
         if budget is not None:
             scopes.append(_BudgetScope(budget=budget, anchor_id=anchor.id))
@@ -215,10 +215,10 @@ class AsyncRun(Run):
             result=result,
             meta=meta,
         )
-        self.store.put(node)
+        node = self._runtime._put(node)
         self.cursor_id = node.id
         self._settle_scopes()
-        return self.store.get(node.id)
+        return node
 
     async def _aregistered_tool_call(
         self,
@@ -295,10 +295,10 @@ class AsyncRun(Run):
                     "charges": {"steps": 1},
                 },
             )
-            self.store.put(node)
+            node = self._runtime._put(node)
             self.cursor_id = node.id
             self._settle_scopes()
-            return self.store.get(node.id)
+            return node
         if spec.handler is None:
             self._refuse_policy("registered action has no handler", payload)
         return await self._acall(

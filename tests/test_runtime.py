@@ -63,6 +63,23 @@ def test_model_call_records_result_charges_and_moves_cursor() -> None:
     assert node.meta["charges"]["tokens"] == 5
 
 
+def test_on_node_callback_failure_warns_without_breaking_the_run() -> None:
+    def broken(_node: object) -> None:
+        raise RuntimeError("observer unavailable")
+
+    store = MemoryStore()
+    with pytest.warns(RuntimeWarning, match="on_node callback failed"):
+        run = Runtime(store, on_node=broken).run("observer-failure")
+        node = run.model_call(
+            {"model": "mock-1"},
+            fn=lambda _payload: {
+                "text": "ok",
+                "usage": {"input_tokens": 1, "output_tokens": 1},
+            },
+        )
+    assert store.get(node.id).result["text"] == "ok"
+
+
 def test_runtime_records_measurement_meter_readings() -> None:
     meter = FakeJouleMeter()
     run = Runtime(MemoryStore(), meters=[meter]).run("measure")
