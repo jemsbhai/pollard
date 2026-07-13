@@ -258,6 +258,57 @@ def test_cli_import_reports_tampered_manifest_without_writing(
         assert store.roots() == []
 
 
+def test_cli_runs_accepts_multiple_stores_and_merge_unions_them(
+    tmp_path: Path,
+    capsys: object,
+) -> None:
+    first = tmp_path / "first.db"
+    second = tmp_path / "second.db"
+    destination = tmp_path / "destination.db"
+    first_root, _payload = _recording(first)
+    with SQLiteStore(second) as store:
+        second_run = Runtime(store).run("second-run")
+        second_run.note({"label": "from-second"})
+
+    assert main(["runs", str(first), str(second), "--json"]) == 0
+    runs = json.loads(capsys.readouterr().out)["runs"]  # type: ignore[attr-defined]
+    assert {run["label"] for run in runs} == {"cli-test", "second-run"}
+    assert {run["store"] for run in runs} == {str(first), str(second)}
+
+    assert (
+        main(
+            [
+                "merge",
+                str(destination),
+                str(first),
+                str(second),
+                "--json",
+            ]
+        )
+        == 0
+    )
+    merged = json.loads(capsys.readouterr().out)  # type: ignore[attr-defined]
+    assert merged["copied"] == 4
+    with SQLiteStore(destination) as store:
+        assert store.exists(first_root)
+        assert {store.get(root_id).payload["run"] for root_id in store.roots()} == {
+            "cli-test",
+            "second-run",
+        }
+
+
+def test_cli_pg_env_store_spec_never_echoes_credentials(
+    monkeypatch: object,
+    capsys: object,
+) -> None:
+    monkeypatch.setenv(  # type: ignore[attr-defined]
+        "POLLARD_PG_DSN",
+        "postgresql://private-user:private-password@localhost/private-db",
+    )
+    assert main(["runs", "pg-env:MISSING#team", "--json"]) == 2
+    assert "MISSING" in capsys.readouterr().err  # type: ignore[attr-defined]
+
+
 def _golden_tree() -> tuple[MemoryStore, Node]:
     store = MemoryStore()
     root = Node.make(kind=NodeKind.ROOT, parent=None, payload={"run": "golden"})

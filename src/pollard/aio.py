@@ -51,6 +51,7 @@ class AsyncRuntime(Runtime):
         dry_run: bool = False,
         mode: str | ReplayMode = ReplayMode.RECORD,
         on_node: NodeCallback | None = None,
+        reservation_lease_seconds: int | float = 60,
     ) -> None:
         super().__init__(
             store,
@@ -60,6 +61,7 @@ class AsyncRuntime(Runtime):
             dry_run=dry_run,
             mode=mode,
             on_node=on_node,
+            reservation_lease_seconds=reservation_lease_seconds,
         )
 
     def run(self, label: str, *, budget: Budget | None = None, attempt: int = 0) -> AsyncRun:
@@ -183,7 +185,7 @@ class AsyncRun(Run):
         if recorded is not None:
             await _areemit_chunks(recorded, on_delta)
             return recorded
-        self._precheck(kind.value, payload)
+        reservation = self._precheck(kind.value, payload)
         measurements = _start_measurements(self._runtime.meters)
         start = time.perf_counter()
         try:
@@ -197,6 +199,9 @@ class AsyncRun(Run):
                 on_delta=on_delta,
                 keep_chunks=keep_chunks,
             )
+        except BaseException:
+            self._release_reservation(reservation)
+            raise
         finally:
             duration = time.perf_counter() - start
             _stop_measurements(measurements)
@@ -207,6 +212,7 @@ class AsyncRun(Run):
         meta["charges"] = charges
         if isinstance(result, dict) and isinstance(result.get("usage"), dict):
             meta["usage"] = result["usage"]
+        self._settle_reservation(reservation, charges)
         node = Node.make(
             kind=kind,
             parent=self.cursor_id,
@@ -289,7 +295,9 @@ class AsyncRun(Run):
         if recorded is not None:
             return recorded
         if self._runtime.dry_run and spec.side_effects:
-            self._precheck(NodeKind.TOOL_CALL.value, payload)
+            reservation = self._precheck(NodeKind.TOOL_CALL.value, payload)
+            charges: dict[str, int | float] = {"steps": 1}
+            self._settle_reservation(reservation, charges)
             node = Node.make(
                 kind=NodeKind.TOOL_CALL,
                 parent=self.cursor_id,
@@ -298,7 +306,7 @@ class AsyncRun(Run):
                 meta={
                     "created_at": _now_utc(),
                     "dry_run": True,
-                    "charges": {"steps": 1},
+                    "charges": charges,
                 },
             )
             node = self._runtime._put(node)

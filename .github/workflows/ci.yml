@@ -45,3 +45,41 @@ jobs:
             $charHits
             exit 1
           }
+
+  postgres:
+    name: PostgreSQL shared-store acceptance
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: pollard
+          POSTGRES_PASSWORD: pollard
+          POSTGRES_DB: pollard
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U pollard -d pollard"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      POLLARD_TEST_POSTGRES_DSN: postgresql://pollard:pollard@localhost:5432/pollard
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install
+        run: python -m pip install -e ".[dev]"
+
+      - name: Shared store and contention acceptance
+        run: >-
+          python -m pytest
+          tests/test_store_shared.py
+          tests/test_store_postgres.py
+          tests/test_governance.py
+          tests/test_window_meter.py

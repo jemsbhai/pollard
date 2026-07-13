@@ -4,6 +4,21 @@ All notable changes to pollard will be documented in this file.
 
 The format is based on Keep a Changelog, and this project follows Semantic Versioning.
 
+## [0.8.0] - 2026-07-13
+
+### Added
+
+- Add idempotent, conflict-aware store merge with conservative metadata union
+  and replay-mode result conflict rejection.
+- Add `PostgresStore` through `pollard[pg]`, including payload interning,
+  logical-store isolation, benign concurrent puts, and row-locked metadata.
+- Add store-backed `WindowMeter` request and token ceilings with refusal window
+  context shared across writers and resumes.
+- Add transactional budget reserve and settle state with expiring leases for
+  SQLite and PostgreSQL.
+- Add multi-store `pollard runs` and `pollard merge`, a PostgreSQL CI service
+  job, and repeated two-process contention acceptance coverage.
+
 ## [0.7.0] - 2026-07-13
 
 ### Added

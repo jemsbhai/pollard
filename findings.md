@@ -20,3 +20,22 @@ Findings:
   tokens against a one-settle bound of 4 tokens.
 - EXP-003: the unregistered hostile tool request did not execute and recorded a
   policy refusal with the registry digest.
+
+## 2026-07-13 Phase 8 Scale-Out Checkpoint
+
+Source: `LOGBOOK.md`, entries `2026-07-13 EXP-005 Draft Plan` and
+`2026-07-13 v0.8.0 Scale-Out Acceptance Checkpoint`.
+
+Scope: local Docker PostgreSQL 16 and SQLite acceptance tests. This is not a
+network-latency or throughput benchmark.
+
+Findings:
+
+- In 20 repeated rounds, two operating-system processes sharing one
+  PostgreSQL logical store executed exactly four calls under
+  `Budget(steps=4)`.
+- Two-thread request-window contention executed exactly three calls under a
+  three-request window on both SQLite and PostgreSQL.
+- A 1,001-node SQLite merge remained verify-clean and preserved every
+  rehydrated payload's canonical bytes.
+- No model-provider or cloud API request was made and provider spend was 0 USD.

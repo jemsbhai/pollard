@@ -4,19 +4,23 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
-from collections.abc import Mapping, Sequence
+from collections.abc import Iterator, Mapping, Sequence
+from contextlib import contextmanager
 from html import escape
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlsplit, urlunsplit
 
 from .errors import PollardError
 from .governance import export_subtree, gc, import_subtree
 from .governor import charge_to_decimal, charge_to_json, recompute_charges
+from .merge import merge
 from .redaction import contains_redaction
 from .seal import seal
 from .store import Store
-from .stores import SQLiteStore
+from .stores import PostgresStore, SQLiteStore
 from .tree import Node, NodeKind
 from .verify import verify
 
@@ -26,7 +30,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(argv)
     try:
         return int(args.handler(args))
-    except (KeyError, OSError, PollardError, TypeError, ValueError) as exc:
+    except (ImportError, KeyError, OSError, PollardError, TypeError, ValueError) as exc:
         print(f"pollard: {exc}", file=sys.stderr)
         return 2
 
@@ -68,7 +72,7 @@ def _parser() -> argparse.ArgumentParser:
     seal_parser.set_defaults(handler=_seal)
 
     runs = subparsers.add_parser("runs", help="list run roots in a store")
-    runs.add_argument("db", type=Path)
+    runs.add_argument("stores", nargs="+", help="SQLite path or PostgreSQL store spec")
     runs.add_argument("--json", action="store_true", help="emit machine-readable JSON")
     runs.set_defaults(handler=_runs)
 
@@ -99,6 +103,19 @@ def _parser() -> argparse.ArgumentParser:
         "--json", action="store_true", help="emit machine-readable JSON"
     )
     import_parser.set_defaults(handler=_import)
+
+    merge_parser = subparsers.add_parser("merge", help="merge one or more stores")
+    merge_parser.add_argument("destination", help="destination store spec")
+    merge_parser.add_argument("sources", nargs="+", help="source store specs")
+    merge_parser.add_argument(
+        "--replay",
+        action="store_true",
+        help="reject result conflicts instead of recording them",
+    )
+    merge_parser.add_argument(
+        "--json", action="store_true", help="emit machine-readable JSON"
+    )
+    merge_parser.set_defaults(handler=_merge)
     return parser
 
 
@@ -204,20 +221,23 @@ def _seal(args: argparse.Namespace) -> int:
 
 
 def _runs(args: argparse.Namespace) -> int:
-    with _open(args.db) as store:
-        runs: list[dict[str, Any]] = []
-        for root_id in store.roots():
-            root = store.get(root_id)
-            nodes = list(store.walk(root_id))
-            runs.append(
-                {
-                    "root_id": root_id,
-                    "label": _label(root),
-                    "attempt": root.attempt,
-                    "nodes": len(nodes),
-                    "pruned": sum(node.meta.get("pruned") is True for node in nodes),
-                }
-            )
+    runs: list[dict[str, Any]] = []
+    for spec in args.stores:
+        with _open_store(spec, create=False) as store:
+            store_label = _store_label(spec)
+            for root_id in store.roots():
+                root = store.get(root_id)
+                nodes = list(store.walk(root_id))
+                runs.append(
+                    {
+                        "store": store_label,
+                        "root_id": root_id,
+                        "label": _label(root),
+                        "attempt": root.attempt,
+                        "nodes": len(nodes),
+                        "pruned": sum(node.meta.get("pruned") is True for node in nodes),
+                    }
+                )
     document = {"runs": runs}
     if args.json:
         _emit(document, json_output=True)
@@ -225,10 +245,43 @@ def _runs(args: argparse.Namespace) -> int:
     if not runs:
         print("no runs")
         return 0
+    multiple = len(args.stores) > 1
     for run in runs:
+        prefix = f"{run['store']}  " if multiple else ""
         print(
-            f"{run['root_id'][:8]}  {run['label']}  "
+            f"{prefix}{run['root_id'][:8]}  {run['label']}  "
             f"nodes={run['nodes']} pruned={run['pruned']}"
+        )
+    return 0
+
+
+def _merge(args: argparse.Namespace) -> int:
+    reports: list[dict[str, Any]] = []
+    with _open_store(args.destination, create=True) as destination:
+        for source_spec in args.sources:
+            with _open_store(source_spec, create=False) as source:
+                report = merge(destination, source, replay=args.replay)
+                reports.append(
+                    {"source": _store_label(source_spec), **report.to_dict()}
+                )
+    document = {
+        "destination": _store_label(args.destination),
+        "sources": reports,
+        "copied": sum(report["copied"] for report in reports),
+        "existing": sum(report["existing"] for report in reports),
+        "result_conflicts": sum(
+            report["result_conflicts"] for report in reports
+        ),
+        "meta_conflicts": sum(report["meta_conflicts"] for report in reports),
+    }
+    if args.json:
+        _emit(document, json_output=True)
+    else:
+        print(
+            f"{document['destination']}: copied={document['copied']} "
+            f"existing={document['existing']} "
+            f"result_conflicts={document['result_conflicts']} "
+            f"meta_conflicts={document['meta_conflicts']}"
         )
     return 0
 
@@ -482,6 +535,53 @@ def _open(path: Path) -> SQLiteStore:
     if not path.is_file():
         raise FileNotFoundError(path)
     return SQLiteStore(path)
+
+
+@contextmanager
+def _open_store(spec: str, *, create: bool) -> Iterator[Store]:
+    dsn, store_id = _postgres_spec(spec)
+    if dsn is not None:
+        try:
+            with PostgresStore(dsn, store_id=store_id) as store:
+                yield store
+        except Exception as exc:
+            if type(exc).__module__.startswith("psycopg"):
+                raise OSError(f"could not access {_store_label(spec)}") from exc
+            raise
+        return
+    path = Path(spec)
+    if not create and not path.is_file():
+        raise FileNotFoundError(path)
+    with SQLiteStore(path) as store:
+        yield store
+
+
+def _postgres_spec(spec: str) -> tuple[str | None, str]:
+    if spec.startswith("pg-env:"):
+        reference = spec.removeprefix("pg-env:")
+        variable, separator, fragment = reference.partition("#")
+        if not variable:
+            raise ValueError("pg-env store spec requires an environment variable")
+        dsn = os.environ.get(variable)
+        if not dsn:
+            raise ValueError(f"PostgreSQL DSN environment variable is not set: {variable}")
+        return dsn, fragment if separator and fragment else "default"
+    if spec.startswith(("postgresql://", "postgres://")):
+        parsed = urlsplit(spec)
+        dsn = urlunsplit((parsed.scheme, parsed.netloc, parsed.path, parsed.query, ""))
+        return dsn, parsed.fragment or "default"
+    return None, "default"
+
+
+def _store_label(spec: str) -> str:
+    if spec.startswith("pg-env:"):
+        reference = spec.removeprefix("pg-env:")
+        variable, _separator, fragment = reference.partition("#")
+        return f"pg-env:{variable}#{fragment or 'default'}"
+    if spec.startswith(("postgresql://", "postgres://")):
+        parsed = urlsplit(spec)
+        return f"postgresql://{parsed.hostname or 'host'}#{parsed.fragment or 'default'}"
+    return str(Path(spec))
 
 
 def _emit(value: object, *, json_output: bool) -> None:

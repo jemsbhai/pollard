@@ -1,13 +1,15 @@
 # Observability
 
 Pollard recordings are inspectable without a server, account, or network
-connection. The core package installs a `pollard` command that reads SQLite
+connection. The core package installs a `pollard` command. Tree inspection
+commands read SQLite stores; `runs` and `merge` also accept PostgreSQL logical
 stores. Every command has a `--json` form for scripts and CI.
 
 ## List and inspect runs
 
 ```powershell
 pollard runs runs.db
+pollard runs worker-a.db worker-b.db
 pollard show runs.db <root-id>
 pollard report runs.db <root-id>
 ```
@@ -59,6 +61,15 @@ Import verifies the complete subtree seal before writing nodes. Garbage
 collection is explicit; `drop-pruned` removes marked subtrees and `compact`
 reclaims unreferenced SQLite blobs. See [Data governance](data-governance.md)
 for field-level retention and redaction behavior.
+
+Disconnected stores can be unioned without exporting an intermediate file:
+
+```powershell
+pollard merge combined.db worker-a.db worker-b.db --json
+```
+
+PostgreSQL store syntax and credential-safe `pg-env:` references are documented
+in [Scale-out stores and governance](scale-out.md).
 
 ## Integrity and seals
 

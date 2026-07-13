@@ -7,7 +7,7 @@ from importlib import import_module
 from types import ModuleType
 from typing import TYPE_CHECKING, Any
 
-__version__ = "0.7.0"
+__version__ = "0.8.0"
 
 if TYPE_CHECKING:
     from .aio import AsyncRun, AsyncRuntime
@@ -29,6 +29,8 @@ if TYPE_CHECKING:
         import_subtree,
     )
     from .governor import Budget, recompute_charges
+    from .merge import MergeReport, merge
+    from .meters import WindowMeter
     from .policy import Decision, Policy, PolicyContext
     from .redaction import redact
     from .registry import ActionSpec, Registry
@@ -36,7 +38,7 @@ if TYPE_CHECKING:
     from .runtime import Run, Runtime
     from .seal import SealEntry, SealReport, seal
     from .store import MemoryStore
-    from .stores import HashRopeStore, SQLiteStore
+    from .stores import HashRopeStore, PostgresStore, SQLiteStore
     from .tree import Node, NodeKind
     from .verify import VerifyFinding, VerifyReport, verify
 
@@ -54,12 +56,14 @@ _EXPORTS = {
     "GCReport": ("pollard.governance", "GCReport"),
     "ImportReport": ("pollard.governance", "ImportReport"),
     "MemoryStore": ("pollard.store", "MemoryStore"),
+    "MergeReport": ("pollard.merge", "MergeReport"),
     "MissingRecording": ("pollard.errors", "MissingRecording"),
     "Node": ("pollard.tree", "Node"),
     "NodeKind": ("pollard.tree", "NodeKind"),
     "Policy": ("pollard.policy", "Policy"),
     "PolicyContext": ("pollard.policy", "PolicyContext"),
     "PolicyViolation": ("pollard.errors", "PolicyViolation"),
+    "PostgresStore": ("pollard.stores", "PostgresStore"),
     "PollardError": ("pollard.errors", "PollardError"),
     "Registry": ("pollard.registry", "Registry"),
     "ReplayMode": ("pollard.replay", "ReplayMode"),
@@ -71,10 +75,12 @@ _EXPORTS = {
     "UnsupportedSchema": ("pollard.errors", "UnsupportedSchema"),
     "VerifyFinding": ("pollard.verify", "VerifyFinding"),
     "VerifyReport": ("pollard.verify", "VerifyReport"),
+    "WindowMeter": ("pollard.meters", "WindowMeter"),
     "recompute_charges": ("pollard.governor", "recompute_charges"),
     "export_subtree": ("pollard.governance", "export_subtree"),
     "gc": ("pollard.governance", "gc"),
     "import_subtree": ("pollard.governance", "import_subtree"),
+    "merge": ("pollard.merge", "merge"),
     "redact": ("pollard.redaction", "redact"),
     "seal": ("pollard.seal", "seal"),
     "verify": ("pollard.verify", "verify"),
@@ -94,6 +100,7 @@ __all__ = [
     "ImportReport",
     "IntegrityError",
     "MemoryStore",
+    "MergeReport",
     "MissingRecording",
     "Node",
     "NodeKind",
@@ -101,6 +108,7 @@ __all__ = [
     "PolicyContext",
     "PolicyViolation",
     "PollardError",
+    "PostgresStore",
     "Registry",
     "ReplayMode",
     "Run",
@@ -111,10 +119,12 @@ __all__ = [
     "UnsupportedSchema",
     "VerifyFinding",
     "VerifyReport",
+    "WindowMeter",
     "__version__",
     "export_subtree",
     "gc",
     "import_subtree",
+    "merge",
     "recompute_charges",
     "redact",
     "seal",

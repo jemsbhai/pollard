@@ -25,9 +25,9 @@ result value.
 
 ## Interning Is Not Redaction
 
-`SQLiteStore` interns payload string leaves whose UTF-8 form is at least 1 KiB.
-The threshold is configurable with `intern_threshold`, and interning can be
-disabled with `intern_payloads=False`.
+`SQLiteStore` and `PostgresStore` intern payload string leaves whose UTF-8 form
+is at least 1 KiB. The threshold is configurable with `intern_threshold`, and
+interning can be disabled with `intern_payloads=False`.
 
 An interned string remains plaintext in the `blobs` table, stored once and
 referenced from node payload rows. This reduces duplicate storage. It is not
@@ -109,6 +109,12 @@ and survivor seal digests.
 `compact` removes unreferenced interned blobs and asks SQLite to vacuum the
 file. It does not remove tree nodes. Running it after `drop-pruned` reclaims blob
 space formerly used only by deleted subtrees.
+
+Transactional stores also keep mutable budget reservations, settled budget
+state, and sliding-window events. These rows are coordination state, not node
+identity fields, and subtree seals do not cover them. Backups intended for live
+continuation must include those tables. A sealed export remains sufficient for
+offline tree verification but does not restore active governance windows.
 
 The operation is offline by contract. Do not run it while another process is
 writing the same store.
