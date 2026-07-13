@@ -65,7 +65,19 @@ class AnthropicMessagesFn:
 
     def estimate_input_tokens(self, payload: dict[str, Any]) -> int | None:
         params = merge_request(self.defaults, payload)
-        params.pop("stream", None)
+        for key in (
+            "container",
+            "inference_geo",
+            "max_tokens",
+            "metadata",
+            "service_tier",
+            "stop_sequences",
+            "stream",
+            "temperature",
+            "top_k",
+            "top_p",
+        ):
+            params.pop(key, None)
         counted = self.client.messages.count_tokens(**params)
         if isinstance(counted, int) and not isinstance(counted, bool):
             return counted

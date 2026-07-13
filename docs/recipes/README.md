@@ -13,7 +13,8 @@ use credentials configured by the user.
 | `mcp_registry.py` | `pip install "pollard[mcp]"` |
 
 The provider recipes make live calls and may incur provider charges. Review the
-payload, model, and budget before running them.
+payload, model, and budget before running them. The checked-in examples disable
+SDK retries and cap each provider response at 128 output tokens.
 
 The MCP recipe accepts either a Streamable HTTP URL or a local stdio command.
 The repository includes a credential-free local server for a complete smoke

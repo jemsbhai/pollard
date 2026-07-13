@@ -1,6 +1,7 @@
 """A live OpenAI Responses tool loop behind Pollard's registry firewall."""
 
 import json
+import sys
 
 from pollard import ActionSpec, Budget, Registry, Runtime
 from pollard.adapters.openai import make_responses_fn
@@ -32,7 +33,9 @@ def weather(args: dict[str, object]) -> dict[str, object]:
 def main() -> None:
     from openai import OpenAI
 
-    client = OpenAI()
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
+    client = OpenAI(max_retries=0)
     registry = Registry(
         [ActionSpec("weather", "1", "Fixed demo forecast.", WEATHER_SCHEMA, False, weather)]
     )
@@ -42,9 +45,15 @@ def main() -> None:
         {"role": "user", "content": "What is the weather in Boston?"}
     ]
 
-    with runtime.run("openai-tool-loop", budget=Budget(tokens=20_000, steps=6)) as run:
+    with runtime.run("openai-tool-loop", budget=Budget(tokens=2_000, steps=6)) as run:
         first = run.model_call(
-            {"model": "gpt-5.5", "input": input_items, "tools": OPENAI_TOOLS},
+            {
+                "model": "gpt-5.5",
+                "input": input_items,
+                "tools": OPENAI_TOOLS,
+                "max_output_tokens": 128,
+                "reasoning": {"effort": "none"},
+            },
             fn=call_openai,
         )
         for requested in first.result.get("tool_calls", []):
@@ -61,7 +70,13 @@ def main() -> None:
                 }
             )
         final = run.model_call(
-            {"model": "gpt-5.5", "input": input_items, "tools": OPENAI_TOOLS},
+            {
+                "model": "gpt-5.5",
+                "input": input_items,
+                "tools": OPENAI_TOOLS,
+                "max_output_tokens": 128,
+                "reasoning": {"effort": "none"},
+            },
             fn=call_openai,
         )
         print(final.result["text"])

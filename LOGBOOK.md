@@ -181,3 +181,53 @@ External release status at this checkpoint:
 - TestPyPI was not attempted because TestPyPI authentication is not configured
   and REC-005 is still incomplete.
 - No production upload, tag, push, or GitHub release was attempted.
+
+## 2026-07-13 REC-005 Final Result
+
+The user added provider credits, supplied the Anthropic credential through the
+Windows user environment, directed the release to skip TestPyPI, and capped
+available credit at 5 USD per provider. Before paid calls, every provider recipe
+was changed to disable SDK retries and limit each response to 128 output tokens.
+
+Environment:
+
+- Python: 3.12.2.
+- Pollard: 0.5.0.
+- OpenAI SDK: 2.45.0.
+- Anthropic SDK: 0.116.0.
+- LangGraph: 1.2.9.
+- pydantic-ai-slim: 2.9.0.
+- MCP SDK: 1.28.1 for the clean-environment replay of the MCP recipe.
+
+Results:
+
+| Recipe | Model or server | Input tokens | Output tokens | Root id | Result |
+| --- | --- | ---: | ---: | --- | --- |
+| OpenAI tool loop | `gpt-5.5` | 159 | 28 | `44e86b6e8de9b6ed9f3075472c4ba5d5b039c850c85b4e8fdac1005c5737dafc` | passed |
+| LangGraph node | `gpt-5.5` | 10 | 128 | `083ed1d4657c7c62ced94184d1b723800cf8bdbb2b409862c14d6605a22f8bba` | passed |
+| pydantic-ai wrapper | `gpt-5.5` | 10 | 128 | `2005f48739a3e4afa5d7665537806dfab02791e05723d37ac4ee1484862c41e2` | passed |
+| Anthropic tool loop | `claude-sonnet-4-6` | 1,244 | 97 | `2f9120727333664e2d35d8054ad7655d71159bcafab9403728b8b39ed588afd8` | passed |
+| MCP registry | local stdio server | not applicable | not applicable | `896e094b73da866da189ebfe83ce12ab8c75d6d3917605cf87574e6dd142ce7a` | passed |
+
+Cost calculation at the standard published rates checked on 2026-07-13:
+
+- GPT-5.5 at 5 USD per million input tokens and 30 USD per million output
+  tokens: 179 input and 284 output tokens across three recipes, approximately
+  0.009415 USD.
+- Claude Sonnet 4.6 at 3 USD per million input tokens and 15 USD per million
+  output tokens: approximately 0.005187 USD.
+- Combined estimated provider cost: approximately 0.014602 USD.
+
+Live findings and corrections:
+
+- The Anthropic precheck initially stopped locally because `max_tokens` was
+  forwarded to the current SDK's `count_tokens` method. No billable message
+  request occurred on that attempt. The adapter now strips create-only fields,
+  with a regression test.
+- The successful Anthropic calls were stored before Windows cp1252 output failed
+  on a sun symbol. Provider recipes now configure UTF-8 output. The corrected
+  display was verified from the stored nodes using an intentionally invalid API
+  key, so the verification could not make another paid request.
+
+REC-005 passed. All five live recipes produced governed roots, and measured
+provider cost stayed far below the user's 5 USD limit on each account.

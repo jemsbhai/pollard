@@ -1,5 +1,7 @@
 """A live Anthropic tool loop with token estimation and registry gating."""
 
+import sys
+
 from pollard import ActionSpec, Budget, Registry, Runtime
 from pollard.adapters.anthropic import make_messages_fn
 from pollard.meters import DepthMeter, StepMeter, TokenMeter, WallClockMeter
@@ -30,8 +32,10 @@ def weather(args: dict[str, object]) -> dict[str, object]:
 def main() -> None:
     from anthropic import Anthropic
 
-    client = Anthropic()
-    call_anthropic = make_messages_fn(client, max_tokens=512)
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
+    client = Anthropic(max_retries=0)
+    call_anthropic = make_messages_fn(client, max_tokens=128)
     runtime = Runtime(
         "anthropic-tool-loop.db",
         registry=Registry(
@@ -41,7 +45,7 @@ def main() -> None:
             StepMeter(),
             DepthMeter(),
             WallClockMeter(),
-            TokenMeter(call_anthropic, reserved_output_tokens=512),
+            TokenMeter(call_anthropic, reserved_output_tokens=128),
         ],
         mode="hybrid",
     )
@@ -49,9 +53,14 @@ def main() -> None:
         {"role": "user", "content": "What is the weather in Boston?"}
     ]
 
-    with runtime.run("anthropic-tool-loop", budget=Budget(tokens=20_000, steps=6)) as run:
+    with runtime.run("anthropic-tool-loop", budget=Budget(tokens=2_000, steps=6)) as run:
         first = run.model_call(
-            {"model": "claude-sonnet-4-6", "messages": messages, "tools": ANTHROPIC_TOOLS},
+            {
+                "model": "claude-sonnet-4-6",
+                "messages": messages,
+                "tools": ANTHROPIC_TOOLS,
+                "output_config": {"effort": "low"},
+            },
             fn=call_anthropic,
         )
         messages.append({"role": "assistant", "content": first.result["content"]})
@@ -67,7 +76,12 @@ def main() -> None:
             )
         messages.append({"role": "user", "content": tool_results})
         final = run.model_call(
-            {"model": "claude-sonnet-4-6", "messages": messages, "tools": ANTHROPIC_TOOLS},
+            {
+                "model": "claude-sonnet-4-6",
+                "messages": messages,
+                "tools": ANTHROPIC_TOOLS,
+                "output_config": {"effort": "low"},
+            },
             fn=call_anthropic,
         )
         print(final.result["text"])

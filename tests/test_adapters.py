@@ -194,7 +194,13 @@ def test_openai_chat_stream_assembles_tool_fragments() -> None:
 
 def test_anthropic_message_tool_stream_and_count_fixtures() -> None:
     message_endpoint = SyncCreate(FrozenModel(load("anthropic_message.json")))
-    message_endpoint.count_tokens = lambda **_kwargs: FrozenModel({"input_tokens": 17})
+    count_calls: list[dict[str, Any]] = []
+
+    def count_tokens(**kwargs: Any) -> FrozenModel:
+        count_calls.append(kwargs)
+        return FrozenModel({"input_tokens": 17})
+
+    message_endpoint.count_tokens = count_tokens
     client = SimpleNamespace(messages=message_endpoint)
     adapter = make_messages_fn(client, max_tokens=200)
     result = adapter({"model": "claude-sonnet-4-6", "messages": []})
@@ -203,6 +209,7 @@ def test_anthropic_message_tool_stream_and_count_fixtures() -> None:
     assert adapter.estimate_input_tokens(
         {"model": "claude-sonnet-4-6", "messages": []}
     ) == 17
+    assert count_calls == [{"model": "claude-sonnet-4-6", "messages": []}]
 
     tool_endpoint = SyncCreate(FrozenModel(load("anthropic_tool_use.json")))
     tool_endpoint.count_tokens = lambda **_kwargs: 1
