@@ -1,0 +1,79 @@
+{
+  "adapter": "pollard.adapters.openai.make_chat_completions_fn",
+  "artifact": {
+    "cli_output": [
+      "{",
+      "  \"findings\": [],",
+      "  \"nodes\": 17,",
+      "  \"ok\": true,",
+      "  \"roots\": [",
+      "    \"8712dc51c125e88f99a78e242487837b3e1a502c863fdfcbe7c0e7793396aa6d\"",
+      "  ]",
+      "}",
+      "evidence\\EXP-006\\code-fix\\seal.json",
+      "evidence\\EXP-006\\code-fix\\tree.html"
+    ],
+    "db_sha256": "c75c1301175c8d33d4ddd909a3d2ee6e2f58974c2ba551cffc5dd53fef198182",
+    "html_sha256": "82a24d68a074760601b75e9f26268d39c5ffe65ecc6fe6e87d9d08896917931d",
+    "node_count": 17,
+    "root_id": "8712dc51c125e88f99a78e242487837b3e1a502c863fdfcbe7c0e7793396aa6d",
+    "seal_digest": "baa30d99d652e8740c95a730746c4928759f7082cff34a7ee64519dacd1d2dd9",
+    "seal_entries": 17,
+    "seal_sha256": "a3a39cc05cf07b715a817e8fbc05023a4609c04219472550ff0a0531b5a8a394"
+  },
+  "baseline_passed": false,
+  "environment": {
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python": "3.12.2"
+  },
+  "fixed_file_sha256": "292dbc9743c632aa00a3764507999e8e258b4c017b1cf39a5d37e84f2b9bd16f",
+  "id": "EXP-006B",
+  "inputs": {
+    "calculator.py": "e96a85e7db1846c6f6cdf153d8c64fb1fad61ef65ed1400e514f03e869c893a8",
+    "test_calculator.py": "edce02631b8e87ffb59a15d1a7acb9eac871f66cd1f2055228120fc32b0fc513"
+  },
+  "model": {
+    "id": "qwen2.5-coder:7b",
+    "llama_cpp_release": "b9630",
+    "server_sha256": "a30eb024cd2bbb883cbc8151d52991c12b73efbe908b0059db740a1eee2593ae",
+    "sha256": "60e05f2100071479f596b964f89f510f057ce397ea22f2833a0cfe029bfc2463"
+  },
+  "provider_spend_usd": 0,
+  "registry_digest": "07607b7c0120e40e6834ee8cd64f4004cf3d507198d8d7d5e94fb261f4aa4aff",
+  "rejected_test": {
+    "passed": false,
+    "returncode": 1,
+    "stderr": "test_above_range_returns_upper_bound (test_calculator.ClampTests.test_above_range_returns_upper_bound) ... ok\ntest_below_range_returns_lower_bound (test_calculator.ClampTests.test_below_range_returns_lower_bound) ... ok\ntest_reversed_bounds_are_rejected (test_calculator.ClampTests.test_reversed_bounds_are_rejected) ... FAIL\ntest_value_in_range_is_unchanged (test_calculator.ClampTests.test_value_in_range_is_unchanged) ... ok\n\n======================================================================\nFAIL: test_reversed_bounds_are_rejected (test_calculator.ClampTests.test_reversed_bounds_are_rejected)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<sandbox>\\candidate-a\\test_calculator.py\", line 17, in test_reversed_bounds_are_rejected\n    with self.assertRaises(ValueError):\nAssertionError: ValueError not raised\n\n----------------------------------------------------------------------\nRan 4 tests in 0.000s\n\nFAILED (failures=1)\n",
+    "stdout": ""
+  },
+  "rejected_tip": "0e51822a43febbd0b90244385f5aeacb7ce273edb745538f0ed4223de81ec89c",
+  "report": {
+    "avoided": {},
+    "spent": {
+      "seconds": 5.992570799950045,
+      "steps": 11.0,
+      "tokens": 2082.0
+    }
+  },
+  "selected_test": {
+    "passed": true,
+    "returncode": 0,
+    "stderr": "test_above_range_returns_upper_bound (test_calculator.ClampTests.test_above_range_returns_upper_bound) ... ok\ntest_below_range_returns_lower_bound (test_calculator.ClampTests.test_below_range_returns_lower_bound) ... ok\ntest_reversed_bounds_are_rejected (test_calculator.ClampTests.test_reversed_bounds_are_rejected) ... ok\ntest_value_in_range_is_unchanged (test_calculator.ClampTests.test_value_in_range_is_unchanged) ... ok\n\n----------------------------------------------------------------------\nRan 4 tests in 0.000s\n\nOK\n",
+    "stdout": ""
+  },
+  "selected_tip": "7c73e0fc3cdf74b3387c4650312918dd0edd5c7e14f0074b340c3ac06b7a8b3e",
+  "selected_workspace": {
+    "digest": "e9896e9f5c42b1fc00b35defb981e070fdd830286234657d20e5a34ab00c1a0b",
+    "files": {
+      "calculator.py": "292dbc9743c632aa00a3764507999e8e258b4c017b1cf39a5d37e84f2b9bd16f",
+      "test_calculator.py": "edce02631b8e87ffb59a15d1a7acb9eac871f66cd1f2055228120fc32b0fc513"
+    }
+  },
+  "selected_write": {
+    "bytes": 322,
+    "path": "calculator.py",
+    "sha256": "292dbc9743c632aa00a3764507999e8e258b4c017b1cf39a5d37e84f2b9bd16f"
+  },
+  "status": "passed",
+  "workload": "code-fix-pinned-repository-and-tests"
+}

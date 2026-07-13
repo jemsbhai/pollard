@@ -1,0 +1,71 @@
+{
+  "cases": [
+    {
+      "artifacts": {
+        "evidence/EXP-006/research/outcome.json": "8f2e7a750eea70b9129eb1e1d83ebe2d5639ce431e9ebab6bb0445122b87d394",
+        "evidence/EXP-006/research/run.db": "ec9fdbc6124994b492f317215ed13dc88019523216b2cd3df2bce97981483f8c",
+        "evidence/EXP-006/research/seal.json": "1760f6d40b4a2631c46c4378471ae354c993b158ec0f7775c1858b291ab12e9f",
+        "evidence/EXP-006/research/tree.html": "bf3ec08ff5834137916669cc8d69d213b7420d488bd6711630b710e1d2e3648f"
+      },
+      "id": "EXP-006A",
+      "inputs": {
+        "evidence/EXP-006/inputs/research/DOC-001.md": "09bd368f3e318daa78ac83faa60aecccf0c029fe71d76cb2b15df2cb1eb06267",
+        "evidence/EXP-006/inputs/research/DOC-002.md": "06061faa7acf9040880a1fb0fee942fdd77c9bb0e3aa1b2ffca2413a9b3a4efd",
+        "evidence/EXP-006/inputs/research/DOC-003.md": "d315a112ed63a7e82f0c94c3bb3b256412e2d33c9fecc2e14b73019d3491bae9"
+      },
+      "node_count": 19,
+      "provider_spend_usd": 0,
+      "registry_digest": "ecba6f4cc40f2efdd8aa217c15244d9e1356c42fa9454c79649251e6f3d55f2b",
+      "root_id": "e4da2c8852425720cc61315200245424ecffe2582557b6a49ba512e8026526d8",
+      "seal_digest": "b9fb38ccc401c24e1f05b78551f6469be57ed92ed134831d44a9d8ce94e8945e",
+      "status": "passed"
+    },
+    {
+      "artifacts": {
+        "evidence/EXP-006/code-fix/fixed/calculator.py": "292dbc9743c632aa00a3764507999e8e258b4c017b1cf39a5d37e84f2b9bd16f",
+        "evidence/EXP-006/code-fix/outcome.json": "cd139f26721ac38b24416b694de63bf2c03b720dc56a2d02527504f6d1941381",
+        "evidence/EXP-006/code-fix/run.db": "c75c1301175c8d33d4ddd909a3d2ee6e2f58974c2ba551cffc5dd53fef198182",
+        "evidence/EXP-006/code-fix/seal.json": "a3a39cc05cf07b715a817e8fbc05023a4609c04219472550ff0a0531b5a8a394",
+        "evidence/EXP-006/code-fix/test-result.json": "c0974220be677ea0fdd4bfcec36f0ddd1b8c08a2081f2c0087486f3ca5f3790e",
+        "evidence/EXP-006/code-fix/tree.html": "82a24d68a074760601b75e9f26268d39c5ffe65ecc6fe6e87d9d08896917931d"
+      },
+      "id": "EXP-006B",
+      "inputs": {
+        "evidence/EXP-006/inputs/code-fix/repo/calculator.py": "e96a85e7db1846c6f6cdf153d8c64fb1fad61ef65ed1400e514f03e869c893a8",
+        "evidence/EXP-006/inputs/code-fix/repo/test_calculator.py": "edce02631b8e87ffb59a15d1a7acb9eac871f66cd1f2055228120fc32b0fc513"
+      },
+      "node_count": 17,
+      "provider_spend_usd": 0,
+      "registry_digest": "07607b7c0120e40e6834ee8cd64f4004cf3d507198d8d7d5e94fb261f4aa4aff",
+      "root_id": "8712dc51c125e88f99a78e242487837b3e1a502c863fdfcbe7c0e7793396aa6d",
+      "seal_digest": "baa30d99d652e8740c95a730746c4928759f7082cff34a7ee64519dacd1d2dd9",
+      "status": "passed"
+    },
+    {
+      "artifacts": {
+        "evidence/EXP-006/mcp-household/outcome.json": "315117e8ea4ecd7af3b658679a1ec56b6fc940d083f0471965f34952c0bdca2b",
+        "evidence/EXP-006/mcp-household/run.db": "ee6f2d22aefd6db4d4f6872f52e2e4391acf2f9a09006dc0fbda5aeafb45e2bc",
+        "evidence/EXP-006/mcp-household/seal.json": "1f65a789782447c31fcf169a831efc88a37720593ad72e4980e0d29f3d1a02aa",
+        "evidence/EXP-006/mcp-household/tree.html": "b12729dc4f7f46603964c494d86dff90e7de8c0eeca159fa70863ade5e27670f"
+      },
+      "id": "EXP-006C",
+      "inputs": {
+        "evidence/EXP-006/inputs/mcp/servers/catalog_server.py": "ad3fc147af0e8646f0496db0589344f0fbe6b5b3f881fb7bdb8072f1b1dbf069",
+        "evidence/EXP-006/inputs/mcp/servers/math_server.py": "0bd799c8cef848b732362d1ad15b2b77c50cb4682a4a95e0122e48826c2993c0",
+        "evidence/EXP-006/inputs/mcp/servers/policy_server.py": "f1f5777ab0e1db9d2b43332d724c8b9a14cf40d18f31f5a9cdb297d7e264702b"
+      },
+      "node_count": 13,
+      "provider_spend_usd": 0,
+      "registry_digest": "2372eb5efb392fa4621f18198dc2587e5bba2c7850e3bbfc2c91d305475babe2",
+      "root_id": "c2c8d3fa87e93be7e81442e7518a1af29df523df8dbbe7b81735bdb4b489bee0",
+      "seal_digest": "c5935a9a6b31cc4b885b884a7c232c2b950527ba6ae13de98f8832369b7d2c86",
+      "status": "passed"
+    }
+  ],
+  "experiment": "EXP-006",
+  "provider_spend_usd": 0.0,
+  "recording_network": "loopback-and-local-stdio-only",
+  "release_target": "1.0.0",
+  "replay_network": "none",
+  "schema": "pollard/exp-006-manifest/v1"
+}

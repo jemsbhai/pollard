@@ -734,3 +734,147 @@ Cost and credentials:
   was made. Provider spend for Phase 9 remains 0 USD.
 - No provider credential was read. The PostgreSQL release database used a
   disposable local test credential and was removed after the service suite.
+
+## 2026-07-13 EXP-006 End-to-End Case-Study Protocol
+
+Status: the user selected all three Phase 9 candidates instead of one. The
+shared artifact contract and branch conditions were fixed in the active task
+before each recording. This entry was added to the repository after the
+recordings, so it is not claimed as a separately timestamped preregistration.
+
+Question:
+
+- Can Pollard record, inspect, seal, and later replay realistic adapter and
+  tool workflows with rejected and selected branches, while a stranger can
+  verify the committed evidence without the model, tools, optional
+  dependencies, credentials, or network access?
+
+Shared protocol:
+
+- Adapter: `pollard.adapters.openai.make_chat_completions_fn` against a local
+  OpenAI-compatible llama.cpp server.
+- Runtime: llama.cpp b9630, SHA-256
+  `a30eb024cd2bbb883cbc8151d52991c12b73efbe908b0059db740a1eee2593ae`.
+- Model: local `qwen2.5-coder:7b`, SHA-256
+  `60e05f2100071479f596b964f89f510f057ce397ea22f2833a0cfe029bfc2463`.
+- Network during recording: loopback HTTP for the local model and local stdio
+  for MCP only. Hosted-provider requests: none.
+- Each case must use a frozen registry, record a rejected branch, prune it,
+  roll back, select a passing branch, pass `pollard verify`, and emit a subtree
+  seal plus content-free HTML.
+- The combined manifest must pin every input and artifact. Strict replay must
+  cover every root-to-leaf path with sentinel model and tool functions that
+  fail if invoked.
+
+Case conditions:
+
+- EXP-006A reads three fixed local documents. A branch that omits DOC-003 must
+  fail the coverage checker; the selected branch must cite and consult all
+  three documents and avoid the registered unsupported phrases.
+- EXP-006B starts from a pinned incorrect `clamp` implementation and four
+  pinned tests. An incomplete candidate must fail reversed-bounds handling;
+  the selected candidate must pass all four tests in an isolated workspace.
+- EXP-006C starts three real MCP stdio servers for catalog lookup, integer
+  arithmetic, and budget policy. An over-budget order must be rejected; the
+  selected order must remain within the 2,000-cent limit.
+
+Interpretation boundary:
+
+- EXP-006A uses model-generated synthesis.
+- EXP-006B and EXP-006C use deterministic candidate controllers and model
+  review. They test governed execution, tool use, branch selection, and replay;
+  they do not show that the model autonomously invented those candidate
+  patches or orders.
+- Offline replay validates the committed semantic results. It does not claim
+  that a new stochastic inference run will return identical bytes.
+
+## 2026-07-13 EXP-006 End-to-End Case-Study Result
+
+Status: passed.
+
+Results:
+
+- EXP-006A produced 19 verify-clean nodes. The narrow branch omitted DOC-003
+  and failed source and citation coverage. The selected branch consulted and
+  cited all three documents and passed the unsupported-phrase checker. Seal:
+  `b9fb38ccc401c24e1f05b78551f6469be57ed92ed134831d44a9d8ce94e8945e`.
+- EXP-006B produced 17 verify-clean nodes. The baseline failed, the incomplete
+  candidate failed only reversed-bounds handling, and the selected candidate
+  passed all four pinned tests. The recorded write hash equals the emitted
+  fixed-file hash. Seal:
+  `baa30d99d652e8740c95a730746c4928759f7082cff34a7ee64519dacd1d2dd9`.
+- EXP-006C produced 13 verify-clean nodes across three MCP stdio servers. The
+  2,897-cent order was rejected against a 2,000-cent limit; after rollback, the
+  1,547-cent order passed with a 453-cent margin. Seal:
+  `c5935a9a6b31cc4b885b884a7c232c2b950527ba6ae13de98f8832369b7d2c86`.
+- The combined evidence contains 49 nodes and six root-to-leaf paths. The
+  offline verifier confirmed every input and artifact hash, registry digest,
+  node ancestry, and subtree seal, then strictly replayed all six paths with
+  zero executed model calls, zero executed tool calls, and no network use.
+- No common credential pattern, absolute local user path, or remote HTML asset
+  was found. Every HTML tree remained content-free by default.
+- Raw manifest: `evidence/EXP-006/manifest.json`. Case index and stranger
+  instructions: `evidence/EXP-006/README.md`.
+- OpenAI, Anthropic, AWS, Azure, Google Cloud, and other hosted-provider calls:
+  none. Provider spend: 0 USD.
+
+## 2026-07-13 Phase 9 Final Reviewer-Adversary and API Freeze Review
+
+Status: passed for the 1.0 release candidate.
+
+Review actions:
+
+- Re-ran the existing EXP-001, EXP-004, and EXP-005 scope audit and retained
+  every hardware, finite-fit, same-host, energy, cost, and non-consensus
+  qualifier.
+- Attached EXP-006 to every new public case-study number and prohibited claims
+  that the deterministic code and household candidates were autonomously
+  invented by the model.
+- Added a recursive evidence credential and local-path scan, manifest hash
+  checks, remote-asset checks, all-node verification, registry reconstruction,
+  and strict replay sentinels.
+- Confirmed the README, evidence index, examples index, launch guide, changelog,
+  and case-study index agree on commands, artifacts, costs, and limitations.
+- Rechecked the frozen `pollard/v1` identity bytes against the golden vectors,
+  canonical value rules, seven-method public `Store` protocol, and sync and
+  async step-function contracts. No candidate freeze correction was required.
+- Activated the documented deprecation policy and the four-surface 1.0
+  covenant. Incompatible changes to those surfaces now require 2.0.
+
+## 2026-07-13 v1.0.0 Local Release-Candidate Checkpoint
+
+Scope:
+
+- Added EXP-006A research synthesis, EXP-006B pinned code fix, and EXP-006C
+  three-server MCP household recordings with inputs, SQLite trees, seals,
+  content-free HTML, outcomes, a combined manifest, and offline verification.
+- Completed the final reviewer-adversary pass, documentation audit, changelog
+  audit, and four-surface API freeze review.
+- Updated the package version and development classifier for 1.0.0.
+
+Verification:
+
+- Ruff passed for source, tests, examples, and the three recorded MCP servers.
+- Mypy strict mode passed for 37 source files.
+- Main suite: 238 passed and 6 PostgreSQL-only tests skipped without a DSN.
+- Coverage: 91.24% against a 90% floor.
+- Documentation writing scan and absolute-link scan passed. The built wheel
+  metadata contains 14 Markdown links and every target is absolute HTTPS.
+- The wheel and source distribution built successfully and passed Twine
+  checks.
+- A clean virtual environment installed the core wheel without dependencies,
+  imported version 1.0.0, and exposed all nine CLI commands.
+- The source distribution contains every EXP-006 input, recording, seal, HTML
+  tree, outcome, manifest, case index, and recording or verification script.
+- From the extracted source distribution, the core-only environment verified
+  all 49 nodes and strictly replayed all six paths with no model call, tool
+  execution, optional MCP dependency, or network use.
+
+Cost, credentials, and publication status:
+
+- No hosted-provider request occurred during EXP-006 or the 1.0 release gate.
+  OpenAI, Anthropic, AWS, Azure, Google Cloud, and other provider spend was
+  0 USD.
+- No provider credential was read.
+- At this checkpoint, 1.0.0 has not yet been pushed, merged, tagged, uploaded
+  to PyPI, or published as a GitHub release.

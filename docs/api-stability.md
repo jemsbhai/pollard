@@ -1,8 +1,7 @@
 # API stability policy
 
-Pollard 0.9 is the review candidate for this policy. The compatibility promise
-starts with 1.0.0; prerelease versions remain free to correct the candidate
-before that release.
+Pollard 1.0 activates this policy. The compatibility promise starts with
+1.0.0 and applies throughout the 1.x release line.
 
 ## The 1.0 covenant
 

@@ -4,6 +4,28 @@ All notable changes to pollard will be documented in this file.
 
 The format is based on Keep a Changelog, and this project follows Semantic Versioning.
 
+## [1.0.0] - 2026-07-13
+
+### Added
+
+- Add EXP-006 end-to-end research, code-fix, and local MCP household case
+  studies with pinned inputs, verify-clean SQLite recordings, subtree seals,
+  and content-free HTML trees.
+- Add a combined evidence manifest and a zero-dependency offline verifier that
+  checks hashes, nodes, seals, registry digests, local-path and credential
+  leakage, and all six strict-replay paths without executing model or tool
+  functions.
+- Add stranger-verification, recording, interpretation-boundary, and 1.0
+  launch documentation for the case-study artifacts.
+
+### Changed
+
+- Activate the 1.0 compatibility covenant for node identity, canonical
+  identity serialization, the public `Store` protocol, and synchronous and
+  asynchronous step-function contracts.
+- Mark the package as production/stable and complete the Phase 9 evidence and
+  reviewer-adversary checkpoints.
+
 ## [0.9.0] - 2026-07-13
 
 ### Added

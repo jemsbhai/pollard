@@ -1,0 +1,121 @@
+{
+  "adapter": "pollard.adapters.openai.make_chat_completions_fn",
+  "artifact": {
+    "cli_output": [
+      "{",
+      "  \"findings\": [],",
+      "  \"nodes\": 13,",
+      "  \"ok\": true,",
+      "  \"roots\": [",
+      "    \"c2c8d3fa87e93be7e81442e7518a1af29df523df8dbbe7b81735bdb4b489bee0\"",
+      "  ]",
+      "}",
+      "evidence\\EXP-006\\mcp-household\\seal.json",
+      "evidence\\EXP-006\\mcp-household\\tree.html"
+    ],
+    "db_sha256": "ee6f2d22aefd6db4d4f6872f52e2e4391acf2f9a09006dc0fbda5aeafb45e2bc",
+    "html_sha256": "b12729dc4f7f46603964c494d86dff90e7de8c0eeca159fa70863ade5e27670f",
+    "node_count": 13,
+    "root_id": "c2c8d3fa87e93be7e81442e7518a1af29df523df8dbbe7b81735bdb4b489bee0",
+    "seal_digest": "c5935a9a6b31cc4b885b884a7c232c2b950527ba6ae13de98f8832369b7d2c86",
+    "seal_entries": 13,
+    "seal_sha256": "1f65a789782447c31fcf169a831efc88a37720593ad72e4980e0d29f3d1a02aa"
+  },
+  "catalog": {
+    "items": [
+      {
+        "name": "dish soap",
+        "price_cents": 349
+      },
+      {
+        "name": "laundry detergent",
+        "price_cents": 899
+      },
+      {
+        "name": "paper towels",
+        "price_cents": 699
+      },
+      {
+        "name": "premium air freshener",
+        "price_cents": 1299
+      },
+      {
+        "name": "sponges",
+        "price_cents": 299
+      }
+    ],
+    "query": "weekly household cleaning essentials"
+  },
+  "id": "EXP-006C",
+  "limit_cents": 2000,
+  "mcp": {
+    "servers": {
+      "catalog_server.py": "ad3fc147af0e8646f0496db0589344f0fbe6b5b3f881fb7bdb8072f1b1dbf069",
+      "math_server.py": "0bd799c8cef848b732362d1ad15b2b77c50cb4682a4a95e0122e48826c2993c0",
+      "policy_server.py": "f1f5777ab0e1db9d2b43332d724c8b9a14cf40d18f31f5a9cdb297d7e264702b"
+    },
+    "transport": "stdio"
+  },
+  "model": {
+    "id": "qwen2.5-coder:7b",
+    "llama_cpp_release": "b9630",
+    "server_sha256": "a30eb024cd2bbb883cbc8151d52991c12b73efbe908b0059db740a1eee2593ae",
+    "sha256": "60e05f2100071479f596b964f89f510f057ce397ea22f2833a0cfe029bfc2463"
+  },
+  "provider_spend_usd": 0,
+  "registry_digest": "2372eb5efb392fa4621f18198dc2587e5bba2c7850e3bbfc2c91d305475babe2",
+  "rejected": {
+    "items": [
+      "laundry detergent",
+      "paper towels",
+      "premium air freshener"
+    ],
+    "policy": {
+      "approved": false,
+      "limit_cents": 2000,
+      "margin_cents": -897,
+      "total_cents": 2897
+    },
+    "sum": {
+      "prices_cents": [
+        899,
+        699,
+        1299
+      ],
+      "total_cents": 2897
+    },
+    "tip": "f52d37a6663a4055caa57d78103ab7a08f1dac2eba1d6c5dddef174d828f4154"
+  },
+  "report": {
+    "avoided": {},
+    "spent": {
+      "seconds": 2.3711551999731455,
+      "steps": 7.0,
+      "tokens": 558.0
+    }
+  },
+  "selected": {
+    "items": [
+      "laundry detergent",
+      "dish soap",
+      "sponges"
+    ],
+    "policy": {
+      "approved": true,
+      "limit_cents": 2000,
+      "margin_cents": 453,
+      "total_cents": 1547
+    },
+    "sum": {
+      "prices_cents": [
+        899,
+        349,
+        299
+      ],
+      "total_cents": 1547
+    },
+    "tip": "c42bc39024c97c71b54709630902c339fa1c073d2d851dce09bbc37c73c60131"
+  },
+  "status": "passed",
+  "workload": "household-order-over-three-local-mcp-servers"
+}

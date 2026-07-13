@@ -197,10 +197,42 @@ Required qualifiers:
 
 ## Wave 10: v1.0
 
-Status: blocked only on the selected EXP-006 end-to-end case study, its sealed
-artifact, offline stranger-verification instructions, and the final freeze
-review.
+Status: shipped in 1.0.0 after EXP-006, offline stranger verification, the
+reviewer-adversary pass, and the API freeze review completed.
 
-The case-study tree is the 1.0 launch demo. Do not announce the 1.0 covenant as
-active or imply end-to-end case-study evidence until EXP-006 is committed and
-the 1.0.0 release exists.
+Audience: practitioners and reviewers who want to inspect a governed agent run
+before adopting the stable API.
+
+Angle: "verify the tree before trusting the claim." The three EXP-006 trees are
+the launch demos:
+
+- research synthesis over three pinned offline documents;
+- a code fix evaluated by a pinned four-test suite; and
+- a household order evaluated through three local MCP stdio servers.
+
+Offline demo command:
+
+```powershell
+$env:PYTHONPATH = (Resolve-Path src)
+python examples\exp_006_verify.py
+```
+
+Allowed claims:
+
+- EXP-006 contains 49 verify-clean nodes across three sealed case studies.
+- Strict offline replay covers all six root-to-leaf paths without invoking a
+  model function or tool handler and without using a network connection.
+- Every case uses a Phase 5 adapter, registry-firewalled tools, branch and
+  rollback, and Phase 6 CLI artifacts.
+- No hosted model was called for EXP-006 and provider spend was 0 USD.
+
+Required boundaries:
+
+- The research case uses model-generated synthesis.
+- The code-fix and household cases use deterministic candidate controllers
+  with model review; do not claim that the model autonomously invented those
+  candidate patches or orders.
+- Offline replay validates the committed semantic recording. It does not prove
+  that stochastic local inference would produce byte-identical new results.
+- The 1.0 covenant covers the four named frozen surfaces. Other public APIs
+  follow normal Semantic Versioning and the documented deprecation policy.

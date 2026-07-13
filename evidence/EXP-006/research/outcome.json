@@ -1,0 +1,79 @@
+{
+  "adapter": "pollard.adapters.openai.make_chat_completions_fn",
+  "artifact": {
+    "cli_output": [
+      "{",
+      "  \"findings\": [],",
+      "  \"nodes\": 19,",
+      "  \"ok\": true,",
+      "  \"roots\": [",
+      "    \"e4da2c8852425720cc61315200245424ecffe2582557b6a49ba512e8026526d8\"",
+      "  ]",
+      "}",
+      "evidence\\EXP-006\\research\\seal.json",
+      "evidence\\EXP-006\\research\\tree.html"
+    ],
+    "db_sha256": "ec9fdbc6124994b492f317215ed13dc88019523216b2cd3df2bce97981483f8c",
+    "html_sha256": "bf3ec08ff5834137916669cc8d69d213b7420d488bd6711630b710e1d2e3648f",
+    "node_count": 19,
+    "root_id": "e4da2c8852425720cc61315200245424ecffe2582557b6a49ba512e8026526d8",
+    "seal_digest": "b9fb38ccc401c24e1f05b78551f6469be57ed92ed134831d44a9d8ce94e8945e",
+    "seal_entries": 19,
+    "seal_sha256": "1760f6d40b4a2631c46c4378471ae354c993b158ec0f7775c1858b291ab12e9f"
+  },
+  "documents": {
+    "DOC-001": {
+      "sha256": "09bd368f3e318daa78ac83faa60aecccf0c029fe71d76cb2b15df2cb1eb06267",
+      "title": "DOC-001: Identity and canonical serialization"
+    },
+    "DOC-002": {
+      "sha256": "06061faa7acf9040880a1fb0fee942fdd77c9bb0e3aa1b2ffca2413a9b3a4efd",
+      "title": "DOC-002: Budgets and concurrent reservations"
+    },
+    "DOC-003": {
+      "sha256": "d315a112ed63a7e82f0c94c3bb3b256412e2d33c9fecc2e14b73019d3491bae9",
+      "title": "DOC-003: Replay, verification, and seals"
+    }
+  },
+  "id": "EXP-006A",
+  "model": {
+    "id": "qwen2.5-coder:7b",
+    "llama_cpp_release": "b9630",
+    "server_sha256": "a30eb024cd2bbb883cbc8151d52991c12b73efbe908b0059db740a1eee2593ae",
+    "sha256": "60e05f2100071479f596b964f89f510f057ce397ea22f2833a0cfe029bfc2463"
+  },
+  "narrow_check": {
+    "missing_citations": [
+      "DOC-001",
+      "DOC-002",
+      "DOC-003"
+    ],
+    "missing_documents": [
+      "DOC-003"
+    ],
+    "passed": false,
+    "unsupported_phrases": []
+  },
+  "narrow_tip": "6933701570732787f95fc1f8f72fa3615e96214dc5d3f76891a3bef1849855ce",
+  "plan": "**Offline Research Task Plan: Explaining Pollard's Identity, Concurrent Budget, and Replay Guarantees**\n\n**Objective:** To understand and explain the concepts of Pollard's identity, concurrent budget, and replay guarantees using the provided catalog of documents.\n\n**Documents to Review:**\n1. **DOC-001: Identity and canonical serialization**\n2. **DOC-002: Budgets and concurrent reservations**\n3. **DOC-003: Replay, verification, and seals**\n\n**Steps:**\n\n1. **Pollard's Identity:**\n   - **Objective:** Understand what Pollard's identity is and its significance.\n   - **Action:** Read **DOC-001** to find information on identity and canonical serialization. Look for sections that discuss Pollard's identity specifically.\n   - **Expected Outcome:** Gain a clear understanding of Pollard's identity and its role in the system.\n\n2. **Concurrent Budget:**\n   - **Objective:** Learn about concurrent budgeting and how it works.\n   - **Action:** Read **DOC-002** to explore the topic of budgets and concurrent reservations. Focus on sections that detail concurrent budgeting.\n   - **Expected Outcome:** Understand how concurrent budgets are managed and their importance in the system.\n\n3. **Replay Guarantees:**\n   - **Objective:** Understand what replay guarantees are and how they are implemented.\n   - **Action:** Read **DOC-003** to find information on replay, verification, and seals. Look for sections that discuss replay guarantees.\n   - **Expected Outcome:** Learn about the mechanisms in place to ensure replay guarantees and their role in maintaining system integrity.\n\n**Summary:**\nAfter reviewing the relevant sections in each document, you should be able to explain Pollard's identity, concurrent budgeting, and replay guarantees. Ensure that your explanation covers the key points and concepts discussed in the documents.\n\n**Next Steps:**\n- Prepare a concise summary of each topic.\n- Create visual aids (e.g., diagrams, flowcharts) to illustrate the concepts.\n- Prepare a presentation or written document to present your findings to others.",
+  "provider_spend_usd": 0,
+  "registry_digest": "ecba6f4cc40f2efdd8aa217c15244d9e1356c42fa9454c79649251e6f3d55f2b",
+  "report": {
+    "avoided": {},
+    "spent": {
+      "seconds": 11.465887899976224,
+      "steps": 13.0,
+      "tokens": 3306.0
+    }
+  },
+  "selected_check": {
+    "missing_citations": [],
+    "missing_documents": [],
+    "passed": true,
+    "unsupported_phrases": []
+  },
+  "selected_tip": "fd866bc61d3f3c01abc570bb6b0ee43c4abe129611d16caff1c8ec594f921c8d",
+  "status": "passed",
+  "summary": "[DOC-001] Pollard's identity system uniquely identifies each semantic step using a node that includes the parent node, step kind, attempt number, and identity payload, serialized as sorted, compact UTF-8 JSON and hashed with SHA-256.\n\n[DOC-002] Pollard manages budgets and concurrent reservations by checking known charges against a configured shared limit, reserving, executing, and settling token charges based on actual charges, using SQLite and PostgreSQL for coordination and managing shared transactional arbiter roles.\n\n[DOC-003] Pollard's replay and seal mechanisms ensure the integrity and tamper-evident nature of stored results, verifying node identity and ancestry, and using subtree seals to detect any changes to the history.",
+  "workload": "research-and-summarize-fixed-offline-documents"
+}
