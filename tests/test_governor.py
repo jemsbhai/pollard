@@ -1,7 +1,11 @@
+from decimal import Decimal
+
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 
 from pollard import Budget, BudgetExceeded, MemoryStore, Runtime, recompute_charges
+from pollard.governor import charge_to_decimal
 
 
 def test_budget_refusal_happens_before_execution() -> None:
@@ -49,6 +53,22 @@ def test_post_settle_exhaustion_blocks_the_next_call() -> None:
 
     assert not called
     assert refusal.payload["meter"] == "tokens"
+
+
+def test_budget_limits_include_extra_and_validate_values() -> None:
+    assert Budget(usd="0.25", extra={"custom": 2}).limits() == {
+        "custom": Decimal("2"),
+        "usd": Decimal("0.25"),
+    }
+    with pytest.raises(ValueError, match="negative"):
+        Budget(tokens=-1).limits()
+    with pytest.raises(TypeError, match="bool"):
+        Budget(steps=True).limits()  # type: ignore[arg-type]
+
+
+def test_charge_to_decimal_rejects_bool() -> None:
+    with pytest.raises(TypeError, match="bool"):
+        charge_to_decimal(True)  # type: ignore[arg-type]
 
 
 @given(st.lists(st.tuples(st.integers(0, 50), st.integers(0, 50)), min_size=1, max_size=10))

@@ -58,6 +58,12 @@ def test_cost_meter_uses_decimal_arithmetic() -> None:
     ) == Decimal("5.00")
 
 
+def test_cost_meter_returns_zero_for_missing_price_or_usage() -> None:
+    meter = CostMeter({"mock-1": {"input_per_1m": "2.00", "output_per_1m": "6.00"}})
+    assert meter.charge("model_call", {"model": "missing"}, {}, {}) == Decimal("0")
+    assert meter.charge("model_call", {"model": "mock-1"}, {"usage": {}}, {}) == Decimal("0")
+
+
 def test_usage_helpers_normalize_provider_shapes() -> None:
     assert usage_from_openai({"usage": {"prompt_tokens": 5, "completion_tokens": 7}}) == {
         "input_tokens": 5,
@@ -67,3 +73,5 @@ def test_usage_helpers_normalize_provider_shapes() -> None:
         "input_tokens": 11,
         "output_tokens": 13,
     }
+    assert usage_from_openai({"usage": "bad"}) == {"input_tokens": 0, "output_tokens": 0}
+    assert usage_from_anthropic({}) == {"input_tokens": 0, "output_tokens": 0}

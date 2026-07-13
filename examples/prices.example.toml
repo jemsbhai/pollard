@@ -1,0 +1,5 @@
+# Fill these with current provider prices before using CostMeter.
+
+[mock-1]
+input_per_1m = "0.00"
+output_per_1m = "0.00"
