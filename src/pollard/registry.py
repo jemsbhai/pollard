@@ -3,14 +3,15 @@
 from __future__ import annotations
 
 import hashlib
-from collections.abc import Callable, Iterator
+from collections.abc import Awaitable, Callable, Iterator
 from dataclasses import dataclass, field
 from typing import Any
 
 from ._canon import IdentityValue, canonical_bytes
 from .errors import UnsupportedSchema
 
-ActionHandler = Callable[[dict[str, Any]], dict[str, Any]]
+ActionResult = dict[str, Any] | Awaitable[dict[str, Any]]
+ActionHandler = Callable[[dict[str, Any]], ActionResult]
 
 _SUPPORTED_KEYS = {"type", "properties", "required", "enum", "items", "additionalProperties"}
 _SUPPORTED_TYPES = {"object", "string", "integer", "boolean", "array", "null"}

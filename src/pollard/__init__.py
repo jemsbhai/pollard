@@ -2,6 +2,7 @@
 
 __version__ = "0.1.0"
 
+from .aio import AsyncRun, AsyncRuntime
 from .errors import (
     BudgetExceeded,
     ConfirmationRequired,
@@ -21,6 +22,8 @@ from .verify import VerifyFinding, VerifyReport, verify
 
 __all__ = [
     "ActionSpec",
+    "AsyncRun",
+    "AsyncRuntime",
     "Budget",
     "BudgetExceeded",
     "ConfirmationRequired",

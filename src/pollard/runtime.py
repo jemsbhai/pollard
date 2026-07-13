@@ -7,6 +7,7 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from decimal import Decimal
+from inspect import isawaitable
 from pathlib import Path
 from types import TracebackType
 from typing import Any, NoReturn, Protocol
@@ -530,7 +531,13 @@ def _registered_handler(
     handler = spec.handler
 
     def call(_payload: dict[str, Any]) -> dict[str, Any]:
-        return handler(args)
+        result = handler(args)
+        if isawaitable(result):
+            close = getattr(result, "close", None)
+            if callable(close):
+                close()
+            raise TypeError("async registered handler requires AsyncRuntime")
+        return result
 
     return call
 
