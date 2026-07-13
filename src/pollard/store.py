@@ -74,6 +74,18 @@ class MemoryStore:
             key=lambda item: (str(self._nodes[item].payload.get("run", "")), item),
         )
 
+    def _pollard_drop_nodes(self, node_ids: set[str]) -> None:
+        self._nodes = {
+            node_id: node for node_id, node in self._nodes.items() if node_id not in node_ids
+        }
+        self._children = {}
+        for node in self._nodes.values():
+            if node.parent is not None:
+                self._children.setdefault(node.parent, set()).add(node.id)
+
+    def _pollard_compact(self) -> int:
+        return 0
+
     def _handle_existing(self, existing: Node, incoming: Node) -> None:
         if existing.identity_tuple() != incoming.identity_tuple():
             raise IntegrityError(f"node id collision for {incoming.id}")

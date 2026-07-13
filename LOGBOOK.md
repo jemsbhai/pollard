@@ -264,3 +264,113 @@ Cloud-provider live scope:
 - Azure OpenAI and LiteLLM cloud examples compile but remain live-unverified
   because no AWS, Azure, or Google Cloud credential was supplied for this work.
 - Provider spend for this checkpoint: 0 USD.
+
+## 2026-07-13 Phase 7 Storage Growth Checkpoint Plan
+
+Status: registered before execution. This is the Phase 7 acceptance checkpoint,
+not EXP-004. Phase 9 will define and run the formal EXP-004 protocol.
+
+Question:
+
+- Does SQLite payload interning reduce practical growth for repeated full
+  message histories without changing node ids?
+
+Hypothesis:
+
+- For a deterministic 200-turn synthetic conversation with one new 8 KiB
+  message per turn, the interning-on database will be smaller at every measured
+  checkpoint than the interning-off database.
+- The final node id will match between modes at every checkpoint.
+- The fitted log-log growth exponent will be lower with interning enabled. No
+  claim of asymptotic linearity will be made from this checkpoint.
+
+Protocol:
+
+- Script: `examples/07_phase7_storage.py`.
+- Turns: 25, 50, 100, and 200, each built in a new SQLite database.
+- Payload: full conversation history on each model-call node; each added message
+  has a deterministic 8,192-byte content string.
+- Conditions: `intern_payloads=True` against `intern_payloads=False`, with the
+  default 1,024-byte threshold.
+- Metrics: closed-database bytes, final node-id parity, size ratio at 200 turns,
+  and ordinary least-squares slope over log(turns) and log(bytes).
+- Environment fields: Python version, platform, and SQLite version.
+- No provider, network, GPU, or credential use.
+
+## 2026-07-13 Phase 7 Storage Growth Checkpoint Result
+
+Status: passed. This remains an acceptance checkpoint, not EXP-004.
+
+Environment:
+
+- Python: 3.12.2.
+- Platform: Windows 11, build 26200.
+- SQLite: 3.43.1.
+- Message content per turn: 8,192 bytes.
+- Intern threshold: 1,024 bytes.
+
+Results:
+
+| Turns | Interning on, bytes | Interning off, bytes |
+| ---: | ---: | ---: |
+| 25 | 319,488 | 2,723,840 |
+| 50 | 655,360 | 10,555,392 |
+| 100 | 1,581,056 | 41,701,376 |
+| 200 | 4,222,976 | 165,650,432 |
+
+- Final node ids matched between modes at every checkpoint.
+- The plain-to-interned size ratio at 200 turns was 39.225994.
+- The fitted log-log slope was 1.244381 with interning and 1.976118 without
+  interning.
+- The interning-on database was smaller at every checkpoint, and its fitted
+  slope was lower, so all registered hypotheses passed.
+- No provider, network, GPU, or credential use occurred. Provider spend was
+  0 USD.
+
+Interpretation:
+
+- This synthetic checkpoint shows practical reduction for repeated large
+  message strings under the stated setup.
+- It does not establish an asymptotic growth class. Placeholder and message-list
+  structure still grow with repeated histories. EXP-004 will define the formal
+  protocol and fitted-model analysis in Phase 9.
+
+## 2026-07-13 v0.7.0 Local Release Checkpoint
+
+Scope:
+
+- Added transparent SQLite payload interning, enabled by default with a
+  configurable byte threshold and a schema-one migration path.
+- Added redact-before-hash markers and automatic sensitive string handling for
+  sync and async registered tool calls.
+- Added explicit drop-pruned and compact garbage collection with survivor
+  seals.
+- Added sealed subtree export and verify-before-write import APIs and CLI
+  commands.
+- Added field-level data-governance documentation and an automated rule that
+  README links use absolute URLs for PyPI rendering.
+
+Acceptance evidence:
+
+- The shared store suite passed against memory, hashrope, SQLite with interning,
+  and SQLite without interning.
+- Plaintext scans passed for every built-in store backend while the registered
+  handler received the original sensitive argument.
+- The GC property test retained every unmarked sibling across generated prune
+  patterns.
+- Tampered payloads, results, seals, detached parents, conflicts, and malformed
+  subtree topology were rejected before import writes.
+- The 200-turn storage checkpoint passed with identity parity; its scoped
+  measurements are recorded in the preceding logbook entry.
+
+Verification:
+
+- Full suite: 211 tests passed.
+- Coverage: 91.74 percent against a 90 percent floor.
+- Ruff: passed.
+- Mypy strict mode: passed for 34 source files.
+- Writing-standards and README absolute-link scans: passed.
+- Wheel and source distribution: built successfully and passed Twine checks.
+- Clean wheel install: imported version 0.7.0, exposed `redact`, `gc`,
+  `export_subtree`, and `import_subtree`, and listed all eight CLI commands.
+- No provider or cloud request was made. Provider spend: 0 USD.

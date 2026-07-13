@@ -9,11 +9,20 @@ from typing import Any
 
 from ._canon import IdentityValue, canonical_bytes
 from .errors import UnsupportedSchema
+from .redaction import redact
 
 ActionResult = dict[str, Any] | Awaitable[dict[str, Any]]
 ActionHandler = Callable[[dict[str, Any]], ActionResult]
 
-_SUPPORTED_KEYS = {"type", "properties", "required", "enum", "items", "additionalProperties"}
+_SUPPORTED_KEYS = {
+    "type",
+    "properties",
+    "required",
+    "enum",
+    "items",
+    "additionalProperties",
+    "sensitive",
+}
 _SUPPORTED_TYPES = {"object", "string", "integer", "boolean", "array", "null"}
 
 
@@ -41,6 +50,17 @@ class ActionSpec:
         except TypeError as exc:
             return str(exc)
         return _validate_value(args, self.schema, "$")
+
+    def redact_args(
+        self,
+        args: dict[str, IdentityValue],
+    ) -> dict[str, IdentityValue]:
+        """Return the audit form of args with sensitive string fields redacted."""
+
+        redacted = _redact_sensitive(args, self.schema)
+        if not isinstance(redacted, dict):
+            raise TypeError("action arguments must redact to an object")
+        return redacted
 
 
 class Registry:
@@ -112,7 +132,34 @@ def _check_schema(schema: IdentityValue, path: str) -> None:
     additional = schema.get("additionalProperties")
     if additional is not None and not isinstance(additional, bool):
         raise UnsupportedSchema(f"{path}.additionalProperties: must be a boolean")
+    sensitive = schema.get("sensitive")
+    if sensitive is not None and not isinstance(sensitive, bool):
+        raise UnsupportedSchema(f"{path}.sensitive: must be a boolean")
+    if sensitive is True and schema_type != "string":
+        raise UnsupportedSchema(f"{path}.sensitive: only string fields may be sensitive")
     canonical_bytes(schema)
+
+
+def _redact_sensitive(
+    value: IdentityValue,
+    schema: dict[str, IdentityValue],
+) -> IdentityValue:
+    if schema.get("sensitive") is True and isinstance(value, str):
+        return redact(value)
+    if isinstance(value, dict):
+        properties = schema.get("properties")
+        if not isinstance(properties, dict):
+            return value
+        result = dict(value)
+        for name, child_schema in properties.items():
+            if name in result and isinstance(child_schema, dict):
+                result[name] = _redact_sensitive(result[name], child_schema)
+        return result
+    if isinstance(value, list):
+        item_schema = schema.get("items")
+        if isinstance(item_schema, dict):
+            return [_redact_sensitive(item, item_schema) for item in value]
+    return value
 
 
 def _validate_value(

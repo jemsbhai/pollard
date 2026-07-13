@@ -4,6 +4,20 @@ All notable changes to pollard will be documented in this file.
 
 The format is based on Keep a Changelog, and this project follows Semantic Versioning.
 
+## [0.7.0] - 2026-07-13
+
+### Added
+
+- Add transparent SQLite payload interning with configurable thresholds and
+  identity parity when interning is disabled.
+- Add redact-before-hash markers and automatic redaction for registry schema
+  string fields marked `sensitive: true`.
+- Add explicit `gc()` drop-pruned and compact modes with survivor seals.
+- Add sealed subtree export and verified import APIs plus `gc`, `export`, and
+  `import` CLI commands.
+- Add compliance-oriented documentation describing stored fields, retention,
+  redaction limits, and operator responsibilities.
+
 ## [0.6.0] - 2026-07-13
 
 ### Added

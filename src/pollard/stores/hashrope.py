@@ -79,6 +79,17 @@ class HashRopeStore:
 
         validate_rope(self._rope, self._hasher)
 
+    def _pollard_drop_nodes(self, node_ids: set[str]) -> None:
+        self._nodes = {
+            node_id: node for node_id, node in self._nodes.items() if node_id not in node_ids
+        }
+        self._rebuild_children()
+        self._rewrite_log()
+
+    def _pollard_compact(self) -> int:
+        self._rewrite_log()
+        return 0
+
     def _append(self, record: dict[str, Any]) -> None:
         line = (
             json.dumps(
@@ -140,6 +151,18 @@ class HashRopeStore:
     def _apply_meta(self, node_id: str, patch: dict[str, object]) -> None:
         node = self._nodes[node_id]
         self._nodes[node_id] = replace(node, meta={**node.meta, **patch})
+
+    def _rebuild_children(self) -> None:
+        self._children = {}
+        for node in self._nodes.values():
+            if node.parent is not None:
+                self._children.setdefault(node.parent, set()).add(node.id)
+
+    def _rewrite_log(self) -> None:
+        nodes = [node for root_id in self.roots() for node in self.walk(root_id)]
+        self._rope = rope_from_bytes(b"", self._hasher)
+        for node in nodes:
+            self._append({"op": "put", **_node_record(node)})
 
 
 def _node_record(node: Node) -> dict[str, Any]:

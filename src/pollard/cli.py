@@ -10,7 +10,10 @@ from html import escape
 from pathlib import Path
 from typing import Any
 
+from .errors import PollardError
+from .governance import export_subtree, gc, import_subtree
 from .governor import charge_to_decimal, charge_to_json, recompute_charges
+from .redaction import contains_redaction
 from .seal import seal
 from .store import Store
 from .stores import SQLiteStore
@@ -23,7 +26,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(argv)
     try:
         return int(args.handler(args))
-    except (KeyError, OSError, TypeError, ValueError) as exc:
+    except (KeyError, OSError, PollardError, TypeError, ValueError) as exc:
         print(f"pollard: {exc}", file=sys.stderr)
         return 2
 
@@ -68,6 +71,34 @@ def _parser() -> argparse.ArgumentParser:
     runs.add_argument("db", type=Path)
     runs.add_argument("--json", action="store_true", help="emit machine-readable JSON")
     runs.set_defaults(handler=_runs)
+
+    gc_parser = subparsers.add_parser("gc", help="run explicit offline maintenance")
+    gc_parser.add_argument("db", type=Path)
+    gc_parser.add_argument(
+        "mode",
+        choices=("drop-pruned", "compact"),
+        nargs="?",
+        default="drop-pruned",
+    )
+    gc_parser.add_argument("--json", action="store_true", help="emit machine-readable JSON")
+    gc_parser.set_defaults(handler=_gc)
+
+    export_parser = subparsers.add_parser("export", help="export a sealed subtree")
+    export_parser.add_argument("db", type=Path)
+    export_parser.add_argument("root_id")
+    export_parser.add_argument("path", type=Path)
+    export_parser.add_argument(
+        "--json", action="store_true", help="emit machine-readable JSON"
+    )
+    export_parser.set_defaults(handler=_export)
+
+    import_parser = subparsers.add_parser("import", help="import a sealed subtree")
+    import_parser.add_argument("path", type=Path)
+    import_parser.add_argument("db", type=Path)
+    import_parser.add_argument(
+        "--json", action="store_true", help="emit machine-readable JSON"
+    )
+    import_parser.set_defaults(handler=_import)
     return parser
 
 
@@ -202,6 +233,42 @@ def _runs(args: argparse.Namespace) -> int:
     return 0
 
 
+def _gc(args: argparse.Namespace) -> int:
+    with _open(args.db) as store:
+        document = gc(store, mode=args.mode).to_dict()
+    if args.json:
+        _emit(document, json_output=True)
+    else:
+        print(
+            f"{document['mode']}: removed {document['removed_nodes']} nodes "
+            f"and {document['removed_blobs']} blobs"
+        )
+    return 0
+
+
+def _export(args: argparse.Namespace) -> int:
+    with _open(args.db) as store:
+        document = export_subtree(store, args.root_id, args.path).to_dict()
+    if args.json:
+        _emit(document, json_output=True)
+    else:
+        print(f"{document['path']}  {document['digest']}")
+    return 0
+
+
+def _import(args: argparse.Namespace) -> int:
+    with SQLiteStore(args.db) as store:
+        document = import_subtree(args.path, store).to_dict()
+    if args.json:
+        _emit(document, json_output=True)
+    else:
+        print(
+            f"{document['root_id']}  imported={document['imported']} "
+            f"existing={document['existing']}"
+        )
+    return 0
+
+
 def tree_document(
     store: Store,
     root_id: str,
@@ -220,6 +287,7 @@ def tree_document(
             "avoided": _numeric_mapping(node.meta.get("avoided")),
             "refusal": node.kind == NodeKind.REFUSAL.value,
             "pruned": node.meta.get("pruned") is True,
+            "redacted": contains_redaction(node.payload),
             "children": store.children(node.id),
         }
         if include_payloads:
@@ -281,6 +349,7 @@ summary {{ cursor: pointer; }}
 .charges {{ color: #087f5b; }}
 .refusal > details > summary {{ color: #c92a2a; font-weight: 700; }}
 .pruned {{ opacity: .5; }}
+.redacted > details > summary {{ text-decoration: underline dotted; }}
 pre {{ white-space: pre-wrap; overflow-wrap: anywhere; padding: .6rem; background: #8881; }}
 </style>
 </head>
@@ -298,6 +367,8 @@ def _html_node(store: Store, node: Node, *, include_payloads: bool) -> str:
         classes.append("refusal")
     if node.meta.get("pruned") is True:
         classes.append("pruned")
+    if contains_redaction(node.payload):
+        classes.append("redacted")
     class_attr = f' class="{" ".join(classes)}"' if classes else ""
     charges = _charges_text(node)
     charges_html = f' <span class="charges">{escape(charges)}</span>' if charges else ""
@@ -332,6 +403,8 @@ def _node_summary(node: Node) -> str:
         markers += " [REFUSED]"
     if node.meta.get("pruned") is True:
         markers += " [PRUNED]"
+    if contains_redaction(node.payload):
+        markers += " [REDACTED]"
     return f"{node.kind} {node.id[:8]} {_label(node)}{suffix}{markers}"
 
 
@@ -341,6 +414,8 @@ def _markers(node: Node) -> str:
         markers.append("REFUSED")
     if node.meta.get("pruned") is True:
         markers.append("PRUNED")
+    if contains_redaction(node.payload):
+        markers.append("REDACTED")
     return "" if not markers else " [" + ", ".join(markers) + "]"
 
 

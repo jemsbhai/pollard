@@ -23,7 +23,8 @@ root 2db812ec support-triage
 ```
 
 The default output includes structure, short node ids, labels, charges,
-refusals, and prune markers. It does not include payloads or results. Use
+refusals, prune markers, and a `REDACTED` marker when a payload contains a
+redaction digest. It does not include payloads or results. Use
 `--payloads` only when the destination is allowed to receive prompt and result
 content:
 
@@ -42,6 +43,22 @@ The export is one self-contained HTML file with native collapsible sections,
 inline CSS, no JavaScript, and no remote assets. Payloads and results are absent
 unless `--payloads` is also present. Pruned nodes are dimmed and refusals are
 highlighted.
+
+## Retention And Transfer
+
+Offline storage operations use the same JSON and human-readable CLI patterns:
+
+```powershell
+pollard export runs.db <root-id> subtree.json --json
+pollard import subtree.json archive.db --json
+pollard gc runs.db drop-pruned --json
+pollard gc runs.db compact --json
+```
+
+Import verifies the complete subtree seal before writing nodes. Garbage
+collection is explicit; `drop-pruned` removes marked subtrees and `compact`
+reclaims unreferenced SQLite blobs. See [Data governance](data-governance.md)
+for field-level retention and redaction behavior.
 
 ## Integrity and seals
 

@@ -4,7 +4,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from pollard import MemoryStore, Runtime, SQLiteStore
+from pollard import MemoryStore, Runtime, SQLiteStore, redact
 from pollard.cli import main, render_html
 from pollard.tree import Node, NodeKind
 
@@ -191,6 +191,71 @@ def test_html_export_of_one_thousand_nodes_has_a_size_guard() -> None:
         )
     rendered = render_html(store, root.id)
     assert len(rendered.encode("utf-8")) < 1_000_000
+
+
+def test_redaction_markers_and_governance_commands(
+    tmp_path: Path,
+    capsys: object,
+) -> None:
+    db = tmp_path / "governance.db"
+    with SQLiteStore(db) as store:
+        run = Runtime(store).run("governance-cli")
+        run.note({"token": redact("never-store-this", hint="api token")})
+        run.note({"label": "discard"})
+        run.prune()
+        root_id = run.root_id
+
+    assert main(["show", str(db), root_id, "--payloads"]) == 0
+    shown = capsys.readouterr().out  # type: ignore[attr-defined]
+    assert "[REDACTED]" in shown
+    assert "never-store-this" not in shown
+
+    assert main(["show", str(db), root_id, "--json", "--payloads"]) == 0
+    document = json.loads(capsys.readouterr().out)  # type: ignore[attr-defined]
+    assert document["nodes"][1]["redacted"] is True
+
+    html = tmp_path / "redacted.html"
+    assert main(["show", str(db), root_id, "--html", str(html), "--payloads"]) == 0
+    capsys.readouterr()  # type: ignore[attr-defined]
+    assert 'class="redacted"' in html.read_text(encoding="utf-8")
+
+    exported = tmp_path / "subtree.json"
+    assert main(["export", str(db), root_id, str(exported), "--json"]) == 0
+    export_result = json.loads(capsys.readouterr().out)  # type: ignore[attr-defined]
+    assert export_result["nodes"] == 3
+
+    imported_db = tmp_path / "imported.db"
+    assert main(["import", str(exported), str(imported_db), "--json"]) == 0
+    import_result = json.loads(capsys.readouterr().out)  # type: ignore[attr-defined]
+    assert import_result["imported"] == 3
+    assert main(["verify", str(imported_db), "--json"]) == 0
+    assert json.loads(capsys.readouterr().out)["ok"] is True  # type: ignore[attr-defined]
+
+    assert main(["gc", str(db), "drop-pruned", "--json"]) == 0
+    gc_result = json.loads(capsys.readouterr().out)  # type: ignore[attr-defined]
+    assert gc_result["removed_nodes"] == 1
+    assert main(["gc", str(db), "compact", "--json"]) == 0
+    assert json.loads(capsys.readouterr().out)["mode"] == "compact"  # type: ignore[attr-defined]
+
+
+def test_cli_import_reports_tampered_manifest_without_writing(
+    tmp_path: Path,
+    capsys: object,
+) -> None:
+    db = tmp_path / "source.db"
+    root_id, _payload = _recording(db)
+    exported = tmp_path / "tampered.json"
+    assert main(["export", str(db), root_id, str(exported)]) == 0
+    capsys.readouterr()  # type: ignore[attr-defined]
+    manifest = json.loads(exported.read_text(encoding="utf-8"))
+    manifest["seal"]["digest"] = "0" * 64
+    exported.write_text(json.dumps(manifest), encoding="utf-8")
+
+    target = tmp_path / "target.db"
+    assert main(["import", str(exported), str(target)]) == 2
+    assert "seal" in capsys.readouterr().err  # type: ignore[attr-defined]
+    with SQLiteStore(target) as store:
+        assert store.roots() == []
 
 
 def _golden_tree() -> tuple[MemoryStore, Node]:
