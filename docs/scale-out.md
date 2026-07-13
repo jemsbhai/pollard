@@ -1,9 +1,9 @@
 # Scale-Out Stores And Governance
 
-Pollard 0.8 adds a shared-arbiter path for worker teams. PostgreSQL coordinates
+Pollard's shared-arbiter path coordinates worker teams through PostgreSQL across
 multiple hosts. SQLite uses the same transaction contract for processes sharing
 one database file on one host. MemoryStore and HashRopeStore remain local
-backends and use the earlier per-runtime budget checks.
+backends and use per-runtime budget checks.
 
 This design has one hard boundary: all workers governed by one shared limit
 must use the same transactional store and logical store id. Pollard is not a

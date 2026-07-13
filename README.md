@@ -56,6 +56,41 @@ Current limits:
   and logical store id. Pollard does not provide decentralized consensus.
 - The audit tree is tamper-evident, not tamper-proof. Verification detects changed history, but it cannot stop deletion of the whole store file.
 
+## Installation And Integration Paths
+
+Pollard requires Python 3.10 or newer. The core package has no runtime
+dependency and includes in-memory and SQLite stores, the registry firewall,
+budgets, replay, seals, merge, governance helpers, and the offline CLI:
+
+```powershell
+pip install pollard
+```
+
+Install only the integrations used by the application:
+
+| Need | Install | Boundary |
+|---|---|---|
+| OpenAI API or Azure OpenAI v1 with an API key | `pollard[openai]` | Responses and Chat Completions, sync or async, streaming or complete |
+| Azure OpenAI v1 with Microsoft Entra ID | `pollard[azure-openai]` | OpenAI adapter plus the Azure Identity token provider |
+| Anthropic API | `pollard[anthropic]` | Messages, sync or async, streaming or complete, optional live token count |
+| Amazon Bedrock | `pollard[bedrock]` | Converse and ConverseStream, optional CountTokens precheck |
+| Other cloud providers | `pollard[litellm]` | LiteLLM chat routes for Vertex AI, Azure AI, SageMaker, OCI, Watsonx, Databricks, and others |
+| LangGraph | `pollard[langgraph]` | OpenAI-backed LangGraph node integration recipe |
+| pydantic-ai | `pollard[pydantic-ai]` | One complete agent run recorded as a Pollard step |
+| MCP | `pollard[mcp]` | Discover MCP tools and expose them through a Pollard registry |
+| Shared PostgreSQL store | `pollard[pg]` | Transactional multi-process and multi-host coordination |
+| OpenTelemetry | `pollard[otel]` | Content-free live or offline span export |
+| OpenAI prompt estimate | `pollard[estimate-openai]` | Local tiktoken estimate plus an explicit output reservation |
+| Local GPU energy | `pollard[nvml]` | Whole-GPU NVML measurement for supported local hardware |
+| Hashrope store | `pollard[hashrope]` | In-process append-only operation-log backend |
+| tokenmaster meter | `pollard[tokenmaster]` | tokenmaster state and advice stored in node metadata |
+
+Pollard itself needs no model-provider credential. A live recipe uses the
+credential chain of its caller-owned SDK. The complete provider, endpoint,
+model, IAM, cost, and data-retention boundaries are in
+[Cloud-hosted model providers](https://github.com/jemsbhai/pollard/blob/main/docs/cloud-providers.md)
+and the runnable [integration recipes](https://github.com/jemsbhai/pollard/blob/main/docs/recipes/README.md).
+
 ## Offline Mock Demo
 
 Core Pollard still installs with zero runtime dependencies and can be tried
@@ -378,3 +413,19 @@ and advance deprecation policy are specified in the
 [API stability policy](https://github.com/jemsbhai/pollard/blob/main/docs/api-stability.md).
 Version 1.0.0 activates this covenant. Incompatible changes to a frozen surface
 require 2.0.
+
+## Documentation And Release Policy
+
+The [documentation index](https://github.com/jemsbhai/pollard/blob/main/docs/README.md)
+links the complete operator guides for providers, data governance,
+observability, scale-out stores, seals, examples, evidence, the
+[public API reference](https://github.com/jemsbhai/pollard/blob/main/docs/api-reference.md),
+and API stability.
+All repository README links are absolute HTTPS URLs so the same content renders
+correctly on PyPI.
+
+GitHub Actions validates Pollard but never publishes it. A maintainer builds one
+artifact set from the reviewed `main` commit, creates the tag and GitHub release
+locally, and uploads those same files directly to production PyPI with a local,
+project-scoped token. The complete checkpoints and failure recovery are in the
+[local-only release runbook](https://github.com/jemsbhai/pollard/blob/main/docs/releasing.md).
