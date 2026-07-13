@@ -4,6 +4,31 @@ All notable changes to pollard will be documented in this file.
 
 The format is based on Keep a Changelog, and this project follows Semantic Versioning.
 
+## [0.9.0] - 2026-07-13
+
+### Added
+
+- Add formal EXP-001 local-model, EXP-004 storage-curve, and EXP-005
+  multi-version PostgreSQL contention runners with committed raw artifacts.
+- Add a machine-checked evidence index, adversarial claim boundaries, and
+  reproduction guidance with no hosted-provider dependency.
+- Publish `Store` at the package root and document the proposed 1.0 identity,
+  canonical serialization, store, and step-function stability covenant.
+- Add a 90-day and one-minor-release deprecation policy for non-frozen public
+  APIs after 1.0.
+
+### Changed
+
+- Prefer NVML's cumulative energy counter when available, with sampled power as
+  the compatibility fallback.
+- Serialize PostgreSQL first-use schema creation and close a window-settlement
+  locking gap found by EXP-005.
+- Update OpenAI examples to GPT-5.6 defaults, disable Responses storage in the
+  direct examples, and document current Azure, Bedrock, LiteLLM, and credential
+  boundaries.
+- Enforce absolute Markdown links across every repository README so the same
+  links work on PyPI.
+
 ## [0.8.0] - 2026-07-13
 
 ### Added

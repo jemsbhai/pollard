@@ -1,6 +1,7 @@
 """A live OpenAI Responses tool loop behind Pollard's registry firewall."""
 
 import json
+import os
 import sys
 
 from pollard import ActionSpec, Budget, Registry, Runtime
@@ -40,7 +41,8 @@ def main() -> None:
         [ActionSpec("weather", "1", "Fixed demo forecast.", WEATHER_SCHEMA, False, weather)]
     )
     runtime = Runtime("openai-tool-loop.db", registry=registry, mode="hybrid")
-    call_openai = make_responses_fn(client)
+    model = os.getenv("POLLARD_OPENAI_MODEL", "gpt-5.6")
+    call_openai = make_responses_fn(client, store=False)
     input_items: list[dict[str, object]] = [
         {"role": "user", "content": "What is the weather in Boston?"}
     ]
@@ -48,7 +50,7 @@ def main() -> None:
     with runtime.run("openai-tool-loop", budget=Budget(tokens=2_000, steps=6)) as run:
         first = run.model_call(
             {
-                "model": "gpt-5.5",
+                "model": model,
                 "input": input_items,
                 "tools": OPENAI_TOOLS,
                 "max_output_tokens": 128,
@@ -71,7 +73,7 @@ def main() -> None:
             )
         final = run.model_call(
             {
-                "model": "gpt-5.5",
+                "model": model,
                 "input": input_items,
                 "tools": OPENAI_TOOLS,
                 "max_output_tokens": 128,

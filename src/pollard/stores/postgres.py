@@ -374,10 +374,23 @@ class PostgresStore:
                 """
                 SELECT kind, scope_id, meter FROM pollard_reservations
                 WHERE store_id = %s AND reservation_id = %s
+                ORDER BY kind, scope_id, meter
                 FOR UPDATE
                 """,
                 (self.store_id, reservation_id),
             ).fetchall()
+            window_scopes = sorted(
+                {str(row[1]) for row in rows if str(row[0]) == "window"}
+            )
+            for scope_id in window_scopes:
+                self._conn.execute(
+                    """
+                    SELECT ledger_key FROM pollard_window_scopes
+                    WHERE store_id = %s AND ledger_key = %s
+                    FOR UPDATE
+                    """,
+                    (self.store_id, scope_id),
+                ).fetchone()
             for row in rows:
                 kind, scope_id, meter = str(row[0]), str(row[1]), str(row[2])
                 actual = charges.get(meter, Decimal("0"))
@@ -621,6 +634,10 @@ class PostgresStore:
             """,
         )
         with self._conn.transaction():
+            self._conn.execute(
+                "SELECT pg_advisory_xact_lock(hashtextextended(%s, 0))",
+                ("pollard-schema-v1",),
+            )
             for statement in statements:
                 self._conn.execute(statement)
 

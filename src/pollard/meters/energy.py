@@ -1,8 +1,10 @@
 """NVML-backed energy meter for local GPU inference.
 
-Caveats: this measures whole-GPU power, including other processes. It is
-meaningful for local inference only, not hosted API calls. Sampling error grows
-for calls shorter than about 200 ms. It requires an NVIDIA driver with NVML.
+Caveats: this measures the whole GPU, including other processes. It is
+meaningful for local inference only, not hosted API calls. The meter prefers
+NVML's cumulative energy counter and falls back to sampled-power integration on
+devices that do not expose it. Sampling error in the fallback grows for calls
+shorter than about 200 ms. An NVIDIA driver with NVML is required.
 """
 
 from __future__ import annotations
@@ -22,6 +24,8 @@ class _NvmlModule(Protocol):
     def nvmlDeviceGetHandleByIndex(self, index: int) -> object: ...
 
     def nvmlDeviceGetPowerUsage(self, handle: object) -> int: ...
+
+    def nvmlDeviceGetTotalEnergyConsumption(self, handle: object) -> int: ...
 
 
 class EnergyMeter:
@@ -75,9 +79,13 @@ class EnergyMeasurement:
         self._stop = threading.Event()
         self._thread: threading.Thread | None = None
         self._samples: list[tuple[float, float]] = []
+        self._counter_start_mj: int | None = None
+        self._counter_end_mj: int | None = None
 
     def __enter__(self) -> EnergyMeasurement:
         self._samples = []
+        self._counter_start_mj = self._read_energy_counter()
+        self._counter_end_mj = None
         self._sample()
         self._thread = threading.Thread(target=self._run, daemon=True)
         self._thread.start()
@@ -94,8 +102,17 @@ class EnergyMeasurement:
         if self._thread is not None:
             self._thread.join(timeout=self._interval_s * 4)
         self._sample()
+        self._counter_end_mj = self._read_energy_counter()
 
     def readings(self) -> dict[str, float]:
+        if (
+            self._counter_start_mj is not None
+            and self._counter_end_mj is not None
+            and self._counter_end_mj > self._counter_start_mj
+        ):
+            return {
+                "joules": (self._counter_end_mj - self._counter_start_mj) / 1000.0
+            }
         return {"joules": _integrate_samples(self._samples)}
 
     def _run(self) -> None:
@@ -105,6 +122,18 @@ class EnergyMeasurement:
     def _sample(self) -> None:
         watts = self._nvml.nvmlDeviceGetPowerUsage(self._handle) / 1000.0
         self._samples.append((time.perf_counter(), watts))
+
+    def _read_energy_counter(self) -> int | None:
+        read = getattr(self._nvml, "nvmlDeviceGetTotalEnergyConsumption", None)
+        if not callable(read):
+            return None
+        try:
+            value = read(self._handle)
+        except Exception:
+            return None
+        if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+            return None
+        return int(value)
 
 
 def _integrate_samples(samples: Sequence[tuple[float, float]]) -> float:

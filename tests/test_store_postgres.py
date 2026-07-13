@@ -89,6 +89,16 @@ def test_postgres_window_meter_is_atomic_across_two_threads() -> None:
     not os.environ.get("POLLARD_TEST_POSTGRES_DSN"),
     reason="POLLARD_TEST_POSTGRES_DSN is not configured",
 )
+def test_postgres_window_settlement_cannot_escape_eight_writer_limit() -> None:
+    dsn = os.environ["POLLARD_TEST_POSTGRES_DSN"]
+    for _round in range(5):
+        assert _run_eight_writer_window_round(dsn) == 16
+
+
+@pytest.mark.skipif(
+    not os.environ.get("POLLARD_TEST_POSTGRES_DSN"),
+    reason="POLLARD_TEST_POSTGRES_DSN is not configured",
+)
 def test_postgres_concurrent_puts_are_benign_and_meta_patches_are_not_lost() -> None:
     dsn = os.environ["POLLARD_TEST_POSTGRES_DSN"]
     store_id = f"put-{uuid4().hex}"
@@ -201,6 +211,37 @@ def _process_budget_worker(
             except BudgetExceeded:
                 break
     queue.put(completed)
+
+
+def _run_eight_writer_window_round(dsn: str) -> int:
+    store_id = f"window-eight-{uuid4().hex}"
+    label = f"window-eight-{uuid4().hex}"
+    barrier = Barrier(8)
+    lock = Lock()
+    executed: list[tuple[int, int]] = []
+
+    def worker(worker_id: int) -> None:
+        with PostgresStore(dsn, store_id=store_id) as store:
+            run = Runtime(
+                store,
+                meters=[WindowMeter("requests", 16, 60)],
+            ).run(label)
+            barrier.wait()
+            for index in range(4):
+                try:
+                    run.model_call(
+                        {"model": "mock", "worker": worker_id, "index": index},
+                        attempt=worker_id * 100 + index,
+                        fn=lambda _payload, value=(worker_id, index): _thread_result(
+                            executed, lock, value
+                        ),
+                    )
+                except BudgetExceeded:
+                    break
+
+    with ThreadPoolExecutor(max_workers=8) as executor:
+        list(executor.map(worker, range(8)))
+    return len(executed)
 
 
 def _thread_result(

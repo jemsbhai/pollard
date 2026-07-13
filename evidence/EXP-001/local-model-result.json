@@ -1,0 +1,1262 @@
+{
+  "completed_at": "2026-07-13T16:10:46.397892+00:00",
+  "environment": {
+    "gpu": {
+      "driver": "595.79",
+      "energy_counter_unit": "millijoules",
+      "energy_source": "nvmlDeviceGetTotalEnergyConsumption",
+      "memory_bytes": 17171480576,
+      "name": "NVIDIA GeForce RTX 4090 Laptop GPU",
+      "scope": "whole GPU, including other processes"
+    },
+    "idle_baseline_seconds": 5.0,
+    "idle_baseline_watts": 33.732042,
+    "llama_cpp_release": "b9630",
+    "llama_cpp_runtime_archive_sha256": "cbb2a0b1c2459897560a654ed8dd2a816cd3989b81f9e019afd4859964794b7b",
+    "llama_cpp_version_output": "version: 9630 (8ed274ef4)\nbuilt with Clang 20.1.8 for Windows x86_64",
+    "model_bytes": 4683074048,
+    "model_id": "qwen2.5-coder:7b",
+    "model_properties": {
+      "model_alias": "sha256-60e05f2100071479f596b964f89f510f057ce397ea22f2833a0cfe029bfc2463"
+    },
+    "model_sha256": "60e05f2100071479f596b964f89f510f057ce397ea22f2833a0cfe029bfc2463",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "pollard": "0.8.0",
+    "price_table": {
+      "basis": "Declared comparison rate, not the host's utility bill or total cost of ownership.",
+      "currency": "USD",
+      "effective_date": "2026-07-13",
+      "usd_per_kwh": "0.20"
+    },
+    "price_table_sha256": "a6489bf40761947e2dbd69f55d2863e3a2948f96b279a0253550e8c41430c398",
+    "python": "3.12.2",
+    "warmup_timings": [
+      {
+        "cache_n": 0,
+        "predicted_ms": 11.66,
+        "predicted_n": 2,
+        "prompt_ms": 18.295,
+        "prompt_n": 7
+      },
+      {
+        "cache_n": 0,
+        "predicted_ms": 11.105,
+        "predicted_n": 2,
+        "prompt_ms": 16.069,
+        "prompt_n": 7
+      },
+      {
+        "cache_n": 0,
+        "predicted_ms": 10.703,
+        "predicted_n": 2,
+        "prompt_ms": 15.88,
+        "prompt_n": 7
+      }
+    ]
+  },
+  "id": "EXP-001",
+  "leg": "local_model",
+  "protocol": {
+    "branch_counts": [
+      2,
+      4,
+      8
+    ],
+    "comparison_limit": "electricity-only scenario; excludes host, capital, cooling, and labor cost",
+    "confidence_interval": "two-sided 95% Student t interval, df=4",
+    "cost_formula": "nvml_joules / 3,600,000 * declared usd_per_kwh",
+    "energy_scope": "raw NVML whole-GPU cumulative counter over condition wallclock",
+    "prefix_max_output_tokens": 24,
+    "prompt_cache": false,
+    "schedule": [
+      {
+        "branches": 2,
+        "condition_order": [
+          "naive",
+          "shared"
+        ],
+        "seed": 3
+      },
+      {
+        "branches": 4,
+        "condition_order": [
+          "shared",
+          "naive"
+        ],
+        "seed": 2
+      },
+      {
+        "branches": 8,
+        "condition_order": [
+          "naive",
+          "shared"
+        ],
+        "seed": 1
+      },
+      {
+        "branches": 8,
+        "condition_order": [
+          "shared",
+          "naive"
+        ],
+        "seed": 0
+      },
+      {
+        "branches": 2,
+        "condition_order": [
+          "shared",
+          "naive"
+        ],
+        "seed": 2
+      },
+      {
+        "branches": 4,
+        "condition_order": [
+          "naive",
+          "shared"
+        ],
+        "seed": 1
+      },
+      {
+        "branches": 4,
+        "condition_order": [
+          "shared",
+          "naive"
+        ],
+        "seed": 0
+      },
+      {
+        "branches": 8,
+        "condition_order": [
+          "shared",
+          "naive"
+        ],
+        "seed": 4
+      },
+      {
+        "branches": 4,
+        "condition_order": [
+          "naive",
+          "shared"
+        ],
+        "seed": 3
+      },
+      {
+        "branches": 8,
+        "condition_order": [
+          "shared",
+          "naive"
+        ],
+        "seed": 2
+      },
+      {
+        "branches": 4,
+        "condition_order": [
+          "shared",
+          "naive"
+        ],
+        "seed": 4
+      },
+      {
+        "branches": 2,
+        "condition_order": [
+          "naive",
+          "shared"
+        ],
+        "seed": 1
+      },
+      {
+        "branches": 8,
+        "condition_order": [
+          "naive",
+          "shared"
+        ],
+        "seed": 3
+      },
+      {
+        "branches": 2,
+        "condition_order": [
+          "shared",
+          "naive"
+        ],
+        "seed": 4
+      },
+      {
+        "branches": 2,
+        "condition_order": [
+          "shared",
+          "naive"
+        ],
+        "seed": 0
+      }
+    ],
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "server_parallel_slots": 1,
+    "suffix_max_output_tokens": 16,
+    "wallclock_scope": "condition calls only; model load, warmup, and idle baseline excluded"
+  },
+  "question": "What wall-clock, whole-GPU energy, and declared-rate electricity cost change follows from executing one shared prefix instead of repeating it?",
+  "rows": [
+    {
+      "branches": 2,
+      "calls": 4,
+      "condition": "naive",
+      "idle_adjusted_joules": 136.382516,
+      "idle_adjusted_usd_at_declared_energy_rate": "0.000007576806",
+      "max_llama_cache_n": 0,
+      "nvml_joules": 175.278,
+      "pollard_meter_joules": 175.278,
+      "pollard_meter_seconds": 1.132062,
+      "prefix_output_digests": [
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032",
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032"
+      ],
+      "seed": 3,
+      "suffix_output_digests": [
+        "0bce7b078e84e98b8f81710860e301bd596a60c97058d2aa7bbbb50649ea3cf7",
+        "7fb3ccbfa5bd73df22784f4859f78d54100705be5792fef340385708f2af0550"
+      ],
+      "tokens": 1998,
+      "usd_at_declared_energy_rate": "0.000009737667",
+      "wallclock_seconds": 1.153072
+    },
+    {
+      "branches": 2,
+      "calls": 3,
+      "condition": "shared",
+      "idle_adjusted_joules": 97.198792,
+      "idle_adjusted_usd_at_declared_energy_rate": "0.000005399933",
+      "max_llama_cache_n": 0,
+      "nvml_joules": 117.174,
+      "pollard_meter_joules": 117.174,
+      "pollard_meter_seconds": 0.582077,
+      "prefix_output_digests": [
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032"
+      ],
+      "seed": 3,
+      "suffix_output_digests": [
+        "0bce7b078e84e98b8f81710860e301bd596a60c97058d2aa7bbbb50649ea3cf7",
+        "7fb3ccbfa5bd73df22784f4859f78d54100705be5792fef340385708f2af0550"
+      ],
+      "tokens": 1055,
+      "usd_at_declared_energy_rate": "0.000006509667",
+      "wallclock_seconds": 0.592173
+    },
+    {
+      "branches": 4,
+      "calls": 5,
+      "condition": "shared",
+      "idle_adjusted_joules": 129.903057,
+      "idle_adjusted_usd_at_declared_energy_rate": "0.000007216837",
+      "max_llama_cache_n": 0,
+      "nvml_joules": 157.174,
+      "pollard_meter_joules": 157.174,
+      "pollard_meter_seconds": 0.793615,
+      "prefix_output_digests": [
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032"
+      ],
+      "seed": 2,
+      "suffix_output_digests": [
+        "d85811843f0894b839d0f7329d45c6eeb4d1d4cc45ae42b81938f223da75c371",
+        "6f568fd2734d8863676f27a2ef9a8931f14bd7d75494e38bfce0caca3c4fe874",
+        "f4e4f3be48f22c853540d01d8ff4de1ac659ec8cc2ecbeabc800d4f3a15141ef",
+        "f1fdc9ac49e187b1b36dec58bd1b4d75e47e1643ab7af6e141169beae3c450e9"
+      ],
+      "tokens": 1160,
+      "usd_at_declared_energy_rate": "0.000008731889",
+      "wallclock_seconds": 0.808458
+    },
+    {
+      "branches": 4,
+      "calls": 8,
+      "condition": "naive",
+      "idle_adjusted_joules": 309.088732,
+      "idle_adjusted_usd_at_declared_energy_rate": "0.000017171596",
+      "max_llama_cache_n": 0,
+      "nvml_joules": 375.416,
+      "pollard_meter_joules": 375.416,
+      "pollard_meter_seconds": 1.932175,
+      "prefix_output_digests": [
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032",
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032",
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032",
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032"
+      ],
+      "seed": 2,
+      "suffix_output_digests": [
+        "d85811843f0894b839d0f7329d45c6eeb4d1d4cc45ae42b81938f223da75c371",
+        "6f568fd2734d8863676f27a2ef9a8931f14bd7d75494e38bfce0caca3c4fe874",
+        "f4e4f3be48f22c853540d01d8ff4de1ac659ec8cc2ecbeabc800d4f3a15141ef",
+        "f1fdc9ac49e187b1b36dec58bd1b4d75e47e1643ab7af6e141169beae3c450e9"
+      ],
+      "tokens": 3989,
+      "usd_at_declared_energy_rate": "0.000020856444",
+      "wallclock_seconds": 1.966299
+    },
+    {
+      "branches": 8,
+      "calls": 16,
+      "condition": "naive",
+      "idle_adjusted_joules": 625.855305,
+      "idle_adjusted_usd_at_declared_energy_rate": "0.000034769739",
+      "max_llama_cache_n": 0,
+      "nvml_joules": 760.005,
+      "pollard_meter_joules": 747.554262,
+      "pollard_meter_seconds": 3.907445,
+      "prefix_output_digests": [
+        "f51d39d1aad1b2ae64e17143abb21517e00d2c0d6ea4987dbd7c3192827ac7f3",
+        "f51d39d1aad1b2ae64e17143abb21517e00d2c0d6ea4987dbd7c3192827ac7f3",
+        "f51d39d1aad1b2ae64e17143abb21517e00d2c0d6ea4987dbd7c3192827ac7f3",
+        "f51d39d1aad1b2ae64e17143abb21517e00d2c0d6ea4987dbd7c3192827ac7f3",
+        "f51d39d1aad1b2ae64e17143abb21517e00d2c0d6ea4987dbd7c3192827ac7f3",
+        "f51d39d1aad1b2ae64e17143abb21517e00d2c0d6ea4987dbd7c3192827ac7f3",
+        "f51d39d1aad1b2ae64e17143abb21517e00d2c0d6ea4987dbd7c3192827ac7f3",
+        "f51d39d1aad1b2ae64e17143abb21517e00d2c0d6ea4987dbd7c3192827ac7f3"
+      ],
+      "seed": 1,
+      "suffix_output_digests": [
+        "a93afb682fbb98b1791d49671cc81ee02ae37f74406de9da4ac4bea834f80224",
+        "7efa675147d611c53f0642b5a868d744987d4d2193cd4878fd88bb6dda00aaa8",
+        "324600b99a04069fec6e560959197313d08a1be7841de979105825294803277d",
+        "bc6cf4e4644195805bb4e06b346458bed5c2987716fc7dd12d71a474a4b495fe",
+        "50ce89dab2e1ab7b8ef733d7510f85688da872841d80f711baa08ed7b1e091a3",
+        "5a64bb514bb517c447f87b56468536fc5bd7b0d54c5c05f9f87c74c70cb592b1",
+        "7c72d22ae2a273111fe187b433e7affd30e6ef1ec969e3b9bfb1831e1f5a0a41",
+        "324600b99a04069fec6e560959197313d08a1be7841de979105825294803277d"
+      ],
+      "tokens": 7978,
+      "usd_at_declared_energy_rate": "0.000042222500",
+      "wallclock_seconds": 3.976922
+    },
+    {
+      "branches": 8,
+      "calls": 9,
+      "condition": "shared",
+      "idle_adjusted_joules": 204.794966,
+      "idle_adjusted_usd_at_declared_energy_rate": "0.000011377498",
+      "max_llama_cache_n": 0,
+      "nvml_joules": 248.521,
+      "pollard_meter_joules": 248.521,
+      "pollard_meter_seconds": 1.247954,
+      "prefix_output_digests": [
+        "f51d39d1aad1b2ae64e17143abb21517e00d2c0d6ea4987dbd7c3192827ac7f3"
+      ],
+      "seed": 1,
+      "suffix_output_digests": [
+        "a93afb682fbb98b1791d49671cc81ee02ae37f74406de9da4ac4bea834f80224",
+        "7efa675147d611c53f0642b5a868d744987d4d2193cd4878fd88bb6dda00aaa8",
+        "324600b99a04069fec6e560959197313d08a1be7841de979105825294803277d",
+        "bc6cf4e4644195805bb4e06b346458bed5c2987716fc7dd12d71a474a4b495fe",
+        "50ce89dab2e1ab7b8ef733d7510f85688da872841d80f711baa08ed7b1e091a3",
+        "5a64bb514bb517c447f87b56468536fc5bd7b0d54c5c05f9f87c74c70cb592b1",
+        "7c72d22ae2a273111fe187b433e7affd30e6ef1ec969e3b9bfb1831e1f5a0a41",
+        "324600b99a04069fec6e560959197313d08a1be7841de979105825294803277d"
+      ],
+      "tokens": 1377,
+      "usd_at_declared_energy_rate": "0.000013806722",
+      "wallclock_seconds": 1.296276
+    },
+    {
+      "branches": 8,
+      "calls": 9,
+      "condition": "shared",
+      "idle_adjusted_joules": 190.829491,
+      "idle_adjusted_usd_at_declared_energy_rate": "0.000010601638",
+      "max_llama_cache_n": 0,
+      "nvml_joules": 231.16,
+      "pollard_meter_joules": 254.63836,
+      "pollard_meter_seconds": 1.154873,
+      "prefix_output_digests": [
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032"
+      ],
+      "seed": 0,
+      "suffix_output_digests": [
+        "e89a44ca5d61d4ab94f10514e274b3663b747e3829dc7636462c6d4bdc02fa91",
+        "6f568fd2734d8863676f27a2ef9a8931f14bd7d75494e38bfce0caca3c4fe874",
+        "2ca30e721f125c0c51d4a85fb45176836413820754f561680e6124d84712be5c",
+        "236ef5326b54a96a7738608644ee1c2795eea0025031f698f851e71e419901aa",
+        "50ce89dab2e1ab7b8ef733d7510f85688da872841d80f711baa08ed7b1e091a3",
+        "db7274a4aea5104f868419e9e5f394edc0749e937a265d890b6a262908c1329d",
+        "324600b99a04069fec6e560959197313d08a1be7841de979105825294803277d",
+        "324600b99a04069fec6e560959197313d08a1be7841de979105825294803277d"
+      ],
+      "tokens": 1375,
+      "usd_at_declared_energy_rate": "0.000012842222",
+      "wallclock_seconds": 1.195614
+    },
+    {
+      "branches": 8,
+      "calls": 16,
+      "condition": "naive",
+      "idle_adjusted_joules": 609.227622,
+      "idle_adjusted_usd_at_declared_energy_rate": "0.000033845979",
+      "max_llama_cache_n": 0,
+      "nvml_joules": 740.355,
+      "pollard_meter_joules": 740.355,
+      "pollard_meter_seconds": 3.832172,
+      "prefix_output_digests": [
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032",
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032",
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032",
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032",
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032",
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032",
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032",
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032"
+      ],
+      "seed": 0,
+      "suffix_output_digests": [
+        "e89a44ca5d61d4ab94f10514e274b3663b747e3829dc7636462c6d4bdc02fa91",
+        "6f568fd2734d8863676f27a2ef9a8931f14bd7d75494e38bfce0caca3c4fe874",
+        "2ca30e721f125c0c51d4a85fb45176836413820754f561680e6124d84712be5c",
+        "236ef5326b54a96a7738608644ee1c2795eea0025031f698f851e71e419901aa",
+        "50ce89dab2e1ab7b8ef733d7510f85688da872841d80f711baa08ed7b1e091a3",
+        "db7274a4aea5104f868419e9e5f394edc0749e937a265d890b6a262908c1329d",
+        "324600b99a04069fec6e560959197313d08a1be7841de979105825294803277d",
+        "324600b99a04069fec6e560959197313d08a1be7841de979105825294803277d"
+      ],
+      "tokens": 7976,
+      "usd_at_declared_energy_rate": "0.000041130833",
+      "wallclock_seconds": 3.887324
+    },
+    {
+      "branches": 2,
+      "calls": 3,
+      "condition": "shared",
+      "idle_adjusted_joules": 87.209181,
+      "idle_adjusted_usd_at_declared_energy_rate": "0.000004844955",
+      "max_llama_cache_n": 0,
+      "nvml_joules": 107.718,
+      "pollard_meter_joules": 107.718,
+      "pollard_meter_seconds": 0.599535,
+      "prefix_output_digests": [
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032"
+      ],
+      "seed": 2,
+      "suffix_output_digests": [
+        "d85811843f0894b839d0f7329d45c6eeb4d1d4cc45ae42b81938f223da75c371",
+        "6f568fd2734d8863676f27a2ef9a8931f14bd7d75494e38bfce0caca3c4fe874"
+      ],
+      "tokens": 1054,
+      "usd_at_declared_energy_rate": "0.000005984333",
+      "wallclock_seconds": 0.607992
+    },
+    {
+      "branches": 2,
+      "calls": 4,
+      "condition": "naive",
+      "idle_adjusted_joules": 137.116701,
+      "idle_adjusted_usd_at_declared_energy_rate": "0.000007617594",
+      "max_llama_cache_n": 0,
+      "nvml_joules": 170.047,
+      "pollard_meter_joules": 170.047,
+      "pollard_meter_seconds": 0.9591,
+      "prefix_output_digests": [
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032",
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032"
+      ],
+      "seed": 2,
+      "suffix_output_digests": [
+        "d85811843f0894b839d0f7329d45c6eeb4d1d4cc45ae42b81938f223da75c371",
+        "6f568fd2734d8863676f27a2ef9a8931f14bd7d75494e38bfce0caca3c4fe874"
+      ],
+      "tokens": 1997,
+      "usd_at_declared_energy_rate": "0.000009447056",
+      "wallclock_seconds": 0.976232
+    },
+    {
+      "branches": 4,
+      "calls": 8,
+      "condition": "naive",
+      "idle_adjusted_joules": 325.004707,
+      "idle_adjusted_usd_at_declared_energy_rate": "0.000018055817",
+      "max_llama_cache_n": 0,
+      "nvml_joules": 393.723,
+      "pollard_meter_joules": 393.723,
+      "pollard_meter_seconds": 2.002189,
+      "prefix_output_digests": [
+        "f51d39d1aad1b2ae64e17143abb21517e00d2c0d6ea4987dbd7c3192827ac7f3",
+        "f51d39d1aad1b2ae64e17143abb21517e00d2c0d6ea4987dbd7c3192827ac7f3",
+        "f51d39d1aad1b2ae64e17143abb21517e00d2c0d6ea4987dbd7c3192827ac7f3",
+        "f51d39d1aad1b2ae64e17143abb21517e00d2c0d6ea4987dbd7c3192827ac7f3"
+      ],
+      "seed": 1,
+      "suffix_output_digests": [
+        "a93afb682fbb98b1791d49671cc81ee02ae37f74406de9da4ac4bea834f80224",
+        "7efa675147d611c53f0642b5a868d744987d4d2193cd4878fd88bb6dda00aaa8",
+        "324600b99a04069fec6e560959197313d08a1be7841de979105825294803277d",
+        "bc6cf4e4644195805bb4e06b346458bed5c2987716fc7dd12d71a474a4b495fe"
+      ],
+      "tokens": 3993,
+      "usd_at_declared_energy_rate": "0.000021873500",
+      "wallclock_seconds": 2.037181
+    },
+    {
+      "branches": 4,
+      "calls": 5,
+      "condition": "shared",
+      "idle_adjusted_joules": 123.329617,
+      "idle_adjusted_usd_at_declared_energy_rate": "0.000006851645",
+      "max_llama_cache_n": 0,
+      "nvml_joules": 152.494,
+      "pollard_meter_joules": 168.388195,
+      "pollard_meter_seconds": 0.846488,
+      "prefix_output_digests": [
+        "f51d39d1aad1b2ae64e17143abb21517e00d2c0d6ea4987dbd7c3192827ac7f3"
+      ],
+      "seed": 1,
+      "suffix_output_digests": [
+        "a93afb682fbb98b1791d49671cc81ee02ae37f74406de9da4ac4bea834f80224",
+        "7efa675147d611c53f0642b5a868d744987d4d2193cd4878fd88bb6dda00aaa8",
+        "324600b99a04069fec6e560959197313d08a1be7841de979105825294803277d",
+        "bc6cf4e4644195805bb4e06b346458bed5c2987716fc7dd12d71a474a4b495fe"
+      ],
+      "tokens": 1164,
+      "usd_at_declared_energy_rate": "0.000008471889",
+      "wallclock_seconds": 0.86459
+    },
+    {
+      "branches": 4,
+      "calls": 5,
+      "condition": "shared",
+      "idle_adjusted_joules": 141.245556,
+      "idle_adjusted_usd_at_declared_energy_rate": "0.000007846975",
+      "max_llama_cache_n": 0,
+      "nvml_joules": 167.232,
+      "pollard_meter_joules": 167.232,
+      "pollard_meter_seconds": 0.750164,
+      "prefix_output_digests": [
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032"
+      ],
+      "seed": 0,
+      "suffix_output_digests": [
+        "e89a44ca5d61d4ab94f10514e274b3663b747e3829dc7636462c6d4bdc02fa91",
+        "6f568fd2734d8863676f27a2ef9a8931f14bd7d75494e38bfce0caca3c4fe874",
+        "2ca30e721f125c0c51d4a85fb45176836413820754f561680e6124d84712be5c",
+        "236ef5326b54a96a7738608644ee1c2795eea0025031f698f851e71e419901aa"
+      ],
+      "tokens": 1158,
+      "usd_at_declared_energy_rate": "0.000009290667",
+      "wallclock_seconds": 0.770379
+    },
+    {
+      "branches": 4,
+      "calls": 8,
+      "condition": "naive",
+      "idle_adjusted_joules": 306.259171,
+      "idle_adjusted_usd_at_declared_energy_rate": "0.000017014398",
+      "max_llama_cache_n": 0,
+      "nvml_joules": 371.604,
+      "pollard_meter_joules": 371.604,
+      "pollard_meter_seconds": 1.903416,
+      "prefix_output_digests": [
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032",
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032",
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032",
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032"
+      ],
+      "seed": 0,
+      "suffix_output_digests": [
+        "e89a44ca5d61d4ab94f10514e274b3663b747e3829dc7636462c6d4bdc02fa91",
+        "6f568fd2734d8863676f27a2ef9a8931f14bd7d75494e38bfce0caca3c4fe874",
+        "2ca30e721f125c0c51d4a85fb45176836413820754f561680e6124d84712be5c",
+        "236ef5326b54a96a7738608644ee1c2795eea0025031f698f851e71e419901aa"
+      ],
+      "tokens": 3987,
+      "usd_at_declared_energy_rate": "0.000020644667",
+      "wallclock_seconds": 1.937174
+    },
+    {
+      "branches": 8,
+      "calls": 9,
+      "condition": "shared",
+      "idle_adjusted_joules": 194.723197,
+      "idle_adjusted_usd_at_declared_energy_rate": "0.000010817955",
+      "max_llama_cache_n": 0,
+      "nvml_joules": 236.723,
+      "pollard_meter_joules": 236.723,
+      "pollard_meter_seconds": 1.19439,
+      "prefix_output_digests": [
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032"
+      ],
+      "seed": 4,
+      "suffix_output_digests": [
+        "0bce7b078e84e98b8f81710860e301bd596a60c97058d2aa7bbbb50649ea3cf7",
+        "6f568fd2734d8863676f27a2ef9a8931f14bd7d75494e38bfce0caca3c4fe874",
+        "f4e4f3be48f22c853540d01d8ff4de1ac659ec8cc2ecbeabc800d4f3a15141ef",
+        "236ef5326b54a96a7738608644ee1c2795eea0025031f698f851e71e419901aa",
+        "50ce89dab2e1ab7b8ef733d7510f85688da872841d80f711baa08ed7b1e091a3",
+        "337414b574e4d6d72da6c3ad34dc8eb67f4222f4a7f453879b87264ae73cbd22",
+        "324600b99a04069fec6e560959197313d08a1be7841de979105825294803277d",
+        "f202886cc94f354a5dfa5a6e3f63d4cdae2451b7a1c4b036ca9ea0c3d8a3a0e0"
+      ],
+      "tokens": 1380,
+      "usd_at_declared_energy_rate": "0.000013151278",
+      "wallclock_seconds": 1.245101
+    },
+    {
+      "branches": 8,
+      "calls": 16,
+      "condition": "naive",
+      "idle_adjusted_joules": 624.872924,
+      "idle_adjusted_usd_at_declared_energy_rate": "0.000034715162",
+      "max_llama_cache_n": 0,
+      "nvml_joules": 757.107,
+      "pollard_meter_joules": 757.107,
+      "pollard_meter_seconds": 3.858236,
+      "prefix_output_digests": [
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032",
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032",
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032",
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032",
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032",
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032",
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032",
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032"
+      ],
+      "seed": 4,
+      "suffix_output_digests": [
+        "0bce7b078e84e98b8f81710860e301bd596a60c97058d2aa7bbbb50649ea3cf7",
+        "6f568fd2734d8863676f27a2ef9a8931f14bd7d75494e38bfce0caca3c4fe874",
+        "f4e4f3be48f22c853540d01d8ff4de1ac659ec8cc2ecbeabc800d4f3a15141ef",
+        "236ef5326b54a96a7738608644ee1c2795eea0025031f698f851e71e419901aa",
+        "50ce89dab2e1ab7b8ef733d7510f85688da872841d80f711baa08ed7b1e091a3",
+        "337414b574e4d6d72da6c3ad34dc8eb67f4222f4a7f453879b87264ae73cbd22",
+        "324600b99a04069fec6e560959197313d08a1be7841de979105825294803277d",
+        "f202886cc94f354a5dfa5a6e3f63d4cdae2451b7a1c4b036ca9ea0c3d8a3a0e0"
+      ],
+      "tokens": 7981,
+      "usd_at_declared_energy_rate": "0.000042061500",
+      "wallclock_seconds": 3.920133
+    },
+    {
+      "branches": 4,
+      "calls": 8,
+      "condition": "naive",
+      "idle_adjusted_joules": 325.340104,
+      "idle_adjusted_usd_at_declared_energy_rate": "0.000018074450",
+      "max_llama_cache_n": 0,
+      "nvml_joules": 391.806,
+      "pollard_meter_joules": 391.806,
+      "pollard_meter_seconds": 1.936199,
+      "prefix_output_digests": [
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032",
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032",
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032",
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032"
+      ],
+      "seed": 3,
+      "suffix_output_digests": [
+        "0bce7b078e84e98b8f81710860e301bd596a60c97058d2aa7bbbb50649ea3cf7",
+        "7fb3ccbfa5bd73df22784f4859f78d54100705be5792fef340385708f2af0550",
+        "2ca30e721f125c0c51d4a85fb45176836413820754f561680e6124d84712be5c",
+        "236ef5326b54a96a7738608644ee1c2795eea0025031f698f851e71e419901aa"
+      ],
+      "tokens": 3991,
+      "usd_at_declared_energy_rate": "0.000021767000",
+      "wallclock_seconds": 1.970408
+    },
+    {
+      "branches": 4,
+      "calls": 5,
+      "condition": "shared",
+      "idle_adjusted_joules": 129.563676,
+      "idle_adjusted_usd_at_declared_energy_rate": "0.000007197982",
+      "max_llama_cache_n": 0,
+      "nvml_joules": 156.703,
+      "pollard_meter_joules": 156.703,
+      "pollard_meter_seconds": 0.788709,
+      "prefix_output_digests": [
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032"
+      ],
+      "seed": 3,
+      "suffix_output_digests": [
+        "0bce7b078e84e98b8f81710860e301bd596a60c97058d2aa7bbbb50649ea3cf7",
+        "7fb3ccbfa5bd73df22784f4859f78d54100705be5792fef340385708f2af0550",
+        "2ca30e721f125c0c51d4a85fb45176836413820754f561680e6124d84712be5c",
+        "236ef5326b54a96a7738608644ee1c2795eea0025031f698f851e71e419901aa"
+      ],
+      "tokens": 1162,
+      "usd_at_declared_energy_rate": "0.000008705722",
+      "wallclock_seconds": 0.804556
+    },
+    {
+      "branches": 8,
+      "calls": 9,
+      "condition": "shared",
+      "idle_adjusted_joules": 210.880344,
+      "idle_adjusted_usd_at_declared_energy_rate": "0.000011715575",
+      "max_llama_cache_n": 0,
+      "nvml_joules": 251.346,
+      "pollard_meter_joules": 267.042018,
+      "pollard_meter_seconds": 1.172556,
+      "prefix_output_digests": [
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032"
+      ],
+      "seed": 2,
+      "suffix_output_digests": [
+        "d85811843f0894b839d0f7329d45c6eeb4d1d4cc45ae42b81938f223da75c371",
+        "6f568fd2734d8863676f27a2ef9a8931f14bd7d75494e38bfce0caca3c4fe874",
+        "f4e4f3be48f22c853540d01d8ff4de1ac659ec8cc2ecbeabc800d4f3a15141ef",
+        "f1fdc9ac49e187b1b36dec58bd1b4d75e47e1643ab7af6e141169beae3c450e9",
+        "50ce89dab2e1ab7b8ef733d7510f85688da872841d80f711baa08ed7b1e091a3",
+        "1bd2fe3d8072992e1ed30bec4da3a4b8bd3244053436a57ae174de9c80fb0f30",
+        "324600b99a04069fec6e560959197313d08a1be7841de979105825294803277d",
+        "324600b99a04069fec6e560959197313d08a1be7841de979105825294803277d"
+      ],
+      "tokens": 1378,
+      "usd_at_declared_energy_rate": "0.000013963667",
+      "wallclock_seconds": 1.199621
+    },
+    {
+      "branches": 8,
+      "calls": 16,
+      "condition": "naive",
+      "idle_adjusted_joules": 629.71902,
+      "idle_adjusted_usd_at_declared_energy_rate": "0.000034984390",
+      "max_llama_cache_n": 0,
+      "nvml_joules": 763.956,
+      "pollard_meter_joules": 763.956,
+      "pollard_meter_seconds": 3.92124,
+      "prefix_output_digests": [
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032",
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032",
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032",
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032",
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032",
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032",
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032",
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032"
+      ],
+      "seed": 2,
+      "suffix_output_digests": [
+        "d85811843f0894b839d0f7329d45c6eeb4d1d4cc45ae42b81938f223da75c371",
+        "6f568fd2734d8863676f27a2ef9a8931f14bd7d75494e38bfce0caca3c4fe874",
+        "f4e4f3be48f22c853540d01d8ff4de1ac659ec8cc2ecbeabc800d4f3a15141ef",
+        "f1fdc9ac49e187b1b36dec58bd1b4d75e47e1643ab7af6e141169beae3c450e9",
+        "50ce89dab2e1ab7b8ef733d7510f85688da872841d80f711baa08ed7b1e091a3",
+        "1bd2fe3d8072992e1ed30bec4da3a4b8bd3244053436a57ae174de9c80fb0f30",
+        "324600b99a04069fec6e560959197313d08a1be7841de979105825294803277d",
+        "324600b99a04069fec6e560959197313d08a1be7841de979105825294803277d"
+      ],
+      "tokens": 7979,
+      "usd_at_declared_energy_rate": "0.000042442000",
+      "wallclock_seconds": 3.979509
+    },
+    {
+      "branches": 4,
+      "calls": 5,
+      "condition": "shared",
+      "idle_adjusted_joules": 132.034654,
+      "idle_adjusted_usd_at_declared_energy_rate": "0.000007335259",
+      "max_llama_cache_n": 0,
+      "nvml_joules": 159.129,
+      "pollard_meter_joules": 159.129,
+      "pollard_meter_seconds": 0.785669,
+      "prefix_output_digests": [
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032"
+      ],
+      "seed": 4,
+      "suffix_output_digests": [
+        "0bce7b078e84e98b8f81710860e301bd596a60c97058d2aa7bbbb50649ea3cf7",
+        "6f568fd2734d8863676f27a2ef9a8931f14bd7d75494e38bfce0caca3c4fe874",
+        "f4e4f3be48f22c853540d01d8ff4de1ac659ec8cc2ecbeabc800d4f3a15141ef",
+        "236ef5326b54a96a7738608644ee1c2795eea0025031f698f851e71e419901aa"
+      ],
+      "tokens": 1161,
+      "usd_at_declared_energy_rate": "0.000008840500",
+      "wallclock_seconds": 0.803223
+    },
+    {
+      "branches": 4,
+      "calls": 8,
+      "condition": "naive",
+      "idle_adjusted_joules": 313.851506,
+      "idle_adjusted_usd_at_declared_energy_rate": "0.000017436195",
+      "max_llama_cache_n": 0,
+      "nvml_joules": 381.298,
+      "pollard_meter_joules": 381.298,
+      "pollard_meter_seconds": 1.975885,
+      "prefix_output_digests": [
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032",
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032",
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032",
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032"
+      ],
+      "seed": 4,
+      "suffix_output_digests": [
+        "0bce7b078e84e98b8f81710860e301bd596a60c97058d2aa7bbbb50649ea3cf7",
+        "6f568fd2734d8863676f27a2ef9a8931f14bd7d75494e38bfce0caca3c4fe874",
+        "f4e4f3be48f22c853540d01d8ff4de1ac659ec8cc2ecbeabc800d4f3a15141ef",
+        "236ef5326b54a96a7738608644ee1c2795eea0025031f698f851e71e419901aa"
+      ],
+      "tokens": 3990,
+      "usd_at_declared_energy_rate": "0.000021183222",
+      "wallclock_seconds": 1.999478
+    },
+    {
+      "branches": 2,
+      "calls": 4,
+      "condition": "naive",
+      "idle_adjusted_joules": 160.235125,
+      "idle_adjusted_usd_at_declared_energy_rate": "0.000008901951",
+      "max_llama_cache_n": 0,
+      "nvml_joules": 195.162,
+      "pollard_meter_joules": 195.162,
+      "pollard_meter_seconds": 1.026337,
+      "prefix_output_digests": [
+        "f51d39d1aad1b2ae64e17143abb21517e00d2c0d6ea4987dbd7c3192827ac7f3",
+        "f51d39d1aad1b2ae64e17143abb21517e00d2c0d6ea4987dbd7c3192827ac7f3"
+      ],
+      "seed": 1,
+      "suffix_output_digests": [
+        "a93afb682fbb98b1791d49671cc81ee02ae37f74406de9da4ac4bea834f80224",
+        "7efa675147d611c53f0642b5a868d744987d4d2193cd4878fd88bb6dda00aaa8"
+      ],
+      "tokens": 2000,
+      "usd_at_declared_energy_rate": "0.000010842333",
+      "wallclock_seconds": 1.035421
+    },
+    {
+      "branches": 2,
+      "calls": 3,
+      "condition": "shared",
+      "idle_adjusted_joules": 113.623655,
+      "idle_adjusted_usd_at_declared_energy_rate": "0.000006312425",
+      "max_llama_cache_n": 0,
+      "nvml_joules": 135.842,
+      "pollard_meter_joules": 135.842,
+      "pollard_meter_seconds": 0.651351,
+      "prefix_output_digests": [
+        "f51d39d1aad1b2ae64e17143abb21517e00d2c0d6ea4987dbd7c3192827ac7f3"
+      ],
+      "seed": 1,
+      "suffix_output_digests": [
+        "a93afb682fbb98b1791d49671cc81ee02ae37f74406de9da4ac4bea834f80224",
+        "7efa675147d611c53f0642b5a868d744987d4d2193cd4878fd88bb6dda00aaa8"
+      ],
+      "tokens": 1057,
+      "usd_at_declared_energy_rate": "0.000007546778",
+      "wallclock_seconds": 0.658672
+    },
+    {
+      "branches": 8,
+      "calls": 16,
+      "condition": "naive",
+      "idle_adjusted_joules": 625.719883,
+      "idle_adjusted_usd_at_declared_energy_rate": "0.000034762216",
+      "max_llama_cache_n": 0,
+      "nvml_joules": 760.392,
+      "pollard_meter_joules": 760.392,
+      "pollard_meter_seconds": 3.900814,
+      "prefix_output_digests": [
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032",
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032",
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032",
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032",
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032",
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032",
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032",
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032"
+      ],
+      "seed": 3,
+      "suffix_output_digests": [
+        "0bce7b078e84e98b8f81710860e301bd596a60c97058d2aa7bbbb50649ea3cf7",
+        "7fb3ccbfa5bd73df22784f4859f78d54100705be5792fef340385708f2af0550",
+        "2ca30e721f125c0c51d4a85fb45176836413820754f561680e6124d84712be5c",
+        "236ef5326b54a96a7738608644ee1c2795eea0025031f698f851e71e419901aa",
+        "50ce89dab2e1ab7b8ef733d7510f85688da872841d80f711baa08ed7b1e091a3",
+        "4beaaf3357cde98cafe90cc8d57fff1f30be306a3606084e0b4c95be022f3e97",
+        "324600b99a04069fec6e560959197313d08a1be7841de979105825294803277d",
+        "324600b99a04069fec6e560959197313d08a1be7841de979105825294803277d"
+      ],
+      "tokens": 7984,
+      "usd_at_declared_energy_rate": "0.000042244000",
+      "wallclock_seconds": 3.992409
+    },
+    {
+      "branches": 8,
+      "calls": 9,
+      "condition": "shared",
+      "idle_adjusted_joules": 215.288992,
+      "idle_adjusted_usd_at_declared_energy_rate": "0.000011960500",
+      "max_llama_cache_n": 0,
+      "nvml_joules": 258.444,
+      "pollard_meter_joules": 258.444,
+      "pollard_meter_seconds": 1.228489,
+      "prefix_output_digests": [
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032"
+      ],
+      "seed": 3,
+      "suffix_output_digests": [
+        "0bce7b078e84e98b8f81710860e301bd596a60c97058d2aa7bbbb50649ea3cf7",
+        "7fb3ccbfa5bd73df22784f4859f78d54100705be5792fef340385708f2af0550",
+        "2ca30e721f125c0c51d4a85fb45176836413820754f561680e6124d84712be5c",
+        "236ef5326b54a96a7738608644ee1c2795eea0025031f698f851e71e419901aa",
+        "50ce89dab2e1ab7b8ef733d7510f85688da872841d80f711baa08ed7b1e091a3",
+        "4beaaf3357cde98cafe90cc8d57fff1f30be306a3606084e0b4c95be022f3e97",
+        "324600b99a04069fec6e560959197313d08a1be7841de979105825294803277d",
+        "324600b99a04069fec6e560959197313d08a1be7841de979105825294803277d"
+      ],
+      "tokens": 1383,
+      "usd_at_declared_energy_rate": "0.000014358000",
+      "wallclock_seconds": 1.279348
+    },
+    {
+      "branches": 2,
+      "calls": 3,
+      "condition": "shared",
+      "idle_adjusted_joules": 87.909647,
+      "idle_adjusted_usd_at_declared_energy_rate": "0.000004883869",
+      "max_llama_cache_n": 0,
+      "nvml_joules": 109.612,
+      "pollard_meter_joules": 109.612,
+      "pollard_meter_seconds": 0.62739,
+      "prefix_output_digests": [
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032"
+      ],
+      "seed": 4,
+      "suffix_output_digests": [
+        "0bce7b078e84e98b8f81710860e301bd596a60c97058d2aa7bbbb50649ea3cf7",
+        "6f568fd2734d8863676f27a2ef9a8931f14bd7d75494e38bfce0caca3c4fe874"
+      ],
+      "tokens": 1055,
+      "usd_at_declared_energy_rate": "0.000006089556",
+      "wallclock_seconds": 0.643375
+    },
+    {
+      "branches": 2,
+      "calls": 4,
+      "condition": "naive",
+      "idle_adjusted_joules": 179.636748,
+      "idle_adjusted_usd_at_declared_energy_rate": "0.000009979819",
+      "max_llama_cache_n": 0,
+      "nvml_joules": 214.371,
+      "pollard_meter_joules": 214.371,
+      "pollard_meter_seconds": 1.017239,
+      "prefix_output_digests": [
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032",
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032"
+      ],
+      "seed": 4,
+      "suffix_output_digests": [
+        "0bce7b078e84e98b8f81710860e301bd596a60c97058d2aa7bbbb50649ea3cf7",
+        "6f568fd2734d8863676f27a2ef9a8931f14bd7d75494e38bfce0caca3c4fe874"
+      ],
+      "tokens": 1998,
+      "usd_at_declared_energy_rate": "0.000011909500",
+      "wallclock_seconds": 1.029711
+    },
+    {
+      "branches": 2,
+      "calls": 3,
+      "condition": "shared",
+      "idle_adjusted_joules": 106.659408,
+      "idle_adjusted_usd_at_declared_energy_rate": "0.000005925523",
+      "max_llama_cache_n": 0,
+      "nvml_joules": 126.435,
+      "pollard_meter_joules": 92.478613,
+      "pollard_meter_seconds": 0.578224,
+      "prefix_output_digests": [
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032"
+      ],
+      "seed": 0,
+      "suffix_output_digests": [
+        "e89a44ca5d61d4ab94f10514e274b3663b747e3829dc7636462c6d4bdc02fa91",
+        "6f568fd2734d8863676f27a2ef9a8931f14bd7d75494e38bfce0caca3c4fe874"
+      ],
+      "tokens": 1051,
+      "usd_at_declared_energy_rate": "0.000007024167",
+      "wallclock_seconds": 0.586255
+    },
+    {
+      "branches": 2,
+      "calls": 4,
+      "condition": "naive",
+      "idle_adjusted_joules": 140.416284,
+      "idle_adjusted_usd_at_declared_energy_rate": "0.000007800905",
+      "max_llama_cache_n": 0,
+      "nvml_joules": 173.372,
+      "pollard_meter_joules": 173.372,
+      "pollard_meter_seconds": 0.968535,
+      "prefix_output_digests": [
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032",
+        "a393bdb747cb4cbbb01c98202e6356f9908cc9e477061416bd79dfa7baca3032"
+      ],
+      "seed": 0,
+      "suffix_output_digests": [
+        "e89a44ca5d61d4ab94f10514e274b3663b747e3829dc7636462c6d4bdc02fa91",
+        "6f568fd2734d8863676f27a2ef9a8931f14bd7d75494e38bfce0caca3c4fe874"
+      ],
+      "tokens": 1994,
+      "usd_at_declared_energy_rate": "0.000009631778",
+      "wallclock_seconds": 0.976986
+    }
+  ],
+  "runner_duration_seconds": 65.369906,
+  "started_at": "2026-07-13T16:09:41.028095+00:00",
+  "status": "passed",
+  "summary": [
+    {
+      "branches": 2,
+      "conditions": {
+        "naive": {
+          "idle_adjusted_joules": {
+            "ci95_half_width": 23.419708,
+            "mean": 150.757475
+          },
+          "idle_adjusted_usd_at_declared_energy_rate": {
+            "ci95_half_width": 1e-06,
+            "mean": 8e-06
+          },
+          "nvml_joules": {
+            "ci95_half_width": 23.367549,
+            "mean": 185.646
+          },
+          "tokens": {
+            "ci95_half_width": 2.719913,
+            "mean": 1997.4
+          },
+          "usd_at_declared_energy_rate": {
+            "ci95_half_width": 1e-06,
+            "mean": 1e-05
+          },
+          "wallclock_seconds": {
+            "ci95_half_width": 0.089493,
+            "mean": 1.034284
+          }
+        },
+        "shared": {
+          "idle_adjusted_joules": {
+            "ci95_half_width": 14.379441,
+            "mean": 98.520137
+          },
+          "idle_adjusted_usd_at_declared_energy_rate": {
+            "ci95_half_width": 1e-06,
+            "mean": 5e-06
+          },
+          "nvml_joules": {
+            "ci95_half_width": 14.650472,
+            "mean": 119.3562
+          },
+          "tokens": {
+            "ci95_half_width": 2.719913,
+            "mean": 1054.4
+          },
+          "usd_at_declared_energy_rate": {
+            "ci95_half_width": 1e-06,
+            "mean": 7e-06
+          },
+          "wallclock_seconds": {
+            "ci95_half_width": 0.039613,
+            "mean": 0.617693
+          }
+        }
+      },
+      "output_digest_parity": true,
+      "seeds": 5,
+      "shared_savings_pct": {
+        "idle_adjusted_joules": {
+          "ci95_half_width": 13.136333,
+          "mean": 33.864227
+        },
+        "idle_adjusted_usd_at_declared_energy_rate": {
+          "ci95_half_width": 13.136334,
+          "mean": 33.864224
+        },
+        "nvml_joules": {
+          "ci95_half_width": 10.428756,
+          "mean": 35.227991
+        },
+        "tokens": {
+          "ci95_half_width": 0.064325,
+          "mean": 47.21142
+        },
+        "usd_at_declared_energy_rate": {
+          "ci95_half_width": 10.428755,
+          "mean": 35.22799
+        },
+        "wallclock_seconds": {
+          "ci95_half_width": 6.179807,
+          "mean": 40.052576
+        }
+      }
+    },
+    {
+      "branches": 4,
+      "conditions": {
+        "naive": {
+          "idle_adjusted_joules": {
+            "ci95_half_width": 11.026455,
+            "mean": 315.908844
+          },
+          "idle_adjusted_usd_at_declared_energy_rate": {
+            "ci95_half_width": 1e-06,
+            "mean": 1.8e-05
+          },
+          "nvml_joules": {
+            "ci95_half_width": 12.140758,
+            "mean": 382.7694
+          },
+          "tokens": {
+            "ci95_half_width": 2.776,
+            "mean": 3990.0
+          },
+          "usd_at_declared_energy_rate": {
+            "ci95_half_width": 1e-06,
+            "mean": 2.1e-05
+          },
+          "wallclock_seconds": {
+            "ci95_half_width": 0.047031,
+            "mean": 1.982108
+          }
+        },
+        "shared": {
+          "idle_adjusted_joules": {
+            "ci95_half_width": 8.043486,
+            "mean": 131.215312
+          },
+          "idle_adjusted_usd_at_declared_energy_rate": {
+            "ci95_half_width": 0.0,
+            "mean": 7e-06
+          },
+          "nvml_joules": {
+            "ci95_half_width": 6.734081,
+            "mean": 158.5464
+          },
+          "tokens": {
+            "ci95_half_width": 2.776,
+            "mean": 1161.0
+          },
+          "usd_at_declared_energy_rate": {
+            "ci95_half_width": 0.0,
+            "mean": 9e-06
+          },
+          "wallclock_seconds": {
+            "ci95_half_width": 0.042226,
+            "mean": 0.810241
+          }
+        }
+      },
+      "output_digest_parity": true,
+      "seeds": 5,
+      "shared_savings_pct": {
+        "idle_adjusted_joules": {
+          "ci95_half_width": 3.792474,
+          "mean": 58.402477
+        },
+        "idle_adjusted_usd_at_declared_energy_rate": {
+          "ci95_half_width": 3.792474,
+          "mean": 58.402476
+        },
+        "nvml_joules": {
+          "ci95_half_width": 2.936724,
+          "mean": 58.534159
+        },
+        "tokens": {
+          "ci95_half_width": 0.04933,
+          "mean": 70.902273
+        },
+        "usd_at_declared_energy_rate": {
+          "ci95_half_width": 2.936725,
+          "mean": 58.534158
+        },
+        "wallclock_seconds": {
+          "ci95_half_width": 1.276648,
+          "mean": 59.134399
+        }
+      }
+    },
+    {
+      "branches": 8,
+      "conditions": {
+        "naive": {
+          "idle_adjusted_joules": {
+            "ci95_half_width": 9.889942,
+            "mean": 623.078951
+          },
+          "idle_adjusted_usd_at_declared_energy_rate": {
+            "ci95_half_width": 1e-06,
+            "mean": 3.5e-05
+          },
+          "nvml_joules": {
+            "ci95_half_width": 11.512207,
+            "mean": 756.363
+          },
+          "tokens": {
+            "ci95_half_width": 3.785959,
+            "mean": 7979.6
+          },
+          "usd_at_declared_energy_rate": {
+            "ci95_half_width": 1e-06,
+            "mean": 4.2e-05
+          },
+          "wallclock_seconds": {
+            "ci95_half_width": 0.056232,
+            "mean": 3.951259
+          }
+        },
+        "shared": {
+          "idle_adjusted_joules": {
+            "ci95_half_width": 12.909259,
+            "mean": 203.303398
+          },
+          "idle_adjusted_usd_at_declared_energy_rate": {
+            "ci95_half_width": 1e-06,
+            "mean": 1.1e-05
+          },
+          "nvml_joules": {
+            "ci95_half_width": 13.785006,
+            "mean": 245.2388
+          },
+          "tokens": {
+            "ci95_half_width": 3.785959,
+            "mean": 1378.6
+          },
+          "usd_at_declared_energy_rate": {
+            "ci95_half_width": 1e-06,
+            "mean": 1.4e-05
+          },
+          "wallclock_seconds": {
+            "ci95_half_width": 0.05652,
+            "mean": 1.243192
+          }
+        }
+      },
+      "output_digest_parity": true,
+      "seeds": 5,
+      "shared_savings_pct": {
+        "idle_adjusted_joules": {
+          "ci95_half_width": 1.729523,
+          "mean": 67.379548
+        },
+        "idle_adjusted_usd_at_declared_energy_rate": {
+          "ci95_half_width": 1.729524,
+          "mean": 67.379548
+        },
+        "nvml_joules": {
+          "ci95_half_width": 1.459938,
+          "mean": 67.584319
+        },
+        "tokens": {
+          "ci95_half_width": 0.039244,
+          "mean": 82.723454
+        },
+        "usd_at_declared_energy_rate": {
+          "ci95_half_width": 1.459938,
+          "mean": 67.584319
+        },
+        "wallclock_seconds": {
+          "ci95_half_width": 1.23286,
+          "mean": 68.539428
+        }
+      }
+    }
+  ]
+}

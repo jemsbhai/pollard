@@ -11,9 +11,12 @@ from openai import OpenAI
 from pollard import Budget, Runtime
 from pollard.adapters.openai import make_responses_fn
 
+client = OpenAI(max_retries=0)
 with Runtime("runs.db").run("triage", budget=Budget(tokens=20_000)) as run:
-    node = run.model_call({"model": "gpt-5.5", "input": "Summarize: ..."},
-                          fn=make_responses_fn(OpenAI()))
+    node = run.model_call(
+        {"model": "gpt-5.6", "input": "Summarize: ...", "max_output_tokens": 256},
+        fn=make_responses_fn(client, store=False),
+    )
     print(node.result["text"], run.report())
 ```
 
@@ -196,8 +199,8 @@ marks an unwanted tip without deleting history. Identical calls beneath the same
 parent compute the same node id, so hybrid and replay modes reuse recorded
 prefixes before branches diverge.
 
-EXP-001 measured this behavior only with deterministic mock token accounting.
-Its local-model, wall-clock, dollar, and joule legs remain unrun. See the
+EXP-001 now includes a pinned llama.cpp/Qwen local-model run with wall-clock,
+whole-GPU NVML energy, token, and declared electricity-rate measurements. See the
 [logbook](https://github.com/jemsbhai/pollard/blob/main/LOGBOOK.md) and
 [findings](https://github.com/jemsbhai/pollard/blob/main/findings.md) for the
 exact scope and results.
@@ -316,7 +319,32 @@ Use `TokenmasterMeter` instead of the built-in `TokenMeter` when you want tokenm
 
 ## Evidence
 
-Phase 4 adds the [experiment logbook](https://github.com/jemsbhai/pollard/blob/main/LOGBOOK.md)
-and [findings index](https://github.com/jemsbhai/pollard/blob/main/findings.md).
-README performance numbers are intentionally absent until a logged run supports
-the same scope.
+Every number below is scoped to its committed protocol and raw artifact. It is
+not a hosted-provider, throughput, availability, or total-cost claim.
+
+| Experiment | Recorded result |
+|---|---|
+| EXP-001 | Shared-prefix local inference reduced mean wall-clock by 40.05%, 59.13%, and 68.54% at 2, 4, and 8 branches; the corresponding whole-GPU NVML energy reductions were 35.23%, 58.53%, and 67.58%. |
+| EXP-004 | At 200 synthetic turns, the plain SQLite file was 38.93 times the interned file; fitted finite-range log-log exponents were 1.970694 and 1.201388. |
+| EXP-005 | Across 1,650 PostgreSQL contention rounds, exact limits never exceeded the configured limit; maximum estimator overshoot was 6 charges and never exceeded its registered bound. |
+
+The [evidence index](https://github.com/jemsbhai/pollard/blob/main/evidence/README.md)
+links protocols, raw JSON, reproduction commands, and limitations. The
+[experiment logbook](https://github.com/jemsbhai/pollard/blob/main/LOGBOOK.md)
+and [findings index](https://github.com/jemsbhai/pollard/blob/main/findings.md)
+retain the interpretation and claim history.
+
+## 1.0 Stability Covenant
+
+Starting with 1.0.0, these interoperability surfaces are frozen until 2.0:
+
+- the `pollard/v1` node-identity domain and identity document;
+- canonical identity serialization, including its supported value types;
+- the public `Store` protocol method signatures and meanings; and
+- the synchronous and asynchronous step-function result contracts.
+
+Other public APIs follow Semantic Versioning. The covenant, exact byte rules,
+and advance deprecation policy are specified in the
+[API stability policy](https://github.com/jemsbhai/pollard/blob/main/docs/api-stability.md).
+Version 0.9 is the review candidate for this covenant; the freeze begins only
+when 1.0.0 is released.

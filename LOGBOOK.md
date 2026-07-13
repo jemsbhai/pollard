@@ -252,6 +252,9 @@ Verification:
 - Mypy strict mode: passed for 32 source files.
 - Writing-standards scan: passed.
 - Wheel and source distribution: built successfully and passed Twine checks.
+- Source distribution inspection confirmed that the three raw evidence JSON
+  artifacts, evidence index, examples index, and API stability policy ship in
+  the archive.
 - Clean wheel install: imported successfully and exposed the `pollard` CLI with
   `show`, `report`, `verify`, `seal`, and `runs`.
 
@@ -471,3 +474,263 @@ Cost and claim boundary:
 - AWS, Azure, Google Cloud, and other model-provider spend: 0 USD.
 - The 20-round result supports the exact fixed release gate only. It is not a
   throughput, availability, or fully decentralized coordination claim.
+
+## 2026-07-13 EXP-001 Local-Model Protocol
+
+Status: registered by the Phase 9 roadmap before execution; exact executable
+conditions were fixed in `examples/exp_001_local_model.py` before timed runs.
+
+Question:
+
+- Does storing a common model-generated prefix once reduce local inference
+  wall-clock, token volume, whole-GPU energy, and electricity-rate cost when
+  producing 2, 4, or 8 suffix branches?
+
+Protocol:
+
+- Runtime: llama.cpp b9630, one parallel slot, prompt caching disabled, with
+  archive SHA-256 and `llama-server --version` output recorded.
+- Model: local Qwen2.5-Coder 7B GGUF with file size and SHA-256 recorded.
+- Conditions: naive full-prefix replay for every branch against one stored
+  prefix followed by suffix branches.
+- Branch counts: 2, 4, and 8. Seeds: 0 through 4. Condition order is randomized
+  and counterbalanced in a recorded schedule.
+- Measurements: condition-call wall-clock, generated-token counts, and raw
+  whole-GPU cumulative NVML energy. Model load, warmup, and idle-baseline time
+  are excluded from wall-clock.
+- Cost: raw NVML joules divided by 3,600,000 and multiplied by the committed
+  `evidence/prices.toml` USD/kWh rate. This excludes the host, cooling, capital,
+  labor, and all other total-cost components.
+- Statistics: per-condition means and two-sided 95% Student t confidence
+  intervals with four degrees of freedom.
+
+Pass rules:
+
+- Every naive/shared output digest pair matches.
+- Every llama.cpp response reports zero cached prompt tokens.
+- Mean shared-prefix wall-clock, raw NVML joules, declared-rate USD, and token
+  count are below the naive condition for every branch count.
+
+## 2026-07-13 EXP-001 Local-Model Result
+
+Status: passed.
+
+Environment:
+
+- Platform: Windows 11, build 26200; Python 3.12.2; Pollard 0.8.0 under test.
+- GPU: NVIDIA GeForce RTX 4090 Laptop GPU, 17,171,480,576 bytes reported
+  memory, driver 595.79.
+- Energy source: `nvmlDeviceGetTotalEnergyConsumption`, millijoule counter,
+  whole-GPU scope including other processes.
+- llama.cpp: b9630, version 9630 at commit `8ed274ef4`; release archive SHA-256
+  `cbb2a0b1c2459897560a654ed8dd2a816cd3989b81f9e019afd4859964794b7b`.
+- Model: `qwen2.5-coder:7b`, 4,683,074,048 bytes; SHA-256
+  `60e05f2100071479f596b964f89f510f057ce397ea22f2833a0cfe029bfc2463`.
+- Declared comparison rate: 0.20 USD/kWh. The committed price-table SHA-256 is
+  `a6489bf40761947e2dbd69f55d2863e3a2948f96b279a0253550e8c41430c398`.
+
+Results:
+
+| Branches | Mean wall-clock saving | 95% CI half-width | Mean whole-GPU NVML energy saving | 95% CI half-width | Mean token saving |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 2 | 40.052576% | 6.179807 pp | 35.227991% | 10.428756 pp | 47.211420% |
+| 4 | 59.134399% | 1.276648 pp | 58.534159% | 2.936724 pp | 70.902273% |
+| 8 | 68.539428% | 1.232860 pp | 67.584319% | 1.459938 pp | 82.723454% |
+
+- Every output digest matched and every response reported zero cached prompt
+  tokens.
+- Mean raw condition values for 2 branches were 1.034284 seconds and
+  185.6460 joules naive against 0.617693 seconds and 119.3562 joules shared.
+- For 4 branches they were 1.982108 seconds and 382.7694 joules naive against
+  0.810241 seconds and 158.5464 joules shared.
+- For 8 branches they were 3.951259 seconds and 756.3630 joules naive against
+  1.243192 seconds and 245.2388 joules shared.
+- Raw JSON: `evidence/EXP-001/local-model-result.json`.
+- Hosted-provider requests and spend: none, 0 USD.
+
+Interpretation boundary:
+
+- This supports the registered local hardware, model, runtime, prompt, and
+  branch-count scope. It does not establish a hosted-provider saving or general
+  performance across models and hardware.
+- Energy is a raw whole-GPU counter over each condition, not isolated process
+  energy. USD is a declared electricity-only conversion, not actual utility
+  cost or total cost of ownership.
+
+## 2026-07-13 EXP-004 Formal Storage-Curve Protocol
+
+Status: registered by the Phase 9 roadmap and the earlier Phase 7 checkpoint;
+the exact five-seed protocol was fixed in `examples/exp_004_storage.py` before
+the formal run.
+
+Question:
+
+- How do closed SQLite file sizes change over a finite 200-turn synthetic full
+  history when payload interning is enabled or disabled?
+
+Protocol and pass rules:
+
+- Create fresh databases for seeds 0 through 4 at 25, 50, 100, and 200 turns.
+- Add one deterministic 8,192-byte message per turn and store the full history
+  on every model-call node.
+- Compare the default 1,024-byte interning threshold with interning disabled.
+- Record closed database bytes and node-ID parity. Fit ordinary least squares
+  over natural-log turns and natural-log bytes, then report two-sided 95%
+  Student t intervals across seeds.
+- Pass only if every final node ID matches, interning is smaller at every
+  checkpoint and seed, and its fitted exponent is lower. Make no asymptotic
+  complexity claim.
+
+## 2026-07-13 EXP-004 Formal Storage-Curve Result
+
+Status: passed.
+
+Environment:
+
+- Windows 11 build 26200, Python 3.12.2, SQLite 3.43.1, Pollard 0.8.0 under
+  test, 4,096-byte pages, WAL journal mode, synchronous level 2.
+
+Results:
+
+| Turns | Mean interned bytes | Mean plain bytes | Plain/interned ratio |
+| ---: | ---: | ---: | ---: |
+| 25 | 352,256 | 2,756,608 | 7.825581 |
+| 50 | 688,128 | 10,588,160 | 15.386905 |
+| 100 | 1,613,824 | 41,734,144 | 25.860406 |
+| 200 | 4,255,744 | 165,683,200 | 38.931665 |
+
+- The fitted exponent mean was 1.201388 with interning and 1.970694 without.
+- File sizes were deterministic across the five seeds, so each size and
+  exponent confidence-interval half-width was 0.
+- Every node ID matched between conditions and every pass rule held.
+- Raw JSON: `evidence/EXP-004/result.json`.
+- Provider, network, and GPU calls: none. Provider spend: 0 USD.
+
+Interpretation boundary:
+
+- These are practical file sizes and finite-range fitted curves for one
+  synthetic workload. They do not prove linear or quadratic asymptotic growth.
+
+## 2026-07-13 EXP-005 Formal Contention Result
+
+Status: passed. The preregistered plan appears above as
+`2026-07-13 EXP-005 Draft Plan`; the final runner adds explicit call-duration,
+version, and seed matrices without changing its hypotheses.
+
+Environment:
+
+- Host: Windows 11 build 26200, Python 3.12.2, psycopg 3.3.4, Pollard 0.8.0
+  under test, Docker Desktop local containers.
+- PostgreSQL 14.23 image:
+  `postgres@sha256:f1341c01408dc7278e9d365ed4f860cd3f87dd16b4464ac326fc0f422083a579`.
+- PostgreSQL 18.4 image:
+  `postgres@sha256:9a8afca54e7861fd90fab5fdf4c42477a6b1cb7d293595148e674e0a3181de15`.
+
+Executed matrix:
+
+- Exact step and request meters: 2, 4, and 8 worker processes by 0, 10, and
+  50 millisecond call durations, 30 seeds per condition.
+- Estimated token meter: 2, 4, and 8 workers with actual charges below, equal
+  to, and above the four-token estimate, 30 seeds per condition.
+- Failure recovery: intentionally terminate a worker after reserve and before
+  settle with 1, 2, and 4 second leases, five seeds per condition.
+- Each PostgreSQL version ran 30 conditions and 825 rounds, for 1,650 rounds
+  total.
+
+Results:
+
+- Every condition passed with no database or worker error.
+- Exact step and request conditions never settled above their configured
+  limits. The largest exact settled amount was 16 against a limit of 16.
+- Estimated-token overshoot maxima across condition profiles were 0, 3, and 6
+  tokens. Every individual round satisfied `settled <= limit +` the sum of
+  positive actual-minus-estimate errors over admitted calls; minimum bound slack
+  was 0.
+- Every intentionally abandoned reservation returned active capacity on the
+  first post-expiry precheck. An expired reservation record remains until late
+  settle handling or garbage collection; it no longer consumes capacity.
+- Raw JSON: `evidence/EXP-005/result.json`.
+- Model-provider calls and spend: none, 0 USD.
+
+Implementation findings:
+
+- Concurrent first-use initialization exposed a PostgreSQL DDL race. Schema
+  creation now takes a transaction advisory lock.
+- Reservation settlement exposed a request-window row-lock gap that admitted
+  17 calls against a limit of 16. Settlement now locks the window scope before
+  moving an active reservation to its settled event. The corrected matrix and
+  repeated eight-writer regression passed.
+
+Interpretation boundary:
+
+- This supports the exact and estimator bounds under the recorded same-host
+  PostgreSQL matrix. It is not a throughput, availability, consensus,
+  network-partition, or multi-region experiment.
+
+## 2026-07-13 Phase 9 Reviewer-Adversary Pass
+
+Status: passed for EXP-001, EXP-004, and EXP-005 public claims; EXP-006 and the
+1.0 freeze remain pending.
+
+Review actions:
+
+- Replaced the stale README statement that local-model evidence was unrun with
+  the exact EXP-001 scope.
+- Attached an experiment ID to every README and launch numeric evidence claim.
+- Labeled the 4090 as a Laptop GPU and energy as raw whole-GPU NVML energy.
+- Labeled USD as a declared electricity-rate scenario and prohibited utility,
+  hosted-provider, amortization, and total-cost interpretations.
+- Described EXP-004 exponents as finite-range fits and prohibited asymptotic
+  claims.
+- Described EXP-005 as same-host correctness evidence and prohibited
+  throughput, availability, network-partition, multi-region, and consensus
+  claims.
+- Recorded the two defects discovered during evidence execution instead of
+  omitting failed preliminary behavior. Only the corrected reruns are the
+  formal passing artifact.
+- Added automated result-state, condition-count, output-parity, secret-pattern,
+  and README claim-ID checks.
+- Confirmed all evidence runners used local compute or local databases. OpenAI,
+  Anthropic, AWS, Azure, Google Cloud, and other provider spend was 0 USD.
+
+## 2026-07-13 v0.9.0 Evidence Candidate Checkpoint
+
+Scope:
+
+- Added committed raw results and reproduction runners for EXP-001 local-model
+  shared prefixes, EXP-004 SQLite storage curves, and EXP-005 PostgreSQL
+  contention and estimator bounds.
+- Added an evidence index, adversarial public-claim boundaries, and automated
+  artifact checks.
+- Published `Store` at the package root and documented the candidate 1.0
+  identity, canonical serialization, Store protocol, step-function contract,
+  and deprecation policy. The freeze does not begin until 1.0.0.
+- Updated provider documentation and recipes against current official guidance:
+  GPT-5.6 as the OpenAI default, Responses storage disabled in examples, Azure
+  OpenAI v1 client setup, Bedrock CountTokens limitations and IAM boundary, and
+  LiteLLM cloud routes.
+- EXP-006 and the sealed 1.0 launch case study remain pending target selection.
+
+Verification:
+
+- Main suite: 237 passed and 6 PostgreSQL-only tests skipped without a DSN.
+- Coverage: 91.21% against a 90% floor.
+- Fresh PostgreSQL 16 service subset: 67 passed, including repeated
+  eight-writer contention and first-use initialization.
+- Ruff: passed for source, tests, and examples.
+- Mypy strict mode: passed for 37 source files.
+- Writing-standards scan: passed for root, docs, examples, and evidence
+  Markdown.
+- Absolute-link scan: passed for every repository README.
+- Wheel and source distribution: built successfully and passed Twine checks.
+- Clean wheel install: imported 0.9.0, exposed `Store`, and ran the nine-command
+  console script.
+- Built wheel metadata contained 13 Markdown links and every target was an
+  absolute HTTPS URL.
+
+Cost and credentials:
+
+- No OpenAI, Anthropic, AWS, Azure, Google Cloud, or other model-provider call
+  was made. Provider spend for Phase 9 remains 0 USD.
+- No provider credential was read. The PostgreSQL release database used a
+  disposable local test credential and was removed after the service suite.

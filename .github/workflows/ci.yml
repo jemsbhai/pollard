@@ -37,7 +37,7 @@ jobs:
         shell: pwsh
         run: |
           $bad = 'robust|leverage|seamless|seamlessly|delve|harness|moreover|empower|unlock|elevate|streamline|foster|meticulous|pivotal|holistic|cutting-edge|game-changing|revolutionize'
-          $docs = @('README.md', 'CHANGELOG.md', 'LOGBOOK.md', 'findings.md') + (Get-ChildItem docs -Recurse -Filter '*.md' | ForEach-Object { $_.FullName })
+          $docs = @('README.md', 'CHANGELOG.md', 'LOGBOOK.md', 'findings.md', 'evidence/README.md', 'examples/README.md') + (Get-ChildItem docs -Recurse -Filter '*.md' | ForEach-Object { $_.FullName })
           $wordHits = Select-String -Path $docs -Pattern $bad -CaseSensitive:$false
           $charHits = Select-String -Path $docs -Pattern ([char]0x2014),([char]0x2013),([char]0x2018),([char]0x2019),([char]0x201C),([char]0x201D)
           if ($wordHits -or $charHits) {
