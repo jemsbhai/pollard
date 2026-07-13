@@ -1,0 +1,52 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pollard"
+version = "0.0.1"
+description = "Governed execution trees for AI agents: budget it, gate it, replay it."
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "AUTHOR_NAME_TODO", email = "jemsbhai@gmail.com"}]
+keywords = ["agents", "llm", "execution-tree", "budget", "audit", "replay", "mcp"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Typing :: Typed",
+]
+
+[project.urls]
+Homepage = "https://github.com/jemsbhai/pollard"
+Issues = "https://github.com/jemsbhai/pollard/issues"
+
+[project.optional-dependencies]
+nvml = ["nvidia-ml-py>=12.535"]
+schema = ["jsonschema>=4.21"]
+mcp = ["mcp>=1.0"]
+dev = ["pytest>=8", "pytest-cov>=5", "hypothesis>=6.100", "ruff>=0.5", "mypy>=1.10", "build", "twine"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+
+[tool.mypy]
+strict = true
+python_version = "3.10"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.coverage.run]
+source = ["src/pollard"]
