@@ -4,7 +4,11 @@ from __future__ import annotations
 
 import warnings
 from decimal import Decimal
-from typing import Any, Protocol, TypeAlias
+from importlib import import_module
+from typing import TYPE_CHECKING, Any, Protocol, TypeAlias
+
+if TYPE_CHECKING:
+    from .tokenmaster import TokenmasterMeter as TokenmasterMeter
 
 ChargeAmount: TypeAlias = int | float | Decimal
 
@@ -188,3 +192,12 @@ def _int_usage(usage: dict[str, Any], *keys: str) -> int:
         if isinstance(value, int):
             return value
     return 0
+
+
+def __getattr__(name: str) -> Any:
+    if name == "TokenmasterMeter":
+        module = import_module("pollard.meters.tokenmaster")
+        value = getattr(module, name)
+        globals()[name] = value
+        return value
+    raise AttributeError(f"module 'pollard.meters' has no attribute {name!r}")

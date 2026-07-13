@@ -32,11 +32,13 @@ What you get:
 
 Budget semantics are honest about what can be controlled. If a precheck estimate proves a step would exceed budget, pollard records a refusal node and does not call your function. If the actual result charge exceeds budget after the function returns, that node still stands because the spend already happened; later steps are refused.
 
-Limits in v0.3:
+Limits in v0.4:
 
 - Replay of sampled model calls serves the recorded output. It does not re-check that a provider would return that output again.
 - Hosted API energy use is not measured. The NVML energy meter is for local GPU inference only.
 - A SQLite store assumes one writer process.
+- HashRopeStore is an in-process append-only snapshot backend, not a multi-writer database.
+- TokenmasterMeter reports tokenmaster state from the usage data your model client returns; it does not tokenize prompts itself.
 - The audit tree is tamper-evident, not tamper-proof. Verification detects changed history, but it cannot stop deletion of the whole store file.
 
 ## Registry Firewall
@@ -74,4 +76,80 @@ def test_agent(pollard_run):
 
 Run with `--pollard-mode=record`, `--pollard-mode=hybrid`, or `--pollard-mode=replay`. The fixture stores small SQLite recordings under `tests/pollard_recordings/` by default.
 
+## Export Seals
+
+`seal(store, root_id)` returns a rolling SHA-256 report over a subtree's node ids
+and result digests. The final digest can be stored beside an exported run:
+
+```python
+from pollard import Runtime, seal
+
+rt = Runtime()
+with rt.run("audit") as run:
+    run.note({"status": "ready"})
+    report = seal(run.store, run.root_id)
+
+print(report.digest)
+print(report.to_dict())
+```
+
+The seal validates each visited node before hashing it. Mutable metadata is not
+included; see `docs/seal.md` for the field-level design.
+
+## Store Backends
+
+Core pollard includes `MemoryStore` and `SQLiteStore`. The optional hashrope backend keeps an append-only operation log inside a hashrope rope:
+
+```powershell
+pip install "pollard[hashrope]"
+```
+
+```python
+from pollard import HashRopeStore, Runtime
+
+store = HashRopeStore()
+with Runtime(store).run("hashrope-demo") as run:
+    run.note({"checkpoint": "stored in a hashrope log"})
+
+snapshot = store.to_bytes()
+reopened = HashRopeStore(snapshot)
+assert reopened.get(run.root_id).payload == {"run": "hashrope-demo"}
+```
+
 See `examples/` for offline scripts that run without network access.
+
+## Tokenmaster Meter
+
+The optional tokenmaster meter records Pollard model-call usage into tokenmaster and stores the resulting gauge plus advice on each node:
+
+```powershell
+pip install "pollard[tokenmaster]"
+```
+
+```python
+from pollard import Budget, Runtime
+from pollard.meters import StepMeter, TokenmasterMeter
+
+rt = Runtime(
+    meters=[
+        StepMeter(),
+        TokenmasterMeter(model="anthropic:claude-sonnet-4-6", expected_remaining_turns=5),
+    ]
+)
+
+with rt.run("tokenmaster-demo", budget=Budget(tokens=120_000, steps=20)) as run:
+    node = run.model_call(
+        {"model": "anthropic:claude-sonnet-4-6"},
+        fn=lambda _payload: {"usage": {"input_tokens": 1000, "output_tokens": 300}},
+    )
+    print(node.meta["charges"]["tokens"])
+    print(node.meta["tokenmaster"]["state"]["zone"])
+```
+
+Use `TokenmasterMeter` instead of the built-in `TokenMeter` when you want tokenmaster state and recommendations in the audit record. The budget charge remains the per-call token volume, including cache and reasoning token fields when present.
+
+## Evidence
+
+Phase 4 adds `LOGBOOK.md` and `findings.md` for experiment notes. README
+performance numbers are intentionally absent until a logged run supports the
+same scope.

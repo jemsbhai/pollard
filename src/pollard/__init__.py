@@ -7,7 +7,7 @@ from importlib import import_module
 from types import ModuleType
 from typing import TYPE_CHECKING, Any
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 
 if TYPE_CHECKING:
     from .aio import AsyncRun, AsyncRuntime
@@ -25,8 +25,9 @@ if TYPE_CHECKING:
     from .registry import ActionSpec, Registry
     from .replay import ReplayMode
     from .runtime import Run, Runtime
+    from .seal import SealEntry, SealReport, seal
     from .store import MemoryStore
-    from .stores import SQLiteStore
+    from .stores import HashRopeStore, SQLiteStore
     from .tree import Node, NodeKind
     from .verify import VerifyFinding, VerifyReport, verify
 
@@ -39,6 +40,7 @@ _EXPORTS = {
     "ConfirmationRequired": ("pollard.errors", "ConfirmationRequired"),
     "Decision": ("pollard.policy", "Decision"),
     "IntegrityError": ("pollard.errors", "IntegrityError"),
+    "HashRopeStore": ("pollard.stores.hashrope", "HashRopeStore"),
     "MemoryStore": ("pollard.store", "MemoryStore"),
     "MissingRecording": ("pollard.errors", "MissingRecording"),
     "Node": ("pollard.tree", "Node"),
@@ -51,11 +53,14 @@ _EXPORTS = {
     "ReplayMode": ("pollard.replay", "ReplayMode"),
     "Run": ("pollard.runtime", "Run"),
     "Runtime": ("pollard.runtime", "Runtime"),
+    "SealEntry": ("pollard.seal", "SealEntry"),
+    "SealReport": ("pollard.seal", "SealReport"),
     "SQLiteStore": ("pollard.stores", "SQLiteStore"),
     "UnsupportedSchema": ("pollard.errors", "UnsupportedSchema"),
     "VerifyFinding": ("pollard.verify", "VerifyFinding"),
     "VerifyReport": ("pollard.verify", "VerifyReport"),
     "recompute_charges": ("pollard.governor", "recompute_charges"),
+    "seal": ("pollard.seal", "seal"),
     "verify": ("pollard.verify", "verify"),
 }
 
@@ -67,6 +72,7 @@ __all__ = [
     "BudgetExceeded",
     "ConfirmationRequired",
     "Decision",
+    "HashRopeStore",
     "IntegrityError",
     "MemoryStore",
     "MissingRecording",
@@ -81,11 +87,14 @@ __all__ = [
     "Run",
     "Runtime",
     "SQLiteStore",
+    "SealEntry",
+    "SealReport",
     "UnsupportedSchema",
     "VerifyFinding",
     "VerifyReport",
     "__version__",
     "recompute_charges",
+    "seal",
     "verify",
 ]
 

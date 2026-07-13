@@ -4,6 +4,16 @@ All notable changes to pollard will be documented in this file.
 
 The format is based on Keep a Changelog, and this project follows Semantic Versioning.
 
+## [0.4.0] - 2026-07-13
+
+### Added
+
+- Add an optional hashrope-backed store with append-only log snapshots.
+- Add an optional tokenmaster-backed token meter with node metadata for state and advice.
+- Add `seal()` for rolling export digests over node ids and result digests.
+- Add Phase 4 offline benchmark script, logbook, and findings index.
+- Add launch plan notes for the v0.4 evidence wave.
+
 ## [0.3.0] - 2026-07-13
 
 ### Added
