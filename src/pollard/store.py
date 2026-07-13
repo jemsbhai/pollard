@@ -24,6 +24,8 @@ class Store(Protocol):
 
     def walk(self, root_id: str) -> Iterator[Node]: ...
 
+    def roots(self) -> list[str]: ...
+
 
 class MemoryStore:
     """Append-only in-memory store for tests and ephemeral runs."""
@@ -65,6 +67,12 @@ class MemoryStore:
         yield root
         for child_id in self.children(root_id):
             yield from self.walk(child_id)
+
+    def roots(self) -> list[str]:
+        return sorted(
+            (node_id for node_id, node in self._nodes.items() if node.parent is None),
+            key=lambda item: (str(self._nodes[item].payload.get("run", "")), item),
+        )
 
     def _handle_existing(self, existing: Node, incoming: Node) -> None:
         if existing.identity_tuple() != incoming.identity_tuple():

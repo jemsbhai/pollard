@@ -41,7 +41,7 @@ def main() -> None:
         builder.add_edge("governed_model", END)
         graph = builder.compile()
         print(graph.invoke({"prompt": "Explain content addressing.", "answer": ""})["answer"])
-        print("root:", run.root_id)
+        print("inspect:", f"pollard show langgraph-node.db {run.root_id}")
 
 
 if __name__ == "__main__":

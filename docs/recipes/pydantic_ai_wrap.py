@@ -42,7 +42,7 @@ def main() -> None:
             fn=call_agent,
         )
         print(node.result["text"])
-        print("root:", run.root_id)
+        print("inspect:", f"pollard show pydantic-ai.db {run.root_id}")
 
 
 if __name__ == "__main__":

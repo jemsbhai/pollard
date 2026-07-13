@@ -46,6 +46,9 @@ def test_hybrid_hit_serves_recording_and_accounts_avoided_charges() -> None:
     avoided = run.report()["avoided"]
     assert avoided["steps"] == 1.0
     assert avoided["tokens"] == 5.0
+    persisted = store.get(node.id).meta["avoided"]
+    assert persisted["steps"] == 1
+    assert persisted["tokens"] == 5
 
 
 def test_hybrid_miss_executes_and_stores() -> None:
@@ -70,6 +73,7 @@ def test_replay_hit_never_calls_fn_even_when_budget_would_refuse() -> None:
 
     assert node.result == RESULT
     assert run.report()["avoided"]["steps"] == 1.0
+    assert "avoided" not in store.get(node.id).meta
 
 
 def test_replay_miss_raises_missing_recording_without_calling_fn() -> None:

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import time
+import warnings
 from collections.abc import Callable, Iterator
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -28,12 +29,19 @@ from .hashing import digest_payload
 from .meters import DepthMeter, Meter, StepMeter, TokenMeter, WallClockMeter
 from .policy import Decision, Policy, PolicyContext
 from .registry import ActionSpec, Registry
-from .replay import ReplayMode, avoided_charges, normalize_mode, recorded_node_or_missing
+from .replay import (
+    ReplayMode,
+    avoided_charges,
+    normalize_mode,
+    record_avoided_charges,
+    recorded_node_or_missing,
+)
 from .store import MemoryStore, Store
 from .stores import SQLiteStore
 from .tree import Node, NodeKind
 
 DeltaCallback = Callable[[dict[str, Any]], None]
+NodeCallback = Callable[[Node], None]
 StepResult = dict[str, Any] | Iterator[dict[str, Any]]
 StepFn = Callable[[dict[str, Any]], StepResult]
 
@@ -64,6 +72,7 @@ class Runtime:
         policies: list[Policy] | None = None,
         dry_run: bool = False,
         mode: str | ReplayMode = ReplayMode.RECORD,
+        on_node: NodeCallback | None = None,
     ) -> None:
         self.store: Store = _coerce_store(store)
         self.meters = meters or [StepMeter(), DepthMeter(), WallClockMeter(), TokenMeter()]
@@ -71,13 +80,26 @@ class Runtime:
         self.policies = policies or []
         self.dry_run = dry_run
         self.mode = normalize_mode(mode)
+        self.on_node = on_node
+
+    def _put(self, node: Node) -> Node:
+        is_new = not self.store.exists(node.id)
+        self.store.put(node)
+        stored = self.store.get(node.id)
+        if is_new and self.on_node is not None:
+            try:
+                self.on_node(stored)
+            except Exception as exc:
+                warnings.warn(
+                    f"pollard on_node callback failed with {type(exc).__name__}",
+                    RuntimeWarning,
+                    stacklevel=2,
+                )
+        return stored
 
     def run(self, label: str, *, budget: Budget | None = None, attempt: int = 0) -> Run:
         root = Node.make(kind=NodeKind.ROOT, parent=None, payload={"run": label}, attempt=attempt)
-        if not self.store.exists(root.id):
-            self.store.put(root)
-        else:
-            root = self.store.get(root.id)
+        root = self._put(root) if not self.store.exists(root.id) else self.store.get(root.id)
         self._bind_registry(root.id)
         scopes = [] if budget is None else [_BudgetScope(budget=budget, anchor_id=root.id)]
         return Run(
@@ -200,7 +222,7 @@ class Run:
             attempt=attempt,
             meta={"created_at": _now_utc()},
         )
-        self.store.put(node)
+        node = self._runtime._put(node)
         self.cursor_id = node.id
         return node
 
@@ -214,7 +236,7 @@ class Run:
             attempt=attempt,
             meta={"created_at": _now_utc()},
         )
-        self.store.put(anchor)
+        anchor = self._runtime._put(anchor)
         scopes = [*_copy_scopes(self._budget_scopes)]
         if budget is not None:
             scopes.append(_BudgetScope(budget=budget, anchor_id=anchor.id))
@@ -289,10 +311,10 @@ class Run:
             result=result,
             meta=meta,
         )
-        self.store.put(node)
+        node = self._runtime._put(node)
         self.cursor_id = node.id
         self._settle_scopes()
-        return self.store.get(node.id)
+        return node
 
     def _registered_tool_call(
         self,
@@ -369,10 +391,10 @@ class Run:
                     "charges": {"steps": 1},
                 },
             )
-            self.store.put(node)
+            node = self._runtime._put(node)
             self.cursor_id = node.id
             self._settle_scopes()
-            return self.store.get(node.id)
+            return node
         if spec.handler is None:
             self._refuse_policy("registered action has no handler", payload)
         return self._call(
@@ -422,6 +444,8 @@ class Run:
             node=node,
         )
         self._add_avoided(charges)
+        if self._runtime.mode == ReplayMode.HYBRID:
+            record_avoided_charges(self.store, node.id, charges)
         self.cursor_id = node.id
         _reemit_chunks(node, on_delta)
         return node
@@ -491,7 +515,7 @@ class Run:
             payload=payload,
             meta={"created_at": _now_utc()},
         )
-        self.store.put(node)
+        node = self._runtime._put(node)
         self.cursor_id = node.id
         raise BudgetExceeded(f"budget exceeded for {meter}", node.id)
 
@@ -515,7 +539,7 @@ class Run:
             payload=payload,
             meta={"created_at": _now_utc()},
         )
-        self.store.put(node)
+        node = self._runtime._put(node)
         self.cursor_id = node.id
         raise PolicyViolation(detail, node.id)
 

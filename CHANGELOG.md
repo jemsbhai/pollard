@@ -4,6 +4,19 @@ All notable changes to pollard will be documented in this file.
 
 The format is based on Keep a Changelog, and this project follows Semantic Versioning.
 
+## [0.6.0] - 2026-07-13
+
+### Added
+
+- Add a direct Amazon Bedrock Converse adapter with streaming, tool-use, usage,
+  and opt-in CountTokens support against frozen fixtures.
+- Document Azure OpenAI through the existing OpenAI adapter and cloud routes
+  such as Vertex AI through the LiteLLM adapter.
+- Add `pollard show`, `report`, `verify`, `seal`, and `runs` with JSON output,
+  privacy-safe defaults, and a self-contained HTML tree export.
+- Add an optional OpenTelemetry bridge for offline topology-preserving export
+  and live node callbacks.
+
 ## [0.5.0] - 2026-07-13
 
 ### Added

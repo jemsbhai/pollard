@@ -16,7 +16,7 @@ async def _run_session(session: Any, tool: str, args: dict[str, Any]) -> None:
     async with runtime.run("mcp-registry", budget=Budget(steps=3)) as governed:
         node = await governed.atool_call(tool, args, version="mcp")
         print(json.dumps(node.result, indent=2, sort_keys=True))
-        print("root:", governed.root_id)
+        print("inspect:", f"pollard show mcp-registry.db {governed.root_id}")
 
 
 async def run(

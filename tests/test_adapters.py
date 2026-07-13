@@ -4,8 +4,11 @@ from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
 
+import pytest
+
 from pollard import AsyncRuntime, MemoryStore, Runtime
 from pollard.adapters.anthropic import make_messages_fn
+from pollard.adapters.bedrock import make_converse_fn
 from pollard.adapters.litellm import make_async_completion_fn, make_completion_fn
 from pollard.adapters.openai import (
     make_async_chat_completions_fn,
@@ -257,6 +260,99 @@ def test_litellm_non_stream_and_stream_fixtures() -> None:
     assert node.result["text"] == "litellm"
     assert node.result["usage"] == {"input_tokens": 5, "output_tokens": 2}
     assert calls[-1]["stream_options"] == {"include_usage": True}
+
+
+def test_bedrock_converse_normalizes_tools_usage_and_count_tokens() -> None:
+    calls: list[dict[str, Any]] = []
+    count_calls: list[dict[str, Any]] = []
+
+    class Client:
+        def converse(self, **kwargs: Any) -> dict[str, Any]:
+            calls.append(kwargs)
+            return load("bedrock_converse.json")
+
+        def count_tokens(self, **kwargs: Any) -> dict[str, int]:
+            count_calls.append(kwargs)
+            return {"inputTokens": 21}
+
+    adapter = make_converse_fn(Client(), count_tokens=True, guardrailConfig={"trace": "enabled"})
+    payload = {
+        "modelId": "us.amazon.nova-lite-v1:0",
+        "messages": [{"role": "user", "content": [{"text": "hello"}]}],
+        "inferenceConfig": {"maxTokens": 64},
+    }
+    result = adapter(payload)
+
+    assert isinstance(result, dict)
+    assert result["text"] == "fixture bedrock"
+    assert result["usage"] == {"input_tokens": 10, "output_tokens": 6}
+    assert result["tool_calls"] == [
+        {
+            "toolUseId": "tooluse_weather",
+            "name": "weather",
+            "input": {"city": "Boston"},
+        }
+    ]
+    assert calls[0]["guardrailConfig"] == {"trace": "enabled"}
+    assert adapter.estimate_input_tokens(payload) == 21
+    assert count_calls == [
+        {
+            "modelId": "us.amazon.nova-lite-v1:0",
+            "input": {
+                "converse": {
+                    "messages": payload["messages"],
+                }
+            },
+        }
+    ]
+
+
+def test_bedrock_converse_stream_runs_through_pollard() -> None:
+    calls: list[dict[str, Any]] = []
+
+    class Client:
+        def converse_stream(self, **kwargs: Any) -> dict[str, Any]:
+            calls.append(kwargs)
+            return {"stream": iter(load("bedrock_stream.json"))}
+
+    seen: list[dict[str, Any]] = []
+    node = Runtime(MemoryStore()).run("bedrock-stream").model_call(
+        {
+            "_pollard": {"provider": "aws.bedrock"},
+            "modelId": "us.amazon.nova-lite-v1:0",
+            "messages": [],
+        },
+        fn=make_converse_fn(Client(), stream=True),
+        on_delta=seen.append,
+        keep_chunks=True,
+    )
+
+    assert node.result["text"] == "bedrock"
+    assert node.result["usage"] == {"input_tokens": 9, "output_tokens": 5}
+    assert node.result["tool_calls"] == [
+        {
+            "toolUseId": "tooluse_stream",
+            "name": "weather",
+            "input": {"city": "Boston"},
+        }
+    ]
+    assert node.result["chunks"] == seen
+    assert calls[0]["modelId"] == "us.amazon.nova-lite-v1:0"
+    assert "_pollard" not in calls[0]
+
+
+def test_bedrock_stream_surfaces_provider_errors() -> None:
+    class Client:
+        def converse_stream(self, **_kwargs: Any) -> dict[str, Any]:
+            return {
+                "stream": iter(
+                    [{"throttlingException": {"message": "fixture throttle"}}]
+                )
+            }
+
+    stream = make_converse_fn(Client(), stream=True)({"modelId": "fixture", "messages": []})
+    with pytest.raises(RuntimeError, match=r"throttlingException.*fixture throttle"):
+        list(stream)
 
 
 def test_async_openai_and_litellm_stream_factories() -> None:

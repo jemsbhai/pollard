@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pollard"
-version = "0.5.0"
+version = "0.6.0"
 description = "Governed execution trees for AI agents: budget it, gate it, replay it."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -35,9 +35,14 @@ hashrope = ["hashrope>=0.2.2"]
 tokenmaster = ["tokenmaster>=0.1.0"]
 openai = ["openai>=1.66"]
 anthropic = ["anthropic>=0.40"]
+bedrock = ["boto3>=1.43.44"]
 litellm = ["litellm>=1.60"]
 estimate-openai = ["tiktoken>=0.7"]
-dev = ["pytest>=8", "pytest-cov>=5", "hypothesis>=6.100", "ruff>=0.5", "mypy>=1.10", "build", "twine", "hashrope>=0.2.2", "tokenmaster>=0.1.0"]
+otel = ["opentelemetry-api>=1.25"]
+dev = ["pytest>=8", "pytest-cov>=5", "hypothesis>=6.100", "ruff>=0.5", "mypy>=1.10", "build", "twine", "hashrope>=0.2.2", "tokenmaster>=0.1.0", "opentelemetry-sdk>=1.25"]
+
+[project.scripts]
+pollard = "pollard.cli:main"
 
 [project.entry-points.pytest11]
 pollard = "pollard.pytest_plugin"
