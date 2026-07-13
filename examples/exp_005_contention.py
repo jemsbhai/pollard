@@ -12,7 +12,7 @@ import statistics
 import sys
 import time
 from collections.abc import Sequence
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 from uuid import uuid4
@@ -609,7 +609,7 @@ def run_experiment(
     return {
         "id": "EXP-005",
         "status": "passed" if passed else "failed",
-        "started_at": datetime.now(UTC).isoformat(),
+        "started_at": datetime.now(timezone.utc).isoformat(),
         "session_id": session_id,
         "question": (
             "Do exact and estimated shared limits obey their documented concurrency bounds?"

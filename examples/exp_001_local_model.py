@@ -18,12 +18,10 @@ import urllib.error
 import urllib.request
 from collections.abc import Iterator
 from contextlib import contextmanager
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from decimal import Decimal
 from pathlib import Path
 from typing import Any
-
-import tomllib
 
 import pollard
 from pollard import Budget, MemoryStore, Runtime
@@ -424,16 +422,27 @@ def summarize(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return summaries
 
 
+def load_price_table(path: Path) -> dict[str, Any]:
+    try:
+        import tomllib
+    except ModuleNotFoundError:  # pragma: no cover - Python 3.10 compatibility
+        try:
+            import tomli as tomllib
+        except ModuleNotFoundError as exc:  # pragma: no cover - dependency message
+            raise RuntimeError("Python 3.10 requires tomli to read the price table") from exc
+    with path.open("rb") as stream:
+        return tomllib.load(stream)
+
+
 def run_experiment(args: argparse.Namespace) -> dict[str, Any]:
-    started_at = datetime.now(UTC)
+    started_at = datetime.now(timezone.utc)
     runner_started = time.perf_counter()
     runtime_sha256 = sha256_file(args.runtime_archive)
     model_sha256 = sha256_file(args.model)
     price_sha256 = sha256_file(args.price_table)
     _verify_hash("runtime archive", runtime_sha256, args.expected_runtime_sha256)
     _verify_hash("model", model_sha256, args.expected_model_sha256)
-    with args.price_table.open("rb") as stream:
-        prices = tomllib.load(stream)
+    prices = load_price_table(args.price_table)
     energy_price = prices.get("local_energy")
     if not isinstance(energy_price, dict):
         raise ValueError("price table omitted [local_energy]")
@@ -496,7 +505,7 @@ def run_experiment(args: argparse.Namespace) -> dict[str, Any]:
         "leg": "local_model",
         "status": "passed" if passed else "failed",
         "started_at": started_at.isoformat(),
-        "completed_at": datetime.now(UTC).isoformat(),
+        "completed_at": datetime.now(timezone.utc).isoformat(),
         "runner_duration_seconds": round(time.perf_counter() - runner_started, 6),
         "question": (
             "What wall-clock, whole-GPU energy, and declared-rate electricity cost "
