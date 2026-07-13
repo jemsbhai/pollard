@@ -6,6 +6,7 @@ dist/
 build/
 *.egg-info/
 .pytest_cache/
+.hypothesis/
 .coverage
 htmlcov/
 .mypy_cache/
