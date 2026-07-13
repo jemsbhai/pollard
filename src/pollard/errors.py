@@ -33,5 +33,14 @@ class ConfirmationRequired(PollardError):
         self.resume_token = resume_token
 
 
+class MissingRecording(PollardError):
+    """Raised when replay mode cannot find a stored result for a step."""
+
+    def __init__(self, message: str, node_id: str, payload_summary: str) -> None:
+        super().__init__(message)
+        self.node_id = node_id
+        self.payload_summary = payload_summary
+
+
 class UnsupportedSchema(PollardError):
     """Raised when a registry schema uses unsupported JSON Schema features."""

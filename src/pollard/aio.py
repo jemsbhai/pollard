@@ -15,6 +15,7 @@ from .governor import Budget
 from .meters import Meter
 from .policy import Decision, Policy, PolicyContext
 from .registry import ActionSpec, Registry
+from .replay import ReplayMode
 from .runtime import (
     Run,
     RunBranch,
@@ -41,6 +42,7 @@ class AsyncRuntime(Runtime):
         registry: Registry | None = None,
         policies: list[Policy] | None = None,
         dry_run: bool = False,
+        mode: str | ReplayMode = ReplayMode.RECORD,
     ) -> None:
         super().__init__(
             store,
@@ -48,6 +50,7 @@ class AsyncRuntime(Runtime):
             registry=registry,
             policies=policies,
             dry_run=dry_run,
+            mode=mode,
         )
 
     def run(self, label: str, *, budget: Budget | None = None, attempt: int = 0) -> AsyncRun:
@@ -159,6 +162,9 @@ class AsyncRun(Run):
         fn: AsyncStepFn,
         attempt: int,
     ) -> Node:
+        recorded = self._recorded_node(kind, payload, attempt)
+        if recorded is not None:
+            return recorded
         self._precheck(kind.value, payload)
         measurements = _start_measurements(self._runtime.meters)
         start = time.perf_counter()
@@ -246,6 +252,9 @@ class AsyncRun(Run):
                     attempt=attempt,
                 )
                 raise ConfirmationRequired("confirmation required by policy", prepared.id)
+        recorded = self._recorded_node(NodeKind.TOOL_CALL, payload, attempt)
+        if recorded is not None:
+            return recorded
         if self._runtime.dry_run and spec.side_effects:
             self._precheck(NodeKind.TOOL_CALL.value, payload)
             node = Node.make(

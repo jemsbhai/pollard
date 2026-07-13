@@ -4,6 +4,15 @@ All notable changes to pollard will be documented in this file.
 
 The format is based on Keep a Changelog, and this project follows Semantic Versioning.
 
+## [0.3.0] - 2026-07-13
+
+### Added
+
+- Add record, hybrid, and replay runtime modes with avoided-charge accounting.
+- Add `MissingRecording` and replay integrity checks before serving stored results.
+- Add the `pollard_run` pytest fixture and `--pollard-mode` option.
+- Add a committed replay recording and CI test that runs with sockets guarded.
+
 ## [0.2.0] - 2026-07-13
 
 ### Added

@@ -18,3 +18,5 @@ htmlcov/
 runs.db
 *.db-wal
 *.db-shm
+!tests/pollard_recordings/
+!tests/pollard_recordings/*.db

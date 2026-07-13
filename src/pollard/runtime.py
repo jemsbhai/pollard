@@ -28,6 +28,7 @@ from .hashing import digest_payload
 from .meters import DepthMeter, Meter, StepMeter, TokenMeter, WallClockMeter
 from .policy import Decision, Policy, PolicyContext
 from .registry import ActionSpec, Registry
+from .replay import ReplayMode, avoided_charges, normalize_mode, recorded_node_or_missing
 from .store import MemoryStore, Store
 from .stores import SQLiteStore
 from .tree import Node, NodeKind
@@ -60,12 +61,14 @@ class Runtime:
         registry: Registry | None = None,
         policies: list[Policy] | None = None,
         dry_run: bool = False,
+        mode: str | ReplayMode = ReplayMode.RECORD,
     ) -> None:
         self.store: Store = _coerce_store(store)
         self.meters = meters or [StepMeter(), DepthMeter(), WallClockMeter(), TokenMeter()]
         self.registry = registry
         self.policies = policies or []
         self.dry_run = dry_run
+        self.mode = normalize_mode(mode)
 
     def run(self, label: str, *, budget: Budget | None = None, attempt: int = 0) -> Run:
         root = Node.make(kind=NodeKind.ROOT, parent=None, payload={"run": label}, attempt=attempt)
@@ -243,6 +246,9 @@ class Run:
         fn: StepFn,
         attempt: int,
     ) -> Node:
+        recorded = self._recorded_node(kind, payload, attempt)
+        if recorded is not None:
+            return recorded
         self._precheck(kind.value, payload)
         measurements = _start_measurements(self._runtime.meters)
         start = time.perf_counter()
@@ -330,6 +336,9 @@ class Run:
                     attempt=attempt,
                 )
                 raise ConfirmationRequired("confirmation required by policy", prepared.id)
+        recorded = self._recorded_node(NodeKind.TOOL_CALL, payload, attempt)
+        if recorded is not None:
+            return recorded
         if self._runtime.dry_run and spec.side_effects:
             self._precheck(NodeKind.TOOL_CALL.value, payload)
             node = Node.make(
@@ -370,6 +379,37 @@ class Run:
             if amount != 0:
                 charges[meter.name] = charge_to_json(amount)
         return charges
+
+    def _recorded_node(
+        self,
+        kind: NodeKind,
+        payload: dict[str, IdentityValue],
+        attempt: int,
+    ) -> Node | None:
+        node = recorded_node_or_missing(
+            mode=self._runtime.mode,
+            store=self.store,
+            kind=kind,
+            parent_id=self.cursor_id,
+            payload=payload,
+            attempt=attempt,
+        )
+        if node is None:
+            return None
+        charges = avoided_charges(
+            meters=self._runtime.meters,
+            kind=kind.value,
+            payload=payload,
+            node=node,
+        )
+        self._add_avoided(charges)
+        self.cursor_id = node.id
+        return node
+
+    def _add_avoided(self, charges: dict[str, int | float]) -> None:
+        for name, amount in charges.items():
+            total = charge_to_decimal(self._avoided.get(name, 0)) + charge_to_decimal(amount)
+            self._avoided[name] = float(total)
 
     def _precheck(self, kind: str, payload: dict[str, IdentityValue]) -> None:
         estimates = self._estimates(kind, payload)

@@ -28,13 +28,13 @@ What you get:
 - Branch and rollback: make alternate children, move the cursor back, and keep shared history.
 - Audit: each node id commits to its ancestry and identity payload.
 - Registry firewall: registered tool calls resolve against a versioned action set or fail closed.
-- Replay-ready records: results live at nodes, separate from node identity, for later record and replay work.
+- Replay: record semantic steps once, then serve stored results in tests and CI.
 
 Budget semantics are honest about what can be controlled. If a precheck estimate proves a step would exceed budget, pollard records a refusal node and does not call your function. If the actual result charge exceeds budget after the function returns, that node still stands because the spend already happened; later steps are refused.
 
-Limits in v0.2:
+Limits in v0.3:
 
-- Replay of sampled model calls is not included until v0.3.
+- Replay of sampled model calls serves the recorded output. It does not re-check that a provider would return that output again.
 - Hosted API energy use is not measured. The NVML energy meter is for local GPU inference only.
 - A SQLite store assumes one writer process.
 - The audit tree is tamper-evident, not tamper-proof. Verification detects changed history, but it cannot stop deletion of the whole store file.
@@ -51,7 +51,27 @@ How it compares:
 
 - LangGraph and related graph runtimes execute a graph you author ahead of time. pollard ledgers the control flow your code performs and can wrap calls inside a graph node.
 - pydantic-ai, smolagents, and the OpenAI Agents SDK own more of the agent loop. pollard is bring-your-own-client and has zero core runtime dependencies.
-- Action firewall products judge tool calls by content policy. pollard v0.2 will add structural registry gating: an action resolves against a versioned registry or it does not execute.
+- Action firewall products judge tool calls by content policy. pollard uses structural registry gating: an action resolves against a versioned registry or it does not execute.
 - HTTP recorders pin transport bytes. pollard pins semantic steps, so recordings can outlive SDK or provider changes.
+
+## Record And Replay
+
+`Runtime(mode=...)` accepts three modes:
+
+- `record`: execute the function and store the result.
+- `hybrid`: serve a stored result when the computed node id already exists, otherwise execute and store.
+- `replay`: never call the function. A missing result raises `MissingRecording`.
+
+Replay mode verifies the stored node ancestry before serving a result. When `hybrid` or `replay` serves a stored result, `run.report()["avoided"]` records the charges that were skipped for that run.
+
+For pytest, install pollard with the `dev` extra or with pytest available, then use the fixture:
+
+```python
+def test_agent(pollard_run):
+    node = pollard_run.model_call(payload, fn=real_client)
+    assert "invoice" in node.result["text"].lower()
+```
+
+Run with `--pollard-mode=record`, `--pollard-mode=hybrid`, or `--pollard-mode=replay`. The fixture stores small SQLite recordings under `tests/pollard_recordings/` by default.
 
 See `examples/` for offline scripts that run without network access.

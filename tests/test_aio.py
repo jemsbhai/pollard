@@ -57,6 +57,33 @@ def test_async_model_call_matches_sync_identity() -> None:
     assert asyncio.run(scenario()) == sync_node.id
 
 
+def test_async_replay_hit_never_awaits_fn() -> None:
+    store = MemoryStore()
+
+    async def record() -> None:
+        run = AsyncRuntime(store, mode="record").run("async-replay")
+
+        async def fn(_payload: dict[str, object]) -> dict[str, object]:
+            return {"text": "ok", "usage": {"input_tokens": 1, "output_tokens": 1}}
+
+        await run.amodel_call({"model": "mock-1"}, fn=fn)
+
+    async def replay() -> None:
+        run = AsyncRuntime(store, mode="replay").run("async-replay")
+
+        async def fn(_payload: dict[str, object]) -> dict[str, object]:
+            raise AssertionError("replay mode awaited fn")
+
+        node = await run.amodel_call({"model": "mock-1"}, fn=fn)
+        assert node.result["text"] == "ok"
+        avoided = run.report()["avoided"]
+        assert avoided["steps"] == 1.0
+        assert avoided["tokens"] == 2.0
+
+    asyncio.run(record())
+    asyncio.run(replay())
+
+
 def test_async_registered_tool_awaits_handler() -> None:
     async def scenario() -> None:
         run = AsyncRuntime(MemoryStore(), registry=make_registry()).run("async-tool")
