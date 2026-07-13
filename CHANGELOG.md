@@ -6,6 +6,8 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-07-13
+
 ### Changed
 
 - Remove GitHub's package-publishing workflow and document the local-only,
