@@ -3,21 +3,27 @@
 __version__ = "0.0.1"
 
 from .errors import BudgetExceeded, IntegrityError, PollardError
+from .governor import Budget, recompute_charges
+from .runtime import Run, Runtime
 from .store import MemoryStore
 from .stores import SQLiteStore
 from .tree import Node, NodeKind
 from .verify import VerifyFinding, VerifyReport, verify
 
 __all__ = [
+    "Budget",
     "BudgetExceeded",
     "IntegrityError",
     "MemoryStore",
     "Node",
     "NodeKind",
     "PollardError",
+    "Run",
+    "Runtime",
     "SQLiteStore",
     "VerifyFinding",
     "VerifyReport",
     "__version__",
+    "recompute_charges",
     "verify",
 ]

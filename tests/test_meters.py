@@ -1,0 +1,69 @@
+import warnings
+from decimal import Decimal
+
+import pytest
+
+from pollard.meters import (
+    CostMeter,
+    StepMeter,
+    TokenMeter,
+    WallClockMeter,
+    usage_from_anthropic,
+    usage_from_openai,
+)
+
+
+def test_step_meter_charges_model_and_tool_calls_only() -> None:
+    meter = StepMeter()
+    assert meter.precheck_estimate("model_call", {}) == 1
+    assert meter.charge("tool_call", {}, {}, {}) == 1
+    assert meter.charge("note", {}, {}, {}) == 0
+
+
+def test_wall_clock_meter_reads_duration_meta() -> None:
+    meter = WallClockMeter()
+    assert meter.charge("model_call", {}, {}, {"duration_s": 0.25}) == 0.25
+    assert meter.charge("model_call", {}, {}, {}) == 0.0
+
+
+def test_token_meter_reads_standard_usage_shape() -> None:
+    meter = TokenMeter()
+    assert (
+        meter.charge(
+            "model_call",
+            {},
+            {"usage": {"input_tokens": 10, "output_tokens": 3}},
+            {},
+        )
+        == 13
+    )
+
+
+def test_token_meter_warns_once_for_missing_usage() -> None:
+    meter = TokenMeter()
+    with pytest.warns(UserWarning):
+        assert meter.charge("model_call", {}, {"text": "ok"}, {}) == 0
+    with warnings.catch_warnings(record=True) as caught:
+        assert meter.charge("model_call", {}, {"text": "ok"}, {}) == 0
+    assert caught == []
+
+
+def test_cost_meter_uses_decimal_arithmetic() -> None:
+    meter = CostMeter({"mock-1": {"input_per_1m": "2.00", "output_per_1m": "6.00"}})
+    assert meter.charge(
+        "model_call",
+        {"model": "mock-1"},
+        {"usage": {"input_tokens": 1_000_000, "output_tokens": 500_000}},
+        {},
+    ) == Decimal("5.00")
+
+
+def test_usage_helpers_normalize_provider_shapes() -> None:
+    assert usage_from_openai({"usage": {"prompt_tokens": 5, "completion_tokens": 7}}) == {
+        "input_tokens": 5,
+        "output_tokens": 7,
+    }
+    assert usage_from_anthropic({"usage": {"input_tokens": 11, "output_tokens": 13}}) == {
+        "input_tokens": 11,
+        "output_tokens": 13,
+    }

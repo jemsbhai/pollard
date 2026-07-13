@@ -1,0 +1,360 @@
+"""Sync runtime for governed execution trees."""
+
+from __future__ import annotations
+
+import time
+from collections.abc import Callable
+from dataclasses import dataclass, field
+from datetime import datetime, timezone
+from decimal import Decimal
+from pathlib import Path
+from typing import Any
+
+from ._canon import IdentityValue
+from .errors import BudgetExceeded
+from .governor import (
+    Budget,
+    BudgetCheck,
+    charge_to_decimal,
+    charge_to_json,
+    check_budget,
+    exhausted_after_settle,
+    recompute_charges,
+    spent_decimal,
+)
+from .hashing import digest_payload
+from .meters import DepthMeter, Meter, StepMeter, TokenMeter, WallClockMeter
+from .store import MemoryStore, Store
+from .stores import SQLiteStore
+from .tree import Node, NodeKind
+
+StepFn = Callable[[dict[str, Any]], dict[str, Any]]
+
+
+@dataclass
+class _BudgetScope:
+    budget: Budget
+    anchor_id: str
+    exhausted: set[str] = field(default_factory=set)
+
+
+class Runtime:
+    def __init__(
+        self,
+        store: str | Path | Store | None = None,
+        *,
+        meters: list[Meter] | None = None,
+    ) -> None:
+        self.store: Store = _coerce_store(store)
+        self.meters = meters or [StepMeter(), DepthMeter(), WallClockMeter(), TokenMeter()]
+
+    def run(self, label: str, *, budget: Budget | None = None, attempt: int = 0) -> Run:
+        root = Node.make(kind=NodeKind.ROOT, parent=None, payload={"run": label}, attempt=attempt)
+        if not self.store.exists(root.id):
+            self.store.put(root)
+        else:
+            root = self.store.get(root.id)
+        scopes = [] if budget is None else [_BudgetScope(budget=budget, anchor_id=root.id)]
+        return Run(
+            runtime=self,
+            root_id=root.id,
+            cursor_id=root.id,
+            label=label,
+            budget_scopes=scopes,
+        )
+
+    def resume(self, label: str, *, budget: Budget | None = None, attempt: int = 0) -> Run:
+        root = Node.make(kind=NodeKind.ROOT, parent=None, payload={"run": label}, attempt=attempt)
+        stored_root = self.store.get(root.id)
+        scopes = [] if budget is None else [_BudgetScope(budget=budget, anchor_id=stored_root.id)]
+        return Run(
+            runtime=self,
+            root_id=stored_root.id,
+            cursor_id=_deepest_non_pruned_leaf(self.store, stored_root.id),
+            label=label,
+            budget_scopes=scopes,
+        )
+
+
+class Run:
+    def __init__(
+        self,
+        *,
+        runtime: Runtime,
+        root_id: str,
+        cursor_id: str,
+        label: str,
+        budget_scopes: list[_BudgetScope],
+    ) -> None:
+        self._runtime = runtime
+        self.root_id = root_id
+        self.cursor_id = cursor_id
+        self.label = label
+        self._budget_scopes = budget_scopes
+        self._avoided: dict[str, float] = {}
+
+    @property
+    def store(self) -> Store:
+        return self._runtime.store
+
+    @property
+    def cursor(self) -> Node:
+        return self.store.get(self.cursor_id)
+
+    def __enter__(self) -> Run:
+        return self
+
+    def __exit__(self, _exc_type: object, _exc: object, _tb: object) -> None:
+        return None
+
+    def model_call(
+        self,
+        payload: dict[str, IdentityValue],
+        *,
+        fn: StepFn,
+        attempt: int = 0,
+    ) -> Node:
+        return self._call(NodeKind.MODEL_CALL, payload, fn=fn, attempt=attempt)
+
+    def tool_call(
+        self,
+        name: str,
+        args: dict[str, IdentityValue],
+        *,
+        fn: StepFn,
+        attempt: int = 0,
+    ) -> Node:
+        payload: dict[str, IdentityValue] = {"tool": name, "args": args}
+        return self._call(NodeKind.TOOL_CALL, payload, fn=fn, attempt=attempt)
+
+    def note(self, payload: dict[str, IdentityValue], *, attempt: int = 0) -> Node:
+        self._precheck(NodeKind.NOTE.value, payload)
+        node = Node.make(
+            kind=NodeKind.NOTE,
+            parent=self.cursor_id,
+            payload=payload,
+            attempt=attempt,
+            meta={"created_at": _now_utc()},
+        )
+        self.store.put(node)
+        self.cursor_id = node.id
+        return node
+
+    def branch(self, *, attempt: int = 0, budget: Budget | None = None) -> RunBranch:
+        payload: dict[str, IdentityValue] = {"branch": True}
+        self._precheck(NodeKind.NOTE.value, payload)
+        anchor = Node.make(
+            kind=NodeKind.NOTE,
+            parent=self.cursor_id,
+            payload=payload,
+            attempt=attempt,
+            meta={"created_at": _now_utc()},
+        )
+        self.store.put(anchor)
+        scopes = [*_copy_scopes(self._budget_scopes)]
+        if budget is not None:
+            scopes.append(_BudgetScope(budget=budget, anchor_id=anchor.id))
+        child = Run(
+            runtime=self._runtime,
+            root_id=self.root_id,
+            cursor_id=anchor.id,
+            label=self.label,
+            budget_scopes=scopes,
+        )
+        return RunBranch(parent=self, child=child)
+
+    def rollback(self, node_id: str | None = None, *, steps: int = 1) -> Node:
+        target = node_id
+        if target is None:
+            target = self.cursor_id
+            for _ in range(steps):
+                parent = self.store.get(target).parent
+                if parent is None:
+                    break
+                target = parent
+        self._ensure_ancestor(target)
+        self.cursor_id = target
+        return self.cursor
+
+    def prune(self) -> None:
+        self.store.update_meta(self.cursor_id, {"pruned": True})
+
+    def report(self) -> dict[str, dict[str, float]]:
+        return {
+            "spent": recompute_charges(self.store, self.root_id),
+            "avoided": dict(self._avoided),
+        }
+
+    def _call(
+        self,
+        kind: NodeKind,
+        payload: dict[str, IdentityValue],
+        *,
+        fn: StepFn,
+        attempt: int,
+    ) -> Node:
+        self._precheck(kind.value, payload)
+        start = time.perf_counter()
+        result = fn(payload)
+        duration = time.perf_counter() - start
+        meta: dict[str, Any] = {"created_at": _now_utc(), "duration_s": duration}
+        charges = self._charges(kind.value, payload, result, meta)
+        meta["charges"] = charges
+        if isinstance(result, dict) and isinstance(result.get("usage"), dict):
+            meta["usage"] = result["usage"]
+        node = Node.make(
+            kind=kind,
+            parent=self.cursor_id,
+            payload=payload,
+            attempt=attempt,
+            result=result,
+            meta=meta,
+        )
+        self.store.put(node)
+        self.cursor_id = node.id
+        self._settle_scopes()
+        return self.store.get(node.id)
+
+    def _charges(
+        self,
+        kind: str,
+        payload: dict[str, IdentityValue],
+        result: dict[str, Any],
+        meta: dict[str, Any],
+    ) -> dict[str, int | float]:
+        charges: dict[str, int | float] = {}
+        payload_any: dict[str, Any] = payload
+        for meter in self._runtime.meters:
+            amount = charge_to_decimal(meter.charge(kind, payload_any, result, meta))
+            if amount != 0:
+                charges[meter.name] = charge_to_json(amount)
+        return charges
+
+    def _precheck(self, kind: str, payload: dict[str, IdentityValue]) -> None:
+        estimates = self._estimates(kind, payload)
+        for scope in self._budget_scopes:
+            check = check_budget(
+                budget=scope.budget,
+                spent=spent_decimal(self.store, scope.anchor_id),
+                estimates=estimates,
+                exhausted=scope.exhausted,
+            )
+            if not check.ok:
+                self._refuse(check, kind, payload)
+
+    def _estimates(self, kind: str, payload: dict[str, IdentityValue]) -> dict[str, Decimal]:
+        estimates: dict[str, Decimal] = {}
+        payload_any: dict[str, Any] = payload
+        for meter in self._runtime.meters:
+            estimate = meter.precheck_estimate(kind, payload_any)
+            if estimate is not None:
+                estimates[meter.name] = charge_to_decimal(estimate)
+        next_depth = _depth(self.store, self.cursor_id) + 1
+        estimates["depth"] = Decimal(next_depth)
+        return estimates
+
+    def _refuse(
+        self,
+        check: BudgetCheck,
+        blocked_kind: str,
+        blocked_payload: dict[str, IdentityValue],
+    ) -> None:
+        meter = check.meter or "unknown"
+        payload: dict[str, IdentityValue] = {
+            "reason": "budget",
+            "meter": meter,
+            "requested": str(check.requested),
+            "remaining": str(check.remaining),
+            "blocked_kind": blocked_kind,
+            "blocked_payload_digest": digest_payload(blocked_payload),
+        }
+        node = Node.make(
+            kind=NodeKind.REFUSAL,
+            parent=self.cursor_id,
+            payload=payload,
+            meta={"created_at": _now_utc()},
+        )
+        self.store.put(node)
+        self.cursor_id = node.id
+        raise BudgetExceeded(f"budget exceeded for {meter}", node.id)
+
+    def _settle_scopes(self) -> None:
+        for scope in self._budget_scopes:
+            scope.exhausted.update(
+                exhausted_after_settle(
+                    budget=scope.budget,
+                    spent=spent_decimal(self.store, scope.anchor_id),
+                )
+            )
+
+    def _ensure_ancestor(self, node_id: str) -> None:
+        current: str | None = self.cursor_id
+        while current is not None:
+            if current == node_id:
+                return
+            current = self.store.get(current).parent
+        raise ValueError(f"{node_id} is not an ancestor of the cursor")
+
+
+@dataclass
+class RunBranch:
+    parent: Run
+    child: Run
+
+    def __enter__(self) -> Run:
+        return self.child
+
+    def __exit__(self, _exc_type: object, _exc: object, _tb: object) -> None:
+        return None
+
+
+def _coerce_store(store: str | Path | Store | None) -> Store:
+    if store is None:
+        return MemoryStore()
+    if isinstance(store, str | Path):
+        return SQLiteStore(store)
+    return store
+
+
+def _copy_scopes(scopes: list[_BudgetScope]) -> list[_BudgetScope]:
+    return [
+        _BudgetScope(
+            budget=scope.budget,
+            anchor_id=scope.anchor_id,
+            exhausted=set(scope.exhausted),
+        )
+        for scope in scopes
+    ]
+
+
+def _now_utc() -> str:
+    return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+def _depth(store: Store, node_id: str) -> int:
+    depth = 0
+    current = store.get(node_id).parent
+    while current is not None:
+        depth += 1
+        current = store.get(current).parent
+    return depth
+
+
+def _deepest_non_pruned_leaf(store: Store, root_id: str) -> str:
+    best_id = root_id
+    best_depth = 0
+    for node in store.walk(root_id):
+        if node.meta.get("pruned") is True:
+            continue
+        children = [
+            child_id
+            for child_id in store.children(node.id)
+            if store.get(child_id).meta.get("pruned") is not True
+        ]
+        if children:
+            continue
+        node_depth = _depth(store, node.id)
+        if node_depth > best_depth or (node_depth == best_depth and node.id < best_id):
+            best_depth = node_depth
+            best_id = node.id
+    return best_id
