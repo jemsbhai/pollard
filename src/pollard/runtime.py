@@ -8,7 +8,8 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from decimal import Decimal
 from pathlib import Path
-from typing import Any
+from types import TracebackType
+from typing import Any, Protocol
 
 from ._canon import IdentityValue
 from .errors import BudgetExceeded
@@ -194,10 +195,16 @@ class Run:
         attempt: int,
     ) -> Node:
         self._precheck(kind.value, payload)
+        measurements = _start_measurements(self._runtime.meters)
         start = time.perf_counter()
-        result = fn(payload)
-        duration = time.perf_counter() - start
+        try:
+            result = fn(payload)
+        finally:
+            duration = time.perf_counter() - start
+            _stop_measurements(measurements)
         meta: dict[str, Any] = {"created_at": _now_utc(), "duration_s": duration}
+        for measurement in measurements:
+            meta.update(measurement.readings())
         charges = self._charges(kind.value, payload, result, meta)
         meta["charges"] = charges
         if isinstance(result, dict) and isinstance(result.get("usage"), dict):
@@ -308,6 +315,19 @@ class RunBranch:
         return None
 
 
+class _Measurement(Protocol):
+    def __enter__(self) -> _Measurement: ...
+
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc: BaseException | None,
+        tb: TracebackType | None,
+    ) -> None: ...
+
+    def readings(self) -> dict[str, float]: ...
+
+
 def _coerce_store(store: str | Path | Store | None) -> Store:
     if store is None:
         return MemoryStore()
@@ -325,6 +345,23 @@ def _copy_scopes(scopes: list[_BudgetScope]) -> list[_BudgetScope]:
         )
         for scope in scopes
     ]
+
+
+def _start_measurements(meters: list[Meter]) -> list[_Measurement]:
+    measurements: list[_Measurement] = []
+    for meter in meters:
+        measure = getattr(meter, "measure", None)
+        if not callable(measure):
+            continue
+        measurement = measure()
+        measurement.__enter__()
+        measurements.append(measurement)
+    return measurements
+
+
+def _stop_measurements(measurements: list[_Measurement]) -> None:
+    for measurement in reversed(measurements):
+        measurement.__exit__(None, None, None)
 
 
 def _now_utc() -> str:

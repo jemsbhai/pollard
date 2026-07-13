@@ -5,6 +5,48 @@ import pytest
 from pollard import Budget, BudgetExceeded, MemoryStore, Runtime, SQLiteStore
 
 
+class FakeMeasurement:
+    def __init__(self) -> None:
+        self.entered = False
+        self.exited = False
+
+    def __enter__(self) -> "FakeMeasurement":
+        self.entered = True
+        return self
+
+    def __exit__(self, exc_type: object, exc: object, tb: object) -> None:
+        del exc_type, exc, tb
+        self.exited = True
+
+    def readings(self) -> dict[str, float]:
+        return {"joules": 2.5}
+
+
+class FakeJouleMeter:
+    name = "joules"
+
+    def __init__(self) -> None:
+        self.measurement = FakeMeasurement()
+
+    def measure(self) -> FakeMeasurement:
+        return self.measurement
+
+    def charge(
+        self,
+        node_kind: str,
+        payload: dict[str, object],
+        result: object,
+        meta: dict[str, object],
+    ) -> float:
+        del node_kind, payload, result
+        value = meta.get("joules", 0.0)
+        return float(value)
+
+    def precheck_estimate(self, node_kind: str, payload: dict[str, object]) -> None:
+        del node_kind, payload
+        return None
+
+
 def test_model_call_records_result_charges_and_moves_cursor() -> None:
     with Runtime(MemoryStore()).run("model") as run:
         node = run.model_call(
@@ -18,6 +60,16 @@ def test_model_call_records_result_charges_and_moves_cursor() -> None:
     assert node.result == {"text": "ok", "usage": {"input_tokens": 2, "output_tokens": 3}}
     assert node.meta["charges"]["steps"] == 1
     assert node.meta["charges"]["tokens"] == 5
+
+
+def test_runtime_records_measurement_meter_readings() -> None:
+    meter = FakeJouleMeter()
+    run = Runtime(MemoryStore(), meters=[meter]).run("measure")
+    node = run.model_call({"model": "mock-1"}, fn=lambda _payload: {"text": "ok"})
+    assert meter.measurement.entered
+    assert meter.measurement.exited
+    assert node.meta["joules"] == 2.5
+    assert node.meta["charges"]["joules"] == 2.5
 
 
 def test_tool_call_wraps_name_and_args_in_payload() -> None:
