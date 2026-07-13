@@ -9,7 +9,7 @@ description = "Governed execution trees for AI agents: budget it, gate it, repla
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
-authors = [{name = "AUTHOR_NAME_TODO", email = "jemsbhai@gmail.com"}]
+authors = [{name = "Muntaser Syed", email = "jemsbhai@gmail.com"}]
 keywords = ["agents", "llm", "execution-tree", "budget", "audit", "replay", "mcp"]
 classifiers = [
   "Development Status :: 3 - Alpha",
