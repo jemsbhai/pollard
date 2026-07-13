@@ -204,5 +204,46 @@ def test_sync_runtime_rejects_async_registered_handler() -> None:
         run.tool_call("echo", {"text": "hello"})
 
 
+def test_async_stream_forwards_and_replays_chunks() -> None:
+    store = MemoryStore()
+
+    async def stream(_payload: dict[str, object]):  # type: ignore[no-untyped-def]
+        yield {"delta": {"text": "async "}}
+        yield {
+            "result": {
+                "text": "async stream",
+                "usage": {"input_tokens": 2, "output_tokens": 1},
+            }
+        }
+
+    async def scenario() -> None:
+        live_seen: list[dict[str, object]] = []
+
+        async def on_delta(chunk: dict[str, object]) -> None:
+            live_seen.append(chunk)
+
+        live = AsyncRuntime(store, mode="record").run("async-stream")
+        node = await live.amodel_call(
+            {"model": "mock-1"},
+            fn=stream,
+            on_delta=on_delta,
+            keep_chunks=True,
+        )
+        assert node.result["text"] == "async stream"
+        assert node.meta["charges"]["steps"] == 1
+        assert node.meta["charges"]["tokens"] == 3
+
+        replay_seen: list[dict[str, object]] = []
+        replay = AsyncRuntime(store, mode="replay").run("async-stream")
+        replayed = await replay.amodel_call(
+            {"model": "mock-1"},
+            fn=stream,
+            on_delta=replay_seen.append,
+        )
+        assert live_seen == replay_seen == replayed.result["chunks"]
+
+    asyncio.run(scenario())
+
+
 async def _async_result(text: str) -> dict[str, object]:
     return {"text": text, "usage": {"input_tokens": 0, "output_tokens": 0}}

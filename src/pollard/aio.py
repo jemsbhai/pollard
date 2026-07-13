@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import time
-from collections.abc import Awaitable, Callable
+from collections.abc import AsyncIterator, Awaitable, Callable, Iterator
 from datetime import datetime, timezone
 from inspect import isawaitable
 from pathlib import Path
@@ -23,6 +23,7 @@ from .runtime import (
     _BudgetScope,
     _copy_scopes,
     _deepest_non_pruned_leaf,
+    _merge_stream_value,
     _PendingToolCall,
     _start_measurements,
     _stop_measurements,
@@ -30,7 +31,12 @@ from .runtime import (
 from .store import Store
 from .tree import Node, NodeKind
 
-AsyncStepFn = Callable[[dict[str, Any]], Awaitable[dict[str, Any]]]
+AsyncDeltaCallback = Callable[[dict[str, Any]], Awaitable[None] | None]
+AsyncStepResult = dict[str, Any] | Iterator[dict[str, Any]] | AsyncIterator[dict[str, Any]]
+AsyncStepFn = Callable[
+    [dict[str, Any]],
+    Awaitable[AsyncStepResult] | AsyncIterator[dict[str, Any]],
+]
 
 
 class AsyncRuntime(Runtime):
@@ -99,8 +105,17 @@ class AsyncRun(Run):
         *,
         fn: AsyncStepFn,
         attempt: int = 0,
+        on_delta: AsyncDeltaCallback | None = None,
+        keep_chunks: bool = False,
     ) -> Node:
-        return await self._acall(NodeKind.MODEL_CALL, payload, fn=fn, attempt=attempt)
+        return await self._acall(
+            NodeKind.MODEL_CALL,
+            payload,
+            fn=fn,
+            attempt=attempt,
+            on_delta=on_delta,
+            keep_chunks=keep_chunks,
+        )
 
     async def atool_call(
         self,
@@ -161,15 +176,27 @@ class AsyncRun(Run):
         *,
         fn: AsyncStepFn,
         attempt: int,
+        on_delta: AsyncDeltaCallback | None = None,
+        keep_chunks: bool = False,
     ) -> Node:
         recorded = self._recorded_node(kind, payload, attempt)
         if recorded is not None:
+            await _areemit_chunks(recorded, on_delta)
             return recorded
         self._precheck(kind.value, payload)
         measurements = _start_measurements(self._runtime.meters)
         start = time.perf_counter()
         try:
-            result = await fn(payload)
+            pending = fn(payload)
+            if isinstance(pending, AsyncIterator):
+                produced: AsyncStepResult = pending
+            else:
+                produced = await pending
+            result = await _aconsume_step_result(
+                produced,
+                on_delta=on_delta,
+                keep_chunks=keep_chunks,
+            )
         finally:
             duration = time.perf_counter() - start
             _stop_measurements(measurements)
@@ -310,6 +337,72 @@ def _async_registered_handler(
         return result
 
     return call
+
+
+async def _aconsume_step_result(
+    value: AsyncStepResult,
+    *,
+    on_delta: AsyncDeltaCallback | None,
+    keep_chunks: bool,
+) -> dict[str, Any]:
+    if isinstance(value, dict):
+        return value
+    chunks: list[dict[str, Any]] = []
+    result: dict[str, Any] = {}
+    if isinstance(value, AsyncIterator):
+        async for item in value:
+            await _aconsume_chunk(item, chunks, result, on_delta)
+    elif isinstance(value, Iterator):
+        for item in value:
+            await _aconsume_chunk(item, chunks, result, on_delta)
+    else:
+        raise TypeError("async step function must return a dict or a chunk iterator")
+    if keep_chunks:
+        result["chunks"] = chunks
+    return result
+
+
+async def _aconsume_chunk(
+    item: dict[str, Any],
+    chunks: list[dict[str, Any]],
+    result: dict[str, Any],
+    on_delta: AsyncDeltaCallback | None,
+) -> None:
+    if not isinstance(item, dict):
+        raise TypeError("stream chunks must be dicts")
+    chunk = dict(item)
+    chunks.append(chunk)
+    if on_delta is not None:
+        emitted = on_delta(chunk)
+        if isawaitable(emitted):
+            await emitted
+    complete = chunk.get("result")
+    delta = chunk.get("delta")
+    if complete is not None:
+        if not isinstance(complete, dict):
+            raise TypeError("a stream chunk result must be a dict")
+        result.clear()
+        result.update(complete)
+    elif delta is not None:
+        if not isinstance(delta, dict):
+            raise TypeError("a stream chunk delta must be a dict")
+        _merge_stream_value(result, delta)
+    else:
+        _merge_stream_value(result, chunk)
+
+
+async def _areemit_chunks(node: Node, on_delta: AsyncDeltaCallback | None) -> None:
+    if on_delta is None or not isinstance(node.result, dict):
+        return
+    chunks = node.result.get("chunks")
+    if not isinstance(chunks, list):
+        return
+    for chunk in chunks:
+        if not isinstance(chunk, dict):
+            continue
+        emitted = on_delta(chunk)
+        if isawaitable(emitted):
+            await emitted
 
 
 def _now_utc() -> str:

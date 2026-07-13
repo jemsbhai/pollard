@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import time
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from decimal import Decimal
@@ -33,7 +33,9 @@ from .store import MemoryStore, Store
 from .stores import SQLiteStore
 from .tree import Node, NodeKind
 
-StepFn = Callable[[dict[str, Any]], dict[str, Any]]
+DeltaCallback = Callable[[dict[str, Any]], None]
+StepResult = dict[str, Any] | Iterator[dict[str, Any]]
+StepFn = Callable[[dict[str, Any]], StepResult]
 
 
 @dataclass
@@ -148,8 +150,17 @@ class Run:
         *,
         fn: StepFn,
         attempt: int = 0,
+        on_delta: DeltaCallback | None = None,
+        keep_chunks: bool = False,
     ) -> Node:
-        return self._call(NodeKind.MODEL_CALL, payload, fn=fn, attempt=attempt)
+        return self._call(
+            NodeKind.MODEL_CALL,
+            payload,
+            fn=fn,
+            attempt=attempt,
+            on_delta=on_delta,
+            keep_chunks=keep_chunks,
+        )
 
     def tool_call(
         self,
@@ -245,15 +256,21 @@ class Run:
         *,
         fn: StepFn,
         attempt: int,
+        on_delta: DeltaCallback | None = None,
+        keep_chunks: bool = False,
     ) -> Node:
-        recorded = self._recorded_node(kind, payload, attempt)
+        recorded = self._recorded_node(kind, payload, attempt, on_delta=on_delta)
         if recorded is not None:
             return recorded
         self._precheck(kind.value, payload)
         measurements = _start_measurements(self._runtime.meters)
         start = time.perf_counter()
         try:
-            result = fn(payload)
+            result = _consume_step_result(
+                fn(payload),
+                on_delta=on_delta,
+                keep_chunks=keep_chunks,
+            )
         finally:
             duration = time.perf_counter() - start
             _stop_measurements(measurements)
@@ -385,6 +402,8 @@ class Run:
         kind: NodeKind,
         payload: dict[str, IdentityValue],
         attempt: int,
+        *,
+        on_delta: DeltaCallback | None = None,
     ) -> Node | None:
         node = recorded_node_or_missing(
             mode=self._runtime.mode,
@@ -404,6 +423,7 @@ class Run:
         )
         self._add_avoided(charges)
         self.cursor_id = node.id
+        _reemit_chunks(node, on_delta)
         return node
 
     def _add_avoided(self, charges: dict[str, int | float]) -> None:
@@ -412,7 +432,7 @@ class Run:
             self._avoided[name] = float(total)
 
     def _precheck(self, kind: str, payload: dict[str, IdentityValue]) -> None:
-        estimates = self._estimates(kind, payload)
+        estimates, approximate = self._estimates(kind, payload)
         for scope in self._budget_scopes:
             check = check_budget(
                 budget=scope.budget,
@@ -421,24 +441,38 @@ class Run:
                 exhausted=scope.exhausted,
             )
             if not check.ok:
-                self._refuse(check, kind, payload)
+                self._refuse(
+                    check,
+                    kind,
+                    payload,
+                    estimated=check.meter in approximate,
+                )
 
-    def _estimates(self, kind: str, payload: dict[str, IdentityValue]) -> dict[str, Decimal]:
+    def _estimates(
+        self,
+        kind: str,
+        payload: dict[str, IdentityValue],
+    ) -> tuple[dict[str, Decimal], set[str]]:
         estimates: dict[str, Decimal] = {}
+        approximate: set[str] = set()
         payload_any: dict[str, Any] = payload
         for meter in self._runtime.meters:
             estimate = meter.precheck_estimate(kind, payload_any)
             if estimate is not None:
                 estimates[meter.name] = charge_to_decimal(estimate)
+                if getattr(meter, "precheck_is_estimate", False) is True:
+                    approximate.add(meter.name)
         next_depth = _depth(self.store, self.cursor_id) + 1
         estimates["depth"] = Decimal(next_depth)
-        return estimates
+        return estimates, approximate
 
     def _refuse(
         self,
         check: BudgetCheck,
         blocked_kind: str,
         blocked_payload: dict[str, IdentityValue],
+        *,
+        estimated: bool = False,
     ) -> None:
         meter = check.meter or "unknown"
         payload: dict[str, IdentityValue] = {
@@ -449,6 +483,8 @@ class Run:
             "blocked_kind": blocked_kind,
             "blocked_payload_digest": digest_payload(blocked_payload),
         }
+        if estimated:
+            payload["estimated"] = "true"
         node = Node.make(
             kind=NodeKind.REFUSAL,
             parent=self.cursor_id,
@@ -560,6 +596,66 @@ def _start_measurements(meters: list[Meter]) -> list[_Measurement]:
 def _stop_measurements(measurements: list[_Measurement]) -> None:
     for measurement in reversed(measurements):
         measurement.__exit__(None, None, None)
+
+
+def _consume_step_result(
+    value: StepResult,
+    *,
+    on_delta: DeltaCallback | None,
+    keep_chunks: bool,
+) -> dict[str, Any]:
+    if isinstance(value, dict):
+        return value
+    if not isinstance(value, Iterator):
+        raise TypeError("step function must return a dict or an iterator of chunk dicts")
+    chunks: list[dict[str, Any]] = []
+    result: dict[str, Any] = {}
+    for item in value:
+        if not isinstance(item, dict):
+            raise TypeError("stream chunks must be dicts")
+        chunk = dict(item)
+        chunks.append(chunk)
+        if on_delta is not None:
+            on_delta(chunk)
+        complete = chunk.get("result")
+        delta = chunk.get("delta")
+        if complete is not None:
+            if not isinstance(complete, dict):
+                raise TypeError("a stream chunk result must be a dict")
+            result = dict(complete)
+        elif delta is not None:
+            if not isinstance(delta, dict):
+                raise TypeError("a stream chunk delta must be a dict")
+            _merge_stream_value(result, delta)
+        else:
+            _merge_stream_value(result, chunk)
+    if keep_chunks:
+        result["chunks"] = chunks
+    return result
+
+
+def _merge_stream_value(target: dict[str, Any], delta: dict[str, Any]) -> None:
+    for key, value in delta.items():
+        current = target.get(key)
+        if isinstance(current, dict) and isinstance(value, dict):
+            _merge_stream_value(current, value)
+        elif isinstance(current, str) and isinstance(value, str):
+            target[key] = current + value
+        elif isinstance(current, list) and isinstance(value, list):
+            target[key] = [*current, *value]
+        else:
+            target[key] = value
+
+
+def _reemit_chunks(node: Node, on_delta: DeltaCallback | None) -> None:
+    if on_delta is None or not isinstance(node.result, dict):
+        return
+    chunks = node.result.get("chunks")
+    if not isinstance(chunks, list):
+        return
+    for chunk in chunks:
+        if isinstance(chunk, dict):
+            on_delta(chunk)
 
 
 def _registered_handler(

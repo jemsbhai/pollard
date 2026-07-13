@@ -1,0 +1,13 @@
+{
+  "id": "resp_fixture",
+  "model": "gpt-5.5",
+  "output": [
+    {
+      "id": "msg_fixture",
+      "type": "message",
+      "role": "assistant",
+      "content": [{"type": "output_text", "text": "fixture response", "annotations": []}]
+    }
+  ],
+  "usage": {"input_tokens": 11, "output_tokens": 4, "total_tokens": 15}
+}

@@ -16,6 +16,11 @@ htmlcov/
 *.key
 *secrets*
 runs.db
+openai-tool-loop.db
+anthropic-tool-loop.db
+langgraph-node.db
+pydantic-ai.db
+mcp-registry.db
 *.db-wal
 *.db-shm
 !tests/pollard_recordings/

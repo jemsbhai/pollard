@@ -3,24 +3,25 @@
 Governed execution trees for AI agents: budget it, gate it, replay it.
 
 ```powershell
-pip install pollard
+pip install "pollard[openai]"
 ```
 
 ```python
+from openai import OpenAI
 from pollard import Budget, Runtime
-from examples.mock_model import call_model
+from pollard.adapters.openai import make_responses_fn
 
-rt = Runtime("runs.db")
-with rt.run("triage", budget=Budget(tokens=120_000, depth=8)) as run:
-    node = run.model_call(
-        {"model": "mock-1", "messages": [{"role": "user", "content": "Summarize: ..."}]},
-        fn=call_model,
-    )
-    print(node.result["text"])
-    print(run.report())
+with Runtime("runs.db").run("triage", budget=Budget(tokens=20_000)) as run:
+    node = run.model_call({"model": "gpt-5.5", "input": "Summarize: ..."},
+                          fn=make_responses_fn(OpenAI()))
+    print(node.result["text"], run.report())
 ```
 
 pollard is a runtime primitive, not an agent framework. It records each step as a node in a content-addressed tree. Node identity is a hash of the step inputs, parent identity, kind, and attempt number, so the tree gives you a control-flow ledger without owning your model client, tools, prompts, or loop.
+
+The client above belongs to your code. Pollard does not read credentials or
+construct provider clients. Anthropic and LiteLLM adapters follow the same
+pattern through `pollard[anthropic]` and `pollard[litellm]`.
 
 What you get:
 
@@ -32,14 +33,66 @@ What you get:
 
 Budget semantics are honest about what can be controlled. If a precheck estimate proves a step would exceed budget, pollard records a refusal node and does not call your function. If the actual result charge exceeds budget after the function returns, that node still stands because the spend already happened; later steps are refused.
 
-Limits in v0.4:
+Limits in v0.5:
 
 - Replay of sampled model calls serves the recorded output. It does not re-check that a provider would return that output again.
 - Hosted API energy use is not measured. The NVML energy meter is for local GPU inference only.
 - A SQLite store assumes one writer process.
 - HashRopeStore is an in-process append-only snapshot backend, not a multi-writer database.
 - TokenmasterMeter reports tokenmaster state from the usage data your model client returns; it does not tokenize prompts itself.
+- Prompt estimators are approximations. Images, tool schemas, provider-added
+  instructions, and wire-format changes can make the settled usage differ.
 - The audit tree is tamper-evident, not tamper-proof. Verification detects changed history, but it cannot stop deletion of the whole store file.
+
+## Offline Mock Demo
+
+Core Pollard still installs with zero runtime dependencies and can be tried
+without a provider account:
+
+```python
+from pollard import Budget, Runtime
+from examples.mock_model import call_model
+
+with Runtime().run("offline", budget=Budget(tokens=100)) as run:
+    node = run.model_call({"model": "mock-1", "messages": []}, fn=call_model)
+    print(node.result["text"])
+```
+
+## Streaming And Estimates
+
+A model function may return a result dictionary or an iterator of chunk
+dictionaries. `model_call(..., on_delta=callback)` forwards chunks in order.
+With `keep_chunks=True`, Pollard stores those chunks under `result["chunks"]`
+and re-emits them through the callback during replay. Charges settle once, after
+the stream ends, and node identity remains a function of the input payload.
+
+`TokenMeter(estimator=..., reserved_output_tokens=N)` applies an estimated input
+charge plus an explicit output reservation at precheck. A refusal caused by that
+estimate records `{"estimated": "true"}`. The settled provider usage remains the
+source of actual token charges.
+
+The optional tiktoken estimator is available as:
+
+```python
+from pollard.estimators.openai import OpenAITokenEstimator
+from pollard.meters import TokenMeter
+
+meter = TokenMeter(OpenAITokenEstimator(), reserved_output_tokens=1024)
+```
+
+See `docs/recipes/` for full tool loops and integration patterns.
+
+## Branch, Rollback, And Shared Prefixes
+
+`run.branch()` creates an alternate child cursor while leaving the parent cursor
+unchanged. `run.rollback()` moves a cursor to an ancestor, and `run.prune()`
+marks an unwanted tip without deleting history. Identical calls beneath the same
+parent compute the same node id, so hybrid and replay modes reuse recorded
+prefixes before branches diverge.
+
+EXP-001 measured this behavior only with deterministic mock token accounting.
+Its local-model, wall-clock, dollar, and joule legs remain unrun. See
+`LOGBOOK.md` and `findings.md` for the exact scope and results.
 
 ## Registry Firewall
 

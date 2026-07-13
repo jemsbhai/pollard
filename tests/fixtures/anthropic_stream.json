@@ -1,0 +1,13 @@
+[
+  {
+    "type": "message_start",
+    "message": {"id": "msg_stream_fixture", "model": "claude-sonnet-4-6", "usage": {"input_tokens": 13, "output_tokens": 0}}
+  },
+  {"type": "content_block_start", "index": 0, "content_block": {"type": "text", "text": ""}},
+  {"type": "content_block_delta", "index": 0, "delta": {"type": "text_delta", "text": "stream"}},
+  {"type": "content_block_start", "index": 1, "content_block": {"type": "tool_use", "id": "toolu_stream", "name": "weather", "input": {}}},
+  {"type": "content_block_delta", "index": 1, "delta": {"type": "input_json_delta", "partial_json": "{\"city\":"}},
+  {"type": "content_block_delta", "index": 1, "delta": {"type": "input_json_delta", "partial_json": "\"Boston\"}"}},
+  {"type": "message_delta", "delta": {"stop_reason": "tool_use"}, "usage": {"output_tokens": 6}},
+  {"type": "message_stop"}
+]

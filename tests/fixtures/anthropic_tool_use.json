@@ -1,0 +1,12 @@
+{
+  "id": "msg_tool_fixture",
+  "type": "message",
+  "role": "assistant",
+  "model": "claude-sonnet-4-6",
+  "content": [
+    {"type": "text", "text": "Checking."},
+    {"type": "tool_use", "id": "toolu_weather", "name": "weather", "input": {"city": "Boston"}}
+  ],
+  "stop_reason": "tool_use",
+  "usage": {"input_tokens": 14, "output_tokens": 7}
+}
