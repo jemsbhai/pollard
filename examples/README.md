@@ -25,11 +25,21 @@ python examples\03_budget_stop.py
 
 ## Formal evidence runners
 
-`exp_001_local_model.py`, `exp_004_storage.py`, and
-`exp_005_contention.py` are controlled experiment runners, not quickstart
-scripts. They pin or record the environment, use fixed seeds, write raw JSON,
-and fail when a registered hypothesis does not hold. None makes a hosted-model
+`exp_001_local_model.py`, `exp_004_storage.py`, `exp_005_contention.py`, and
+the three `exp_006_*` recording scripts are controlled evidence runners, not
+quickstart scripts. They pin or record the environment, write raw artifacts,
+and fail when a registered condition does not hold. None makes a hosted-model
 request.
+
+EXP-006 uses `exp_006_research.py`, `exp_006_code_fix.py`, and
+`exp_006_mcp_household.py` to record its three case studies. Recheck the
+committed artifacts without the model, MCP servers, optional dependencies, or
+network access:
+
+```powershell
+$env:PYTHONPATH = (Resolve-Path src)
+python examples\exp_006_verify.py
+```
 
 Use each script's `--help` output and the
 [evidence index](https://github.com/jemsbhai/pollard/blob/main/evidence/README.md)

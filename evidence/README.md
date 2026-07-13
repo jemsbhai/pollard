@@ -69,6 +69,32 @@ python examples\exp_005_contention.py `
   --output evidence\EXP-005\result.json
 ```
 
+## EXP-006: end-to-end case studies
+
+- [Case-study index](https://github.com/jemsbhai/pollard/blob/main/evidence/EXP-006/README.md)
+- [Combined manifest](https://github.com/jemsbhai/pollard/blob/main/evidence/EXP-006/manifest.json)
+- [Offline verifier](https://github.com/jemsbhai/pollard/blob/main/examples/exp_006_verify.py)
+
+EXP-006 records all three Phase 9 candidate workloads: research over pinned
+documents, a code fix against pinned tests, and a household order across three
+local MCP stdio servers. Every case contains a rejected branch, rollback, a
+selected branch, a verify-clean SQLite tree, a seal, and a self-contained HTML
+export. The committed recordings contain 49 nodes and six root-to-leaf paths.
+No hosted model was called and provider spend was 0 USD.
+
+Verify every input and artifact hash, registry digest, node, seal, and replay
+path without network access or optional dependencies:
+
+```powershell
+$env:PYTHONPATH = (Resolve-Path src)
+python examples\exp_006_verify.py
+```
+
+The research output is model-generated. The code-fix and household cases use
+deterministic candidate controllers with model review, so they do not support a
+claim that the model autonomously invented the recorded candidates. Full
+recording prerequisites and claim limits are in the case-study index.
+
 ## Verification and claim boundary
 
 The test suite validates result IDs and pass states, expected condition counts,
@@ -77,6 +103,6 @@ Interpretation lives in the
 [logbook](https://github.com/jemsbhai/pollard/blob/main/LOGBOOK.md) and
 [findings index](https://github.com/jemsbhai/pollard/blob/main/findings.md).
 
-EXP-006, the sealed end-to-end case study, is intentionally absent until its
-target is selected. No 1.0 launch claim may imply that the case study has run
-before its committed seal and offline verification instructions exist.
+EXP-006 is the 1.0 launch evidence. Its manifest pins every shipped case input
+and artifact, while the verifier proves strict offline replay without executing
+a model function or tool handler.

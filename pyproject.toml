@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pollard"
-version = "0.9.0"
+version = "1.0.0"
 description = "Governed execution trees for AI agents: budget it, gate it, replay it."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -12,7 +12,7 @@ license = {text = "MIT"}
 authors = [{name = "Muntaser Syed", email = "jemsbhai@gmail.com"}]
 keywords = ["agents", "llm", "execution-tree", "budget", "audit", "replay", "mcp"]
 classifiers = [
-  "Development Status :: 4 - Beta",
+  "Development Status :: 5 - Production/Stable",
   "Intended Audience :: Developers",
   "License :: OSI Approved :: MIT License",
   "Programming Language :: Python :: 3",

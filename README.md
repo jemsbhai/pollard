@@ -317,6 +317,36 @@ with rt.run("tokenmaster-demo", budget=Budget(tokens=120_000, steps=20)) as run:
 
 Use `TokenmasterMeter` instead of the built-in `TokenMeter` when you want tokenmaster state and recommendations in the audit record. The budget charge remains the per-call token volume, including cache and reasoning token fields when present.
 
+## End-to-End Case Studies
+
+EXP-006 records three complete governed workloads: research over pinned local
+documents, a code fix against a pinned repository and test suite, and a
+household order across three local MCP stdio servers. Each recording uses the
+OpenAI-compatible adapter with a pinned local model, registry-firewalled tools,
+a rejected branch, rollback, a selected branch, CLI verification, a subtree
+seal, and a content-free HTML tree. No hosted model was called; EXP-006 provider
+spend was 0 USD.
+
+The committed evidence contains 49 nodes and six root-to-leaf paths. Verify all
+input and artifact hashes, nodes, seals, registry digests, and paths without a
+model, MCP SDK, optional dependency, credential, or network connection:
+
+```powershell
+$env:PYTHONPATH = (Resolve-Path src)
+python examples\exp_006_verify.py
+```
+
+Strict replay uses sentinel functions that fail if Pollard attempts to execute
+a model or tool handler. The expected result reports zero executed model calls,
+zero executed tool calls, and no network use. See the
+[EXP-006 case-study index](https://github.com/jemsbhai/pollard/blob/main/evidence/EXP-006/README.md)
+for the manifest, seals, HTML trees, recording prerequisites, and claim limits.
+
+The research synthesis is model-generated. The code-fix and household cases
+use deterministic candidate controllers with model review; they are workflow
+and governance evidence, not evidence that the model autonomously invented the
+candidate patches or orders.
+
 ## Evidence
 
 Every number below is scoped to its committed protocol and raw artifact. It is
@@ -346,5 +376,5 @@ Starting with 1.0.0, these interoperability surfaces are frozen until 2.0:
 Other public APIs follow Semantic Versioning. The covenant, exact byte rules,
 and advance deprecation policy are specified in the
 [API stability policy](https://github.com/jemsbhai/pollard/blob/main/docs/api-stability.md).
-Version 0.9 is the review candidate for this covenant; the freeze begins only
-when 1.0.0 is released.
+Version 1.0.0 activates this covenant. Incompatible changes to a frozen surface
+require 2.0.

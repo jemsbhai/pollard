@@ -1,0 +1,2 @@
+# EXP-006 manifest hashes commit to the exact recorded artifact bytes.
+evidence/EXP-006/** -text whitespace=cr-at-eol

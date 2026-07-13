@@ -75,3 +75,36 @@ Findings:
 - Provider spend was 0 USD. These results support only the recorded scopes and
   do not support hosted-provider savings, general throughput, availability,
   consensus, or total-cost claims.
+
+## 2026-07-13 EXP-006 End-to-End Case Studies
+
+Source: `LOGBOOK.md`, entries `2026-07-13 EXP-006 End-to-End Case-Study
+Protocol`, `2026-07-13 EXP-006 End-to-End Case-Study Result`, and
+`2026-07-13 Phase 9 Final Reviewer-Adversary and API Freeze Review`.
+
+Scope: three local adapter and tool workflows recorded with pinned
+Qwen2.5-Coder 7B and llama.cpp files. Recording used loopback HTTP and local
+stdio only. Verification and replay use no network.
+
+Findings:
+
+- EXP-006A rejected incomplete source coverage and selected a model-generated
+  synthesis that passed its registered document, citation, and phrase checks.
+- EXP-006B rejected a candidate that failed reversed-bounds handling and
+  selected a candidate that passed all four pinned tests.
+- EXP-006C rejected a 2,897-cent order against a 2,000-cent limit and selected
+  a 1,547-cent order through three actual local MCP stdio servers.
+- All 49 nodes verified, all three subtree seals matched, and all six
+  root-to-leaf paths replayed strictly with no model or tool function
+  execution.
+- No hosted model call occurred and provider spend was 0 USD.
+
+Interpretation boundary:
+
+- The research synthesis is model-generated. The code-fix and household
+  candidates are deterministic controller inputs reviewed by the model. Those
+  cases support governance and workflow claims, not autonomous-invention
+  claims.
+- Offline replay establishes integrity and availability of the committed
+  semantic results. It does not establish deterministic regeneration by the
+  local model.

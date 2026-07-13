@@ -1,0 +1,6 @@
+{
+  "passed": true,
+  "returncode": 0,
+  "stderr": "test_above_range_returns_upper_bound (test_calculator.ClampTests.test_above_range_returns_upper_bound) ... ok\ntest_below_range_returns_lower_bound (test_calculator.ClampTests.test_below_range_returns_lower_bound) ... ok\ntest_reversed_bounds_are_rejected (test_calculator.ClampTests.test_reversed_bounds_are_rejected) ... ok\ntest_value_in_range_is_unchanged (test_calculator.ClampTests.test_value_in_range_is_unchanged) ... ok\n\n----------------------------------------------------------------------\nRan 4 tests in 0.000s\n\nOK\n",
+  "stdout": ""
+}

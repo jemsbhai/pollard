@@ -1,4 +1,6 @@
 import json
+import subprocess
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -41,7 +43,7 @@ def test_formal_evidence_artifacts_pass_registered_protocols() -> None:
 
 
 def test_formal_evidence_contains_no_common_secret_or_local_path_patterns() -> None:
-    paths = sorted(EVIDENCE.glob("EXP-*/*.json"))
+    paths = sorted(EVIDENCE.glob("EXP-*/**/*.json"))
     assert paths
     forbidden = (
         "postgresql://",
@@ -55,6 +57,31 @@ def test_formal_evidence_contains_no_common_secret_or_local_path_patterns() -> N
     for path in paths:
         text = path.read_text(encoding="utf-8").lower()
         assert not any(fragment in text for fragment in forbidden), path
+
+
+def test_exp006_case_studies_pass_strict_offline_verification() -> None:
+    manifest = _load("EXP-006/manifest.json")
+    assert manifest["schema"] == "pollard/exp-006-manifest/v1"
+    assert manifest["provider_spend_usd"] == 0
+    assert [case["id"] for case in manifest["cases"]] == [
+        "EXP-006A",
+        "EXP-006B",
+        "EXP-006C",
+    ]
+    assert sum(case["node_count"] for case in manifest["cases"]) == 49
+    completed = subprocess.run(
+        [sys.executable, "examples/exp_006_verify.py"],
+        check=True,
+        capture_output=True,
+        text=True,
+        timeout=60,
+    )
+    result = json.loads(completed.stdout)
+    assert result["ok"] is True
+    assert result["network_used"] is False
+    assert result["model_calls_executed"] == 0
+    assert result["tool_calls_executed"] == 0
+    assert sum(case["paths_replayed"] for case in result["cases"]) == 6
 
 
 def test_readme_numeric_evidence_rows_name_their_experiment() -> None:
