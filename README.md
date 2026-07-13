@@ -33,19 +33,24 @@ What you get:
 - Audit: each node id commits to its ancestry and identity payload.
 - Registry firewall: registered tool calls resolve against a versioned action set or fail closed.
 - Replay: record semantic steps once, then serve stored results in tests and CI.
+- Scale-out: share atomic budgets and sliding windows across workers through
+  SQLite or PostgreSQL, and merge disconnected stores later.
 
-Budget semantics are honest about what can be controlled. If a precheck estimate proves a step would exceed budget, pollard records a refusal node and does not call your function. If the actual result charge exceeds budget after the function returns, that node still stands because the spend already happened; later steps are refused.
+Budget semantics are honest about what can be controlled. If a precheck estimate proves a step would exceed budget, pollard records a refusal node and does not call your function. If the actual result charge exceeds budget after the function returns, that node still stands because the spend already happened; later steps are refused. Transactional stores reserve estimated charges before execution and settle actual charges afterward, so exact step and request prechecks stay within one shared limit under concurrent writers.
 
 Current limits:
 
 - Replay of sampled model calls serves the recorded output. It does not re-check that a provider would return that output again.
 - Hosted API energy use is not measured. The NVML energy meter is for local GPU inference only.
-- A SQLite store assumes one writer process.
+- SQLite serializes writers on one host. PostgreSQL is the shared backend for
+  worker teams and multiple hosts.
 - HashRopeStore is an in-process operation-log backend, not a multi-writer
   database. Explicit offline garbage collection rewrites its snapshot.
 - TokenmasterMeter reports tokenmaster state from the usage data your model client returns; it does not tokenize prompts itself.
 - Prompt estimators are approximations. Images, tool schemas, provider-added
   instructions, and wire-format changes can make the settled usage differ.
+- Shared arbitration requires every worker to use the same transactional store
+  and logical store id. Pollard does not provide decentralized consensus.
 - The audit tree is tamper-evident, not tamper-proof. Verification detects changed history, but it cannot stop deletion of the whole store file.
 
 ## Offline Mock Demo
@@ -87,12 +92,45 @@ meter = TokenMeter(OpenAITokenEstimator(), reserved_output_tokens=1024)
 See the [recipe collection](https://github.com/jemsbhai/pollard/tree/main/docs/recipes)
 for full tool loops and integration patterns.
 
+## Shared Budgets And Rate Windows
+
+Install the PostgreSQL extra and keep the DSN in an environment variable:
+
+```powershell
+pip install "pollard[pg]"
+$env:POLLARD_PG_DSN = "postgresql://pollard_app:password@db.example/pollard"
+```
+
+```python
+import os
+
+from pollard import Budget, PostgresStore, Runtime, WindowMeter
+from pollard.meters import StepMeter
+
+store = PostgresStore(os.environ["POLLARD_PG_DSN"], store_id="support-prod")
+runtime = Runtime(
+    store,
+    meters=[StepMeter(), WindowMeter("requests", 60, 60)],
+)
+with runtime.run("triage", budget=Budget(steps=1_000)) as run:
+    run.model_call({"model": "mock"}, fn=lambda _payload: {"text": "ready"})
+```
+
+The database role needs normal read and write access plus permission to create
+Pollard's tables and indexes on first use. It does not need OpenAI, Anthropic,
+AWS, Azure, or other model credentials. See [Scale-out stores and governance](https://github.com/jemsbhai/pollard/blob/main/docs/scale-out.md)
+for least-privilege setup, token windows, leases, contention guarantees, merge
+rules, and CLI store syntax.
+
 ## Observability
 
-The core package includes an offline CLI for SQLite recordings:
+The core package includes an offline CLI. Tree inspection commands accept
+SQLite recordings, while `runs` and `merge` also accept PostgreSQL store specs:
 
 ```powershell
 pollard runs runs.db
+pollard runs team-a.db team-b.db
+pollard merge combined.db team-a.db team-b.db
 pollard show runs.db <root-id>
 pollard report runs.db <root-id> --json
 pollard verify runs.db
@@ -108,9 +146,9 @@ for CLI exit codes, JSON forms, seals, HTML, and OpenTelemetry examples.
 
 ## Storage And Data Governance
 
-`SQLiteStore` transparently interns repeated payload strings of at least 1 KiB.
-Interning changes only the SQLite encoding. Callers receive the original payload,
-and node ids are identical with interning on or off.
+`SQLiteStore` and `PostgresStore` transparently intern repeated payload strings
+of at least 1 KiB. Interning changes only the storage encoding. Callers receive
+the original payload, and node ids are identical with interning on or off.
 
 Redaction is separate. `redact(value, hint=None)` replaces a value before node
 identity is computed, so the plaintext never reaches a Pollard store. Registry
@@ -222,7 +260,10 @@ for the field-level design.
 
 ## Store Backends
 
-Core pollard includes `MemoryStore` and `SQLiteStore`. The optional hashrope backend keeps an append-only operation log inside a hashrope rope:
+Core pollard includes `MemoryStore` and `SQLiteStore`. `PostgresStore` is
+available through `pollard[pg]` for transactional multi-writer runs. The
+optional hashrope backend keeps an append-only operation log inside a hashrope
+rope:
 
 ```powershell
 pip install "pollard[hashrope]"

@@ -126,3 +126,31 @@ Allowed claims:
 
 Storage-size figures remain logbook checkpoint data until EXP-004 formalizes
 the protocol in Phase 9.
+
+## Wave 8: v0.8
+
+Audience: teams running several agent workers against one operational limit.
+
+Angle: "one budget, many workers." Show two workers sharing one PostgreSQL
+logical store, an exact request window refusing the next call, and disconnected
+worker stores merging into one verify-clean audit ledger.
+
+Demo commands:
+
+```powershell
+pollard runs "pg-env:POLLARD_PG_DSN#support-prod" --json
+pollard merge combined.db worker-a.db worker-b.db --json
+```
+
+Allowed claims:
+
+- Exact step and request prechecks do not exceed their configured limit when
+  workers use the same transactional arbiter.
+- Approximate meters retain the documented actual-minus-estimate overshoot
+  bound.
+- PostgreSQL concurrent puts are safe for content-addressed node identities.
+- Store merge is idempotent and retains result and metadata conflicts.
+
+Do not describe Pollard as a consensus system or claim coordination between
+disconnected stores. The 20-round contention result is an acceptance checkpoint
+for the recorded environment, not a throughput benchmark.

@@ -12,8 +12,14 @@ from inspect import isawaitable
 from pathlib import Path
 from types import TracebackType
 from typing import Any, NoReturn, Protocol
+from uuid import uuid4
 
 from ._canon import IdentityValue
+from .arbiter import (
+    BudgetReservation,
+    TransactionalArbiter,
+    WindowReservation,
+)
 from .errors import BudgetExceeded, ConfirmationRequired, IntegrityError, PolicyViolation
 from .governor import (
     Budget,
@@ -26,7 +32,14 @@ from .governor import (
     spent_decimal,
 )
 from .hashing import digest_payload
-from .meters import DepthMeter, Meter, StepMeter, TokenMeter, WallClockMeter
+from .meters import (
+    DepthMeter,
+    Meter,
+    StepMeter,
+    TokenMeter,
+    WallClockMeter,
+    WindowMeter,
+)
 from .policy import Decision, Policy, PolicyContext
 from .registry import ActionSpec, Registry
 from .replay import (
@@ -73,7 +86,14 @@ class Runtime:
         dry_run: bool = False,
         mode: str | ReplayMode = ReplayMode.RECORD,
         on_node: NodeCallback | None = None,
+        reservation_lease_seconds: int | float = 60,
     ) -> None:
+        if (
+            isinstance(reservation_lease_seconds, bool)
+            or not isinstance(reservation_lease_seconds, int | float)
+            or reservation_lease_seconds <= 0
+        ):
+            raise ValueError("reservation_lease_seconds must be positive")
         self.store: Store = _coerce_store(store)
         self.meters = meters or [StepMeter(), DepthMeter(), WallClockMeter(), TokenMeter()]
         self.registry = registry
@@ -81,6 +101,7 @@ class Runtime:
         self.dry_run = dry_run
         self.mode = normalize_mode(mode)
         self.on_node = on_node
+        self.reservation_lease_seconds = float(reservation_lease_seconds)
 
     def _put(self, node: Node) -> Node:
         is_new = not self.store.exists(node.id)
@@ -284,7 +305,7 @@ class Run:
         recorded = self._recorded_node(kind, payload, attempt, on_delta=on_delta)
         if recorded is not None:
             return recorded
-        self._precheck(kind.value, payload)
+        reservation = self._precheck(kind.value, payload)
         measurements = _start_measurements(self._runtime.meters)
         start = time.perf_counter()
         try:
@@ -293,6 +314,9 @@ class Run:
                 on_delta=on_delta,
                 keep_chunks=keep_chunks,
             )
+        except BaseException:
+            self._release_reservation(reservation)
+            raise
         finally:
             duration = time.perf_counter() - start
             _stop_measurements(measurements)
@@ -303,6 +327,7 @@ class Run:
         meta["charges"] = charges
         if isinstance(result, dict) and isinstance(result.get("usage"), dict):
             meta["usage"] = result["usage"]
+        self._settle_reservation(reservation, charges)
         node = Node.make(
             kind=kind,
             parent=self.cursor_id,
@@ -385,7 +410,9 @@ class Run:
         if recorded is not None:
             return recorded
         if self._runtime.dry_run and spec.side_effects:
-            self._precheck(NodeKind.TOOL_CALL.value, payload)
+            reservation = self._precheck(NodeKind.TOOL_CALL.value, payload)
+            charges: dict[str, int | float] = {"steps": 1}
+            self._settle_reservation(reservation, charges)
             node = Node.make(
                 kind=NodeKind.TOOL_CALL,
                 parent=self.cursor_id,
@@ -394,7 +421,7 @@ class Run:
                 meta={
                     "created_at": _now_utc(),
                     "dry_run": True,
-                    "charges": {"steps": 1},
+                    "charges": charges,
                 },
             )
             node = self._runtime._put(node)
@@ -461,7 +488,9 @@ class Run:
             total = charge_to_decimal(self._avoided.get(name, 0)) + charge_to_decimal(amount)
             self._avoided[name] = float(total)
 
-    def _precheck(self, kind: str, payload: dict[str, IdentityValue]) -> None:
+    def _precheck(
+        self, kind: str, payload: dict[str, IdentityValue]
+    ) -> str | None:
         estimates, approximate = self._estimates(kind, payload)
         for scope in self._budget_scopes:
             check = check_budget(
@@ -477,6 +506,63 @@ class Run:
                     payload,
                     estimated=check.meter in approximate,
                 )
+        if kind not in {NodeKind.MODEL_CALL.value, NodeKind.TOOL_CALL.value}:
+            return None
+        store = self.store
+        if not isinstance(store, TransactionalArbiter):
+            return None
+        budgets = [
+            BudgetReservation(
+                scope_id=scope.anchor_id,
+                limits=scope.budget.limits(),
+                baseline=spent_decimal(store, scope.anchor_id),
+                estimates=estimates,
+            )
+            for scope in self._budget_scopes
+        ]
+        windows: list[WindowReservation] = []
+        payload_any: dict[str, Any] = payload
+        for meter in self._runtime.meters:
+            if not isinstance(meter, WindowMeter):
+                continue
+            estimate = meter.precheck_estimate(kind, payload_any)
+            windows.append(
+                WindowReservation(
+                    ledger_key=meter.ledger_key(self.root_id),
+                    meter=meter.name,
+                    limit=meter.limit,
+                    amount=(
+                        Decimal("0")
+                        if estimate is None
+                        else charge_to_decimal(estimate)
+                    ),
+                    window_seconds=meter.window_seconds,
+                )
+            )
+        if not budgets and not windows:
+            return None
+        reservation_id = uuid4().hex
+        arbiter_check = store._pollard_reserve(
+            reservation_id,
+            budgets,
+            windows,
+            self._runtime.reservation_lease_seconds,
+        )
+        if not arbiter_check.ok:
+            self._refuse(
+                BudgetCheck(
+                    ok=False,
+                    meter=arbiter_check.meter,
+                    requested=arbiter_check.requested,
+                    remaining=arbiter_check.remaining,
+                ),
+                kind,
+                payload,
+                estimated=arbiter_check.meter in approximate,
+                reason=arbiter_check.reason,
+                window_seconds=arbiter_check.window_seconds,
+            )
+        return reservation_id
 
     def _estimates(
         self,
@@ -503,10 +589,12 @@ class Run:
         blocked_payload: dict[str, IdentityValue],
         *,
         estimated: bool = False,
+        reason: str = "budget",
+        window_seconds: float | None = None,
     ) -> None:
         meter = check.meter or "unknown"
         payload: dict[str, IdentityValue] = {
-            "reason": "budget",
+            "reason": reason,
             "meter": meter,
             "requested": str(check.requested),
             "remaining": str(check.remaining),
@@ -515,6 +603,12 @@ class Run:
         }
         if estimated:
             payload["estimated"] = "true"
+        if window_seconds is not None:
+            payload["window_seconds"] = (
+                int(window_seconds)
+                if window_seconds.is_integer()
+                else str(window_seconds)
+            )
         node = Node.make(
             kind=NodeKind.REFUSAL,
             parent=self.cursor_id,
@@ -557,6 +651,28 @@ class Run:
                     spent=spent_decimal(self.store, scope.anchor_id),
                 )
             )
+
+    def _settle_reservation(
+        self,
+        reservation_id: str | None,
+        charges: dict[str, int | float],
+    ) -> None:
+        if reservation_id is None:
+            return
+        store = self.store
+        if not isinstance(store, TransactionalArbiter):
+            return
+        store._pollard_settle(
+            reservation_id,
+            {name: charge_to_decimal(amount) for name, amount in charges.items()},
+        )
+
+    def _release_reservation(self, reservation_id: str | None) -> None:
+        if reservation_id is None:
+            return
+        store = self.store
+        if isinstance(store, TransactionalArbiter):
+            store._pollard_release(reservation_id)
 
     def _ensure_ancestor(self, node_id: str) -> None:
         current: str | None = self.cursor_id

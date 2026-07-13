@@ -8,6 +8,7 @@ from pollard.meters import (
     StepMeter,
     TokenMeter,
     WallClockMeter,
+    WindowMeter,
     usage_from_anthropic,
     usage_from_openai,
 )
@@ -86,6 +87,23 @@ def test_cost_meter_returns_zero_for_missing_price_or_usage() -> None:
     meter = CostMeter({"mock-1": {"input_per_1m": "2.00", "output_per_1m": "6.00"}})
     assert meter.charge("model_call", {"model": "missing"}, {}, {}) == Decimal("0")
     assert meter.charge("model_call", {"model": "mock-1"}, {"usage": {}}, {}) == Decimal("0")
+
+
+def test_window_meter_supports_request_and_token_windows() -> None:
+    requests = WindowMeter("requests", 5, 60)
+    assert requests.precheck_estimate("model_call", {}) == 1
+    assert requests.charge("tool_call", {}, {}, {}) == 1
+    tokens = WindowMeter("tokens", 100, 60)
+    assert tokens.charge(
+        "model_call",
+        {},
+        {"usage": {"input_tokens": 7, "output_tokens": 3}},
+        {},
+    ) == 10
+    with pytest.raises(ValueError, match="limit"):
+        WindowMeter("requests", 0, 60)
+    with pytest.raises(ValueError, match="window_seconds"):
+        WindowMeter("requests", 1, 0)
 
 
 def test_usage_helpers_normalize_provider_shapes() -> None:

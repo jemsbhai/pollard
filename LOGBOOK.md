@@ -374,3 +374,100 @@ Verification:
 - Clean wheel install: imported version 0.7.0, exposed `redact`, `gc`,
   `export_subtree`, and `import_subtree`, and listed all eight CLI commands.
 - No provider or cloud request was made. Provider spend: 0 USD.
+
+## 2026-07-13 EXP-005 Draft Plan
+
+Status: protocol drafted for Phase 9 execution. The Phase 8 release gate below
+tests a narrower fixed configuration and is not the formal experiment result.
+
+Question:
+
+- Under shared PostgreSQL arbitration, do exact and estimated meters follow the
+  documented concurrency bound as worker count, call duration, estimate error,
+  and process failure vary?
+
+Hypotheses:
+
+- Exact step and request prechecks settle no more than their configured limit.
+- For estimated token charges, settled spend is no more than the limit plus the
+  sum of positive actual-minus-estimate differences for calls admitted before
+  the limit became unavailable.
+- A process terminated after reservation stops consuming capacity after its
+  lease expires.
+
+Planned conditions:
+
+- PostgreSQL major versions: current supported minimum and latest CI version.
+- Worker processes: 2, 4, and 8.
+- Exact limits: steps and requests with at least 30 seeded rounds per condition.
+- Estimated meter: deterministic synthetic token estimates with actual charge
+  errors below, equal to, and above the reservation.
+- Failure legs: terminate one process after reserve and before settle at three
+  lease durations.
+- Metrics: admitted calls, settled amount, active reservations, expired
+  reservations, refusal count, bound slack, and database errors.
+- The test function remains local and deterministic. No model API is required.
+
+Pass rules:
+
+- Every exact-meter condition settles at or below its limit.
+- Every estimated-meter condition satisfies the stated overshoot inequality.
+- Every abandoned reservation releases by the first precheck after expiry.
+- Any database or worker error fails the affected condition and remains in the
+  raw result.
+
+## 2026-07-13 v0.8.0 Scale-Out Acceptance Checkpoint
+
+Scope:
+
+- Added conservative conflict-aware merge, optional PostgreSQL storage,
+  store-backed sliding windows, and transactional budget reservations.
+- Added multi-store CLI forms and a PostgreSQL CI service job.
+- This checkpoint validates release invariants; it does not replace EXP-005.
+
+Environment:
+
+- Platform: Windows 11, build 26200.
+- Python: 3.12.2.
+- PostgreSQL: 16 Alpine container under Docker Desktop 25.0.3.
+- psycopg: 3.3.4 with the binary package.
+- Provider and cloud calls: none.
+
+Acceptance evidence:
+
+- Two spawned operating-system processes contended on one PostgreSQL logical
+  store with `Budget(steps=4)`. Exactly four functions executed in each of 20
+  rounds.
+- Two threads contended on `WindowMeter("requests", 3, 60)`. Exactly three
+  functions executed against SQLite and exactly three against PostgreSQL.
+- An intentionally abandoned SQLite reservation blocked capacity before lease
+  expiry and returned capacity on the first precheck after expiry.
+- A merge copied 1,001 nodes between interned SQLite stores, passed
+  verification, and returned byte-identical canonical payloads for every node.
+- Merge property tests covered idempotence, verify-clean union, conservative
+  metadata conflicts, result conflicts, and replay rejection.
+
+Release verification:
+
+- Main suite: 229 passed and 5 PostgreSQL-only tests skipped when the DSN was
+  absent.
+- Coverage: 91.28 percent against a 90 percent floor. The optional PostgreSQL
+  module is exercised by the service job and omitted from the no-service
+  coverage denominator.
+- PostgreSQL service subset: 66 passed, including the two-process 20-round
+  storm, two-thread window and put races, row-locked metadata patches, payload
+  interning, shared protocol cases, and governance operations.
+- Ruff: passed for source, tests, and examples.
+- Mypy strict mode: passed for 37 source files.
+- Writing-standards and README absolute-link scans: passed.
+- Wheel and source distribution: built successfully and passed Twine checks.
+- Clean wheel install with `pollard[pg]`: imported version 0.8.0, connected to
+  PostgreSQL, completed a governed call, and exposed the nine-command CLI.
+
+Cost and claim boundary:
+
+- OpenAI spend: 0 USD.
+- Anthropic spend: 0 USD.
+- AWS, Azure, Google Cloud, and other model-provider spend: 0 USD.
+- The 20-round result supports the exact fixed release gate only. It is not a
+  throughput, availability, or fully decentralized coordination claim.

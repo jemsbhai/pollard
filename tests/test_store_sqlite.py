@@ -1,6 +1,8 @@
 import hashlib
 import sqlite3
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
+from threading import Barrier
 
 import pytest
 
@@ -130,10 +132,10 @@ def test_schema_one_database_migrates_without_changing_nodes(tmp_path: Path) -> 
         )
     with SQLiteStore(path) as store:
         assert store.get(root.id) == root
-        assert store._conn.execute("SELECT v FROM kv WHERE k='schema_version'").fetchone()[0] == "2"
+        assert store._conn.execute("SELECT v FROM kv WHERE k='schema_version'").fetchone()[0] == "3"
 
 
-def test_reopening_schema_two_database_is_read_only(tmp_path: Path) -> None:
+def test_reopening_schema_three_database_is_read_only(tmp_path: Path) -> None:
     path = tmp_path / "stable.db"
     with SQLiteStore(path) as store:
         root = Node.make(kind=NodeKind.ROOT, parent=None, payload={"run": "stable"})
@@ -143,3 +145,25 @@ def test_reopening_schema_two_database_is_read_only(tmp_path: Path) -> None:
         assert reopened.get(root.id) == root
     after = hashlib.sha256(path.read_bytes()).hexdigest()
     assert after == before
+
+
+def test_concurrent_sqlite_puts_and_meta_patches_are_serialized(tmp_path: Path) -> None:
+    path = tmp_path / "writers.db"
+    with SQLiteStore(path):
+        pass
+    root = Node.make(kind=NodeKind.ROOT, parent=None, payload={"run": "writers"})
+    child = Node.make(kind=NodeKind.NOTE, parent=root.id, payload={"same": True})
+    barrier = Barrier(2)
+
+    def worker(worker_id: int) -> None:
+        with SQLiteStore(path) as store:
+            barrier.wait()
+            store.put(root)
+            store.put(child)
+            store.update_meta(root.id, {f"worker_{worker_id}": True})
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        list(executor.map(worker, range(2)))
+    with SQLiteStore(path) as store:
+        assert store.get(child.id) == child
+        assert store.get(root.id).meta == {"worker_0": True, "worker_1": True}

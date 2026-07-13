@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
 import warnings
 from decimal import Decimal
 from importlib import import_module
@@ -186,6 +188,68 @@ class CostMeter:
     def precheck_estimate(self, node_kind: str, payload: dict[str, Any]) -> None:
         del node_kind, payload
         return None
+
+
+class WindowMeter:
+    """A store-backed sliding-window ceiling around a meter."""
+
+    def __init__(
+        self,
+        name: str,
+        limit: ChargeAmount,
+        window_seconds: int | float,
+        *,
+        meter: Meter | None = None,
+    ) -> None:
+        if not isinstance(name, str) or not name:
+            raise ValueError("window meter name must be a non-empty string")
+        if isinstance(limit, bool) or Decimal(str(limit)) <= 0:
+            raise ValueError("window meter limit must be positive")
+        if (
+            isinstance(window_seconds, bool)
+            or not isinstance(window_seconds, int | float)
+            or window_seconds <= 0
+        ):
+            raise ValueError("window_seconds must be positive")
+        self.name = name
+        self.limit = Decimal(str(limit))
+        self.window_seconds = float(window_seconds)
+        if meter is not None:
+            self._meter = meter
+        elif name == "tokens":
+            self._meter = TokenMeter()
+        else:
+            self._meter = StepMeter()
+        self.precheck_is_estimate = getattr(
+            self._meter, "precheck_is_estimate", False
+        )
+
+    def charge(
+        self,
+        node_kind: str,
+        payload: dict[str, Any],
+        result: Any,
+        meta: dict[str, Any],
+    ) -> ChargeAmount:
+        return self._meter.charge(node_kind, payload, result, meta)
+
+    def precheck_estimate(
+        self, node_kind: str, payload: dict[str, Any]
+    ) -> ChargeAmount | None:
+        return self._meter.precheck_estimate(node_kind, payload)
+
+    def ledger_key(self, root_id: str) -> str:
+        document = json.dumps(
+            {
+                "root_id": root_id,
+                "name": self.name,
+                "limit": str(self.limit),
+                "window_seconds": str(self.window_seconds),
+            },
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        return hashlib.sha256(document.encode("utf-8")).hexdigest()
 
 
 def usage_from_openai(resp: dict[str, Any]) -> dict[str, int]:

@@ -5,6 +5,7 @@ import pytest
 from pollard import (
     ActionSpec,
     AsyncRuntime,
+    BudgetExceeded,
     ConfirmationRequired,
     Decision,
     MemoryStore,
@@ -12,6 +13,7 @@ from pollard import (
     Registry,
     Runtime,
     SQLiteStore,
+    WindowMeter,
 )
 
 
@@ -241,6 +243,28 @@ def test_async_stream_forwards_and_replays_chunks() -> None:
             on_delta=replay_seen.append,
         )
         assert live_seen == replay_seen == replayed.result["chunks"]
+
+    asyncio.run(scenario())
+
+
+def test_async_window_reservation_settles_in_sqlite(tmp_path) -> None:  # type: ignore[no-untyped-def]
+    async def scenario() -> None:
+        with SQLiteStore(tmp_path / "async-window.db") as store:
+            run = AsyncRuntime(
+                store,
+                meters=[WindowMeter("requests", 1, 60)],
+            ).run("async-window")
+            await run.amodel_call(
+                {"model": "mock", "index": 1},
+                fn=lambda _payload: _async_result("first"),
+            )
+            with pytest.raises(BudgetExceeded) as exc_info:
+                await run.amodel_call(
+                    {"model": "mock", "index": 2},
+                    fn=lambda _payload: _async_result("second"),
+                )
+            refusal = store.get(exc_info.value.refusal_id)
+            assert refusal.payload["reason"] == "window"
 
     asyncio.run(scenario())
 
