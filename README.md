@@ -27,16 +27,25 @@ What you get:
 - Budget: refuse a step before it runs when a known budget would be exceeded.
 - Branch and rollback: make alternate children, move the cursor back, and keep shared history.
 - Audit: each node id commits to its ancestry and identity payload.
-- Replay-ready records: results live at nodes, separate from node identity, for later record/replay work.
+- Registry firewall: registered tool calls resolve against a versioned action set or fail closed.
+- Replay-ready records: results live at nodes, separate from node identity, for later record and replay work.
 
 Budget semantics are honest about what can be controlled. If a precheck estimate proves a step would exceed budget, pollard records a refusal node and does not call your function. If the actual result charge exceeds budget after the function returns, that node still stands because the spend already happened; later steps are refused.
 
-Limits in v0.1:
+Limits in v0.2:
 
 - Replay of sampled model calls is not included until v0.3.
 - Hosted API energy use is not measured. The NVML energy meter is for local GPU inference only.
 - A SQLite store assumes one writer process.
 - The audit tree is tamper-evident, not tamper-proof. Verification detects changed history, but it cannot stop deletion of the whole store file.
+
+## Registry Firewall
+
+With a registry installed, `tool_call` cannot execute an arbitrary caller-supplied function. The runtime resolves the tool name and version against `ActionSpec`, validates arguments against the supported schema subset, records the `spec_digest` and `registry_digest`, then runs the registered handler. Unknown tools, version mismatch, invalid args, policy denial, and missing confirmation all produce refusal nodes.
+
+This is structural gating, not content judgment. A content firewall tries to decide whether a requested action is safe. pollard answers a narrower audit question: was this action in the declared, versioned set, with arguments that match its schema, under the recorded policy state?
+
+Dry-run mode records side-effectful registered actions without executing their handlers. This is useful for reviewing an intended action transcript before allowing writes.
 
 How it compares:
 

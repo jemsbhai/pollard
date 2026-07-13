@@ -8,8 +8,10 @@ from pollard import (
     ConfirmationRequired,
     Decision,
     MemoryStore,
+    PolicyViolation,
     Registry,
     Runtime,
+    SQLiteStore,
 )
 
 
@@ -61,6 +63,53 @@ def test_async_registered_tool_awaits_handler() -> None:
         node = await run.atool_call("echo", {"text": "hello"})
         assert node.result["text"] == "hello"
         assert node.payload["registry_digest"]
+
+    asyncio.run(scenario())
+
+
+def test_async_unfenced_tool_call_and_required_fn() -> None:
+    async def scenario() -> None:
+        run = AsyncRuntime(MemoryStore()).run("async-unfenced")
+        with pytest.raises(TypeError, match="requires fn"):
+            await run.atool_call("echo", {"text": "hello"})
+
+        async def fn(payload: dict[str, object]) -> dict[str, object]:
+            return {"seen": payload, "usage": {"input_tokens": 0, "output_tokens": 0}}
+
+        node = await run.atool_call("echo", {"text": "hello"}, fn=fn)
+        assert node.result["seen"] == {"tool": "echo", "args": {"text": "hello"}}
+
+    asyncio.run(scenario())
+
+
+def test_async_registry_refuses_bad_args() -> None:
+    async def scenario() -> None:
+        run = AsyncRuntime(MemoryStore(), registry=make_registry()).run("async-refuse")
+        with pytest.raises(PolicyViolation) as exc_info:
+            await run.atool_call("echo", {"text": 1})
+        refusal = run.store.get(exc_info.value.refusal_id)
+        assert "schema validation failed" in str(refusal.payload["detail"])
+
+    asyncio.run(scenario())
+
+
+def test_async_branch_and_resume(tmp_path) -> None:  # type: ignore[no-untyped-def]
+    async def scenario() -> None:
+        db_path = tmp_path / "async-runs.db"
+        with SQLiteStore(db_path) as store:
+            run = AsyncRuntime(store).run("async-resume")
+            original = run.cursor_id
+            with run.branch(attempt=1) as branch:
+                node = await branch.amodel_call(
+                    {"model": "mock-1"},
+                    fn=lambda _payload: _async_result("branch"),
+                )
+            assert run.cursor_id == original
+            assert node.parent != original
+
+        with SQLiteStore(db_path) as store:
+            resumed = AsyncRuntime(store).resume("async-resume")
+            assert resumed.cursor_id == node.id
 
     asyncio.run(scenario())
 
@@ -126,3 +175,7 @@ def test_sync_runtime_rejects_async_registered_handler() -> None:
     run = Runtime(MemoryStore(), registry=make_registry()).run("sync-async")
     with pytest.raises(TypeError, match="AsyncRuntime"):
         run.tool_call("echo", {"text": "hello"})
+
+
+async def _async_result(text: str) -> dict[str, object]:
+    return {"text": text, "usage": {"input_tokens": 0, "output_tokens": 0}}

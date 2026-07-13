@@ -13,6 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
         "examples/01_governed_call.py",
         "examples/02_best_of_n.py",
         "examples/03_budget_stop.py",
+        "examples/04_firewall.py",
     ],
 )
 def test_example_script_runs_offline(script: str) -> None:

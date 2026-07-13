@@ -74,3 +74,36 @@ def test_registry_from_mcp_can_exclude_tools() -> None:
             registry.get("search")
 
     asyncio.run(scenario())
+
+
+def test_registry_from_mcp_accepts_object_listing_and_model_dump_result() -> None:
+    class Tool:
+        def __init__(self) -> None:
+            self.name = "inspect"
+            self.description = "Inspect object."
+            self.inputSchema = {"type": "object", "additionalProperties": True}
+
+    class Listing:
+        def __init__(self) -> None:
+            self.tools = [Tool()]
+
+    class Result:
+        def model_dump(self) -> dict[str, object]:
+            return {"ok": True, "usage": {"input_tokens": 0, "output_tokens": 0}}
+
+    class Session:
+        def list_tools(self) -> Listing:
+            return Listing()
+
+        def call_tool(self, name: str, args: dict[str, object]) -> Result:
+            assert name == "inspect"
+            assert args == {"value": "x"}
+            return Result()
+
+    async def scenario() -> None:
+        registry = await registry_from_mcp(Session())
+        run = AsyncRuntime(registry=registry).run("mcp-object")
+        node = await run.atool_call("inspect", {"value": "x"})
+        assert node.result["ok"] is True
+
+    asyncio.run(scenario())

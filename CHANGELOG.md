@@ -4,6 +4,15 @@ All notable changes to pollard will be documented in this file.
 
 The format is based on Keep a Changelog, and this project follows Semantic Versioning.
 
+## [0.2.0] - 2026-07-13
+
+### Added
+
+- Add a versioned action registry with schema validation and registry digests.
+- Add firewalled tool calls, policy denial, confirmation tokens, and dry-run mode.
+- Add async runtime parity for model and tool calls.
+- Add an MCP tools/list adapter for declared tool registries.
+
 ## [0.1.0] - 2026-07-13
 
 ### Added

@@ -1,6 +1,6 @@
 """Governed execution trees for AI agents: budget it, gate it, replay it."""
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 from .aio import AsyncRun, AsyncRuntime
 from .errors import (
