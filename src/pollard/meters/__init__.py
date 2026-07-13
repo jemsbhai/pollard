@@ -94,6 +94,8 @@ class TokenMeter:
         del payload, meta
         if node_kind not in {"model_call", "tool_call"}:
             return 0
+        if result is None:
+            return 0
         if not isinstance(result, dict) or not isinstance(result.get("usage"), dict):
             self._warn_missing_usage_once()
             return 0

@@ -9,10 +9,10 @@ from datetime import datetime, timezone
 from decimal import Decimal
 from pathlib import Path
 from types import TracebackType
-from typing import Any, Protocol
+from typing import Any, NoReturn, Protocol
 
 from ._canon import IdentityValue
-from .errors import BudgetExceeded
+from .errors import BudgetExceeded, ConfirmationRequired, IntegrityError, PolicyViolation
 from .governor import (
     Budget,
     BudgetCheck,
@@ -25,6 +25,8 @@ from .governor import (
 )
 from .hashing import digest_payload
 from .meters import DepthMeter, Meter, StepMeter, TokenMeter, WallClockMeter
+from .policy import Decision, Policy, PolicyContext
+from .registry import ActionSpec, Registry
 from .store import MemoryStore, Store
 from .stores import SQLiteStore
 from .tree import Node, NodeKind
@@ -39,15 +41,30 @@ class _BudgetScope:
     exhausted: set[str] = field(default_factory=set)
 
 
+@dataclass(frozen=True)
+class _PendingToolCall:
+    parent_id: str
+    payload: dict[str, IdentityValue]
+    args: dict[str, IdentityValue]
+    spec: ActionSpec
+    attempt: int
+
+
 class Runtime:
     def __init__(
         self,
         store: str | Path | Store | None = None,
         *,
         meters: list[Meter] | None = None,
+        registry: Registry | None = None,
+        policies: list[Policy] | None = None,
+        dry_run: bool = False,
     ) -> None:
         self.store: Store = _coerce_store(store)
         self.meters = meters or [StepMeter(), DepthMeter(), WallClockMeter(), TokenMeter()]
+        self.registry = registry
+        self.policies = policies or []
+        self.dry_run = dry_run
 
     def run(self, label: str, *, budget: Budget | None = None, attempt: int = 0) -> Run:
         root = Node.make(kind=NodeKind.ROOT, parent=None, payload={"run": label}, attempt=attempt)
@@ -55,6 +72,7 @@ class Runtime:
             self.store.put(root)
         else:
             root = self.store.get(root.id)
+        self._bind_registry(root.id)
         scopes = [] if budget is None else [_BudgetScope(budget=budget, anchor_id=root.id)]
         return Run(
             runtime=self,
@@ -67,6 +85,7 @@ class Runtime:
     def resume(self, label: str, *, budget: Budget | None = None, attempt: int = 0) -> Run:
         root = Node.make(kind=NodeKind.ROOT, parent=None, payload={"run": label}, attempt=attempt)
         stored_root = self.store.get(root.id)
+        self._bind_registry(stored_root.id)
         scopes = [] if budget is None else [_BudgetScope(budget=budget, anchor_id=stored_root.id)]
         return Run(
             runtime=self,
@@ -75,6 +94,16 @@ class Runtime:
             label=label,
             budget_scopes=scopes,
         )
+
+    def _bind_registry(self, root_id: str) -> None:
+        if self.registry is None:
+            return
+        root = self.store.get(root_id)
+        existing = root.meta.get("registry_digest")
+        if existing is not None and existing != self.registry.registry_digest:
+            raise IntegrityError("run root is already bound to a different registry")
+        if existing is None:
+            self.store.update_meta(root_id, {"registry_digest": self.registry.registry_digest})
 
 
 class Run:
@@ -93,6 +122,7 @@ class Run:
         self.label = label
         self._budget_scopes = budget_scopes
         self._avoided: dict[str, float] = {}
+        self._pending_tool_calls: dict[str, _PendingToolCall] = {}
 
     @property
     def store(self) -> Store:
@@ -122,11 +152,29 @@ class Run:
         name: str,
         args: dict[str, IdentityValue],
         *,
-        fn: StepFn,
+        fn: StepFn | None = None,
+        version: str | None = None,
         attempt: int = 0,
     ) -> Node:
+        if self._runtime.registry is not None:
+            return self._registered_tool_call(name, args, version=version, attempt=attempt)
+        if fn is None:
+            raise TypeError("unfenced tool_call requires fn")
         payload: dict[str, IdentityValue] = {"tool": name, "args": args}
         return self._call(NodeKind.TOOL_CALL, payload, fn=fn, attempt=attempt)
+
+    def confirm(self, token: str) -> Node:
+        pending = self._pending_tool_calls.pop(token)
+        if self.cursor_id != pending.parent_id:
+            raise ValueError("cannot confirm after cursor moved")
+        if pending.spec.handler is None:
+            self._refuse_policy("registered action has no handler", pending.payload)
+        return self._call(
+            NodeKind.TOOL_CALL,
+            pending.payload,
+            fn=_registered_handler(pending.spec, pending.args),
+            attempt=pending.attempt,
+        )
 
     def note(self, payload: dict[str, IdentityValue], *, attempt: int = 0) -> Node:
         self._precheck(NodeKind.NOTE.value, payload)
@@ -222,6 +270,91 @@ class Run:
         self._settle_scopes()
         return self.store.get(node.id)
 
+    def _registered_tool_call(
+        self,
+        name: str,
+        args: dict[str, IdentityValue],
+        *,
+        version: str | None,
+        attempt: int,
+    ) -> Node:
+        registry = self._runtime.registry
+        if registry is None:
+            raise RuntimeError("registered tool call requires a registry")
+        blocked_payload: dict[str, IdentityValue] = {"tool": name, "args": args}
+        try:
+            spec = registry.get(name, version)
+        except KeyError:
+            requested = name if version is None else f"{name}@{version}"
+            self._refuse_policy(
+                f"unknown registered action: {requested}",
+                blocked_payload,
+            )
+        finding = spec.validate_args(args)
+        if finding is not None:
+            self._refuse_policy(f"schema validation failed: {finding}", blocked_payload)
+        payload: dict[str, IdentityValue] = {
+            "tool": spec.name,
+            "version": spec.version,
+            "args": args,
+            "spec_digest": spec.spec_digest,
+            "registry_digest": registry.registry_digest,
+        }
+        for policy in self._runtime.policies:
+            decision = policy.decide(
+                PolicyContext(
+                    spec=spec,
+                    args=args,
+                    cursor_id=self.cursor_id,
+                    run_label=self.label,
+                    counters=self.report()["spent"],
+                )
+            )
+            if decision == Decision.ALLOW:
+                continue
+            if decision == Decision.DENY:
+                self._refuse_policy("denied by policy", payload)
+            if decision == Decision.CONFIRM:
+                prepared = Node.make(
+                    kind=NodeKind.TOOL_CALL,
+                    parent=self.cursor_id,
+                    payload=payload,
+                    attempt=attempt,
+                )
+                self._pending_tool_calls[prepared.id] = _PendingToolCall(
+                    parent_id=self.cursor_id,
+                    payload=payload,
+                    args=args,
+                    spec=spec,
+                    attempt=attempt,
+                )
+                raise ConfirmationRequired("confirmation required by policy", prepared.id)
+        if self._runtime.dry_run and spec.side_effects:
+            self._precheck(NodeKind.TOOL_CALL.value, payload)
+            node = Node.make(
+                kind=NodeKind.TOOL_CALL,
+                parent=self.cursor_id,
+                payload=payload,
+                attempt=attempt,
+                meta={
+                    "created_at": _now_utc(),
+                    "dry_run": True,
+                    "charges": {"steps": 1},
+                },
+            )
+            self.store.put(node)
+            self.cursor_id = node.id
+            self._settle_scopes()
+            return self.store.get(node.id)
+        if spec.handler is None:
+            self._refuse_policy("registered action has no handler", payload)
+        return self._call(
+            NodeKind.TOOL_CALL,
+            payload,
+            fn=_registered_handler(spec, args),
+            attempt=attempt,
+        )
+
     def _charges(
         self,
         kind: str,
@@ -284,6 +417,30 @@ class Run:
         self.store.put(node)
         self.cursor_id = node.id
         raise BudgetExceeded(f"budget exceeded for {meter}", node.id)
+
+    def _refuse_policy(
+        self,
+        detail: str,
+        blocked_payload: dict[str, IdentityValue],
+    ) -> NoReturn:
+        payload: dict[str, IdentityValue] = {
+            "reason": "policy",
+            "detail": detail,
+            "blocked_kind": "tool_call",
+            "blocked_payload_digest": digest_payload(blocked_payload),
+        }
+        registry = self._runtime.registry
+        if registry is not None:
+            payload["registry_digest"] = registry.registry_digest
+        node = Node.make(
+            kind=NodeKind.REFUSAL,
+            parent=self.cursor_id,
+            payload=payload,
+            meta={"created_at": _now_utc()},
+        )
+        self.store.put(node)
+        self.cursor_id = node.id
+        raise PolicyViolation(detail, node.id)
 
     def _settle_scopes(self) -> None:
         for scope in self._budget_scopes:
@@ -362,6 +519,20 @@ def _start_measurements(meters: list[Meter]) -> list[_Measurement]:
 def _stop_measurements(measurements: list[_Measurement]) -> None:
     for measurement in reversed(measurements):
         measurement.__exit__(None, None, None)
+
+
+def _registered_handler(
+    spec: ActionSpec,
+    args: dict[str, IdentityValue],
+) -> StepFn:
+    if spec.handler is None:
+        raise RuntimeError("registered handler is missing")
+    handler = spec.handler
+
+    def call(_payload: dict[str, Any]) -> dict[str, Any]:
+        return handler(args)
+
+    return call
 
 
 def _now_utc() -> str:
