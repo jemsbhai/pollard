@@ -15,5 +15,15 @@ use credentials configured by the user.
 The provider recipes make live calls and may incur provider charges. Review the
 payload, model, and budget before running them.
 
+The MCP recipe accepts either a Streamable HTTP URL or a local stdio command.
+The repository includes a credential-free local server for a complete smoke
+test:
+
+```powershell
+python docs\recipes\mcp_registry.py --stdio `
+  --server-arg examples\mcp_demo_server.py `
+  python search '{\"query\":\"pollard\"}'
+```
+
 Phase 6 adds the `pollard show` command. Until then, each script prints the root
 id that the command will inspect.

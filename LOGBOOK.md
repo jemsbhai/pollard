@@ -116,3 +116,68 @@ Protocol:
 
 Status: pending user credentials and a selected MCP server. No live result is
 claimed by this entry.
+
+## 2026-07-13 REC-005 Partial Result 1
+
+Environment:
+
+- Platform: Windows 11.
+- Python: 3.12.2.
+- Pollard: 0.5.0.
+- OpenAI SDK: 2.38.0.
+- MCP SDK: 1.26.0.
+
+OpenAI tool-loop attempt:
+
+- Script: `docs/recipes/openai_tool_loop.py`.
+- Model: `gpt-5.5`.
+- Exit status: failed before a provider response.
+- Redacted error: HTTP 429, `insufficient_quota`; the configured API project
+  requires usable billing or credits.
+- Root id: none emitted by the recipe.
+
+MCP registry result:
+
+- Client script: `docs/recipes/mcp_registry.py`.
+- Server: `examples/mcp_demo_server.py`, MCP stdio transport.
+- Tool: `search` with the deterministic query `pollard`.
+- Exit status: passed.
+- Root id:
+  `896e094b73da866da189ebfe83ce12ab8c75d6d3917605cf87574e6dd142ce7a`.
+- Redacted output: one successful structured match for the local Pollard
+  documentation record; no credentials or external data were involved.
+
+Remaining live checks:
+
+- `langgraph_node.py` and `pydantic_ai_wrap.py` use the same OpenAI account and
+  are held until that account has usable quota. `pydantic-ai` also remains to
+  be installed for its recipe.
+- `anthropic_tool_loop.py` is held because `ANTHROPIC_API_KEY` is not configured.
+- REC-005 remains incomplete; this partial result does not claim the provider
+  recipes passed.
+
+## 2026-07-13 v0.5.0 Local Release Checkpoint Result
+
+The credential-free release gates were rerun after adding the local MCP live
+path:
+
+- Full suite: 156 tests passed.
+- Coverage: 91.00 percent against a 90 percent floor.
+- Ruff: passed.
+- Mypy strict mode: passed for 29 source files.
+- Writing-standards scan: passed.
+- L0+L1 core size: 1,499 nonblank, noncomment lines against the 1,500-line
+  limit.
+- Build: `pollard-0.5.0.tar.gz` and
+  `pollard-0.5.0-py3-none-any.whl` built successfully.
+- Twine validation: both distributions passed.
+- Clean wheel install: `pollard[mcp]` installed in a new virtual environment,
+  imported as version 0.5.0, and completed the MCP governed-call recipe against
+  MCP SDK 1.28.1.
+
+External release status at this checkpoint:
+
+- PyPI latest remains 0.4.0; version 0.5.0 has not been uploaded.
+- TestPyPI was not attempted because TestPyPI authentication is not configured
+  and REC-005 is still incomplete.
+- No production upload, tag, push, or GitHub release was attempted.
