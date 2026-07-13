@@ -9,13 +9,16 @@ from pollard.meters import DepthMeter, StepMeter, TokenMeter, WallClockMeter
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("model_id", help="Bedrock model or inference-profile id")
     parser.add_argument("--region", default=None, help="AWS Region; defaults to the SDK chain")
     parser.add_argument(
         "--count-tokens",
         action="store_true",
         help="make a separate Bedrock CountTokens request during precheck",
+    )
+    parser.add_argument(
+        "--database", default="bedrock-converse.db", help="SQLite recording path"
     )
     args = parser.parse_args()
 
@@ -26,7 +29,7 @@ def main() -> None:
     client = boto3.client("bedrock-runtime", region_name=args.region)
     call_bedrock = make_converse_fn(client, count_tokens=args.count_tokens)
     runtime = Runtime(
-        "bedrock-converse.db",
+        args.database,
         meters=[
             StepMeter(),
             DepthMeter(),
@@ -51,7 +54,7 @@ def main() -> None:
             fn=call_bedrock,
         )
         print(node.result["text"])
-        print("inspect:", f"pollard show bedrock-converse.db {run.root_id}")
+        print("inspect:", f"pollard show {args.database} {run.root_id}")
 
 
 if __name__ == "__main__":

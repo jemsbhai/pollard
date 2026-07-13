@@ -4,6 +4,30 @@ All notable changes to pollard will be documented in this file.
 
 The format is based on Keep a Changelog, and this project follows Semantic Versioning.
 
+## [Unreleased]
+
+### Changed
+
+- Remove GitHub's package-publishing workflow and document the local-only,
+  direct-to-production-PyPI release procedure and verification checkpoints.
+- Expand the documentation and example indexes with complete prerequisites,
+  credentials, cost boundaries, commands, outputs, failure modes, and evidence
+  limitations.
+- Expand direct OpenAI, Anthropic, Azure OpenAI, Amazon Bedrock, Vertex AI,
+  Microsoft Foundry Models, LiteLLM, gateway, LangGraph, pydantic-ai, and MCP
+  integration guidance against current primary documentation.
+- Update the Anthropic tool-loop default to the pinned `claude-sonnet-5` model,
+  force exactly one demo tool call, add strict schemas and credential preflight,
+  and retain retry-free 128-token response caps.
+- Add bounded LangGraph and pydantic-ai extras, require the Anthropic SDK that
+  supports the documented effort request, and keep the MCP recipe on the
+  compatible 1.x SDK line ahead of MCP Python SDK 2.0.
+- Add an Azure OpenAI extra and a `DefaultAzureCredential` recipe path so the
+  same Azure example covers API-key and Microsoft Entra ID authentication.
+- Add one public API reference for runtime construction, run cursors, step
+  results, budgets, meters, registries, policies, replay, stores, integrity,
+  async calls, adapters, and exceptions.
+
 ## [1.0.0] - 2026-07-13
 
 ### Added

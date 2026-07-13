@@ -1,5 +1,6 @@
-"""Ledger one complete pydantic-ai run as a governed Pollard model call."""
+"""Ledger one capped pydantic-ai run as a governed Pollard model call."""
 
+import argparse
 import os
 import sys
 from typing import Any
@@ -8,16 +9,28 @@ from pollard import Budget, Runtime
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--model",
+        default=os.getenv("POLLARD_OPENAI_MODEL", "gpt-5.6"),
+        help="OpenAI model ID; defaults to POLLARD_OPENAI_MODEL or gpt-5.6",
+    )
+    parser.add_argument(
+        "--database", default="pydantic-ai.db", help="SQLite recording path"
+    )
+    args = parser.parse_args()
+    if not os.getenv("OPENAI_API_KEY"):
+        parser.error("OPENAI_API_KEY must be set before a live run")
+
     from openai import AsyncOpenAI
-    from pydantic_ai import Agent
+    from pydantic_ai import Agent, UsageLimits
     from pydantic_ai.models.openai import OpenAIResponsesModel
     from pydantic_ai.providers.openai import OpenAIProvider
 
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
-    model_name = os.getenv("POLLARD_OPENAI_MODEL", "gpt-5.6")
     model = OpenAIResponsesModel(
-        model_name,
+        args.model,
         provider=OpenAIProvider(openai_client=AsyncOpenAI(max_retries=0)),
     )
     agent = Agent(
@@ -31,7 +44,10 @@ def main() -> None:
     )
 
     def call_agent(payload: dict[str, Any]) -> dict[str, Any]:
-        result = agent.run_sync(payload["prompt"])
+        result = agent.run_sync(
+            payload["prompt"],
+            usage_limits=UsageLimits(request_limit=1, output_tokens_limit=128),
+        )
         return {
             "text": str(result.output),
             "usage": {
@@ -40,15 +56,15 @@ def main() -> None:
             },
         }
 
-    with Runtime("pydantic-ai.db", mode="hybrid").run(
+    with Runtime(args.database, mode="hybrid").run(
         "pydantic-ai", budget=Budget(tokens=2_000, steps=2)
     ) as run:
         node = run.model_call(
-            {"model": f"openai:{model_name}", "prompt": "Explain content addressing."},
+            {"model": f"openai:{args.model}", "prompt": "Explain content addressing."},
             fn=call_agent,
         )
         print(node.result["text"])
-        print("inspect:", f"pollard show pydantic-ai.db {run.root_id}")
+        print("inspect:", f"pollard show {args.database} {run.root_id}")
 
 
 if __name__ == "__main__":
