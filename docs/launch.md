@@ -96,3 +96,33 @@ Allowed claims:
 - Direct Bedrock, Azure OpenAI, Azure AI, Vertex AI, and LiteLLM paths are
   documented and tested with frozen or local fixtures unless a live run is
   explicitly identified in `LOGBOOK.md`.
+
+## Wave 7: v0.7
+
+Audience: teams retaining agent audit records under storage and data-handling
+requirements.
+
+Angle: "an agent audit trail your data-governance team can approve." Show a
+sensitive registry field reaching its handler while the stored node contains
+only a digest marker, then export, import, and explicitly reclaim a pruned
+branch.
+
+Demo commands:
+
+```powershell
+pollard show runs.db <root-id> --payloads
+pollard export runs.db <root-id> subtree.json
+pollard import subtree.json archive.db
+pollard gc runs.db drop-pruned
+pollard gc runs.db compact
+```
+
+Allowed claims:
+
+- SQLite interning preserves canonical payload bytes and node identity.
+- Sensitive registry string fields are redacted before hashing and storage.
+- Sealed imports are verified completely before nodes are written.
+- Garbage collection is explicit and returns seals for surviving roots.
+
+Storage-size figures remain logbook checkpoint data until EXP-004 formalizes
+the protocol in Phase 9.

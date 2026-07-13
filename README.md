@@ -23,8 +23,8 @@ The client above belongs to your code. Pollard does not read credentials or
 construct provider clients. Anthropic, Amazon Bedrock, and LiteLLM adapters
 follow the same pattern through `pollard[anthropic]`, `pollard[bedrock]`, and
 `pollard[litellm]`. Azure OpenAI uses the OpenAI adapter with an Azure-configured
-client. See [Cloud-hosted model providers](docs/cloud-providers.md) for direct
-AWS and Azure examples plus Vertex AI and other LiteLLM routes.
+client. See [Cloud-hosted model providers](https://github.com/jemsbhai/pollard/blob/main/docs/cloud-providers.md)
+for direct AWS and Azure examples plus Vertex AI and other LiteLLM routes.
 
 What you get:
 
@@ -41,7 +41,8 @@ Current limits:
 - Replay of sampled model calls serves the recorded output. It does not re-check that a provider would return that output again.
 - Hosted API energy use is not measured. The NVML energy meter is for local GPU inference only.
 - A SQLite store assumes one writer process.
-- HashRopeStore is an in-process append-only snapshot backend, not a multi-writer database.
+- HashRopeStore is an in-process operation-log backend, not a multi-writer
+  database. Explicit offline garbage collection rewrites its snapshot.
 - TokenmasterMeter reports tokenmaster state from the usage data your model client returns; it does not tokenize prompts itself.
 - Prompt estimators are approximations. Images, tool schemas, provider-added
   instructions, and wire-format changes can make the settled usage differ.
@@ -83,7 +84,8 @@ from pollard.meters import TokenMeter
 meter = TokenMeter(OpenAITokenEstimator(), reserved_output_tokens=1024)
 ```
 
-See `docs/recipes/` for full tool loops and integration patterns.
+See the [recipe collection](https://github.com/jemsbhai/pollard/tree/main/docs/recipes)
+for full tool loops and integration patterns.
 
 ## Observability
 
@@ -101,8 +103,52 @@ pollard show runs.db <root-id> --html run.html
 explicit `--payloads` flag. The HTML export is one static file with no remote
 assets. The optional `pollard[otel]` bridge exports the same node topology to a
 caller-configured OpenTelemetry tracer without placing prompt or result content
-on spans. See [Observability](docs/observability.md) for CLI exit codes, JSON
-forms, seals, HTML, and OpenTelemetry examples.
+on spans. See [Observability](https://github.com/jemsbhai/pollard/blob/main/docs/observability.md)
+for CLI exit codes, JSON forms, seals, HTML, and OpenTelemetry examples.
+
+## Storage And Data Governance
+
+`SQLiteStore` transparently interns repeated payload strings of at least 1 KiB.
+Interning changes only the SQLite encoding. Callers receive the original payload,
+and node ids are identical with interning on or off.
+
+Redaction is separate. `redact(value, hint=None)` replaces a value before node
+identity is computed, so the plaintext never reaches a Pollard store. Registry
+schemas can apply the same rule automatically:
+
+```python
+from pollard import ActionSpec
+
+def send_message(_args):
+    return {"queued": True}
+
+spec = ActionSpec(
+    "send",
+    "1",
+    "Send a message.",
+    {
+        "type": "object",
+        "properties": {"token": {"type": "string", "sensitive": True}},
+        "required": ["token"],
+    },
+    True,
+    handler=send_message,
+)
+```
+
+The handler receives the original `token`; the audit payload stores only its
+digest marker. Results and mutable metadata are not automatically redacted, so
+handlers must not copy secrets into their return values.
+
+```powershell
+pollard gc runs.db drop-pruned
+pollard gc runs.db compact
+pollard export runs.db <root-id> subtree.json
+pollard import subtree.json archive.db
+```
+
+See [Data governance](https://github.com/jemsbhai/pollard/blob/main/docs/data-governance.md)
+for the field-level storage model, retention behavior, and redaction limits.
 
 ## Branch, Rollback, And Shared Prefixes
 
@@ -113,8 +159,10 @@ parent compute the same node id, so hybrid and replay modes reuse recorded
 prefixes before branches diverge.
 
 EXP-001 measured this behavior only with deterministic mock token accounting.
-Its local-model, wall-clock, dollar, and joule legs remain unrun. See
-`LOGBOOK.md` and `findings.md` for the exact scope and results.
+Its local-model, wall-clock, dollar, and joule legs remain unrun. See the
+[logbook](https://github.com/jemsbhai/pollard/blob/main/LOGBOOK.md) and
+[findings](https://github.com/jemsbhai/pollard/blob/main/findings.md) for the
+exact scope and results.
 
 ## Registry Firewall
 
@@ -169,7 +217,8 @@ print(report.to_dict())
 ```
 
 The seal validates each visited node before hashing it. Mutable metadata is not
-included; see `docs/seal.md` for the field-level design.
+included; see [Export seals](https://github.com/jemsbhai/pollard/blob/main/docs/seal.md)
+for the field-level design.
 
 ## Store Backends
 
@@ -191,7 +240,8 @@ reopened = HashRopeStore(snapshot)
 assert reopened.get(run.root_id).payload == {"run": "hashrope-demo"}
 ```
 
-See `examples/` for offline scripts that run without network access.
+See the [offline examples](https://github.com/jemsbhai/pollard/tree/main/examples)
+for scripts that run without network access.
 
 ## Tokenmaster Meter
 
@@ -225,6 +275,7 @@ Use `TokenmasterMeter` instead of the built-in `TokenMeter` when you want tokenm
 
 ## Evidence
 
-Phase 4 adds `LOGBOOK.md` and `findings.md` for experiment notes. README
-performance numbers are intentionally absent until a logged run supports the
-same scope.
+Phase 4 adds the [experiment logbook](https://github.com/jemsbhai/pollard/blob/main/LOGBOOK.md)
+and [findings index](https://github.com/jemsbhai/pollard/blob/main/findings.md).
+README performance numbers are intentionally absent until a logged run supports
+the same scope.

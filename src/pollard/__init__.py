@@ -7,7 +7,7 @@ from importlib import import_module
 from types import ModuleType
 from typing import TYPE_CHECKING, Any
 
-__version__ = "0.6.0"
+__version__ = "0.7.0"
 
 if TYPE_CHECKING:
     from .aio import AsyncRun, AsyncRuntime
@@ -20,8 +20,17 @@ if TYPE_CHECKING:
         PollardError,
         UnsupportedSchema,
     )
+    from .governance import (
+        ExportReport,
+        GCReport,
+        ImportReport,
+        export_subtree,
+        gc,
+        import_subtree,
+    )
     from .governor import Budget, recompute_charges
     from .policy import Decision, Policy, PolicyContext
+    from .redaction import redact
     from .registry import ActionSpec, Registry
     from .replay import ReplayMode
     from .runtime import Run, Runtime
@@ -41,6 +50,9 @@ _EXPORTS = {
     "Decision": ("pollard.policy", "Decision"),
     "IntegrityError": ("pollard.errors", "IntegrityError"),
     "HashRopeStore": ("pollard.stores.hashrope", "HashRopeStore"),
+    "ExportReport": ("pollard.governance", "ExportReport"),
+    "GCReport": ("pollard.governance", "GCReport"),
+    "ImportReport": ("pollard.governance", "ImportReport"),
     "MemoryStore": ("pollard.store", "MemoryStore"),
     "MissingRecording": ("pollard.errors", "MissingRecording"),
     "Node": ("pollard.tree", "Node"),
@@ -60,6 +72,10 @@ _EXPORTS = {
     "VerifyFinding": ("pollard.verify", "VerifyFinding"),
     "VerifyReport": ("pollard.verify", "VerifyReport"),
     "recompute_charges": ("pollard.governor", "recompute_charges"),
+    "export_subtree": ("pollard.governance", "export_subtree"),
+    "gc": ("pollard.governance", "gc"),
+    "import_subtree": ("pollard.governance", "import_subtree"),
+    "redact": ("pollard.redaction", "redact"),
     "seal": ("pollard.seal", "seal"),
     "verify": ("pollard.verify", "verify"),
 }
@@ -72,7 +88,10 @@ __all__ = [
     "BudgetExceeded",
     "ConfirmationRequired",
     "Decision",
+    "ExportReport",
+    "GCReport",
     "HashRopeStore",
+    "ImportReport",
     "IntegrityError",
     "MemoryStore",
     "MissingRecording",
@@ -93,7 +112,11 @@ __all__ = [
     "VerifyFinding",
     "VerifyReport",
     "__version__",
+    "export_subtree",
+    "gc",
+    "import_subtree",
     "recompute_charges",
+    "redact",
     "seal",
     "verify",
 ]

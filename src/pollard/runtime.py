@@ -327,13 +327,19 @@ class Run:
         registry = self._runtime.registry
         if registry is None:
             raise RuntimeError("registered tool call requires a registry")
-        blocked_payload: dict[str, IdentityValue] = {"tool": name, "args": args}
         try:
-            spec = registry.get(name, version)
+            spec = registry.get(name)
         except KeyError:
             requested = name if version is None else f"{name}@{version}"
             self._refuse_policy(
                 f"unknown registered action: {requested}",
+                {"tool": name, "args": args},
+            )
+        audit_args = spec.redact_args(args)
+        blocked_payload: dict[str, IdentityValue] = {"tool": name, "args": audit_args}
+        if version is not None and version != spec.version:
+            self._refuse_policy(
+                f"unknown registered action: {name}@{version}",
                 blocked_payload,
             )
         finding = spec.validate_args(args)
@@ -342,7 +348,7 @@ class Run:
         payload: dict[str, IdentityValue] = {
             "tool": spec.name,
             "version": spec.version,
-            "args": args,
+            "args": audit_args,
             "spec_digest": spec.spec_digest,
             "registry_digest": registry.registry_digest,
         }
