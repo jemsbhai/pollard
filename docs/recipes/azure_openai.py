@@ -28,7 +28,7 @@ def main() -> None:
                 "input": "Explain content addressing in two sentences.",
                 "max_output_tokens": 128,
             },
-            fn=make_responses_fn(client),
+            fn=make_responses_fn(client, store=False),
         )
         print(node.result["text"])
         print("inspect:", f"pollard show azure-openai.db {run.root_id}")

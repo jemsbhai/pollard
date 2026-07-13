@@ -1,5 +1,6 @@
 """A LangGraph node whose provider call is ledgered by Pollard."""
 
+import os
 import sys
 from typing import TypedDict
 
@@ -19,14 +20,15 @@ def main() -> None:
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
     runtime = Runtime("langgraph-node.db", mode="hybrid")
-    call_openai = make_responses_fn(OpenAI(max_retries=0))
+    model = os.getenv("POLLARD_OPENAI_MODEL", "gpt-5.6")
+    call_openai = make_responses_fn(OpenAI(max_retries=0), store=False)
 
     with runtime.run("langgraph-node", budget=Budget(tokens=2_000, steps=4)) as run:
 
         def governed_model_node(state: State) -> dict[str, str]:
             node = run.model_call(
                 {
-                    "model": "gpt-5.5",
+                    "model": model,
                     "input": state["prompt"],
                     "max_output_tokens": 128,
                     "reasoning": {"effort": "none"},

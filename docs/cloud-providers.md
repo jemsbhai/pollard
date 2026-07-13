@@ -39,7 +39,7 @@ client = OpenAI(
     base_url=f"{os.environ['AZURE_OPENAI_ENDPOINT'].rstrip('/')}/openai/v1/",
     max_retries=0,
 )
-call_model = make_responses_fn(client)
+call_model = make_responses_fn(client, store=False)
 
 with Runtime("azure-openai.db").run("azure-openai") as run:
     node = run.model_call(
@@ -60,6 +60,12 @@ provider metadata without sending an unsupported SDK argument.
 For Microsoft Entra ID, construct the same client with a token provider instead
 of an API key. Authentication remains outside Pollard. See Microsoft's
 [Azure OpenAI Responses migration guide](https://learn.microsoft.com/en-us/azure/developer/ai/how-to/azure-openai-to-responses).
+
+OpenAI Responses are stored by the service by default. The example passes
+`store=False` so the provider does not retain the response through that API
+feature; this is separate from Pollard's local recording and from any provider
+abuse-monitoring or legal-retention obligations. See OpenAI's
+[Responses migration guide](https://developers.openai.com/api/docs/guides/migrate-to-responses).
 
 ## Amazon Bedrock
 
@@ -92,8 +98,11 @@ with Runtime("bedrock.db").run("bedrock") as run:
 
 Set `stream=True` on `make_converse_fn` to use `converse_stream`. Set
 `count_tokens=True` to opt into Bedrock's separate CountTokens request during a
-token-meter precheck. CountTokens needs the `bedrock:CountTokens` permission;
-model inference needs the applicable `bedrock:InvokeModel` permissions. See the
+token-meter precheck. AWS does not charge for CountTokens, but some models and
+cross-Region inference profiles do not support it. CountTokens needs the
+`bedrock:CountTokens` permission; model inference needs the applicable
+`bedrock:InvokeModel` permissions. Use a model ID or inference profile available
+in the selected Region. See the
 [Bedrock Converse API](https://docs.aws.amazon.com/bedrock/latest/userguide/conversation-inference.html)
 and [CountTokens API](https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_CountTokens.html).
 

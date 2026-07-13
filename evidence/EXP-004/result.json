@@ -1,0 +1,340 @@
+{
+  "environment": {
+    "platform": "Windows-11-10.0.26200-SP0",
+    "pollard": "0.8.0",
+    "pragmas": {
+      "auto_vacuum": 0,
+      "journal_mode": "wal",
+      "page_size": 4096,
+      "synchronous": 2
+    },
+    "python": "3.12.2",
+    "sqlite": "3.43.1"
+  },
+  "fits": {
+    "interned": [
+      {
+        "exponent": 1.201388,
+        "intercept": 8.826708,
+        "r_squared": 0.99349,
+        "seed": 0
+      },
+      {
+        "exponent": 1.201388,
+        "intercept": 8.826708,
+        "r_squared": 0.99349,
+        "seed": 1
+      },
+      {
+        "exponent": 1.201388,
+        "intercept": 8.826708,
+        "r_squared": 0.99349,
+        "seed": 2
+      },
+      {
+        "exponent": 1.201388,
+        "intercept": 8.826708,
+        "r_squared": 0.99349,
+        "seed": 3
+      },
+      {
+        "exponent": 1.201388,
+        "intercept": 8.826708,
+        "r_squared": 0.99349,
+        "seed": 4
+      }
+    ],
+    "plain": [
+      {
+        "exponent": 1.970694,
+        "intercept": 8.476902,
+        "r_squared": 0.999969,
+        "seed": 0
+      },
+      {
+        "exponent": 1.970694,
+        "intercept": 8.476902,
+        "r_squared": 0.999969,
+        "seed": 1
+      },
+      {
+        "exponent": 1.970694,
+        "intercept": 8.476902,
+        "r_squared": 0.999969,
+        "seed": 2
+      },
+      {
+        "exponent": 1.970694,
+        "intercept": 8.476902,
+        "r_squared": 0.999969,
+        "seed": 3
+      },
+      {
+        "exponent": 1.970694,
+        "intercept": 8.476902,
+        "r_squared": 0.999969,
+        "seed": 4
+      }
+    ]
+  },
+  "id": "EXP-004",
+  "protocol": {
+    "checkpoints": [
+      25,
+      50,
+      100,
+      200
+    ],
+    "confidence_interval": "two-sided 95% Student t interval, df=4",
+    "fit": "ordinary least squares over ln(turns) and ln(closed database bytes)",
+    "intern_threshold_bytes": 1024,
+    "message_bytes_per_turn": 8192,
+    "scope_limit": "fitted finite-range curves; no asymptotic complexity claim",
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ]
+  },
+  "question": "How do 200-turn SQLite storage curves differ with payload interning on and off?",
+  "rows": [
+    {
+      "identity_parity": true,
+      "interned_bytes": 352256,
+      "plain_bytes": 2756608,
+      "plain_to_interned_ratio": 7.825581,
+      "seed": 0,
+      "turns": 25
+    },
+    {
+      "identity_parity": true,
+      "interned_bytes": 688128,
+      "plain_bytes": 10588160,
+      "plain_to_interned_ratio": 15.386905,
+      "seed": 0,
+      "turns": 50
+    },
+    {
+      "identity_parity": true,
+      "interned_bytes": 1613824,
+      "plain_bytes": 41734144,
+      "plain_to_interned_ratio": 25.860406,
+      "seed": 0,
+      "turns": 100
+    },
+    {
+      "identity_parity": true,
+      "interned_bytes": 4255744,
+      "plain_bytes": 165683200,
+      "plain_to_interned_ratio": 38.931665,
+      "seed": 0,
+      "turns": 200
+    },
+    {
+      "identity_parity": true,
+      "interned_bytes": 352256,
+      "plain_bytes": 2756608,
+      "plain_to_interned_ratio": 7.825581,
+      "seed": 1,
+      "turns": 25
+    },
+    {
+      "identity_parity": true,
+      "interned_bytes": 688128,
+      "plain_bytes": 10588160,
+      "plain_to_interned_ratio": 15.386905,
+      "seed": 1,
+      "turns": 50
+    },
+    {
+      "identity_parity": true,
+      "interned_bytes": 1613824,
+      "plain_bytes": 41734144,
+      "plain_to_interned_ratio": 25.860406,
+      "seed": 1,
+      "turns": 100
+    },
+    {
+      "identity_parity": true,
+      "interned_bytes": 4255744,
+      "plain_bytes": 165683200,
+      "plain_to_interned_ratio": 38.931665,
+      "seed": 1,
+      "turns": 200
+    },
+    {
+      "identity_parity": true,
+      "interned_bytes": 352256,
+      "plain_bytes": 2756608,
+      "plain_to_interned_ratio": 7.825581,
+      "seed": 2,
+      "turns": 25
+    },
+    {
+      "identity_parity": true,
+      "interned_bytes": 688128,
+      "plain_bytes": 10588160,
+      "plain_to_interned_ratio": 15.386905,
+      "seed": 2,
+      "turns": 50
+    },
+    {
+      "identity_parity": true,
+      "interned_bytes": 1613824,
+      "plain_bytes": 41734144,
+      "plain_to_interned_ratio": 25.860406,
+      "seed": 2,
+      "turns": 100
+    },
+    {
+      "identity_parity": true,
+      "interned_bytes": 4255744,
+      "plain_bytes": 165683200,
+      "plain_to_interned_ratio": 38.931665,
+      "seed": 2,
+      "turns": 200
+    },
+    {
+      "identity_parity": true,
+      "interned_bytes": 352256,
+      "plain_bytes": 2756608,
+      "plain_to_interned_ratio": 7.825581,
+      "seed": 3,
+      "turns": 25
+    },
+    {
+      "identity_parity": true,
+      "interned_bytes": 688128,
+      "plain_bytes": 10588160,
+      "plain_to_interned_ratio": 15.386905,
+      "seed": 3,
+      "turns": 50
+    },
+    {
+      "identity_parity": true,
+      "interned_bytes": 1613824,
+      "plain_bytes": 41734144,
+      "plain_to_interned_ratio": 25.860406,
+      "seed": 3,
+      "turns": 100
+    },
+    {
+      "identity_parity": true,
+      "interned_bytes": 4255744,
+      "plain_bytes": 165683200,
+      "plain_to_interned_ratio": 38.931665,
+      "seed": 3,
+      "turns": 200
+    },
+    {
+      "identity_parity": true,
+      "interned_bytes": 352256,
+      "plain_bytes": 2756608,
+      "plain_to_interned_ratio": 7.825581,
+      "seed": 4,
+      "turns": 25
+    },
+    {
+      "identity_parity": true,
+      "interned_bytes": 688128,
+      "plain_bytes": 10588160,
+      "plain_to_interned_ratio": 15.386905,
+      "seed": 4,
+      "turns": 50
+    },
+    {
+      "identity_parity": true,
+      "interned_bytes": 1613824,
+      "plain_bytes": 41734144,
+      "plain_to_interned_ratio": 25.860406,
+      "seed": 4,
+      "turns": 100
+    },
+    {
+      "identity_parity": true,
+      "interned_bytes": 4255744,
+      "plain_bytes": 165683200,
+      "plain_to_interned_ratio": 38.931665,
+      "seed": 4,
+      "turns": 200
+    }
+  ],
+  "status": "passed",
+  "summary": {
+    "all_node_ids_match": true,
+    "checkpoints": [
+      {
+        "interned_bytes": {
+          "ci95_half_width": 0.0,
+          "mean": 352256.0
+        },
+        "plain_bytes": {
+          "ci95_half_width": 0.0,
+          "mean": 2756608.0
+        },
+        "plain_to_interned_ratio": {
+          "ci95_half_width": 0.0,
+          "mean": 7.825581
+        },
+        "turns": 25
+      },
+      {
+        "interned_bytes": {
+          "ci95_half_width": 0.0,
+          "mean": 688128.0
+        },
+        "plain_bytes": {
+          "ci95_half_width": 0.0,
+          "mean": 10588160.0
+        },
+        "plain_to_interned_ratio": {
+          "ci95_half_width": 0.0,
+          "mean": 15.386905
+        },
+        "turns": 50
+      },
+      {
+        "interned_bytes": {
+          "ci95_half_width": 0.0,
+          "mean": 1613824.0
+        },
+        "plain_bytes": {
+          "ci95_half_width": 0.0,
+          "mean": 41734144.0
+        },
+        "plain_to_interned_ratio": {
+          "ci95_half_width": 0.0,
+          "mean": 25.860406
+        },
+        "turns": 100
+      },
+      {
+        "interned_bytes": {
+          "ci95_half_width": 0.0,
+          "mean": 4255744.0
+        },
+        "plain_bytes": {
+          "ci95_half_width": 0.0,
+          "mean": 165683200.0
+        },
+        "plain_to_interned_ratio": {
+          "ci95_half_width": 0.0,
+          "mean": 38.931665
+        },
+        "turns": 200
+      }
+    ],
+    "fitted_exponents": {
+      "interned": {
+        "ci95_half_width": 0.0,
+        "mean": 1.201388
+      },
+      "plain": {
+        "ci95_half_width": 0.0,
+        "mean": 1.970694
+      }
+    }
+  }
+}

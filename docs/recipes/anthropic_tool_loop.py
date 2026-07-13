@@ -1,5 +1,6 @@
 """A live Anthropic tool loop with token estimation and registry gating."""
 
+import os
 import sys
 
 from pollard import ActionSpec, Budget, Registry, Runtime
@@ -34,6 +35,7 @@ def main() -> None:
 
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
+    model = os.getenv("POLLARD_ANTHROPIC_MODEL", "claude-sonnet-4-6")
     client = Anthropic(max_retries=0)
     call_anthropic = make_messages_fn(client, max_tokens=128)
     runtime = Runtime(
@@ -56,7 +58,7 @@ def main() -> None:
     with runtime.run("anthropic-tool-loop", budget=Budget(tokens=2_000, steps=6)) as run:
         first = run.model_call(
             {
-                "model": "claude-sonnet-4-6",
+                "model": model,
                 "messages": messages,
                 "tools": ANTHROPIC_TOOLS,
                 "output_config": {"effort": "low"},
@@ -77,7 +79,7 @@ def main() -> None:
         messages.append({"role": "user", "content": tool_results})
         final = run.model_call(
             {
-                "model": "claude-sonnet-4-6",
+                "model": model,
                 "messages": messages,
                 "tools": ANTHROPIC_TOOLS,
                 "output_config": {"effort": "low"},

@@ -7,7 +7,7 @@ from importlib import import_module
 from types import ModuleType
 from typing import TYPE_CHECKING, Any
 
-__version__ = "0.8.0"
+__version__ = "0.9.0"
 
 if TYPE_CHECKING:
     from .aio import AsyncRun, AsyncRuntime
@@ -37,7 +37,7 @@ if TYPE_CHECKING:
     from .replay import ReplayMode
     from .runtime import Run, Runtime
     from .seal import SealEntry, SealReport, seal
-    from .store import MemoryStore
+    from .store import MemoryStore, Store
     from .stores import HashRopeStore, PostgresStore, SQLiteStore
     from .tree import Node, NodeKind
     from .verify import VerifyFinding, VerifyReport, verify
@@ -56,6 +56,7 @@ _EXPORTS = {
     "GCReport": ("pollard.governance", "GCReport"),
     "ImportReport": ("pollard.governance", "ImportReport"),
     "MemoryStore": ("pollard.store", "MemoryStore"),
+    "Store": ("pollard.store", "Store"),
     "MergeReport": ("pollard.merge", "MergeReport"),
     "MissingRecording": ("pollard.errors", "MissingRecording"),
     "Node": ("pollard.tree", "Node"),
@@ -116,6 +117,7 @@ __all__ = [
     "SQLiteStore",
     "SealEntry",
     "SealReport",
+    "Store",
     "UnsupportedSchema",
     "VerifyFinding",
     "VerifyReport",

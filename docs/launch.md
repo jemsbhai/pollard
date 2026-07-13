@@ -154,3 +154,53 @@ Allowed claims:
 Do not describe Pollard as a consensus system or claim coordination between
 disconnected stores. The 20-round contention result is an acceptance checkpoint
 for the recorded environment, not a throughput benchmark.
+
+## Wave 9: v0.9
+
+Audience: reviewers evaluating whether Pollard's performance and concurrency
+claims are reproducible.
+
+Angle: "inspect the evidence before adopting the API covenant." Lead with raw
+artifacts and their limitations, then show the proposed 1.0 byte and protocol
+contracts.
+
+Demo sources:
+
+- `examples/exp_001_local_model.py` and the EXP-001 raw result.
+- `examples/exp_004_storage.py` and the EXP-004 raw result.
+- `examples/exp_005_contention.py` and the EXP-005 raw result.
+- `docs/api-stability.md` for the 1.0 candidate covenant.
+
+Allowed numeric claims:
+
+- EXP-001: in its pinned RTX 4090 Laptop GPU, Qwen2.5-Coder 7B, and llama.cpp
+  environment, shared prefixes reduced mean wall-clock by 40.05%, 59.13%, and
+  68.54% for 2, 4, and 8 branches. The whole-GPU NVML energy reductions were
+  35.23%, 58.53%, and 67.58%.
+- EXP-004: in its deterministic 200-turn SQLite workload, the final plain file
+  was 38.93 times the interned file. The finite-range fitted log-log exponents
+  were 1.970694 and 1.201388.
+- EXP-005: exact meters did not exceed the configured limit across the recorded
+  1,650 PostgreSQL 14 and 18 rounds. The maximum observed estimated-token
+  overshoot was 6 tokens and remained within the registered bound.
+
+Required qualifiers:
+
+- EXP-001 energy is whole-GPU NVML energy and its USD field uses a declared
+  electricity comparison rate, not actual utility cost or total cost of
+  ownership.
+- EXP-004 is a finite synthetic fit and does not prove an asymptotic growth
+  class.
+- EXP-005 is a same-host correctness experiment, not a throughput,
+  availability, network-partition, or consensus result.
+- No hosted-provider cost saving has been measured. Provider spend was 0 USD.
+
+## Wave 10: v1.0
+
+Status: blocked only on the selected EXP-006 end-to-end case study, its sealed
+artifact, offline stranger-verification instructions, and the final freeze
+review.
+
+The case-study tree is the 1.0 launch demo. Do not announce the 1.0 covenant as
+active or imply end-to-end case-study evidence until EXP-006 is committed and
+the 1.0.0 release exists.

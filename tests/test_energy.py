@@ -22,6 +22,16 @@ class FakeNvml:
         return 100_000
 
 
+class FakeCumulativeNvml(FakeNvml):
+    def __init__(self) -> None:
+        super().__init__()
+        self.energy = iter((10_000, 11_500))
+
+    def nvmlDeviceGetTotalEnergyConsumption(self, handle: object) -> int:
+        del handle
+        return next(self.energy)
+
+
 def test_integrate_samples_uses_trapezoids() -> None:
     assert _integrate_samples([(0.0, 100.0), (1.0, 200.0), (3.0, 200.0)]) == 550.0
 
@@ -38,6 +48,13 @@ def test_energy_measurement_records_positive_joules() -> None:
     with meter.measure() as measurement:
         time.sleep(0.003)
     assert measurement.readings()["joules"] > 0
+
+
+def test_energy_measurement_prefers_cumulative_counter() -> None:
+    meter = EnergyMeter(nvml=FakeCumulativeNvml(), interval_s=0.001)
+    with meter.measure() as measurement:
+        time.sleep(0.003)
+    assert measurement.readings()["joules"] == 1.5
 
 
 def test_energy_meter_lazy_import_error(monkeypatch: pytest.MonkeyPatch) -> None:

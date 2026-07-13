@@ -1,0 +1,5 @@
+[local_energy]
+usd_per_kwh = "0.20"
+currency = "USD"
+basis = "Declared comparison rate, not the host's utility bill or total cost of ownership."
+effective_date = "2026-07-13"

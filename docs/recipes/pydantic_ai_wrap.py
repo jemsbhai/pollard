@@ -1,5 +1,6 @@
 """Ledger one complete pydantic-ai run as a governed Pollard model call."""
 
+import os
 import sys
 from typing import Any
 
@@ -14,14 +15,19 @@ def main() -> None:
 
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
+    model_name = os.getenv("POLLARD_OPENAI_MODEL", "gpt-5.6")
     model = OpenAIResponsesModel(
-        "gpt-5.5",
+        model_name,
         provider=OpenAIProvider(openai_client=AsyncOpenAI(max_retries=0)),
     )
     agent = Agent(
         model,
         retries=0,
-        model_settings={"max_tokens": 128, "openai_reasoning_effort": "none"},
+        model_settings={
+            "max_tokens": 128,
+            "openai_reasoning_effort": "none",
+            "openai_store": False,
+        },
     )
 
     def call_agent(payload: dict[str, Any]) -> dict[str, Any]:
@@ -38,7 +44,7 @@ def main() -> None:
         "pydantic-ai", budget=Budget(tokens=2_000, steps=2)
     ) as run:
         node = run.model_call(
-            {"model": "openai:gpt-5.5", "prompt": "Explain content addressing."},
+            {"model": f"openai:{model_name}", "prompt": "Explain content addressing."},
             fn=call_agent,
         )
         print(node.result["text"])

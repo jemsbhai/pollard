@@ -59,7 +59,7 @@ pollard gc runs.db compact --json
 
 Import verifies the complete subtree seal before writing nodes. Garbage
 collection is explicit; `drop-pruned` removes marked subtrees and `compact`
-reclaims unreferenced SQLite blobs. See [Data governance](data-governance.md)
+reclaims unreferenced SQLite blobs. See [Data governance](https://github.com/jemsbhai/pollard/blob/main/docs/data-governance.md)
 for field-level retention and redaction behavior.
 
 Disconnected stores can be unioned without exporting an intermediate file:
@@ -69,7 +69,7 @@ pollard merge combined.db worker-a.db worker-b.db --json
 ```
 
 PostgreSQL store syntax and credential-safe `pg-env:` references are documented
-in [Scale-out stores and governance](scale-out.md).
+in [Scale-out stores and governance](https://github.com/jemsbhai/pollard/blob/main/docs/scale-out.md).
 
 ## Integrity and seals
 
