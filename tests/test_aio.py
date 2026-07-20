@@ -48,7 +48,7 @@ def test_async_running_call_renews_sqlite_reservation(tmp_path) -> None:  # type
 
         async def slow_call(_payload: dict[str, object]) -> dict[str, bool]:
             started.set()
-            await asyncio.sleep(0.5)
+            await asyncio.sleep(2.2)
             executed.append("first")
             return {"ok": True}
 
@@ -56,18 +56,18 @@ def test_async_running_call_renews_sqlite_reservation(tmp_path) -> None:  # type
             first_run = AsyncRuntime(
                 first_store,
                 meters=[WindowMeter("requests", 1, 60)],
-                reservation_lease_seconds=0.2,
+                reservation_lease_seconds=1.0,
             ).run("async-renewal")
             pending = asyncio.create_task(
                 first_run.amodel_call({"model": "slow"}, fn=slow_call)
             )
             await asyncio.wait_for(started.wait(), timeout=5)
-            await asyncio.sleep(0.3)
+            await asyncio.sleep(1.4)
             with SQLiteStore(path) as second_store:
                 second_run = Runtime(
                     second_store,
                     meters=[WindowMeter("requests", 1, 60)],
-                    reservation_lease_seconds=0.2,
+                    reservation_lease_seconds=1.0,
                 ).run("async-renewal")
                 with pytest.raises(BudgetExceeded):
                     second_run.model_call(
