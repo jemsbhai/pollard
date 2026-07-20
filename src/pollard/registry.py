@@ -21,6 +21,9 @@ _SUPPORTED_KEYS = {
     "enum",
     "items",
     "additionalProperties",
+    "title",
+    "description",
+    "default",
     "sensitive",
 }
 _SUPPORTED_TYPES = {"object", "string", "integer", "boolean", "array", "null"}
@@ -132,6 +135,10 @@ def _check_schema(schema: IdentityValue, path: str) -> None:
     additional = schema.get("additionalProperties")
     if additional is not None and not isinstance(additional, bool):
         raise UnsupportedSchema(f"{path}.additionalProperties: must be a boolean")
+    for annotation in ("title", "description"):
+        value = schema.get(annotation)
+        if value is not None and not isinstance(value, str):
+            raise UnsupportedSchema(f"{path}.{annotation}: must be a string")
     sensitive = schema.get("sensitive")
     if sensitive is not None and not isinstance(sensitive, bool):
         raise UnsupportedSchema(f"{path}.sensitive: must be a boolean")
