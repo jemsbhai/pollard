@@ -202,9 +202,11 @@ registry rejects duplicate names and computes `registry_digest` from its sorted
 spec digests. A run root binds to one registry digest.
 
 The zero-dependency schema subset accepts `type`, `properties`, `required`,
-`enum`, `items`, `additionalProperties`, and Pollard's `sensitive` marker. Types
-are object, string, integer, boolean, array, and null. Unsupported keywords or
-types raise `UnsupportedSchema` when the spec is constructed.
+`enum`, `items`, `additionalProperties`, the non-validation annotations `title`,
+`description`, and `default`, and Pollard's `sensitive` marker. Types are object,
+string, integer, boolean, array, and null. Unsupported validation keywords or
+types raise `UnsupportedSchema` when the spec is constructed. An annotation does
+not change argument validation, but remains part of the action spec digest.
 
 `sensitive: true` is valid on string fields. Pollard validates the original
 argument, supplies it to policies and the handler, but hashes and stores a

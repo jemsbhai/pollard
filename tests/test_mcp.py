@@ -1,9 +1,12 @@
 import asyncio
 
 import pytest
+from mcp.server.fastmcp import FastMCP
+from mcp.shared.memory import create_connected_server_and_client_session
 
 from pollard import AsyncRuntime, UnsupportedSchema
 from pollard.mcp import registry_from_mcp
+from pollard.meters import StepMeter
 
 
 class FakeSession:
@@ -43,6 +46,38 @@ def test_registry_from_mcp_builds_async_handlers() -> None:
         node = await run.atool_call("search", {"query": "pollard"})
         assert node.result["args"] == {"query": "pollard"}
         assert session.calls == [("search", {"query": "pollard"})]
+
+    asyncio.run(scenario())
+
+
+def test_registry_from_fastmcp_accepts_generated_schema_annotations() -> None:
+    async def scenario() -> None:
+        calls: list[tuple[str, int]] = []
+        server = FastMCP("pollard-test")
+
+        @server.tool()
+        def append_marker(marker: str, repeat: int = 1) -> dict[str, object]:
+            """Append a marker."""
+
+            calls.append((marker, repeat))
+            return {"marker": marker, "repeat": repeat}
+
+        async with create_connected_server_and_client_session(
+            server._mcp_server
+        ) as session:
+            registry = await registry_from_mcp(session)
+            schema = registry.get("append_marker", "mcp").schema
+            assert schema["title"] == "append_markerArguments"
+            properties = schema["properties"]
+            assert isinstance(properties, dict)
+            repeat_schema = properties["repeat"]
+            assert isinstance(repeat_schema, dict)
+            assert repeat_schema["default"] == 1
+
+            run = AsyncRuntime(registry=registry, meters=[StepMeter()]).run("fastmcp")
+            await run.atool_call("append_marker", {"marker": "ok"})
+
+        assert calls == [("ok", 1)]
 
     asyncio.run(scenario())
 
