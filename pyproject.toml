@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pollard"
-version = "1.0.2"
+version = "1.0.3"
 description = "Governed execution trees for AI agents: budget it, gate it, replay it."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -68,4 +68,3 @@ addopts = "-q -p no:pollard"
 
 [tool.coverage.run]
 source = ["src/pollard"]
-omit = ["src/pollard/stores/postgres.py"]

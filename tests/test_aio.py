@@ -40,6 +40,89 @@ def make_registry(side_effects: bool = False) -> Registry:
     )
 
 
+@pytest.mark.asyncio
+async def test_async_running_call_renews_sqlite_reservation(tmp_path) -> None:  # type: ignore[no-untyped-def]
+    path = tmp_path / "async-renewal.db"
+    started = asyncio.Event()
+    executed: list[str] = []
+
+    async def slow_call(_payload: dict[str, object]) -> dict[str, bool]:
+        started.set()
+        await asyncio.sleep(0.5)
+        executed.append("first")
+        return {"ok": True}
+
+    with SQLiteStore(path) as first_store:
+        first_run = AsyncRuntime(
+            first_store,
+            meters=[WindowMeter("requests", 1, 60)],
+            reservation_lease_seconds=0.2,
+        ).run("async-renewal")
+        pending = asyncio.create_task(
+            first_run.amodel_call({"model": "slow"}, fn=slow_call)
+        )
+        await asyncio.wait_for(started.wait(), timeout=5)
+        await asyncio.sleep(0.3)
+        with SQLiteStore(path) as second_store:
+            second_run = Runtime(
+                second_store,
+                meters=[WindowMeter("requests", 1, 60)],
+                reservation_lease_seconds=0.2,
+            ).run("async-renewal")
+            with pytest.raises(BudgetExceeded):
+                second_run.model_call(
+                    {"model": "second"},
+                    attempt=1,
+                    fn=lambda _payload: executed.append("second") or {"ok": True},
+                )
+        await asyncio.wait_for(pending, timeout=10)
+
+    assert executed == ["first"]
+
+
+@pytest.mark.asyncio
+async def test_async_in_memory_sqlite_keeps_reservation_until_completion() -> None:
+    store = SQLiteStore(":memory:")
+    started = asyncio.Event()
+    executed: list[str] = []
+
+    async def slow_call(_payload: dict[str, object]) -> dict[str, bool]:
+        started.set()
+        await asyncio.sleep(0.2)
+        executed.append("first")
+        return {"ok": True}
+
+    first_run = AsyncRuntime(
+        store,
+        meters=[WindowMeter("requests", 1, 60)],
+        reservation_lease_seconds=0.05,
+    ).run("async-memory-renewal")
+    second_run = AsyncRuntime(
+        store,
+        meters=[WindowMeter("requests", 1, 60)],
+        reservation_lease_seconds=0.05,
+    ).run("async-memory-renewal")
+    pending = asyncio.create_task(
+        first_run.amodel_call({"model": "slow"}, fn=slow_call)
+    )
+    await asyncio.wait_for(started.wait(), timeout=5)
+    await asyncio.sleep(0.1)
+    with pytest.raises(BudgetExceeded):
+        await second_run.amodel_call(
+            {"model": "second"},
+            attempt=1,
+            fn=lambda _payload: _async_result(executed, "second"),
+        )
+    await asyncio.wait_for(pending, timeout=5)
+    store.close()
+    assert executed == ["first"]
+
+
+async def _async_result(target: list[str], value: str) -> dict[str, bool]:
+    target.append(value)
+    return {"ok": True}
+
+
 def test_async_model_call_matches_sync_identity() -> None:
     sync_run = Runtime(MemoryStore()).run("parity")
     sync_node = sync_run.model_call(

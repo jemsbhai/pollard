@@ -73,12 +73,17 @@ On a transactional store, each governed model or tool call uses three steps:
 3. Settlement removes the reservation and adds the actual charge.
 
 Reservations have a lease. A process that exits after precheck cannot hold
-capacity forever; a later precheck removes expired reservations. Set
-`reservation_lease_seconds` longer than the expected call duration:
+capacity forever; a later precheck ignores expired reservations. Pollard renews
+the lease while a model or tool callable is still running:
 
 ```python
 runtime = Runtime(store, reservation_lease_seconds=180)
 ```
+
+If renewal cannot be confirmed before expiry, Pollard reports a lost lease
+after attempting settlement and recording the completed call. Schema migration,
+backup, restore, reconnect, and incident procedures are in
+[PostgreSQL operations](https://github.com/jemsbhai/pollard/blob/main/docs/postgres-operations.md).
 
 With concurrent writers sharing one arbiter, total settled spend is bounded by
 the budget plus the sum of actual-minus-estimate overshoot for calls that passed
@@ -183,7 +188,7 @@ Plain SQLite paths remain compatible with earlier releases.
 ## Operations Boundary
 
 - Use PostgreSQL for several hosts or sustained writer contention.
-- Keep call duration below the configured lease, or increase the lease.
+- Set the lease above expected database interruptions and monitor renewal loss.
 - Run garbage collection only during a coordinated offline maintenance window.
 - Monitor database availability and capacity independently of Pollard.
 - Do not claim fail-closed coordination between disconnected stores. Merge is

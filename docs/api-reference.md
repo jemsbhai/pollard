@@ -247,6 +247,11 @@ SQLite and PostgreSQL intern large string payload leaves by default. Interning
 is a storage encoding, not redaction or encryption. PostgreSQL requires the
 `pg` extra. Hashrope requires the `hashrope` extra.
 
+`PostgresStore.migrate(conninfo)` performs the explicit legacy-to-current
+schema migration and returns `(old_version, new_version)`. It requires a drained
+reservation table. `store.reconnect()` replaces a broken connection and checks
+the schema version before returning.
+
 ## Nodes and reports
 
 `Node` is an immutable dataclass with `id`, `parent`, `kind`, `attempt`,
@@ -275,6 +280,9 @@ gc(store, mode="drop-pruned") -> GCReport
 recompute_charges(store, root_id) -> dict[str, float]
 redact(value, hint=None) -> dict
 ```
+
+`SQLiteSealSink(path).publish(report, store_id=..., signer_identity=...)`
+appends a `SealCustodyRecord` to a database kept outside the Pollard store.
 
 `verify` checks the selected node and its ancestry. The CLI walks every node in
 the selected root when performing a whole-tree verification. `seal` raises on
@@ -330,6 +338,9 @@ All Pollard exceptions derive from `PollardError`:
 | `ConfirmationRequired` | Policy requires explicit continuation | `resume_token` |
 | `MissingRecording` | Strict replay found no stored result | `node_id`, `payload_summary` |
 | `IntegrityError` | Stored or transferred data failed integrity validation | Exception message |
+| `ReservationLeaseLost` | A completed call lost its shared reservation lease | `reservation_id`, `node_id` |
+| `ReservationUncertain` | Reserve or release could not be confirmed after reconnect | `reservation_id` |
+| `SettlementUncertain` | A completed call's shared settlement could not be confirmed | `reservation_id` |
 | `UnsupportedSchema` | Action schema uses an unsupported keyword or type | Exception message |
 
 Provider SDK, tool handler, callback, filesystem, and database exceptions are

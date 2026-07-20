@@ -1,11 +1,19 @@
+import time
 from concurrent.futures import ThreadPoolExecutor
 from decimal import Decimal
 from pathlib import Path
-from threading import Barrier, Lock
+from threading import Barrier, Event, Lock
 
 import pytest
 
-from pollard import Budget, BudgetExceeded, Runtime, SQLiteStore, WindowMeter
+from pollard import (
+    Budget,
+    BudgetExceeded,
+    ReservationLeaseLost,
+    Runtime,
+    SQLiteStore,
+    WindowMeter,
+)
 from pollard.arbiter import BudgetReservation
 from pollard.meters import TokenMeter
 
@@ -80,6 +88,71 @@ def test_expired_sqlite_budget_reservation_releases_capacity(
         assert store._pollard_reserve("first", [request], [], 1).ok
         assert not store._pollard_reserve("blocked", [request], [], 1).ok
         assert store._pollard_reserve("after-expiry", [request], [], 1).ok
+
+
+def test_running_sqlite_call_renews_reservation_past_initial_lease(
+    tmp_path: Path,
+) -> None:
+    path = tmp_path / "renewed-lease.db"
+    started = Event()
+    executed: list[str] = []
+
+    def slow_call(_payload: dict[str, object]) -> dict[str, bool]:
+        started.set()
+        time.sleep(0.5)
+        executed.append("first")
+        return {"ok": True}
+
+    def first_worker() -> None:
+        with SQLiteStore(path) as store:
+            run = Runtime(
+                store,
+                meters=[WindowMeter("requests", 1, 60)],
+                reservation_lease_seconds=0.2,
+            ).run("sqlite-renewal")
+            run.model_call({"model": "slow"}, fn=slow_call)
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        first = executor.submit(first_worker)
+        assert started.wait(timeout=5)
+        time.sleep(0.3)
+        with SQLiteStore(path) as store:
+            second = Runtime(
+                store,
+                meters=[WindowMeter("requests", 1, 60)],
+                reservation_lease_seconds=0.2,
+            ).run("sqlite-renewal")
+            with pytest.raises(BudgetExceeded):
+                second.model_call(
+                    {"model": "second"},
+                    attempt=1,
+                    fn=lambda _payload: executed.append("second") or {"ok": True},
+                )
+        first.result(timeout=10)
+
+    assert executed == ["first"]
+
+
+def test_lost_reservation_lease_is_recorded_and_reported(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    with SQLiteStore(tmp_path / "lost-lease.db") as store:
+        monkeypatch.setattr(store, "_pollard_renew", lambda *_args: False)
+        run = Runtime(
+            store,
+            meters=[WindowMeter("requests", 1, 60)],
+            reservation_lease_seconds=0.1,
+        ).run("lost-lease")
+        with pytest.raises(ReservationLeaseLost) as error:
+            run.model_call(
+                {"model": "slow"},
+                fn=lambda _payload: time.sleep(0.2) or {"ok": True},
+            )
+        node = store.get(error.value.node_id)
+        assert node.result == {"ok": True}
+        assert node.meta["reservation_lease"]["status"] == "lost"
+        assert run.report()["spent"]["requests"] == 1.0
 
 
 def test_failed_call_releases_window_reservation_immediately(tmp_path: Path) -> None:
