@@ -107,9 +107,11 @@ function is running. The default lease is 60 seconds. Renewal uses a separate
 short PostgreSQL connection, so the main store connection remains available to
 the calling code.
 
-Set the lease longer than expected database interruptions and configure the
-libpq connection timeout below the lease. A healthy call can run longer than
-one initial lease because renewal extends the expiry. If renewal cannot be
+Set the lease longer than expected database interruptions, renewal transaction
+latency, and process scheduling stalls, and configure the libpq connection
+timeout below the lease. Renewal starts follow a fixed cadence, so time spent in
+one renewal does not postpone the next attempt. A healthy call can run longer
+than one initial lease because renewal extends the expiry. If renewal cannot be
 confirmed before expiry, Pollard still attempts to settle and record the
 completed call, then raises `ReservationLeaseLost` with `reservation_id` and
 `node_id`. Do not describe that call as protected by an exact shared limit.

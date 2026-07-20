@@ -6,6 +6,14 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 
 ## [Unreleased]
 
+## [1.0.5] - 2026-07-20
+
+### Fixed
+
+- Schedule reservation-renewal attempts at a fixed cadence so a slow database
+  round trip does not postpone the next heartbeat, and report lease loss when
+  call completion has passed the last conservatively confirmed deadline.
+
 ## [1.0.4] - 2026-07-20
 
 ### Fixed

@@ -16,6 +16,7 @@ from pollard import (
 )
 from pollard.arbiter import BudgetReservation
 from pollard.meters import TokenMeter
+from pollard.runtime import _LeaseHeartbeat
 
 
 def test_window_meter_is_shared_across_two_sqlite_writers(tmp_path: Path) -> None:
@@ -99,7 +100,7 @@ def test_running_sqlite_call_renews_reservation_past_initial_lease(
 
     def slow_call(_payload: dict[str, object]) -> dict[str, bool]:
         started.set()
-        time.sleep(0.5)
+        time.sleep(2.2)
         executed.append("first")
         return {"ok": True}
 
@@ -108,19 +109,19 @@ def test_running_sqlite_call_renews_reservation_past_initial_lease(
             run = Runtime(
                 store,
                 meters=[WindowMeter("requests", 1, 60)],
-                reservation_lease_seconds=0.2,
+                reservation_lease_seconds=1.0,
             ).run("sqlite-renewal")
             run.model_call({"model": "slow"}, fn=slow_call)
 
     with ThreadPoolExecutor(max_workers=2) as executor:
         first = executor.submit(first_worker)
         assert started.wait(timeout=5)
-        time.sleep(0.3)
+        time.sleep(1.4)
         with SQLiteStore(path) as store:
             second = Runtime(
                 store,
                 meters=[WindowMeter("requests", 1, 60)],
-                reservation_lease_seconds=0.2,
+                reservation_lease_seconds=1.0,
             ).run("sqlite-renewal")
             with pytest.raises(BudgetExceeded):
                 second.model_call(
@@ -131,6 +132,52 @@ def test_running_sqlite_call_renews_reservation_past_initial_lease(
         first.result(timeout=10)
 
     assert executed == ["first"]
+
+
+def test_lease_heartbeat_cadence_does_not_drift_with_slow_renewal() -> None:
+    lease_seconds = 0.12
+    expires_at = time.monotonic() + lease_seconds
+    renewed_count = 0
+    renewed_three_times = Event()
+
+    def slow_renew(_reservation_id: str, requested_lease: float) -> bool:
+        nonlocal expires_at, renewed_count
+        now = time.monotonic()
+        if now >= expires_at:
+            return False
+        expires_at = now + requested_lease
+        time.sleep(0.09)
+        renewed_count += 1
+        if renewed_count == 3:
+            renewed_three_times.set()
+        return True
+
+    heartbeat = _LeaseHeartbeat(
+        reservation_id="slow-renewal",
+        lease_seconds=lease_seconds,
+        renew=slow_renew,
+    )
+    heartbeat.start()
+    assert renewed_three_times.wait(timeout=1)
+    assert heartbeat.stop() is None
+
+
+def test_lease_heartbeat_stop_reports_unconfirmed_deadline() -> None:
+    renewal_started = Event()
+
+    def delayed_renew(_reservation_id: str, _lease_seconds: float) -> bool:
+        renewal_started.set()
+        time.sleep(0.12)
+        return True
+
+    heartbeat = _LeaseHeartbeat(
+        reservation_id="delayed-renewal",
+        lease_seconds=0.05,
+        renew=delayed_renew,
+    )
+    heartbeat.start()
+    assert renewal_started.wait(timeout=1)
+    assert heartbeat.stop() == "reservation renewal not confirmed before lease deadline"
 
 
 def test_lost_reservation_lease_is_recorded_and_reported(

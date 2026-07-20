@@ -96,6 +96,7 @@ class _LeaseHeartbeat:
         self._renew = renew
         self._stop = Event()
         self._lost: str | None = None
+        self._deadline: float | None = None
         self._thread = Thread(target=self._run, daemon=True)
 
     def start(self) -> None:
@@ -104,23 +105,36 @@ class _LeaseHeartbeat:
     def stop(self) -> str | None:
         self._stop.set()
         self._thread.join()
+        if (
+            self._lost is None
+            and self._deadline is not None
+            and time.monotonic() >= self._deadline
+        ):
+            self._lost = "reservation renewal not confirmed before lease deadline"
         return self._lost
 
     def _run(self) -> None:
         interval = max(0.01, min(30.0, self._lease_seconds / 3))
-        deadline = time.monotonic() + self._lease_seconds
-        while not self._stop.wait(interval):
+        started_at = time.monotonic()
+        self._deadline = started_at + self._lease_seconds
+        next_renewal = started_at + interval
+        while True:
+            wait_seconds = max(0.0, next_renewal - time.monotonic())
+            if self._stop.wait(wait_seconds):
+                return
+            attempted_at = time.monotonic()
+            next_renewal = attempted_at + interval
             try:
                 renewed = self._renew(self._reservation_id, self._lease_seconds)
             except Exception as exc:
-                if time.monotonic() >= deadline:
+                if time.monotonic() >= self._deadline:
                     self._lost = f"renewal failed with {type(exc).__name__}"
                     return
                 continue
             if not renewed:
                 self._lost = "reservation expired or closed before renewal"
                 return
-            deadline = time.monotonic() + self._lease_seconds
+            self._deadline = attempted_at + self._lease_seconds
 
 
 class Runtime:

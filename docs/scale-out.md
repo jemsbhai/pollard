@@ -188,7 +188,8 @@ Plain SQLite paths remain compatible with earlier releases.
 ## Operations Boundary
 
 - Use PostgreSQL for several hosts or sustained writer contention.
-- Set the lease above expected database interruptions and monitor renewal loss.
+- Set the lease above expected database interruptions, renewal latency, and
+  process scheduling stalls, and monitor renewal loss.
 - Run garbage collection only during a coordinated offline maintenance window.
 - Monitor database availability and capacity independently of Pollard.
 - Do not claim fail-closed coordination between disconnected stores. Merge is
