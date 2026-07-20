@@ -49,6 +49,24 @@ def test_walk_is_depth_first_and_deterministic(store: Store) -> None:
     assert walked == [root.id, *store.children(root.id)]
 
 
+def test_walk_handles_depth_beyond_python_recursion_limit(store: Store) -> None:
+    root = Node.make(kind=NodeKind.ROOT, parent=None, payload={"run": "deep-walk"})
+    store.put(root)
+    parent = root
+    expected = [root.id]
+    for index in range(1_100):
+        child = Node.make(
+            kind=NodeKind.NOTE,
+            parent=parent.id,
+            payload={"index": index},
+        )
+        store.put(child)
+        expected.append(child.id)
+        parent = child
+
+    assert [node.id for node in store.walk(root.id)] == expected
+
+
 def test_roots_are_sorted_by_run_label_then_id(store: Store) -> None:
     second = Node.make(kind=NodeKind.ROOT, parent=None, payload={"run": "z-last"})
     first = Node.make(kind=NodeKind.ROOT, parent=None, payload={"run": "a-first"})

@@ -53,10 +53,11 @@ class HashRopeStore:
         self._append({"op": "meta", "id": node_id, "patch": patch})
 
     def walk(self, root_id: str) -> Iterator[Node]:
-        root = self.get(root_id)
-        yield root
-        for child_id in self.children(root_id):
-            yield from self.walk(child_id)
+        pending = [root_id]
+        while pending:
+            node_id = pending.pop()
+            yield self.get(node_id)
+            pending.extend(reversed(self.children(node_id)))
 
     def roots(self) -> list[str]:
         return sorted(

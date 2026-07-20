@@ -195,9 +195,11 @@ class SQLiteStore:
             raise
 
     def walk(self, root_id: str) -> Iterator[Node]:
-        yield self.get(root_id)
-        for child_id in self.children(root_id):
-            yield from self.walk(child_id)
+        pending = [root_id]
+        while pending:
+            node_id = pending.pop()
+            yield self.get(node_id)
+            pending.extend(reversed(self.children(node_id)))
 
     def roots(self) -> list[str]:
         rows = self._conn.execute("SELECT id FROM nodes WHERE parent IS NULL").fetchall()
