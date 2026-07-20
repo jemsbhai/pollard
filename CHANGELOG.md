@@ -6,6 +6,15 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-07-19
+
+### Fixed
+
+- Replace recursive depth-first tree traversal with deterministic iterative
+  traversal in the memory, HashRope, SQLite, PostgreSQL, and subtree-manifest
+  stores, preventing `RecursionError` on valid deep execution trees while
+  preserving the existing preorder.
+
 ## [1.0.1] - 2026-07-13
 
 ### Changed
