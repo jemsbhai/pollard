@@ -155,10 +155,12 @@ with runtime.run("triage", budget=Budget(steps=1_000)) as run:
 ```
 
 The database role needs normal read and write access plus permission to create
-Pollard's tables and indexes on first use. It does not need OpenAI, Anthropic,
-AWS, Azure, or other model credentials. See [Scale-out stores and governance](https://github.com/jemsbhai/pollard/blob/main/docs/scale-out.md)
-for least-privilege setup, token windows, leases, contention guarantees, merge
-rules, and CLI store syntax.
+Pollard's tables and indexes on first use. Existing unversioned schemas require
+an explicit backed-up, drained migration and unknown versions are refused. It
+does not need OpenAI, Anthropic, AWS, Azure, or other model credentials. See
+[Scale-out stores and governance](https://github.com/jemsbhai/pollard/blob/main/docs/scale-out.md)
+for shared limits and [PostgreSQL operations](https://github.com/jemsbhai/pollard/blob/main/docs/postgres-operations.md)
+for schema migration, backup, restore, lease renewal, and reconnect procedures.
 
 ## Observability
 
@@ -295,6 +297,12 @@ print(report.to_dict())
 The seal validates each visited node before hashing it. Mutable metadata is not
 included; see [Export seals](https://github.com/jemsbhai/pollard/blob/main/docs/seal.md)
 for the field-level design.
+
+`SQLiteSealSink` is a reference external custody log. It appends sequence,
+store ID, root ID, seal algorithm, digest, UTC time, and signer identity to a
+SQLite file kept outside the Pollard database. The deployment remains
+responsible for separate access control, signatures, keys, and immutable
+retention.
 
 ## Store Backends
 

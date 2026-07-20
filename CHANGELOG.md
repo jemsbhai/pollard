@@ -6,6 +6,25 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 
 ## [Unreleased]
 
+## [1.0.3] - 2026-07-20
+
+### Added
+
+- Add explicit PostgreSQL schema version 2, an administrator-run forward
+  migration from the legacy unversioned schema, unknown-version refusal, and
+  tested backup, restore, restart, and reconnect procedures.
+- Add `SQLiteSealSink` as a reference external custody log for seal sequence,
+  store ID, root ID, algorithm, digest, time, and signer identity.
+
+### Fixed
+
+- Renew SQLite and PostgreSQL reservations while model or tool calls run past
+  their initial lease, preserving exact request and step admission under a
+  healthy shared database.
+- Make PostgreSQL reserve and settle retries idempotent, recover one lost
+  connection acknowledgement, reject changed settlement charges, and report
+  persistent ambiguity with typed exceptions.
+
 ## [1.0.2] - 2026-07-19
 
 ### Fixed

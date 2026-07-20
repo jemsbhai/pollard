@@ -30,9 +30,15 @@ The refused callable did not run. This guarantee does not apply to a completed
 provider call whose actual usage settles above an estimate; that external spend
 has already occurred, and later steps are refused.
 
-For transactional stores, confirm the reservation lease is longer than the
-expected call duration. Expired reservations are cleared by later prechecks.
-Do not manually edit arbiter tables.
+For transactional stores, inspect renewal errors and database interruptions.
+Calls renew their reservation while running. Do not manually edit arbiter
+tables.
+
+`ReservationUncertain` means a reserve or release transaction could not be
+confirmed after reconnect. `SettlementUncertain` means the provider callable
+completed but its database settlement could not be confirmed. Do not repeat
+the provider call. Use the reservation ID and the recovery procedure in
+[PostgreSQL operations](https://github.com/jemsbhai/pollard/blob/main/docs/postgres-operations.md).
 
 ## PolicyViolation or ConfirmationRequired
 
@@ -126,6 +132,10 @@ For PostgreSQL, verify DSN reachability, TLS, database and schema permissions,
 first-use create privileges, sequence use, and matching `store_id`. The
 preferred CLI form is `pg-env:VARIABLE#store-id` so a password does not appear
 in process arguments.
+
+After a server restart or backend termination, create a new `PostgresStore` or
+call `reconnect()` on the existing instance. A schema migration requirement or
+unknown schema version is intentional refusal, not a connectivity error.
 
 ## Import or merge failure
 

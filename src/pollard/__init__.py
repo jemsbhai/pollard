@@ -7,7 +7,7 @@ from importlib import import_module
 from types import ModuleType
 from typing import TYPE_CHECKING, Any
 
-__version__ = "1.0.2"
+__version__ = "1.0.3"
 
 if TYPE_CHECKING:
     from .aio import AsyncRun, AsyncRuntime
@@ -18,6 +18,9 @@ if TYPE_CHECKING:
         MissingRecording,
         PolicyViolation,
         PollardError,
+        ReservationLeaseLost,
+        ReservationUncertain,
+        SettlementUncertain,
         UnsupportedSchema,
     )
     from .governance import (
@@ -37,6 +40,7 @@ if TYPE_CHECKING:
     from .replay import ReplayMode
     from .runtime import Run, Runtime
     from .seal import SealEntry, SealReport, seal
+    from .seal_custody import SealCustodyRecord, SQLiteSealSink
     from .store import MemoryStore, Store
     from .stores import HashRopeStore, PostgresStore, SQLiteStore
     from .tree import Node, NodeKind
@@ -67,11 +71,16 @@ _EXPORTS = {
     "PostgresStore": ("pollard.stores", "PostgresStore"),
     "PollardError": ("pollard.errors", "PollardError"),
     "Registry": ("pollard.registry", "Registry"),
+    "ReservationLeaseLost": ("pollard.errors", "ReservationLeaseLost"),
+    "ReservationUncertain": ("pollard.errors", "ReservationUncertain"),
     "ReplayMode": ("pollard.replay", "ReplayMode"),
     "Run": ("pollard.runtime", "Run"),
     "Runtime": ("pollard.runtime", "Runtime"),
     "SealEntry": ("pollard.seal", "SealEntry"),
     "SealReport": ("pollard.seal", "SealReport"),
+    "SealCustodyRecord": ("pollard.seal_custody", "SealCustodyRecord"),
+    "SQLiteSealSink": ("pollard.seal_custody", "SQLiteSealSink"),
+    "SettlementUncertain": ("pollard.errors", "SettlementUncertain"),
     "SQLiteStore": ("pollard.stores", "SQLiteStore"),
     "UnsupportedSchema": ("pollard.errors", "UnsupportedSchema"),
     "VerifyFinding": ("pollard.verify", "VerifyFinding"),
@@ -112,11 +121,16 @@ __all__ = [
     "PostgresStore",
     "Registry",
     "ReplayMode",
+    "ReservationLeaseLost",
+    "ReservationUncertain",
     "Run",
     "Runtime",
+    "SQLiteSealSink",
     "SQLiteStore",
+    "SealCustodyRecord",
     "SealEntry",
     "SealReport",
+    "SettlementUncertain",
     "Store",
     "UnsupportedSchema",
     "VerifyFinding",

@@ -44,3 +44,28 @@ class MissingRecording(PollardError):
 
 class UnsupportedSchema(PollardError):
     """Raised when a registry schema uses unsupported JSON Schema features."""
+
+
+class ReservationLeaseLost(PollardError):
+    """Raised after a completed call whose shared reservation lease was lost."""
+
+    def __init__(self, message: str, reservation_id: str, node_id: str) -> None:
+        super().__init__(message)
+        self.reservation_id = reservation_id
+        self.node_id = node_id
+
+
+class ReservationUncertain(PollardError):
+    """Raised when a shared reservation outcome cannot be confirmed."""
+
+    def __init__(self, message: str, reservation_id: str) -> None:
+        super().__init__(message)
+        self.reservation_id = reservation_id
+
+
+class SettlementUncertain(PollardError):
+    """Raised when a completed call's shared settlement cannot be confirmed."""
+
+    def __init__(self, message: str, reservation_id: str) -> None:
+        super().__init__(message)
+        self.reservation_id = reservation_id

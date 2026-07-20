@@ -308,7 +308,9 @@ class SQLiteStore:
                         remaining=remaining,
                         window_seconds=window_request.window_seconds,
                     )
-            expires_at = now + lease_seconds
+            expires_at = (
+                float("inf") if self.path == Path(":memory:") else now + lease_seconds
+            )
             for request in budgets:
                 for meter in sorted(request.limits):
                     if meter == "depth":
@@ -411,6 +413,41 @@ class SQLiteStore:
                 "DELETE FROM reservations WHERE reservation_id = ?",
                 (reservation_id,),
             )
+
+    def _pollard_renew(self, reservation_id: str, lease_seconds: float) -> bool:
+        if self.path == Path(":memory:"):
+            return True
+        conn = sqlite3.connect(self.path)
+        try:
+            conn.execute("PRAGMA busy_timeout=30000")
+            conn.execute("BEGIN IMMEDIATE")
+            now = time.time()
+            row = conn.execute(
+                """
+                SELECT COUNT(*), MIN(expires_at)
+                FROM reservations WHERE reservation_id = ?
+                """,
+                (reservation_id,),
+            ).fetchone()
+            if (
+                row is None
+                or int(row[0]) == 0
+                or row[1] is None
+                or float(row[1]) <= now
+            ):
+                conn.commit()
+                return False
+            conn.execute(
+                "UPDATE reservations SET expires_at = ? WHERE reservation_id = ?",
+                (now + lease_seconds, reservation_id),
+            )
+            conn.commit()
+            return True
+        except BaseException:
+            conn.rollback()
+            raise
+        finally:
+            conn.close()
 
     def _pollard_drop_nodes(self, node_ids: set[str]) -> None:
         with self._conn:

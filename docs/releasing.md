@@ -88,12 +88,13 @@ python -m pip install --upgrade pip
 python -m pip install -e ".[dev,estimate-openai]"
 python -m ruff check src tests examples docs\recipes
 python -m mypy src
+$env:POLLARD_TEST_POSTGRES_DSN = "postgresql://pollard@127.0.0.1/pollard_test"
 python -m pytest --cov --cov-report=term-missing --cov-fail-under=90
 ```
 
-The PostgreSQL tests that require a live database are exercised by the GitHub
-CI service job. An operator with a local PostgreSQL instance can also set
-`POLLARD_TEST_POSTGRES_DSN` and run that test group directly.
+The full coverage gate requires a disposable PostgreSQL database. GitHub CI
+also runs the store tests against every supported PostgreSQL major release.
+Never point the test variable at a database containing application data.
 
 Open a pull request, wait for every matrix job, review the rendered Markdown,
 and merge only the exact commit that passed. Do not publish from the pull

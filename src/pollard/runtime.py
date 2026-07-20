@@ -10,6 +10,7 @@ from datetime import datetime, timezone
 from decimal import Decimal
 from inspect import isawaitable
 from pathlib import Path
+from threading import Event, Thread
 from types import TracebackType
 from typing import Any, NoReturn, Protocol
 from uuid import uuid4
@@ -17,10 +18,17 @@ from uuid import uuid4
 from ._canon import IdentityValue
 from .arbiter import (
     BudgetReservation,
+    RenewableArbiter,
     TransactionalArbiter,
     WindowReservation,
 )
-from .errors import BudgetExceeded, ConfirmationRequired, IntegrityError, PolicyViolation
+from .errors import (
+    BudgetExceeded,
+    ConfirmationRequired,
+    IntegrityError,
+    PolicyViolation,
+    ReservationLeaseLost,
+)
 from .governor import (
     Budget,
     BudgetCheck,
@@ -73,6 +81,46 @@ class _PendingToolCall:
     args: dict[str, IdentityValue]
     spec: ActionSpec
     attempt: int
+
+
+class _LeaseHeartbeat:
+    def __init__(
+        self,
+        *,
+        reservation_id: str,
+        lease_seconds: float,
+        renew: Callable[[str, float], bool],
+    ) -> None:
+        self._reservation_id = reservation_id
+        self._lease_seconds = lease_seconds
+        self._renew = renew
+        self._stop = Event()
+        self._lost: str | None = None
+        self._thread = Thread(target=self._run, daemon=True)
+
+    def start(self) -> None:
+        self._thread.start()
+
+    def stop(self) -> str | None:
+        self._stop.set()
+        self._thread.join()
+        return self._lost
+
+    def _run(self) -> None:
+        interval = max(0.01, min(30.0, self._lease_seconds / 3))
+        deadline = time.monotonic() + self._lease_seconds
+        while not self._stop.wait(interval):
+            try:
+                renewed = self._renew(self._reservation_id, self._lease_seconds)
+            except Exception as exc:
+                if time.monotonic() >= deadline:
+                    self._lost = f"renewal failed with {type(exc).__name__}"
+                    return
+                continue
+            if not renewed:
+                self._lost = "reservation expired or closed before renewal"
+                return
+            deadline = time.monotonic() + self._lease_seconds
 
 
 class Runtime:
@@ -306,6 +354,7 @@ class Run:
         if recorded is not None:
             return recorded
         reservation = self._precheck(kind.value, payload)
+        lease = self._start_reservation_lease(reservation)
         measurements = _start_measurements(self._runtime.meters)
         start = time.perf_counter()
         try:
@@ -315,11 +364,14 @@ class Run:
                 keep_chunks=keep_chunks,
             )
         except BaseException:
+            if lease is not None:
+                lease.stop()
             self._release_reservation(reservation)
             raise
         finally:
             duration = time.perf_counter() - start
             _stop_measurements(measurements)
+        lease_lost = lease.stop() if lease is not None else None
         meta: dict[str, Any] = {"created_at": _now_utc(), "duration_s": duration}
         for measurement in measurements:
             meta.update(measurement.readings())
@@ -327,6 +379,8 @@ class Run:
         meta["charges"] = charges
         if isinstance(result, dict) and isinstance(result.get("usage"), dict):
             meta["usage"] = result["usage"]
+        if lease_lost is not None:
+            meta["reservation_lease"] = {"status": "lost", "detail": lease_lost}
         self._settle_reservation(reservation, charges)
         node = Node.make(
             kind=kind,
@@ -339,6 +393,12 @@ class Run:
         node = self._runtime._put(node)
         self.cursor_id = node.id
         self._settle_scopes()
+        if lease_lost is not None and reservation is not None:
+            raise ReservationLeaseLost(
+                "shared reservation lease was lost while the call was running",
+                reservation,
+                node.id,
+            )
         return node
 
     def _registered_tool_call(
@@ -666,6 +726,23 @@ class Run:
             reservation_id,
             {name: charge_to_decimal(amount) for name, amount in charges.items()},
         )
+
+    def _start_reservation_lease(
+        self,
+        reservation_id: str | None,
+    ) -> _LeaseHeartbeat | None:
+        if reservation_id is None:
+            return None
+        store = self.store
+        if not isinstance(store, RenewableArbiter):
+            return None
+        heartbeat = _LeaseHeartbeat(
+            reservation_id=reservation_id,
+            lease_seconds=self._runtime.reservation_lease_seconds,
+            renew=store._pollard_renew,
+        )
+        heartbeat.start()
+        return heartbeat
 
     def _release_reservation(self, reservation_id: str | None) -> None:
         if reservation_id is None:

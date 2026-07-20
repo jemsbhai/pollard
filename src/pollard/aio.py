@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Any
 
 from ._canon import IdentityValue
-from .errors import ConfirmationRequired
+from .errors import ConfirmationRequired, ReservationLeaseLost
 from .governor import Budget
 from .meters import Meter
 from .policy import Decision, Policy, PolicyContext
@@ -186,6 +186,7 @@ class AsyncRun(Run):
             await _areemit_chunks(recorded, on_delta)
             return recorded
         reservation = self._precheck(kind.value, payload)
+        lease = self._start_reservation_lease(reservation)
         measurements = _start_measurements(self._runtime.meters)
         start = time.perf_counter()
         try:
@@ -200,11 +201,14 @@ class AsyncRun(Run):
                 keep_chunks=keep_chunks,
             )
         except BaseException:
+            if lease is not None:
+                lease.stop()
             self._release_reservation(reservation)
             raise
         finally:
             duration = time.perf_counter() - start
             _stop_measurements(measurements)
+        lease_lost = lease.stop() if lease is not None else None
         meta: dict[str, Any] = {"created_at": _now_utc(), "duration_s": duration}
         for measurement in measurements:
             meta.update(measurement.readings())
@@ -212,6 +216,8 @@ class AsyncRun(Run):
         meta["charges"] = charges
         if isinstance(result, dict) and isinstance(result.get("usage"), dict):
             meta["usage"] = result["usage"]
+        if lease_lost is not None:
+            meta["reservation_lease"] = {"status": "lost", "detail": lease_lost}
         self._settle_reservation(reservation, charges)
         node = Node.make(
             kind=kind,
@@ -224,6 +230,12 @@ class AsyncRun(Run):
         node = self._runtime._put(node)
         self.cursor_id = node.id
         self._settle_scopes()
+        if lease_lost is not None and reservation is not None:
+            raise ReservationLeaseLost(
+                "shared reservation lease was lost while the call was running",
+                reservation,
+                node.id,
+            )
         return node
 
     async def _aregistered_tool_call(

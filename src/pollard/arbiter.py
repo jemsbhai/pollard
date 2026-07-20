@@ -51,3 +51,12 @@ class TransactionalArbiter(Protocol):
     ) -> None: ...
 
     def _pollard_release(self, reservation_id: str) -> None: ...
+
+
+@runtime_checkable
+class RenewableArbiter(Protocol):
+    def _pollard_renew(
+        self,
+        reservation_id: str,
+        lease_seconds: float,
+    ) -> bool: ...
