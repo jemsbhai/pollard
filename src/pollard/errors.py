@@ -46,6 +46,55 @@ class UnsupportedSchema(PollardError):
     """Raised when a registry schema uses unsupported JSON Schema features."""
 
 
+class PostDispatchOutcomeUnknown(PollardError):
+    """Mark a provider-neutral failure whose external outcome is unknown.
+
+    Call adapters may raise this wrapper after dispatch when they cannot tell
+    whether the external operation completed. The runtime records and settles
+    the conservative precheck estimates, then re-raises ``error``.
+    """
+
+    def __init__(self, error: BaseException) -> None:
+        if not isinstance(error, BaseException):
+            raise TypeError("post-dispatch error must wrap an exception")
+        super().__init__("external call outcome is unknown after dispatch")
+        self.error = error
+
+
+def mark_post_dispatch_outcome_unknown(error: Exception) -> BaseException:
+    """Mark a native exception without replacing its public exception type.
+
+    Provider adapters use this after dispatch so callers still receive the
+    original SDK exception. A wrapper is returned only for an exception type
+    that refuses instance attributes.
+    """
+
+    try:
+        error.__dict__["_pollard_post_dispatch_outcome_unknown"] = True
+    except (AttributeError, TypeError):
+        return PostDispatchOutcomeUnknown(error)
+    return error
+
+
+def is_post_dispatch_outcome_unknown(error: BaseException) -> bool:
+    """Return whether an exception represents an unknown dispatched outcome."""
+
+    return isinstance(error, PostDispatchOutcomeUnknown) or (
+        getattr(error, "_pollard_post_dispatch_outcome_unknown", False) is True
+    )
+
+
+class CallCleanupError(PollardError):
+    """Collect secondary failures while preserving a call's primary error."""
+
+    def __init__(self, errors: list[BaseException]) -> None:
+        if not errors:
+            raise ValueError("cleanup errors must not be empty")
+        self.errors = tuple(errors)
+        names = ", ".join(type(error).__name__ for error in self.errors)
+        super().__init__(f"call cleanup failed with: {names}")
+
+
 class ReservationLeaseLost(PollardError):
     """Raised after a completed call whose shared reservation lease was lost."""
 

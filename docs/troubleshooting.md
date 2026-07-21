@@ -40,6 +40,14 @@ completed but its database settlement could not be confirmed. Do not repeat
 the provider call. Use the reservation ID and the recovery procedure in
 [PostgreSQL operations](https://github.com/jemsbhai/pollard/blob/main/docs/postgres-operations.md).
 
+A `call_outcome_unknown` note means a direct adapter or generic callable
+reported that dispatch occurred but the external result was not known. A
+`call_recording_failed` note means the callable returned, but local meter or
+result processing failed before a replayable result could be stored. Both notes
+contain a blocked payload digest and error type, not the prompt, result, provider
+message, or raw response. Treat either note as consumed external capacity and do
+not retry automatically.
+
 ## PolicyViolation or ConfirmationRequired
 
 For a registry refusal, confirm all of these values:

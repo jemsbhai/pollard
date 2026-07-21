@@ -216,9 +216,9 @@ class SQLiteStore:
         windows: list[WindowReservation],
         lease_seconds: float,
     ) -> ReservationCheck:
-        now = time.time()
         try:
             self._conn.execute("BEGIN IMMEDIATE")
+            now = time.time()
             for request in sorted(budgets, key=lambda item: item.scope_id):
                 for meter, limit in sorted(request.limits.items()):
                     if meter == "depth":
@@ -358,9 +358,9 @@ class SQLiteStore:
         reservation_id: str,
         charges: dict[str, Decimal],
     ) -> None:
-        now = time.time()
         try:
             self._conn.execute("BEGIN IMMEDIATE")
+            now = time.time()
             rows = self._conn.execute(
                 """
                 SELECT kind, scope_id, meter, window_seconds

@@ -6,7 +6,7 @@ from collections.abc import AsyncIterator, Iterator
 from dataclasses import dataclass, field
 from typing import Any
 
-from ._common import as_dict, int_field, merge_request
+from ._common import as_dict, int_field, merge_request, post_dispatch_boundary
 
 
 def make_responses_fn(
@@ -21,10 +21,13 @@ def make_responses_fn(
         params = merge_request(defaults, payload)
         if stream:
             params["stream"] = True
-        response = client.responses.create(**params)
+        with post_dispatch_boundary():
+            response = client.responses.create(**params)
+            if not stream:
+                return _normalize_response(response)
         if stream:
             return _responses_stream(response)
-        return _normalize_response(response)
+        raise AssertionError("unreachable")
 
     return call
 
@@ -41,10 +44,13 @@ def make_async_responses_fn(
         params = merge_request(defaults, payload)
         if stream:
             params["stream"] = True
-        response = await client.responses.create(**params)
+        with post_dispatch_boundary():
+            response = await client.responses.create(**params)
+            if not stream:
+                return _normalize_response(response)
         if stream:
             return _async_responses_stream(response)
-        return _normalize_response(response)
+        raise AssertionError("unreachable")
 
     return call
 
@@ -62,10 +68,13 @@ def make_chat_completions_fn(
         if stream:
             params["stream"] = True
             params.setdefault("stream_options", {"include_usage": True})
-        response = client.chat.completions.create(**params)
+        with post_dispatch_boundary():
+            response = client.chat.completions.create(**params)
+            if not stream:
+                return normalize_chat_completion(response)
         if stream:
             return _chat_stream(response)
-        return normalize_chat_completion(response)
+        raise AssertionError("unreachable")
 
     return call
 
@@ -83,10 +92,13 @@ def make_async_chat_completions_fn(
         if stream:
             params["stream"] = True
             params.setdefault("stream_options", {"include_usage": True})
-        response = await client.chat.completions.create(**params)
+        with post_dispatch_boundary():
+            response = await client.chat.completions.create(**params)
+            if not stream:
+                return normalize_chat_completion(response)
         if stream:
             return _async_chat_stream(response)
-        return normalize_chat_completion(response)
+        raise AssertionError("unreachable")
 
     return call
 
@@ -174,10 +186,11 @@ def _responses_tool_calls(response: dict[str, Any]) -> list[dict[str, Any]]:
 def _responses_stream(stream: Any) -> Iterator[dict[str, Any]]:
     completed = False
     text_parts: list[str] = []
-    for event in stream:
-        chunk, is_complete = _responses_event(as_dict(event), text_parts)
-        completed = completed or is_complete
-        yield chunk
+    with post_dispatch_boundary():
+        for event in stream:
+            chunk, is_complete = _responses_event(as_dict(event), text_parts)
+            completed = completed or is_complete
+            yield chunk
     if not completed:
         yield {"result": {"text": "".join(text_parts), "usage": _empty_usage()}}
 
@@ -185,10 +198,11 @@ def _responses_stream(stream: Any) -> Iterator[dict[str, Any]]:
 async def _async_responses_stream(stream: Any) -> AsyncIterator[dict[str, Any]]:
     completed = False
     text_parts: list[str] = []
-    async for event in stream:
-        chunk, is_complete = _responses_event(as_dict(event), text_parts)
-        completed = completed or is_complete
-        yield chunk
+    with post_dispatch_boundary():
+        async for event in stream:
+            chunk, is_complete = _responses_event(as_dict(event), text_parts)
+            completed = completed or is_complete
+            yield chunk
     if not completed:
         yield {"result": {"text": "".join(text_parts), "usage": _empty_usage()}}
 
@@ -228,15 +242,17 @@ class _ChatStreamState:
 
 def _chat_stream(stream: Any) -> Iterator[dict[str, Any]]:
     state = _ChatStreamState()
-    for item in stream:
-        yield _chat_chunk(as_dict(item), state)
+    with post_dispatch_boundary():
+        for item in stream:
+            yield _chat_chunk(as_dict(item), state)
     yield {"result": _chat_final(state)}
 
 
 async def _async_chat_stream(stream: Any) -> AsyncIterator[dict[str, Any]]:
     state = _ChatStreamState()
-    async for item in stream:
-        yield _chat_chunk(as_dict(item), state)
+    with post_dispatch_boundary():
+        async for item in stream:
+            yield _chat_chunk(as_dict(item), state)
     yield {"result": _chat_final(state)}
 
 

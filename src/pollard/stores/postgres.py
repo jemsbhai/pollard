@@ -465,7 +465,6 @@ class PostgresStore:
         lease_seconds: float,
     ) -> ReservationCheck:
         with self._conn.transaction():
-            now = self._database_time()
             request_text, request_digest = _reservation_request(
                 budgets, windows, lease_seconds
             )
@@ -488,6 +487,7 @@ class PostgresStore:
                     raise IntegrityError(
                         f"reservation is already {state}: {reservation_id}"
                     )
+                now = self._database_time()
                 if float(existing[2]) <= now:
                     raise IntegrityError(
                         f"reservation expired before retry: {reservation_id}"
@@ -512,7 +512,7 @@ class PostgresStore:
                     """,
                     (self.store_id, request.scope_id, meter, str(baseline)),
                 )
-            for request, meter, limit in sorted(
+            for request, meter, _limit in sorted(
                 budget_rows, key=lambda item: (item[0].scope_id, item[1])
             ):
                 row = self._conn.execute(
@@ -520,6 +520,36 @@ class PostgresStore:
                     SELECT settled FROM pollard_budget_state
                     WHERE store_id = %s AND scope_id = %s AND meter = %s
                     FOR UPDATE
+                    """,
+                    (self.store_id, request.scope_id, meter),
+                ).fetchone()
+                if row is None:
+                    raise IntegrityError("budget state disappeared during reservation")
+            for window_request in sorted(windows, key=lambda item: item.ledger_key):
+                self._conn.execute(
+                    """
+                    INSERT INTO pollard_window_scopes (store_id, ledger_key)
+                    VALUES (%s, %s)
+                    ON CONFLICT (store_id, ledger_key) DO NOTHING
+                    """,
+                    (self.store_id, window_request.ledger_key),
+                )
+                self._conn.execute(
+                    """
+                    SELECT ledger_key FROM pollard_window_scopes
+                    WHERE store_id = %s AND ledger_key = %s
+                    FOR UPDATE
+                    """,
+                    (self.store_id, window_request.ledger_key),
+                ).fetchone()
+            now = self._database_time()
+            for request, meter, limit in sorted(
+                budget_rows, key=lambda item: (item[0].scope_id, item[1])
+            ):
+                row = self._conn.execute(
+                    """
+                    SELECT settled FROM pollard_budget_state
+                    WHERE store_id = %s AND scope_id = %s AND meter = %s
                     """,
                     (self.store_id, request.scope_id, meter),
                 ).fetchone()
@@ -558,22 +588,6 @@ class PostgresStore:
                         remaining=remaining,
                     )
             for window_request in sorted(windows, key=lambda item: item.ledger_key):
-                self._conn.execute(
-                    """
-                    INSERT INTO pollard_window_scopes (store_id, ledger_key)
-                    VALUES (%s, %s)
-                    ON CONFLICT (store_id, ledger_key) DO NOTHING
-                    """,
-                    (self.store_id, window_request.ledger_key),
-                )
-                self._conn.execute(
-                    """
-                    SELECT ledger_key FROM pollard_window_scopes
-                    WHERE store_id = %s AND ledger_key = %s
-                    FOR UPDATE
-                    """,
-                    (self.store_id, window_request.ledger_key),
-                ).fetchone()
                 cutoff = now - window_request.window_seconds
                 self._conn.execute(
                     """
@@ -695,7 +709,6 @@ class PostgresStore:
         charges: dict[str, Decimal],
     ) -> None:
         with self._conn.transaction():
-            now = self._database_time()
             charges_text, charges_digest = _reservation_charges(charges)
             state_row = self._conn.execute(
                 """
@@ -742,6 +755,7 @@ class PostgresStore:
                     """,
                     (self.store_id, scope_id),
                 ).fetchone()
+            now = self._database_time()
             for row in rows:
                 kind, scope_id, meter = str(row[0]), str(row[1]), str(row[2])
                 actual = charges.get(meter, Decimal("0"))
@@ -806,7 +820,6 @@ class PostgresStore:
 
     def _pollard_release_once(self, reservation_id: str) -> None:
         with self._conn.transaction():
-            now = self._database_time()
             state_row = self._conn.execute(
                 """
                 SELECT state FROM pollard_reservation_state
@@ -821,6 +834,7 @@ class PostgresStore:
                 raise IntegrityError(
                     f"reservation is already {state_row[0]}: {reservation_id}"
                 )
+            now = self._database_time()
             self._conn.execute(
                 """
                 DELETE FROM pollard_reservations
@@ -842,7 +856,6 @@ class PostgresStore:
             self._psycopg.connect(self.conninfo, autocommit=True) as conn,
             conn.transaction(),
         ):
-            now = self._database_time_for(conn)
             row = conn.execute(
                 """
                 SELECT state, expires_at FROM pollard_reservation_state
@@ -851,6 +864,7 @@ class PostgresStore:
                 """,
                 (self.store_id, reservation_id),
             ).fetchone()
+            now = self._database_time_for(conn)
             if (
                 row is None
                 or str(row[0]) != "active"
