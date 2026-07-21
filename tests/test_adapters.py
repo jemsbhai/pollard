@@ -8,7 +8,7 @@ import pytest
 
 from pollard import AsyncRuntime, MemoryStore, Runtime
 from pollard.adapters.anthropic import make_messages_fn
-from pollard.adapters.bedrock import make_converse_fn
+from pollard.adapters.bedrock import BedrockStreamError, make_converse_fn
 from pollard.adapters.litellm import make_async_completion_fn, make_completion_fn
 from pollard.adapters.openai import (
     make_async_chat_completions_fn,
@@ -16,6 +16,7 @@ from pollard.adapters.openai import (
     make_chat_completions_fn,
     make_responses_fn,
 )
+from pollard.errors import is_post_dispatch_outcome_unknown
 
 FIXTURES = Path(__file__).parent / "fixtures"
 
@@ -73,6 +74,34 @@ def test_openai_responses_adapter_normalizes_text_and_usage() -> None:
     assert result["text"] == "fixture response"
     assert result["usage"] == {"input_tokens": 11, "output_tokens": 4}
     assert endpoint.calls == [{"store": False, "model": "gpt-5.5", "input": "hello"}]
+
+
+def test_adapter_preserves_native_error_and_marks_unknown_outcome() -> None:
+    transport_error = OSError("transport detail fixture")
+    provider_error = RuntimeError("provider request id fixture")
+
+    class Endpoint:
+        def create(self, **_kwargs: Any) -> Any:
+            raise provider_error from transport_error
+
+    adapter = make_responses_fn(SimpleNamespace(responses=Endpoint()))
+    with pytest.raises(RuntimeError) as direct_error:
+        adapter({"model": "gpt-5.5", "input": "hello"})
+    assert direct_error.value is provider_error
+    assert is_post_dispatch_outcome_unknown(provider_error)
+
+    run = Runtime(MemoryStore()).run("adapter-error")
+    with pytest.raises(RuntimeError) as runtime_error:
+        run.model_call(
+            {"model": "gpt-5.5", "input": "private prompt"},
+            fn=adapter,
+        )
+    assert runtime_error.value is provider_error
+    assert runtime_error.value.__cause__ is transport_error
+    assert run.cursor.payload["event"] == "call_outcome_unknown"
+    assert run.cursor.meta["failure"]["error_type"] == "RuntimeError"
+    assert "provider request id fixture" not in str(run.cursor)
+    assert "private prompt" not in str(run.cursor)
 
 
 def test_openai_chat_and_tool_call_fixtures() -> None:
@@ -238,6 +267,56 @@ def test_anthropic_message_tool_stream_and_count_fixtures() -> None:
     ]
 
 
+def test_anthropic_count_tokens_uses_a_positive_request_projection() -> None:
+    endpoint = SyncCreate(FrozenModel(load("anthropic_message.json")))
+    count_calls: list[dict[str, Any]] = []
+
+    def count_tokens(**kwargs: Any) -> FrozenModel:
+        count_calls.append(kwargs)
+        return FrozenModel({"input_tokens": 23})
+
+    endpoint.count_tokens = count_tokens
+    adapter = make_messages_fn(
+        SimpleNamespace(messages=endpoint),
+        max_tokens=128,
+        metadata={"user_id": "fixture"},
+        temperature=0.2,
+    )
+    payload = {
+        "_pollard": {"provider": "anthropic"},
+        "model": "claude-sonnet-4-6",
+        "messages": [{"role": "user", "content": "hello"}],
+        "system": "system",
+        "tools": [{"name": "weather", "input_schema": {"type": "object"}}],
+        "tool_choice": {"type": "auto"},
+        "thinking": {"type": "disabled"},
+        "output_config": {"effort": "low"},
+        "cache_control": {"type": "ephemeral"},
+        "service_tier": "auto",
+        "future_generation_only": True,
+    }
+
+    assert adapter.estimate_input_tokens(payload) == 23
+    assert count_calls == [
+        {
+            "model": payload["model"],
+            "messages": payload["messages"],
+            "system": "system",
+            "tools": payload["tools"],
+            "tool_choice": payload["tool_choice"],
+            "thinking": payload["thinking"],
+            "output_config": payload["output_config"],
+            "cache_control": payload["cache_control"],
+        }
+    ]
+
+    adapter(payload)
+    assert endpoint.calls[0]["max_tokens"] == 128
+    assert endpoint.calls[0]["metadata"] == {"user_id": "fixture"}
+    assert endpoint.calls[0]["future_generation_only"] is True
+    assert "_pollard" not in endpoint.calls[0]
+
+
 def test_litellm_non_stream_and_stream_fixtures() -> None:
     calls: list[dict[str, Any]] = []
 
@@ -342,17 +421,23 @@ def test_bedrock_converse_stream_runs_through_pollard() -> None:
 
 
 def test_bedrock_stream_surfaces_provider_errors() -> None:
+    raw_event = {
+        "throttlingException": {"message": "fixture throttle", "retryable": True}
+    }
+
     class Client:
         def converse_stream(self, **_kwargs: Any) -> dict[str, Any]:
-            return {
-                "stream": iter(
-                    [{"throttlingException": {"message": "fixture throttle"}}]
-                )
-            }
+            return {"stream": iter([raw_event])}
 
     stream = make_converse_fn(Client(), stream=True)({"modelId": "fixture", "messages": []})
-    with pytest.raises(RuntimeError, match=r"throttlingException.*fixture throttle"):
+    with pytest.raises(
+        BedrockStreamError,
+        match=r"throttlingException.*fixture throttle",
+    ) as error:
         list(stream)
+    assert error.value.event_name == "throttlingException"
+    assert error.value.raw_event == raw_event
+    assert is_post_dispatch_outcome_unknown(error.value)
 
 
 def test_async_openai_and_litellm_stream_factories() -> None:

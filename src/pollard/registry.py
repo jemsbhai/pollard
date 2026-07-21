@@ -10,6 +10,7 @@ from typing import Any
 from ._canon import IdentityValue, canonical_bytes
 from .errors import UnsupportedSchema
 from .redaction import redact
+from .schema import resolve_local_refs, schema_has_local_refs
 
 ActionResult = dict[str, Any] | Awaitable[dict[str, Any]]
 ActionHandler = Callable[[dict[str, Any]], ActionResult]
@@ -44,6 +45,8 @@ class ActionSpec:
             raise ValueError("action spec name cannot be empty")
         if not self.version:
             raise ValueError("action spec version cannot be empty")
+        if schema_has_local_refs(self.schema):
+            object.__setattr__(self, "schema", resolve_local_refs(self.schema))
         _check_schema(self.schema, f"schema for {self.name}")
         object.__setattr__(self, "spec_digest", _digest_spec(self))
 
@@ -130,6 +133,16 @@ def _check_schema(schema: IdentityValue, path: str) -> None:
         not isinstance(required, list) or not all(isinstance(item, str) for item in required)
     ):
         raise UnsupportedSchema(f"{path}.required: must be a list of strings")
+    enum = schema.get("enum")
+    if enum is not None:
+        if not isinstance(enum, list) or not enum:
+            raise UnsupportedSchema(f"{path}.enum: must be a non-empty list")
+        encoded: set[bytes] = set()
+        for item in enum:
+            item_bytes = canonical_bytes(item)
+            if item_bytes in encoded:
+                raise UnsupportedSchema(f"{path}.enum: values must be unique")
+            encoded.add(item_bytes)
     if "items" in schema:
         _check_schema(schema["items"], f"{path}.items")
     additional = schema.get("additionalProperties")
@@ -178,10 +191,15 @@ def _validate_value(
     if isinstance(expected_type, str) and not _matches_type(value, expected_type):
         return f"{path}: expected {expected_type}"
     enum = schema.get("enum")
-    if isinstance(enum, list) and value not in enum:
+    if isinstance(enum, list) and not any(_json_equal(value, item) for item in enum):
         return f"{path}: value not in enum"
     if expected_type == "object" or (
-        expected_type is None and ("properties" in schema or "required" in schema)
+        expected_type is None
+        and (
+            "properties" in schema
+            or "required" in schema
+            or "additionalProperties" in schema
+        )
     ):
         if not isinstance(value, dict):
             return f"{path}: expected object"
@@ -227,3 +245,7 @@ def _matches_type(value: IdentityValue, expected: str) -> bool:
     if expected == "null":
         return value is None
     return False
+
+
+def _json_equal(left: IdentityValue, right: IdentityValue) -> bool:
+    return canonical_bytes(left) == canonical_bytes(right)

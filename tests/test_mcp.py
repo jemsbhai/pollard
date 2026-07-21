@@ -142,3 +142,39 @@ def test_registry_from_mcp_accepts_object_listing_and_model_dump_result() -> Non
         assert node.result["ok"] is True
 
     asyncio.run(scenario())
+
+
+def test_mcp_model_dump_result_is_normalized_recursively() -> None:
+    class NestedResult:
+        def model_dump(self) -> dict[str, object]:
+            return {"value": "nested"}
+
+    class Result:
+        def model_dump(self) -> dict[str, object]:
+            return {"items": [NestedResult()]}
+
+    class Session:
+        def list_tools(self) -> dict[str, object]:
+            return {
+                "tools": [
+                    {
+                        "name": "nested",
+                        "inputSchema": {
+                            "type": "object",
+                            "additionalProperties": False,
+                        },
+                    }
+                ]
+            }
+
+        def call_tool(self, _name: str, _args: dict[str, object]) -> Result:
+            return Result()
+
+    async def scenario() -> None:
+        registry = await registry_from_mcp(Session())
+        node = await AsyncRuntime(registry=registry, meters=[StepMeter()]).run(
+            "mcp-nested"
+        ).atool_call("nested", {})
+        assert node.result == {"items": [{"value": "nested"}]}
+
+    asyncio.run(scenario())

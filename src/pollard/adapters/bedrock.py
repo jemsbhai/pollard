@@ -8,7 +8,18 @@ from contextlib import suppress
 from dataclasses import dataclass, field
 from typing import Any
 
-from ._common import as_dict, int_field, merge_request
+from ._common import as_dict, int_field, merge_request, post_dispatch_boundary
+
+
+class BedrockStreamError(RuntimeError):
+    """A structured error event returned by Bedrock ConverseStream."""
+
+    def __init__(self, event_name: str, raw_event: dict[str, Any]) -> None:
+        detail = raw_event.get(event_name)
+        message = detail.get("message") if isinstance(detail, Mapping) else detail
+        super().__init__(f"Bedrock stream {event_name}: {message}")
+        self.event_name = event_name
+        self.raw_event = dict(raw_event)
 
 
 def make_converse_fn(
@@ -42,14 +53,15 @@ class BedrockConverseFn:
 
     def __call__(self, payload: dict[str, Any]) -> dict[str, Any] | Iterator[dict[str, Any]]:
         params = merge_request(self.defaults, payload)
-        if self.stream:
-            response = self.client.converse_stream(**params)
-            raw = as_dict(response)
-            stream = raw.get("stream")
-            if stream is None:
-                raise TypeError("Bedrock ConverseStream response is missing stream")
-            return _converse_stream(stream)
-        return normalize_converse(self.client.converse(**params))
+        with post_dispatch_boundary():
+            if self.stream:
+                response = self.client.converse_stream(**params)
+                raw = as_dict(response)
+                stream = raw.get("stream")
+                if stream is None:
+                    raise TypeError("Bedrock ConverseStream response is missing stream")
+                return _converse_stream(stream)
+            return normalize_converse(self.client.converse(**params))
 
     def estimate_input_tokens(self, payload: dict[str, Any]) -> int | None:
         if not self.count_tokens:
@@ -153,16 +165,16 @@ class _BedrockStreamState:
 
 def _converse_stream(stream: Any) -> Iterator[dict[str, Any]]:
     state = _BedrockStreamState()
-    for event in stream:
-        yield _stream_event(as_dict(event), state)
+    with post_dispatch_boundary():
+        for event in stream:
+            yield _stream_event(as_dict(event), state)
     yield {"result": _stream_result(state)}
 
 
 def _stream_event(raw: dict[str, Any], state: _BedrockStreamState) -> dict[str, Any]:
-    for name, value in raw.items():
+    for name in raw:
         if name.endswith("Exception"):
-            message = value.get("message") if isinstance(value, Mapping) else value
-            raise RuntimeError(f"Bedrock stream {name}: {message}")
+            raise BedrockStreamError(name, raw)
     chunk: dict[str, Any] = {"event": raw}
     message_start = raw.get("messageStart")
     if isinstance(message_start, Mapping) and isinstance(message_start.get("role"), str):

@@ -41,7 +41,8 @@ def _make_handler(session: Any, name: str) -> Any:
             return result
         if hasattr(result, "model_dump"):
             dumped = result.model_dump()
-            return dumped if isinstance(dumped, dict) else {"result": dumped}
+            normalized = _to_jsonable(dumped)
+            return normalized if isinstance(normalized, dict) else {"result": normalized}
         if hasattr(result, "content"):
             return {"content": _to_jsonable(result.content)}
         return {"result": _to_jsonable(result)}

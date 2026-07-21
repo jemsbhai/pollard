@@ -2,6 +2,7 @@ import pytest
 
 from pollard import Budget, BudgetExceeded, MemoryStore, Runtime
 from pollard.otel import export_spans, live_span_hook
+from pollard.tree import Node, NodeKind
 
 pytest.importorskip("opentelemetry.sdk")
 
@@ -81,3 +82,24 @@ def test_live_span_hook_emits_new_nodes_without_payload_content() -> None:
     )
     assert "do not export me" not in str(attributes)
     assert "also private" not in str(attributes)
+
+
+def test_offline_export_handles_a_tree_deeper_than_python_recursion() -> None:
+    store = MemoryStore()
+    root = Node.make(kind=NodeKind.ROOT, parent=None, payload={"run": "deep-otel"})
+    store.put(root)
+    parent = root
+    for index in range(1_100):
+        parent = Node.make(
+            kind=NodeKind.NOTE,
+            parent=parent.id,
+            payload={"index": index},
+        )
+        store.put(parent)
+
+    tracer, exporter = _tracer()
+    assert export_spans(store, root.id, tracer) == 1_101
+    spans = exporter.get_finished_spans()
+    assert len(spans) == 1_101
+    by_node = {span.attributes["pollard.node.id"]: span for span in spans}
+    assert by_node[parent.id].parent is not None

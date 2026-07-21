@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sys
 from collections.abc import Callable, Mapping
 from typing import Any
 
@@ -13,19 +14,32 @@ def export_spans(store: Store, root_id: str, tracer: Any) -> int:
     """Export one stored tree as correctly parented OpenTelemetry spans."""
 
     count = 0
-
-    def visit(node_id: str) -> None:
-        nonlocal count
-        node = store.get(node_id)
-        with tracer.start_as_current_span(
-            _span_name(node),
-            attributes=span_attributes(node),
-        ):
+    pending: list[tuple[str, Any]] = [("enter", root_id)]
+    entered: list[Any] = []
+    try:
+        while pending:
+            action, value = pending.pop()
+            if action == "exit":
+                manager = entered.pop()
+                if manager is not value:
+                    raise RuntimeError("OpenTelemetry span traversal stack is inconsistent")
+                manager.__exit__(None, None, None)
+                continue
+            node = store.get(value)
+            manager = tracer.start_as_current_span(
+                _span_name(node),
+                attributes=span_attributes(node),
+            )
+            manager.__enter__()
+            entered.append(manager)
             count += 1
-            for child_id in store.children(node.id):
-                visit(child_id)
-
-    visit(root_id)
+            pending.append(("exit", manager))
+            for child_id in reversed(store.children(node.id)):
+                pending.append(("enter", child_id))
+    finally:
+        exception = sys.exc_info()
+        while entered:
+            entered.pop().__exit__(*exception)
     return count
 
 

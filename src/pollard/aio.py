@@ -10,7 +10,13 @@ from pathlib import Path
 from typing import Any
 
 from ._canon import IdentityValue
-from .errors import ConfirmationRequired, ReservationLeaseLost
+from .errors import (
+    ConfirmationRequired,
+    PostDispatchOutcomeUnknown,
+    ReservationLeaseLost,
+    is_post_dispatch_outcome_unknown,
+    mark_post_dispatch_outcome_unknown,
+)
 from .governor import Budget
 from .meters import Meter
 from .policy import Decision, Policy, PolicyContext
@@ -24,9 +30,14 @@ from .runtime import (
     _BudgetScope,
     _copy_scopes,
     _deepest_non_pruned_leaf,
+    _LeaseHeartbeat,
+    _Measurement,
     _merge_stream_value,
     _PendingToolCall,
+    _raise_primary,
+    _snapshot_payload,
     _start_measurements,
+    _stop_lease,
     _stop_measurements,
 )
 from .store import Store
@@ -181,15 +192,21 @@ class AsyncRun(Run):
         on_delta: AsyncDeltaCallback | None = None,
         keep_chunks: bool = False,
     ) -> Node:
-        recorded = self._recorded_node(kind, payload, attempt)
+        identity_payload = _snapshot_payload(payload)
+        recorded = self._recorded_node(kind, identity_payload, attempt)
         if recorded is not None:
             await _areemit_chunks(recorded, on_delta)
             return recorded
-        reservation = self._precheck(kind.value, payload)
-        lease = self._start_reservation_lease(reservation)
-        measurements = _start_measurements(self._runtime.meters)
+        reservation = self._precheck(kind.value, identity_payload)
+        lease: _LeaseHeartbeat | None = None
+        measurements: list[_Measurement] = []
+        result: dict[str, Any] | None = None
+        primary_error: BaseException | None = None
+        cleanup_errors: list[BaseException] = []
         start = time.perf_counter()
         try:
+            lease = self._start_reservation_lease(reservation)
+            measurements = _start_measurements(self._runtime.meters)
             pending = fn(payload)
             if isinstance(pending, AsyncIterator):
                 produced: AsyncStepResult = pending
@@ -200,40 +217,120 @@ class AsyncRun(Run):
                 on_delta=on_delta,
                 keep_chunks=keep_chunks,
             )
-        except BaseException:
-            if lease is not None:
-                lease.stop()
-            self._release_reservation(reservation)
-            raise
+        except BaseException as exc:
+            primary_error = exc
         finally:
             duration = time.perf_counter() - start
-            _stop_measurements(measurements)
-        lease_lost = lease.stop() if lease is not None else None
-        meta: dict[str, Any] = {"created_at": _now_utc(), "duration_s": duration}
-        for measurement in measurements:
-            meta.update(measurement.readings())
-        charges = self._charges(kind.value, payload, result, meta)
-        meta["charges"] = charges
-        if isinstance(result, dict) and isinstance(result.get("usage"), dict):
-            meta["usage"] = result["usage"]
-        if lease_lost is not None:
-            meta["reservation_lease"] = {"status": "lost", "detail": lease_lost}
+            measurement_error = _stop_measurements(measurements, primary_error)
+            if primary_error is None:
+                primary_error = measurement_error
+            elif measurement_error is not None:
+                cleanup_errors.append(measurement_error)
+
+        if primary_error is not None:
+            lease_lost, lease_error = _stop_lease(lease)
+            if lease_error is not None:
+                cleanup_errors.append(lease_error)
+            if is_post_dispatch_outcome_unknown(primary_error):
+                original_error = (
+                    primary_error.error
+                    if isinstance(primary_error, PostDispatchOutcomeUnknown)
+                    else primary_error
+                )
+                cleanup_errors.extend(
+                    self._record_unknown_outcome(
+                        kind=kind,
+                        payload=identity_payload,
+                        attempt=attempt,
+                        reservation=reservation,
+                        error=original_error,
+                        duration=duration,
+                        lease_lost=lease_lost,
+                    )
+                )
+                _raise_primary(original_error, cleanup_errors)
+            if result is not None:
+                cleanup_errors.extend(
+                    self._record_unknown_outcome(
+                        kind=kind,
+                        payload=identity_payload,
+                        attempt=attempt,
+                        reservation=reservation,
+                        error=primary_error,
+                        duration=duration,
+                        lease_lost=lease_lost,
+                        event="call_recording_failed",
+                        outcome="completed_unrecorded",
+                        phase="post_result_processing",
+                    )
+                )
+                _raise_primary(primary_error, cleanup_errors)
+            try:
+                self._release_reservation(reservation)
+            except BaseException as exc:
+                cleanup_errors.append(exc)
+            _raise_primary(primary_error, cleanup_errors)
+
+        assert result is not None
+        lease_lost, lease_error = _stop_lease(lease)
+        if lease_error is not None:
+            cleanup_errors.extend(
+                self._record_unknown_outcome(
+                    kind=kind,
+                    payload=identity_payload,
+                    attempt=attempt,
+                    reservation=reservation,
+                    error=lease_error,
+                    duration=duration,
+                    lease_lost=lease_lost,
+                    event="call_recording_failed",
+                    outcome="completed_unrecorded",
+                    phase="post_result_processing",
+                )
+            )
+            _raise_primary(lease_error, cleanup_errors)
+        try:
+            meta: dict[str, Any] = {"created_at": _now_utc(), "duration_s": duration}
+            for measurement in measurements:
+                meta.update(measurement.readings())
+            charges = self._charges(kind.value, identity_payload, result, meta)
+            meta["charges"] = charges
+            if isinstance(result, dict) and isinstance(result.get("usage"), dict):
+                meta["usage"] = result["usage"]
+            if lease_lost is not None:
+                meta["reservation_lease"] = {"status": "lost", "detail": lease_lost}
+            node = Node.make(
+                kind=kind,
+                parent=self.cursor_id,
+                payload=identity_payload,
+                attempt=attempt,
+                result=result,
+                meta=meta,
+            )
+        except BaseException as exc:
+            cleanup_errors.extend(
+                self._record_unknown_outcome(
+                    kind=kind,
+                    payload=identity_payload,
+                    attempt=attempt,
+                    reservation=reservation,
+                    error=exc,
+                    duration=duration,
+                    lease_lost=lease_lost,
+                    event="call_recording_failed",
+                    outcome="completed_unrecorded",
+                    phase="post_result_processing",
+                )
+            )
+            _raise_primary(exc, cleanup_errors)
         self._settle_reservation(reservation, charges)
-        node = Node.make(
-            kind=kind,
-            parent=self.cursor_id,
-            payload=payload,
-            attempt=attempt,
-            result=result,
-            meta=meta,
-        )
         node = self._runtime._put(node)
         self.cursor_id = node.id
         self._settle_scopes()
         if lease_lost is not None and reservation is not None:
             raise ReservationLeaseLost(
                 "shared reservation lease was lost while the call was running",
-                reservation,
+                reservation.reservation_id or "",
                 node.id,
             )
         return node
@@ -375,14 +472,25 @@ async def _aconsume_step_result(
         return value
     chunks: list[dict[str, Any]] = []
     result: dict[str, Any] = {}
-    if isinstance(value, AsyncIterator):
-        async for item in value:
-            await _aconsume_chunk(item, chunks, result, on_delta)
-    elif isinstance(value, Iterator):
-        for item in value:
-            await _aconsume_chunk(item, chunks, result, on_delta)
-    else:
-        raise TypeError("async step function must return a dict or a chunk iterator")
+    received_chunk = False
+    try:
+        if isinstance(value, AsyncIterator):
+            async for item in value:
+                received_chunk = True
+                await _aconsume_chunk(item, chunks, result, on_delta)
+        elif isinstance(value, Iterator):
+            for item in value:
+                received_chunk = True
+                await _aconsume_chunk(item, chunks, result, on_delta)
+        else:
+            raise TypeError("async step function must return a dict or a chunk iterator")
+    except Exception as error:
+        if not received_chunk or is_post_dispatch_outcome_unknown(error):
+            raise
+        marked = mark_post_dispatch_outcome_unknown(error)
+        if marked is error:
+            raise
+        raise marked from error
     if keep_chunks:
         result["chunks"] = chunks
     return result

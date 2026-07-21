@@ -1,3 +1,4 @@
+import sqlite3
 import time
 from concurrent.futures import ThreadPoolExecutor
 from decimal import Decimal
@@ -14,7 +15,7 @@ from pollard import (
     SQLiteStore,
     WindowMeter,
 )
-from pollard.arbiter import BudgetReservation
+from pollard.arbiter import BudgetReservation, WindowReservation
 from pollard.meters import TokenMeter
 from pollard.runtime import _LeaseHeartbeat
 
@@ -89,6 +90,117 @@ def test_expired_sqlite_budget_reservation_releases_capacity(
         assert store._pollard_reserve("first", [request], [], 1).ok
         assert not store._pollard_reserve("blocked", [request], [], 1).ok
         assert store._pollard_reserve("after-expiry", [request], [], 1).ok
+
+
+def test_sqlite_reservation_lease_starts_after_write_lock_wait(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    path = tmp_path / "reserve-lock-time.db"
+    request = BudgetReservation(
+        scope_id="scope",
+        limits={"steps": Decimal("1")},
+        baseline={},
+        estimates={"steps": Decimal("1")},
+    )
+    with SQLiteStore(path):
+        pass
+
+    ready = Event()
+    start = Event()
+    begin_attempted = Event()
+    lock_released = Event()
+    monkeypatch.setattr(
+        "pollard.stores.sqlite.time.time",
+        lambda: 200.0 if lock_released.is_set() else 100.0,
+    )
+
+    def reserve() -> bool:
+        with SQLiteStore(path) as store:
+            store._conn.set_trace_callback(
+                lambda statement: begin_attempted.set()
+                if statement == "BEGIN IMMEDIATE"
+                else None
+            )
+            ready.set()
+            assert start.wait(timeout=5)
+            return store._pollard_reserve("reservation", [request], [], 1).ok
+
+    blocker = sqlite3.connect(path)
+    try:
+        with ThreadPoolExecutor(max_workers=1) as executor:
+            future = executor.submit(reserve)
+            assert ready.wait(timeout=5)
+            blocker.execute("BEGIN IMMEDIATE")
+            start.set()
+            assert begin_attempted.wait(timeout=5)
+            lock_released.set()
+            blocker.commit()
+            assert future.result(timeout=5)
+    finally:
+        blocker.close()
+
+    with sqlite3.connect(path) as conn:
+        row = conn.execute(
+            "SELECT expires_at FROM reservations WHERE reservation_id = 'reservation'"
+        ).fetchone()
+    assert row is not None
+    assert float(row[0]) == 201.0
+
+
+def test_sqlite_window_settlement_time_is_sampled_after_write_lock_wait(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    path = tmp_path / "settle-lock-time.db"
+    request = WindowReservation(
+        ledger_key="window",
+        meter="requests",
+        limit=Decimal("1"),
+        amount=Decimal("1"),
+        window_seconds=60,
+    )
+    with SQLiteStore(path) as store:
+        assert store._pollard_reserve("reservation", [], [request], 60).ok
+
+    ready = Event()
+    start = Event()
+    begin_attempted = Event()
+    lock_released = Event()
+    monkeypatch.setattr(
+        "pollard.stores.sqlite.time.time",
+        lambda: 200.0 if lock_released.is_set() else 100.0,
+    )
+
+    def settle() -> None:
+        with SQLiteStore(path) as store:
+            store._conn.set_trace_callback(
+                lambda statement: begin_attempted.set()
+                if statement == "BEGIN IMMEDIATE"
+                else None
+            )
+            ready.set()
+            assert start.wait(timeout=5)
+            store._pollard_settle("reservation", {"requests": Decimal("1")})
+
+    blocker = sqlite3.connect(path)
+    try:
+        with ThreadPoolExecutor(max_workers=1) as executor:
+            future = executor.submit(settle)
+            assert ready.wait(timeout=5)
+            blocker.execute("BEGIN IMMEDIATE")
+            start.set()
+            assert begin_attempted.wait(timeout=5)
+            lock_released.set()
+            blocker.commit()
+            future.result(timeout=5)
+    finally:
+        blocker.close()
+
+    with sqlite3.connect(path) as conn:
+        row = conn.execute("SELECT settled_at FROM window_events").fetchone()
+    assert row is not None
+    assert float(row[0]) == 200.0
 
 
 def test_running_sqlite_call_renews_reservation_past_initial_lease(

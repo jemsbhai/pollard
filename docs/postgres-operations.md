@@ -116,6 +116,11 @@ confirmed before expiry, Pollard still attempts to settle and record the
 completed call, then raises `ReservationLeaseLost` with `reservation_id` and
 `node_id`. Do not describe that call as protected by an exact shared limit.
 
+Reservation time is read from the database after the relevant row or advisory
+locks are held. A request that waits for a competing transaction therefore gets
+a lease and sliding-window cutoff based on its actual admission time, not the
+time before the lock wait.
+
 ## Lost connections and retries
 
 Reserve and settle transactions are keyed by a random reservation ID. Repeating

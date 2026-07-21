@@ -1,10 +1,12 @@
 import asyncio
+from decimal import Decimal
 
 import pytest
 
 from pollard import (
     ActionSpec,
     AsyncRuntime,
+    Budget,
     BudgetExceeded,
     ConfirmationRequired,
     Decision,
@@ -15,6 +17,9 @@ from pollard import (
     SQLiteStore,
     WindowMeter,
 )
+from pollard.arbiter import BudgetReservation, ReservationCheck, WindowReservation
+from pollard.errors import PostDispatchOutcomeUnknown, ReservationUncertain
+from pollard.meters import StepMeter, TokenMeter
 
 
 def make_registry(side_effects: bool = False) -> Registry:
@@ -38,6 +43,40 @@ def make_registry(side_effects: bool = False) -> Registry:
             )
         ]
     )
+
+
+class AsyncTrackingArbiter(MemoryStore):
+    def __init__(self, *, release_error: BaseException | None = None) -> None:
+        super().__init__()
+        self.release_error = release_error
+        self.released: list[str] = []
+        self.settled: list[tuple[str, dict[str, Decimal]]] = []
+
+    def _pollard_reserve(
+        self,
+        reservation_id: str,
+        budgets: list[BudgetReservation],
+        windows: list[WindowReservation],
+        lease_seconds: float,
+    ) -> ReservationCheck:
+        del budgets, windows, lease_seconds
+        return ReservationCheck(ok=True)
+
+    def _pollard_settle(
+        self,
+        reservation_id: str,
+        charges: dict[str, Decimal],
+    ) -> None:
+        self.settled.append((reservation_id, charges))
+
+    def _pollard_release(self, reservation_id: str) -> None:
+        self.released.append(reservation_id)
+        if self.release_error is not None:
+            raise self.release_error
+
+    def _pollard_renew(self, reservation_id: str, lease_seconds: float) -> bool:
+        del reservation_id, lease_seconds
+        return True
 
 
 def test_async_running_call_renews_sqlite_reservation(tmp_path) -> None:  # type: ignore[no-untyped-def]
@@ -353,6 +392,178 @@ def test_async_window_reservation_settles_in_sqlite(tmp_path) -> None:  # type: 
                 )
             refusal = store.get(exc_info.value.refusal_id)
             assert refusal.payload["reason"] == "window"
+
+    asyncio.run(scenario())
+
+
+def test_async_callable_mutation_cannot_change_recorded_payload() -> None:
+    async def scenario() -> None:
+        payload = {
+            "model": "mock-1",
+            "messages": [{"role": "user", "content": "original"}],
+        }
+        expected = {
+            "model": "mock-1",
+            "messages": [{"role": "user", "content": "original"}],
+        }
+
+        async def mutate(received: dict[str, object]) -> dict[str, object]:
+            received.clear()
+            received["model"] = "mutated"
+            return {"text": "ok"}
+
+        run = AsyncRuntime(MemoryStore()).run("async-payload-snapshot")
+        node = await run.amodel_call(payload, fn=mutate)
+
+        assert payload == {"model": "mutated"}
+        assert node.payload == expected
+
+    asyncio.run(scenario())
+
+
+def test_async_stream_callback_failure_after_chunk_settles_estimate() -> None:
+    async def scenario() -> None:
+        store = AsyncTrackingArbiter()
+        run = AsyncRuntime(store, meters=[StepMeter()]).run(
+            "async-stream-callback-failure",
+            budget=Budget(steps=2),
+        )
+        callback_error = RuntimeError("async consumer stopped")
+
+        async def stream(_payload: dict[str, object]):  # type: ignore[no-untyped-def]
+            yield {"delta": {"text": "started"}}
+
+        async def fail_callback(_chunk: dict[str, object]) -> None:
+            raise callback_error
+
+        with pytest.raises(RuntimeError, match="async consumer stopped") as raised:
+            await run.amodel_call(
+                {"model": "mock"},
+                fn=stream,
+                on_delta=fail_callback,
+            )
+
+        assert raised.value is callback_error
+        assert store.released == []
+        assert store.settled[0][1] == {"steps": Decimal("1")}
+        assert run.cursor.payload["event"] == "call_outcome_unknown"
+
+    asyncio.run(scenario())
+
+
+def test_async_release_uncertainty_does_not_mask_callable_error() -> None:
+    async def scenario() -> None:
+        release_error = ReservationUncertain("release uncertain", "reservation")
+        store = AsyncTrackingArbiter(release_error=release_error)
+        run = AsyncRuntime(store, meters=[StepMeter()]).run(
+            "async-release-primary",
+            budget=Budget(steps=2),
+        )
+        provider_error = RuntimeError("async raw provider detail")
+
+        async def fail(_payload: dict[str, object]) -> dict[str, object]:
+            raise provider_error
+
+        with pytest.raises(RuntimeError, match="async raw provider detail") as raised:
+            await run.amodel_call({"model": "mock"}, fn=fail)
+
+        assert raised.value is provider_error
+        assert len(store.released) == 1
+        assert raised.value.__cause__ is release_error
+
+    asyncio.run(scenario())
+
+
+def test_async_meter_exit_failure_after_result_settles_estimate() -> None:
+    class FailingMeasurement:
+        def __enter__(self) -> "FailingMeasurement":
+            return self
+
+        def __exit__(self, _exc_type: object, _exc: object, _tb: object) -> None:
+            raise RuntimeError("async meter exit failed")
+
+        def readings(self) -> dict[str, float]:
+            return {}
+
+    class FailingMeter:
+        name = "failing"
+
+        def measure(self) -> FailingMeasurement:
+            return FailingMeasurement()
+
+        def charge(
+            self,
+            _kind: str,
+            _payload: dict[str, object],
+            _result: object,
+            _meta: dict[str, object],
+        ) -> int:
+            return 0
+
+        def precheck_estimate(
+            self,
+            _kind: str,
+            _payload: dict[str, object],
+        ) -> None:
+            return None
+
+    async def scenario() -> None:
+        store = AsyncTrackingArbiter()
+        run = AsyncRuntime(store, meters=[StepMeter(), FailingMeter()]).run(
+            "async-post-result-meter-failure",
+            budget=Budget(steps=2),
+        )
+
+        with pytest.raises(RuntimeError, match="async meter exit failed"):
+            await run.amodel_call(
+                {"model": "mock"},
+                fn=lambda _payload: _async_result("completed"),
+            )
+
+        assert store.released == []
+        assert store.settled[0][1] == {"steps": Decimal("1")}
+        assert run.cursor.payload["event"] == "call_recording_failed"
+        assert run.cursor.meta["failure"]["outcome"] == "completed_unrecorded"
+
+    asyncio.run(scenario())
+
+
+def test_async_post_dispatch_unknown_settles_estimates_and_records_note() -> None:
+    class EstimateThree:
+        def estimate_input_tokens(self, _payload: dict[str, object]) -> int:
+            return 3
+
+    async def scenario() -> None:
+        store = AsyncTrackingArbiter()
+        run = AsyncRuntime(
+            store,
+            meters=[StepMeter(), TokenMeter(EstimateThree(), reserved_output_tokens=5)],
+        ).run(
+            "async-unknown-outcome",
+            budget=Budget(steps=2, tokens=100),
+        )
+        provider_error = RuntimeError("async secret provider detail")
+
+        async def fail(_payload: dict[str, object]) -> dict[str, object]:
+            raise PostDispatchOutcomeUnknown(provider_error)
+
+        with pytest.raises(RuntimeError, match="async secret provider detail") as raised:
+            await run.amodel_call(
+                {"model": "mock", "prompt": "async private prompt"},
+                fn=fail,
+            )
+
+        assert raised.value is provider_error
+        assert store.released == []
+        assert store.settled[0][1] == {
+            "steps": Decimal("1"),
+            "tokens": Decimal("8"),
+        }
+        failure = run.cursor
+        assert failure.kind == "note"
+        assert failure.meta["charges"] == {"steps": 1, "tokens": 8}
+        assert "async secret provider detail" not in str(failure)
+        assert "async private prompt" not in str(failure)
 
     asyncio.run(scenario())
 

@@ -7,21 +7,25 @@ from importlib import import_module
 from types import ModuleType
 from typing import TYPE_CHECKING, Any
 
-__version__ = "1.0.5"
+__version__ = "1.0.6"
 
 if TYPE_CHECKING:
     from .aio import AsyncRun, AsyncRuntime
     from .errors import (
         BudgetExceeded,
+        CallCleanupError,
         ConfirmationRequired,
         IntegrityError,
         MissingRecording,
         PolicyViolation,
         PollardError,
+        PostDispatchOutcomeUnknown,
         ReservationLeaseLost,
         ReservationUncertain,
         SettlementUncertain,
         UnsupportedSchema,
+        is_post_dispatch_outcome_unknown,
+        mark_post_dispatch_outcome_unknown,
     )
     from .governance import (
         ExportReport,
@@ -52,6 +56,7 @@ _EXPORTS = {
     "AsyncRuntime": ("pollard.aio", "AsyncRuntime"),
     "Budget": ("pollard.governor", "Budget"),
     "BudgetExceeded": ("pollard.errors", "BudgetExceeded"),
+    "CallCleanupError": ("pollard.errors", "CallCleanupError"),
     "ConfirmationRequired": ("pollard.errors", "ConfirmationRequired"),
     "Decision": ("pollard.policy", "Decision"),
     "IntegrityError": ("pollard.errors", "IntegrityError"),
@@ -70,6 +75,7 @@ _EXPORTS = {
     "PolicyViolation": ("pollard.errors", "PolicyViolation"),
     "PostgresStore": ("pollard.stores", "PostgresStore"),
     "PollardError": ("pollard.errors", "PollardError"),
+    "PostDispatchOutcomeUnknown": ("pollard.errors", "PostDispatchOutcomeUnknown"),
     "Registry": ("pollard.registry", "Registry"),
     "ReservationLeaseLost": ("pollard.errors", "ReservationLeaseLost"),
     "ReservationUncertain": ("pollard.errors", "ReservationUncertain"),
@@ -94,6 +100,14 @@ _EXPORTS = {
     "redact": ("pollard.redaction", "redact"),
     "seal": ("pollard.seal", "seal"),
     "verify": ("pollard.verify", "verify"),
+    "is_post_dispatch_outcome_unknown": (
+        "pollard.errors",
+        "is_post_dispatch_outcome_unknown",
+    ),
+    "mark_post_dispatch_outcome_unknown": (
+        "pollard.errors",
+        "mark_post_dispatch_outcome_unknown",
+    ),
 }
 
 __all__ = [
@@ -102,6 +116,7 @@ __all__ = [
     "AsyncRuntime",
     "Budget",
     "BudgetExceeded",
+    "CallCleanupError",
     "ConfirmationRequired",
     "Decision",
     "ExportReport",
@@ -118,6 +133,7 @@ __all__ = [
     "PolicyContext",
     "PolicyViolation",
     "PollardError",
+    "PostDispatchOutcomeUnknown",
     "PostgresStore",
     "Registry",
     "ReplayMode",
@@ -140,6 +156,8 @@ __all__ = [
     "export_subtree",
     "gc",
     "import_subtree",
+    "is_post_dispatch_outcome_unknown",
+    "mark_post_dispatch_outcome_unknown",
     "merge",
     "recompute_charges",
     "redact",

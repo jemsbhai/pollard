@@ -18,6 +18,13 @@ given to the step and the normalized result returned by the callable. It does
 not record HTTP headers unless an application incorrectly puts them in that
 payload. Authentication should remain inside the caller-owned SDK client.
 
+Direct adapters preserve the provider's native exception type. If generation
+request creation, response normalization, or stream consumption fails after
+dispatch, the adapter marks the error as an unknown external outcome. Pollard
+then settles the available precheck estimates, writes a content-free failure
+note, and re-raises that same native error. A token-count request is a separate
+precheck operation and is never proof that generation is available.
+
 ## Supported paths
 
 | Hosting path | Pollard integration | Install | Caller-owned configuration |
@@ -75,6 +82,12 @@ before changing the recipe default.
 The direct Anthropic adapter supports Messages and Messages streaming. Its sync
 callable also implements Pollard's input-token estimator by calling Anthropic's
 token-count endpoint when installed in a `TokenMeter`.
+
+The estimator builds a positive projection of fields accepted by the
+token-count operation instead of forwarding generation-only fields. The
+generation request still receives the complete caller-owned payload. SDK and
+service support can change independently, so pin and test the selected SDK
+version before enabling network-backed prechecks.
 
 ```python
 from anthropic import Anthropic

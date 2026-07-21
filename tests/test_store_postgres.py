@@ -20,7 +20,7 @@ from pollard import (
     Runtime,
     WindowMeter,
 )
-from pollard.arbiter import BudgetReservation
+from pollard.arbiter import BudgetReservation, WindowReservation
 from pollard.cli import main
 from pollard.errors import IntegrityError, ReservationUncertain, SettlementUncertain
 from pollard.tree import Node, NodeKind
@@ -309,6 +309,180 @@ def test_postgres_reserve_and_settle_retries_are_idempotent() -> None:
     not os.environ.get("POLLARD_TEST_POSTGRES_DSN"),
     reason="POLLARD_TEST_POSTGRES_DSN is not configured",
 )
+def test_postgres_reservation_lease_starts_after_budget_row_lock_wait() -> None:
+    dsn = os.environ["POLLARD_TEST_POSTGRES_DSN"]
+    store_id = f"reserve-lock-time-{uuid4().hex}"
+    request = _step_reservation()
+    reservation_id = uuid4().hex
+    lease_seconds = 1.0
+    with PostgresStore(dsn, store_id=store_id) as store:
+        assert store._pollard_reserve("seed", [request], [], 60).ok
+        store._pollard_release("seed")
+        psycopg = importlib.import_module("psycopg")
+        with psycopg.connect(dsn) as blocker:
+            blocker.execute(
+                """
+                SELECT settled FROM pollard_budget_state
+                WHERE store_id = %s AND scope_id = %s AND meter = 'steps'
+                FOR UPDATE
+                """,
+                (store_id, request.scope_id),
+            ).fetchone()
+            ready = Event()
+            start = Event()
+            backend_pid: list[int] = []
+
+            def reserve() -> bool:
+                with PostgresStore(dsn, store_id=store_id) as worker:
+                    backend_pid.append(int(worker._conn.info.backend_pid))
+                    ready.set()
+                    assert start.wait(timeout=5)
+                    return worker._pollard_reserve(
+                        reservation_id, [request], [], lease_seconds
+                    ).ok
+
+            with ThreadPoolExecutor(max_workers=1) as executor:
+                future = executor.submit(reserve)
+                assert ready.wait(timeout=5)
+                start.set()
+                _wait_for_postgres_lock(store._conn, backend_pid[0])
+                time.sleep(0.1)
+                released_at = store._database_time_for(blocker)
+                blocker.commit()
+                assert future.result(timeout=5)
+
+        row = store._conn.execute(
+            """
+            SELECT expires_at FROM pollard_reservation_state
+            WHERE store_id = %s AND reservation_id = %s
+            """,
+            (store_id, reservation_id),
+        ).fetchone()
+        assert row is not None
+        assert float(row[0]) >= released_at + lease_seconds - 0.05
+
+
+@pytest.mark.skipif(
+    not os.environ.get("POLLARD_TEST_POSTGRES_DSN"),
+    reason="POLLARD_TEST_POSTGRES_DSN is not configured",
+)
+def test_postgres_window_settlement_time_is_after_row_lock_wait() -> None:
+    dsn = os.environ["POLLARD_TEST_POSTGRES_DSN"]
+    store_id = f"settle-lock-time-{uuid4().hex}"
+    reservation_id = uuid4().hex
+    request = WindowReservation(
+        ledger_key=f"window-{uuid4().hex}",
+        meter="requests",
+        limit=Decimal("1"),
+        amount=Decimal("1"),
+        window_seconds=60,
+    )
+    with PostgresStore(dsn, store_id=store_id) as store:
+        assert store._pollard_reserve(reservation_id, [], [request], 60).ok
+        psycopg = importlib.import_module("psycopg")
+        with psycopg.connect(dsn) as blocker:
+            blocker.execute(
+                """
+                SELECT state FROM pollard_reservation_state
+                WHERE store_id = %s AND reservation_id = %s
+                FOR UPDATE
+                """,
+                (store_id, reservation_id),
+            ).fetchone()
+            ready = Event()
+            start = Event()
+            backend_pid: list[int] = []
+
+            def settle() -> None:
+                with PostgresStore(dsn, store_id=store_id) as worker:
+                    backend_pid.append(int(worker._conn.info.backend_pid))
+                    ready.set()
+                    assert start.wait(timeout=5)
+                    worker._pollard_settle(
+                        reservation_id, {"requests": Decimal("1")}
+                    )
+
+            with ThreadPoolExecutor(max_workers=1) as executor:
+                future = executor.submit(settle)
+                assert ready.wait(timeout=5)
+                start.set()
+                _wait_for_postgres_lock(store._conn, backend_pid[0])
+                time.sleep(0.1)
+                released_at = store._database_time_for(blocker)
+                blocker.commit()
+                future.result(timeout=5)
+
+        row = store._conn.execute(
+            """
+            SELECT settled_at FROM pollard_window_events
+            WHERE store_id = %s AND scope_id = %s
+            """,
+            (store_id, request.ledger_key),
+        ).fetchone()
+        assert row is not None
+        assert float(row[0]) >= released_at
+
+
+@pytest.mark.skipif(
+    not os.environ.get("POLLARD_TEST_POSTGRES_DSN"),
+    reason="POLLARD_TEST_POSTGRES_DSN is not configured",
+)
+def test_postgres_renewal_lease_starts_after_reservation_row_lock_wait(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    dsn = os.environ["POLLARD_TEST_POSTGRES_DSN"]
+    store_id = f"renew-lock-time-{uuid4().hex}"
+    reservation_id = uuid4().hex
+    request = _step_reservation()
+    lease_seconds = 1.0
+    with PostgresStore(dsn, store_id=store_id) as store:
+        assert store._pollard_reserve(reservation_id, [request], [], 60).ok
+        original_connect = store._psycopg.connect
+        with original_connect(dsn) as blocker:
+            blocker.execute(
+                """
+                SELECT state FROM pollard_reservation_state
+                WHERE store_id = %s AND reservation_id = %s
+                FOR UPDATE
+                """,
+                (store_id, reservation_id),
+            ).fetchone()
+            connected = Event()
+            backend_pid: list[int] = []
+
+            def capture_connection(*args: Any, **kwargs: Any) -> Any:
+                conn = original_connect(*args, **kwargs)
+                backend_pid.append(int(conn.info.backend_pid))
+                connected.set()
+                return conn
+
+            monkeypatch.setattr(store._psycopg, "connect", capture_connection)
+            with ThreadPoolExecutor(max_workers=1) as executor:
+                future = executor.submit(
+                    store._pollard_renew, reservation_id, lease_seconds
+                )
+                assert connected.wait(timeout=5)
+                _wait_for_postgres_lock(store._conn, backend_pid[0])
+                time.sleep(0.1)
+                released_at = store._database_time_for(blocker)
+                blocker.commit()
+                assert future.result(timeout=5)
+
+        row = store._conn.execute(
+            """
+            SELECT expires_at FROM pollard_reservation_state
+            WHERE store_id = %s AND reservation_id = %s
+            """,
+            (store_id, reservation_id),
+        ).fetchone()
+        assert row is not None
+        assert float(row[0]) >= released_at + lease_seconds - 0.05
+
+
+@pytest.mark.skipif(
+    not os.environ.get("POLLARD_TEST_POSTGRES_DSN"),
+    reason="POLLARD_TEST_POSTGRES_DSN is not configured",
+)
 def test_postgres_reconnects_after_backend_loss() -> None:
     dsn = os.environ["POLLARD_TEST_POSTGRES_DSN"]
     with PostgresStore(dsn, store_id=f"reconnect-{uuid4().hex}") as store:
@@ -398,6 +572,49 @@ def test_postgres_settle_commit_with_lost_ack_is_recovered_once(
     not os.environ.get("POLLARD_TEST_POSTGRES_DSN"),
     reason="POLLARD_TEST_POSTGRES_DSN is not configured",
 )
+def test_postgres_release_commit_with_lost_ack_is_recovered(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    dsn = os.environ["POLLARD_TEST_POSTGRES_DSN"]
+    request = _step_reservation()
+    reservation_id = uuid4().hex
+    with PostgresStore(dsn, store_id=f"release-ack-{uuid4().hex}") as store:
+        assert store._pollard_reserve(reservation_id, [request], [], 60).ok
+        original = store._pollard_release_once
+        first = True
+
+        def lose_first_ack(*args: Any, **kwargs: Any) -> None:
+            nonlocal first
+            original(*args, **kwargs)
+            if first:
+                first = False
+                store._conn.close()
+                raise store._psycopg.OperationalError("release acknowledgement lost")
+
+        monkeypatch.setattr(store, "_pollard_release_once", lose_first_ack)
+        store._pollard_release(reservation_id)
+        state = store._conn.execute(
+            """
+            SELECT state FROM pollard_reservation_state
+            WHERE store_id = %s AND reservation_id = %s
+            """,
+            (store.store_id, reservation_id),
+        ).fetchone()
+        details = store._conn.execute(
+            """
+            SELECT COUNT(*) FROM pollard_reservations
+            WHERE store_id = %s AND reservation_id = %s
+            """,
+            (store.store_id, reservation_id),
+        ).fetchone()
+        assert state is not None and str(state[0]) == "released"
+        assert details is not None and int(details[0]) == 0
+
+
+@pytest.mark.skipif(
+    not os.environ.get("POLLARD_TEST_POSTGRES_DSN"),
+    reason="POLLARD_TEST_POSTGRES_DSN is not configured",
+)
 def test_completed_provider_call_recovers_settlement_after_connection_loss(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -433,7 +650,7 @@ def test_completed_provider_call_recovers_settlement_after_connection_loss(
     not os.environ.get("POLLARD_TEST_POSTGRES_DSN"),
     reason="POLLARD_TEST_POSTGRES_DSN is not configured",
 )
-def test_persistent_reserve_and_settle_failures_are_explicit(
+def test_persistent_reserve_settle_and_release_failures_are_explicit(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     dsn = os.environ["POLLARD_TEST_POSTGRES_DSN"]
@@ -454,6 +671,11 @@ def test_persistent_reserve_and_settle_failures_are_explicit(
         with pytest.raises(SettlementUncertain) as settle_error:
             store._pollard_settle(reservation_id, {"steps": Decimal("1")})
         assert settle_error.value.reservation_id == reservation_id
+
+        monkeypatch.setattr(store, "_pollard_release_once", unavailable)
+        with pytest.raises(ReservationUncertain) as release_error:
+            store._pollard_release(reservation_id)
+        assert release_error.value.reservation_id == reservation_id
 
 
 @pytest.mark.skipif(
@@ -704,6 +926,19 @@ def _create_legacy_schema(dsn: str) -> None:
             """,
         ):
             conn.execute(statement)
+
+
+def _wait_for_postgres_lock(conn: Any, backend_pid: int) -> None:
+    deadline = time.monotonic() + 5
+    while time.monotonic() < deadline:
+        row = conn.execute(
+            "SELECT wait_event_type FROM pg_stat_activity WHERE pid = %s",
+            (backend_pid,),
+        ).fetchone()
+        if row is not None and str(row[0]) == "Lock":
+            return
+        time.sleep(0.01)
+    raise AssertionError(f"PostgreSQL backend {backend_pid} did not wait for a lock")
 
 
 def _step_reservation() -> BudgetReservation:

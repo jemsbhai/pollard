@@ -204,9 +204,11 @@ spec digests. A run root binds to one registry digest.
 The zero-dependency schema subset accepts `type`, `properties`, `required`,
 `enum`, `items`, `additionalProperties`, the non-validation annotations `title`,
 `description`, and `default`, and Pollard's `sensitive` marker. Types are object,
-string, integer, boolean, array, and null. Unsupported validation keywords or
-types raise `UnsupportedSchema` when the spec is constructed. An annotation does
-not change argument validation, but remains part of the action spec digest.
+string, integer, boolean, array, and null. Finite local `$ref` values into
+`$defs` or legacy `definitions` are expanded when the spec is constructed.
+Missing, external, and cyclic references raise `UnsupportedSchema`, as do
+unsupported validation keywords or types. An annotation does not change
+argument validation, but remains part of the action spec digest.
 
 `sensitive: true` is valid on string fields. Pollard validates the original
 argument, supplies it to policies and the handler, but hashes and stores a
@@ -340,6 +342,8 @@ All Pollard exceptions derive from `PollardError`:
 | `ConfirmationRequired` | Policy requires explicit continuation | `resume_token` |
 | `MissingRecording` | Strict replay found no stored result | `node_id`, `payload_summary` |
 | `IntegrityError` | Stored or transferred data failed integrity validation | Exception message |
+| `PostDispatchOutcomeUnknown` | A caller explicitly reports an external call with unknown outcome | `error` |
+| `CallCleanupError` | Secondary cleanup errors chained behind a primary call error | `errors` |
 | `ReservationLeaseLost` | A completed call lost its shared reservation lease | `reservation_id`, `node_id` |
 | `ReservationUncertain` | Reserve or release could not be confirmed after reconnect | `reservation_id` |
 | `SettlementUncertain` | A completed call's shared settlement could not be confirmed | `reservation_id` |
@@ -349,3 +353,11 @@ Provider SDK, tool handler, callback, filesystem, and database exceptions are
 not converted into successful Pollard results. Consult
 [Troubleshooting](https://github.com/jemsbhai/pollard/blob/main/docs/troubleshooting.md)
 for diagnostic paths and safe issue data.
+
+Direct provider adapters mark generation failures after dispatch without
+replacing the native exception type. Generic callables can use
+`mark_post_dispatch_outcome_unknown(error)` or raise
+`PostDispatchOutcomeUnknown(error)`. The runtime settles available precheck
+estimates, records a content-free failure note, and re-raises the original
+error. `is_post_dispatch_outcome_unknown(error)` inspects either representation.
+Token-count failures occur during precheck and remain ordinary errors.

@@ -7,7 +7,23 @@ from collections.abc import AsyncIterator, Iterator
 from dataclasses import dataclass, field
 from typing import Any
 
-from ._common import as_dict, int_field, merge_request
+from ._common import as_dict, int_field, merge_request, post_dispatch_boundary
+
+_COUNT_TOKEN_FIELDS = (
+    "model",
+    "messages",
+    "cache_control",
+    "output_config",
+    "output_format",
+    "system",
+    "thinking",
+    "tool_choice",
+    "tools",
+    "extra_body",
+    "extra_headers",
+    "extra_query",
+    "timeout",
+)
 
 
 def make_messages_fn(
@@ -33,10 +49,13 @@ def make_async_messages_fn(
         params = merge_request(defaults, payload)
         if stream:
             params["stream"] = True
-        response = await client.messages.create(**params)
+        with post_dispatch_boundary():
+            response = await client.messages.create(**params)
+            if not stream:
+                return normalize_message(response)
         if stream:
             return _async_messages_stream(response)
-        return normalize_message(response)
+        raise AssertionError("unreachable")
 
     return call
 
@@ -58,26 +77,17 @@ class AnthropicMessagesFn:
         params = merge_request(self.defaults, payload)
         if self.stream:
             params["stream"] = True
-        response = self.client.messages.create(**params)
+        with post_dispatch_boundary():
+            response = self.client.messages.create(**params)
+            if not self.stream:
+                return normalize_message(response)
         if self.stream:
             return _messages_stream(response)
-        return normalize_message(response)
+        raise AssertionError("unreachable")
 
     def estimate_input_tokens(self, payload: dict[str, Any]) -> int | None:
-        params = merge_request(self.defaults, payload)
-        for key in (
-            "container",
-            "inference_geo",
-            "max_tokens",
-            "metadata",
-            "service_tier",
-            "stop_sequences",
-            "stream",
-            "temperature",
-            "top_k",
-            "top_p",
-        ):
-            params.pop(key, None)
+        request = merge_request(self.defaults, payload)
+        params = {key: request[key] for key in _COUNT_TOKEN_FIELDS if key in request}
         counted = self.client.messages.count_tokens(**params)
         if isinstance(counted, int) and not isinstance(counted, bool):
             return counted
@@ -139,15 +149,17 @@ class _AnthropicStreamState:
 
 def _messages_stream(stream: Any) -> Iterator[dict[str, Any]]:
     state = _AnthropicStreamState()
-    for event in stream:
-        yield _message_event(as_dict(event), state)
+    with post_dispatch_boundary():
+        for event in stream:
+            yield _message_event(as_dict(event), state)
     yield {"result": _message_final(state)}
 
 
 async def _async_messages_stream(stream: Any) -> AsyncIterator[dict[str, Any]]:
     state = _AnthropicStreamState()
-    async for event in stream:
-        yield _message_event(as_dict(event), state)
+    with post_dispatch_boundary():
+        async for event in stream:
+            yield _message_event(as_dict(event), state)
     yield {"result": _message_final(state)}
 
 

@@ -6,6 +6,33 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 
 ## [Unreleased]
 
+## [1.0.6] - 2026-07-21
+
+### Added
+
+- Accept finite local JSON Schema references into `$defs` and `definitions`,
+  with deterministic expansion and explicit refusal of missing, external, or
+  cyclic references.
+- Add a provider-neutral post-dispatch outcome signal and content-free failure
+  notes for calls whose external result or local recording state is uncertain.
+
+### Fixed
+
+- Preserve the original identity payload when a caller mutates its request
+  object during execution.
+- Preserve native provider exceptions while direct adapters mark generation
+  failures for conservative estimate settlement by the runtime.
+- Keep meter and lease cleanup failures from masking the primary call error,
+  bound lease shutdown, and conservatively account for completed calls that
+  fail during result processing.
+- Validate closed schemas that omit an explicit object type, distinguish JSON
+  booleans from integers in enums, and reject empty or duplicate enum values.
+- Project Anthropic token-count arguments independently from generation-only
+  arguments, preserve structured Bedrock stream error events, normalize nested
+  MCP SDK models, and export deep OpenTelemetry trees iteratively.
+- Take reservation timestamps after the relevant write locks for SQLite
+  reserve and settle, and PostgreSQL reserve, settle, release, and renewal.
+
 ## [1.0.5] - 2026-07-20
 
 ### Fixed
