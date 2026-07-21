@@ -2,12 +2,20 @@
 
 from __future__ import annotations
 
+import copy
 import json
-from collections.abc import AsyncIterator, Iterator
+from collections.abc import AsyncIterator, Iterator, Mapping
 from dataclasses import dataclass, field
 from typing import Any
 
-from ._common import as_dict, int_field, merge_request, post_dispatch_boundary
+from ._common import (
+    as_dict,
+    has_nonnegative_int_field,
+    int_field,
+    merge_request,
+    post_dispatch_boundary,
+    set_normalized_usage,
+)
 
 _COUNT_TOKEN_FIELDS = (
     "model",
@@ -24,6 +32,25 @@ _COUNT_TOKEN_FIELDS = (
     "extra_query",
     "timeout",
 )
+
+
+class AnthropicStreamError(RuntimeError):
+    """A structured terminal error from an Anthropic Messages stream."""
+
+    def __init__(self, raw_event: dict[str, Any]) -> None:
+        detail = raw_event.get("error")
+        detail = detail if isinstance(detail, Mapping) else {}
+        message = detail.get("message")
+        if not isinstance(message, str) or not message:
+            message = "Anthropic Messages stream ended without message_stop"
+        super().__init__(message)
+        self.event_name = str(raw_event.get("type", "error"))
+        self.error_type = (
+            detail.get("type") if isinstance(detail.get("type"), str) else None
+        )
+        request_id = raw_event.get("request_id")
+        self.request_id = request_id if isinstance(request_id, str) else None
+        self.raw_event = copy.deepcopy(raw_event)
 
 
 def make_messages_fn(
@@ -102,7 +129,15 @@ def normalize_message(response: Any) -> dict[str, Any]:
     """Normalize an Anthropic Message to Pollard's result contract."""
 
     result = as_dict(response)
-    result["usage"] = anthropic_usage(result)
+    set_normalized_usage(
+        result,
+        anthropic_usage(result),
+        required_fields=(("input_tokens",), ("output_tokens",)),
+        optional_fields=(
+            "cache_creation_input_tokens",
+            "cache_read_input_tokens",
+        ),
+    )
     content = result.get("content")
     if not isinstance(content, list):
         return result
@@ -131,7 +166,11 @@ def normalize_message(response: Any) -> dict[str, Any]:
 def anthropic_usage(response: dict[str, Any]) -> dict[str, int]:
     usage = response.get("usage")
     return {
-        "input_tokens": int_field(usage, "input_tokens"),
+        "input_tokens": (
+            int_field(usage, "input_tokens")
+            + int_field(usage, "cache_creation_input_tokens")
+            + int_field(usage, "cache_read_input_tokens")
+        ),
         "output_tokens": int_field(usage, "output_tokens"),
     }
 
@@ -145,6 +184,10 @@ class _AnthropicStreamState:
     message_id: str | None = None
     model: str | None = None
     stop_reason: str | None = None
+    provider_usage: dict[str, Any] = field(default_factory=dict)
+    input_usage_valid: bool = False
+    output_usage_valid: bool = False
+    completed: bool = False
 
 
 def _messages_stream(stream: Any) -> Iterator[dict[str, Any]]:
@@ -152,6 +195,8 @@ def _messages_stream(stream: Any) -> Iterator[dict[str, Any]]:
     with post_dispatch_boundary():
         for event in stream:
             yield _message_event(as_dict(event), state)
+        if not state.completed:
+            raise AnthropicStreamError({"type": "stream_ended"})
     yield {"result": _message_final(state)}
 
 
@@ -160,12 +205,16 @@ async def _async_messages_stream(stream: Any) -> AsyncIterator[dict[str, Any]]:
     with post_dispatch_boundary():
         async for event in stream:
             yield _message_event(as_dict(event), state)
+        if not state.completed:
+            raise AnthropicStreamError({"type": "stream_ended"})
     yield {"result": _message_final(state)}
 
 
 def _message_event(raw: dict[str, Any], state: _AnthropicStreamState) -> dict[str, Any]:
     event_type = raw.get("type")
     chunk: dict[str, Any] = {"event": raw}
+    if event_type == "error":
+        raise AnthropicStreamError(raw)
     if event_type == "message_start":
         message = raw.get("message")
         if isinstance(message, dict):
@@ -175,7 +224,22 @@ def _message_event(raw: dict[str, Any], state: _AnthropicStreamState) -> dict[st
                 state.message_id = message_id
             if isinstance(model, str):
                 state.model = model
-            state.input_tokens = int_field(message.get("usage"), "input_tokens")
+            usage = message.get("usage")
+            if isinstance(usage, dict):
+                state.provider_usage.update(usage)
+                state.input_usage_valid = has_nonnegative_int_field(
+                    usage, "input_tokens"
+                ) and all(
+                    name not in usage
+                    or has_nonnegative_int_field(usage, name)
+                    for name in (
+                        "cache_creation_input_tokens",
+                        "cache_read_input_tokens",
+                    )
+                )
+                state.input_tokens = anthropic_usage({"usage": usage})[
+                    "input_tokens"
+                ]
     elif event_type == "content_block_start":
         _start_content_block(raw, state)
     elif event_type == "content_block_delta":
@@ -186,7 +250,15 @@ def _message_event(raw: dict[str, Any], state: _AnthropicStreamState) -> dict[st
         delta = raw.get("delta")
         if isinstance(delta, dict) and isinstance(delta.get("stop_reason"), str):
             state.stop_reason = delta["stop_reason"]
-        state.output_tokens = int_field(raw.get("usage"), "output_tokens")
+        usage = raw.get("usage")
+        if isinstance(usage, dict):
+            state.provider_usage.update(usage)
+            state.output_usage_valid = has_nonnegative_int_field(
+                usage, "output_tokens"
+            )
+            state.output_tokens = int_field(usage, "output_tokens")
+    elif event_type == "message_stop":
+        state.completed = True
     return chunk
 
 
@@ -226,11 +298,14 @@ def _content_delta(raw: dict[str, Any], state: _AnthropicStreamState) -> str | N
 def _message_final(state: _AnthropicStreamState) -> dict[str, Any]:
     result: dict[str, Any] = {
         "text": "".join(state.text),
-        "usage": {
+    }
+    if state.input_usage_valid and state.output_usage_valid:
+        result["usage"] = {
             "input_tokens": state.input_tokens,
             "output_tokens": state.output_tokens,
-        },
-    }
+        }
+    if state.provider_usage:
+        result["provider_usage"] = dict(state.provider_usage)
     if state.message_id is not None:
         result["id"] = state.message_id
     if state.model is not None:

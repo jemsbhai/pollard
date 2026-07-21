@@ -88,6 +88,12 @@ class TrackingArbiter(MemoryStore):
         return True
 
 
+class FixedTokenEstimator:
+    def estimate_input_tokens(self, payload: dict[str, object]) -> int:
+        del payload
+        return 7
+
+
 class FailingMeasurement:
     def __init__(self, *, fail_enter: bool = False, fail_exit: bool = False) -> None:
         self.fail_enter = fail_enter
@@ -347,6 +353,28 @@ def test_stream_callback_failure_after_first_chunk_settles_estimate() -> None:
     assert run.cursor.payload["event"] == "call_outcome_unknown"
 
 
+def test_stream_operator_interrupt_after_first_chunk_settles_estimate() -> None:
+    store = TrackingArbiter()
+    run = Runtime(store, meters=[StepMeter()]).run(
+        "stream-operator-interrupt",
+        budget=Budget(steps=2),
+    )
+    provider_error = KeyboardInterrupt("operator interrupted active stream")
+
+    def stream(_payload: dict[str, object]):  # type: ignore[no-untyped-def]
+        yield {"delta": {"text": "started"}}
+        raise provider_error
+
+    with pytest.raises(KeyboardInterrupt) as raised:
+        run.model_call({"model": "mock"}, fn=stream)
+
+    assert raised.value is provider_error
+    assert store.released == []
+    assert store.settled[0][1] == {"steps": Decimal("1")}
+    assert run.cursor.payload["event"] == "call_outcome_unknown"
+    assert run.cursor.meta["failure"]["error_type"] == "KeyboardInterrupt"
+
+
 def test_stream_and_non_stream_calls_have_same_identity() -> None:
     payload = {"model": "mock-1", "messages": []}
     direct = Runtime(MemoryStore()).run("identity").model_call(
@@ -405,6 +433,32 @@ def test_estimator_refusal_is_marked_and_fn_is_not_called() -> None:
     assert refusal.payload["estimated"] == "true"
     assert refusal.payload["requested"] == "15"
     assert not called
+
+
+def test_missing_provider_usage_settles_conservative_precheck_estimate() -> None:
+    store = TrackingArbiter()
+    run = Runtime(
+        store,
+        meters=[StepMeter(), TokenMeter(FixedTokenEstimator(), reserved_output_tokens=5)],
+    ).run("missing-usage", budget=Budget(steps=2, tokens=20))
+
+    with pytest.warns(UserWarning, match="no compatible usage"):
+        node = run.model_call(
+            {"model": "mock"},
+            fn=lambda _payload: {"text": "completed without usage"},
+        )
+
+    assert node.meta["charges"] == {"steps": 1, "tokens": 12}
+    assert node.meta["accounting_fallbacks"] == {
+        "tokens": {
+            "reason": "missing_or_invalid_provider_usage",
+            "source": "precheck_estimate",
+        }
+    }
+    assert store.settled[0][1] == {
+        "steps": Decimal("1"),
+        "tokens": Decimal("12"),
+    }
 
 
 def test_callable_mutation_cannot_change_recorded_identity_payload() -> None:
@@ -564,3 +618,23 @@ def test_lease_heartbeat_stop_is_bounded_when_renew_sticks() -> None:
 
     assert elapsed < 0.5
     assert detail is not None
+
+
+def test_lease_heartbeat_records_base_exception_from_renewal() -> None:
+    renewal_started = Event()
+
+    def interrupted_renew(_reservation_id: str, _lease_seconds: float) -> bool:
+        renewal_started.set()
+        raise SystemExit("renewal worker interrupted")
+
+    heartbeat = _LeaseHeartbeat(
+        reservation_id="interrupted-renewal",
+        lease_seconds=0.05,
+        renew=interrupted_renew,
+    )
+    heartbeat.start()
+    assert renewal_started.wait(timeout=1)
+
+    detail = heartbeat.stop()
+
+    assert detail == "renewal failed with SystemExit"

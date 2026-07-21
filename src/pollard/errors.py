@@ -61,7 +61,7 @@ class PostDispatchOutcomeUnknown(PollardError):
         self.error = error
 
 
-def mark_post_dispatch_outcome_unknown(error: Exception) -> BaseException:
+def mark_post_dispatch_outcome_unknown(error: BaseException) -> BaseException:
     """Mark a native exception without replacing its public exception type.
 
     Provider adapters use this after dispatch so callers still receive the

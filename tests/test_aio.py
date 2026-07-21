@@ -451,6 +451,66 @@ def test_async_stream_callback_failure_after_chunk_settles_estimate() -> None:
     asyncio.run(scenario())
 
 
+def test_async_stream_cancellation_after_chunk_settles_estimate() -> None:
+    async def scenario() -> None:
+        store = AsyncTrackingArbiter()
+        run = AsyncRuntime(store, meters=[StepMeter()]).run(
+            "async-stream-cancellation",
+            budget=Budget(steps=2),
+        )
+        provider_error = asyncio.CancelledError("cancelled active stream")
+
+        async def stream(_payload: dict[str, object]):  # type: ignore[no-untyped-def]
+            yield {"delta": {"text": "started"}}
+            raise provider_error
+
+        with pytest.raises(asyncio.CancelledError) as raised:
+            await run.amodel_call({"model": "mock"}, fn=stream)
+
+        assert raised.value is provider_error
+        assert store.released == []
+        assert store.settled[0][1] == {"steps": Decimal("1")}
+        assert run.cursor.payload["event"] == "call_outcome_unknown"
+        assert run.cursor.meta["failure"]["error_type"] == "CancelledError"
+
+    asyncio.run(scenario())
+
+
+def test_async_missing_usage_settles_conservative_precheck_estimate() -> None:
+    class EstimateSeven:
+        def estimate_input_tokens(self, _payload: dict[str, object]) -> int:
+            return 7
+
+    async def scenario() -> None:
+        store = AsyncTrackingArbiter()
+        run = AsyncRuntime(
+            store,
+            meters=[StepMeter(), TokenMeter(EstimateSeven(), reserved_output_tokens=5)],
+        ).run("async-missing-usage", budget=Budget(steps=2, tokens=20))
+
+        async def result_without_usage(
+            _payload: dict[str, object],
+        ) -> dict[str, str]:
+            return {"text": "completed without usage"}
+
+        with pytest.warns(UserWarning, match="no compatible usage"):
+            node = await run.amodel_call(
+                {"model": "mock"},
+                fn=result_without_usage,
+            )
+
+        assert node.meta["charges"] == {"steps": 1, "tokens": 12}
+        assert node.meta["accounting_fallbacks"]["tokens"]["source"] == (
+            "precheck_estimate"
+        )
+        assert store.settled[0][1] == {
+            "steps": Decimal("1"),
+            "tokens": Decimal("12"),
+        }
+
+    asyncio.run(scenario())
+
+
 def test_async_release_uncertainty_does_not_mask_callable_error() -> None:
     async def scenario() -> None:
         release_error = ReservationUncertain("release uncertain", "reservation")

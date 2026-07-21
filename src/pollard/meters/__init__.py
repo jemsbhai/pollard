@@ -122,12 +122,19 @@ class TokenMeter:
             self._warn_missing_usage_once()
             return 0
         usage = result["usage"]
-        input_tokens = usage.get("input_tokens", 0)
-        output_tokens = usage.get("output_tokens", 0)
-        if not isinstance(input_tokens, int) or not isinstance(output_tokens, int):
+        input_tokens = usage.get("input_tokens")
+        output_tokens = usage.get("output_tokens")
+        if (
+            isinstance(input_tokens, bool)
+            or not isinstance(input_tokens, int)
+            or input_tokens < 0
+            or isinstance(output_tokens, bool)
+            or not isinstance(output_tokens, int)
+            or output_tokens < 0
+        ):
             self._warn_missing_usage_once()
             return 0
-        return input_tokens + output_tokens
+        return int(input_tokens) + int(output_tokens)
 
     def precheck_estimate(self, node_kind: str, payload: dict[str, Any]) -> int | None:
         if node_kind != "model_call" or self._estimator is None:
@@ -177,7 +184,14 @@ class CostMeter:
             return Decimal("0")
         input_tokens = usage.get("input_tokens", 0)
         output_tokens = usage.get("output_tokens", 0)
-        if not isinstance(input_tokens, int) or not isinstance(output_tokens, int):
+        if (
+            isinstance(input_tokens, bool)
+            or not isinstance(input_tokens, int)
+            or input_tokens < 0
+            or isinstance(output_tokens, bool)
+            or not isinstance(output_tokens, int)
+            or output_tokens < 0
+        ):
             return Decimal("0")
         million = Decimal(1_000_000)
         return (
@@ -267,7 +281,11 @@ def usage_from_anthropic(resp: dict[str, Any]) -> dict[str, int]:
     if not isinstance(usage, dict):
         return {"input_tokens": 0, "output_tokens": 0}
     return {
-        "input_tokens": _int_usage(usage, "input_tokens"),
+        "input_tokens": (
+            _int_usage(usage, "input_tokens")
+            + _int_usage(usage, "cache_creation_input_tokens")
+            + _int_usage(usage, "cache_read_input_tokens")
+        ),
         "output_tokens": _int_usage(usage, "output_tokens"),
     }
 
@@ -275,7 +293,7 @@ def usage_from_anthropic(resp: dict[str, Any]) -> dict[str, int]:
 def _int_usage(usage: dict[str, Any], *keys: str) -> int:
     for key in keys:
         value = usage.get(key)
-        if isinstance(value, int):
+        if isinstance(value, int) and not isinstance(value, bool) and value >= 0:
             return value
     return 0
 

@@ -49,6 +49,22 @@ def test_token_meter_warns_once_for_missing_usage() -> None:
     assert caught == []
 
 
+@pytest.mark.parametrize(
+    "usage",
+    [
+        {},
+        {"input_tokens": True, "output_tokens": 1},
+        {"input_tokens": -1, "output_tokens": 1},
+        {"input_tokens": 1, "output_tokens": -1},
+    ],
+)
+def test_token_meter_rejects_incomplete_or_invalid_usage(
+    usage: dict[str, object],
+) -> None:
+    with pytest.warns(UserWarning):
+        assert TokenMeter().charge("model_call", {}, {"usage": usage}, {}) == 0
+
+
 def test_token_meter_uses_input_estimator_and_output_reservation() -> None:
     class FixedEstimator:
         def estimate_input_tokens(self, payload: dict[str, object]) -> int:
@@ -87,6 +103,12 @@ def test_cost_meter_returns_zero_for_missing_price_or_usage() -> None:
     meter = CostMeter({"mock-1": {"input_per_1m": "2.00", "output_per_1m": "6.00"}})
     assert meter.charge("model_call", {"model": "missing"}, {}, {}) == Decimal("0")
     assert meter.charge("model_call", {"model": "mock-1"}, {"usage": {}}, {}) == Decimal("0")
+    assert meter.charge(
+        "model_call",
+        {"model": "mock-1"},
+        {"usage": {"input_tokens": -1, "output_tokens": 2}},
+        {},
+    ) == Decimal("0")
 
 
 def test_window_meter_supports_request_and_token_windows() -> None:
@@ -115,5 +137,15 @@ def test_usage_helpers_normalize_provider_shapes() -> None:
         "input_tokens": 11,
         "output_tokens": 13,
     }
+    assert usage_from_anthropic(
+        {
+            "usage": {
+                "input_tokens": 11,
+                "cache_creation_input_tokens": 3,
+                "cache_read_input_tokens": 5,
+                "output_tokens": 13,
+            }
+        }
+    ) == {"input_tokens": 19, "output_tokens": 13}
     assert usage_from_openai({"usage": "bad"}) == {"input_tokens": 0, "output_tokens": 0}
     assert usage_from_anthropic({}) == {"input_tokens": 0, "output_tokens": 0}
