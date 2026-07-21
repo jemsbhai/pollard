@@ -116,7 +116,9 @@ the stream ends, and node identity remains a function of the input payload.
 `TokenMeter(estimator=..., reserved_output_tokens=N)` applies an estimated input
 charge plus an explicit output reservation at precheck. A refusal caused by that
 estimate records `{"estimated": "true"}`. The settled provider usage remains the
-source of actual token charges.
+source of actual token charges when it is valid. If usage is missing or invalid,
+Pollard keeps the available precheck estimate as a conservative charge and
+records the fallback in node metadata.
 
 The optional tiktoken estimator is available as:
 

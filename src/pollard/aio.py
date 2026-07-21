@@ -293,7 +293,13 @@ class AsyncRun(Run):
             meta: dict[str, Any] = {"created_at": _now_utc(), "duration_s": duration}
             for measurement in measurements:
                 meta.update(measurement.readings())
-            charges = self._charges(kind.value, identity_payload, result, meta)
+            charges = self._charges(
+                kind.value,
+                identity_payload,
+                result,
+                meta,
+                reservation=reservation,
+            )
             meta["charges"] = charges
             if isinstance(result, dict) and isinstance(result.get("usage"), dict):
                 meta["usage"] = result["usage"]
@@ -484,7 +490,7 @@ async def _aconsume_step_result(
                 await _aconsume_chunk(item, chunks, result, on_delta)
         else:
             raise TypeError("async step function must return a dict or a chunk iterator")
-    except Exception as error:
+    except BaseException as error:
         if not received_chunk or is_post_dispatch_outcome_unknown(error):
             raise
         marked = mark_post_dispatch_outcome_unknown(error)

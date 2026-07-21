@@ -331,6 +331,12 @@ The complete commands, credentials, cost limits, outputs, and framework
 boundaries are in the
 [integration recipe index](https://github.com/jemsbhai/pollard/blob/main/docs/recipes/README.md).
 
+Direct adapter results expose normalized `usage` for meters and preserve the
+original provider object as `provider_usage`. `OpenAIResponseError`,
+`AnthropicStreamError`, and `BedrockStreamError` are module-level structured
+errors for terminal provider events or streams that close without their
+required terminal event.
+
 ## Exceptions
 
 All Pollard exceptions derive from `PollardError`:
@@ -361,3 +367,9 @@ replacing the native exception type. Generic callables can use
 estimates, records a content-free failure note, and re-raises the original
 error. `is_post_dispatch_outcome_unknown(error)` inspects either representation.
 Token-count failures occur during precheck and remain ordinary errors.
+
+The same post-dispatch rule covers `KeyboardInterrupt`, `SystemExit`, and
+asynchronous cancellation. If a completed result has missing or invalid usage,
+a meter marked with `precheck_is_estimate` settles its reservation estimate and
+the node records `accounting_fallbacks`; valid provider usage remains
+authoritative.

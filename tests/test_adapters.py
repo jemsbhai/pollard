@@ -7,10 +7,11 @@ from typing import Any
 import pytest
 
 from pollard import AsyncRuntime, MemoryStore, Runtime
-from pollard.adapters.anthropic import make_messages_fn
+from pollard.adapters.anthropic import AnthropicStreamError, make_messages_fn
 from pollard.adapters.bedrock import BedrockStreamError, make_converse_fn
 from pollard.adapters.litellm import make_async_completion_fn, make_completion_fn
 from pollard.adapters.openai import (
+    OpenAIResponseError,
     make_async_chat_completions_fn,
     make_async_responses_fn,
     make_chat_completions_fn,
@@ -73,7 +74,44 @@ def test_openai_responses_adapter_normalizes_text_and_usage() -> None:
 
     assert result["text"] == "fixture response"
     assert result["usage"] == {"input_tokens": 11, "output_tokens": 4}
+    assert result["provider_usage"] == load("openai_response.json")["usage"]
     assert endpoint.calls == [{"store": False, "model": "gpt-5.5", "input": "hello"}]
+
+
+def test_openai_responses_adapter_surfaces_failed_response() -> None:
+    raw_response = {
+        "id": "resp_failed_nonstream",
+        "model": "gpt-5.5",
+        "status": "failed",
+        "error": {"code": "server_error", "message": "non-stream generation failed"},
+        "output": [],
+        "usage": None,
+    }
+    endpoint = SyncCreate(FrozenModel(raw_response))
+    adapter = make_responses_fn(SimpleNamespace(responses=endpoint))
+
+    with pytest.raises(OpenAIResponseError, match="non-stream generation failed") as raised:
+        adapter({"model": "gpt-5.5", "input": "hello"})
+
+    assert raised.value.event_name == "response.failed"
+    assert raised.value.raw_event == {
+        "type": "response.failed",
+        "response": raw_response,
+    }
+    assert is_post_dispatch_outcome_unknown(raised.value)
+
+
+def test_adapter_retains_but_does_not_normalize_invalid_provider_usage() -> None:
+    raw_response = load("openai_response.json")
+    raw_response["usage"] = {"input_tokens": -1, "output_tokens": 4}
+    endpoint = SyncCreate(FrozenModel(raw_response))
+
+    result = make_responses_fn(SimpleNamespace(responses=endpoint))(
+        {"model": "gpt-5.5", "input": "hello"}
+    )
+
+    assert "usage" not in result
+    assert result["provider_usage"] == {"input_tokens": -1, "output_tokens": 4}
 
 
 def test_adapter_preserves_native_error_and_marks_unknown_outcome() -> None:
@@ -102,6 +140,21 @@ def test_adapter_preserves_native_error_and_marks_unknown_outcome() -> None:
     assert run.cursor.meta["failure"]["error_type"] == "RuntimeError"
     assert "provider request id fixture" not in str(run.cursor)
     assert "private prompt" not in str(run.cursor)
+
+
+def test_adapter_marks_operator_interrupt_after_dispatch() -> None:
+    provider_error = KeyboardInterrupt("operator interrupted dispatched request")
+
+    class Endpoint:
+        def create(self, **_kwargs: Any) -> Any:
+            raise provider_error
+
+    adapter = make_responses_fn(SimpleNamespace(responses=Endpoint()))
+    with pytest.raises(KeyboardInterrupt) as raised:
+        adapter({"model": "gpt-5.5", "input": "hello"})
+
+    assert raised.value is provider_error
+    assert is_post_dispatch_outcome_unknown(provider_error)
 
 
 def test_openai_chat_and_tool_call_fixtures() -> None:
@@ -168,6 +221,79 @@ def test_openai_responses_stream_and_tool_output() -> None:
             "arguments": "{\"city\":\"Boston\"}",
         }
     ]
+
+
+def test_openai_responses_stream_preserves_incomplete_usage() -> None:
+    event = FrozenModel(
+        {
+            "type": "response.incomplete",
+            "response": {
+                "id": "resp_incomplete",
+                "model": "gpt-5.5",
+                "status": "incomplete",
+                "incomplete_details": {"reason": "max_output_tokens"},
+                "output": [
+                    {
+                        "type": "message",
+                        "content": [{"type": "output_text", "text": "partial"}],
+                    }
+                ],
+                "usage": {"input_tokens": 7, "output_tokens": 3},
+            },
+        }
+    )
+    endpoint = SyncCreate(iter([event]))
+    stream = make_responses_fn(SimpleNamespace(responses=endpoint), stream=True)(
+        {"model": "gpt-5.5", "input": "hello"}
+    )
+
+    chunks = list(stream)
+
+    assert chunks[-1]["result"]["status"] == "incomplete"
+    assert chunks[-1]["result"]["text"] == "partial"
+    assert chunks[-1]["result"]["usage"] == {"input_tokens": 7, "output_tokens": 3}
+
+
+def test_openai_responses_stream_surfaces_failed_event_details() -> None:
+    raw_event = {
+        "type": "response.failed",
+        "response": {
+            "id": "resp_failed",
+            "model": "gpt-5.5",
+            "status": "failed",
+            "error": {"code": "server_error", "message": "generation failed"},
+            "output": [],
+            "usage": None,
+        },
+    }
+    endpoint = SyncCreate(iter([FrozenModel(raw_event)]))
+    stream = make_responses_fn(SimpleNamespace(responses=endpoint), stream=True)(
+        {"model": "gpt-5.5", "input": "hello"}
+    )
+
+    with pytest.raises(OpenAIResponseError, match="generation failed") as raised:
+        list(stream)
+
+    assert raised.value.event_name == "response.failed"
+    assert raised.value.raw_event == raw_event
+    assert raised.value.response_id == "resp_failed"
+    assert raised.value.code == "server_error"
+    assert is_post_dispatch_outcome_unknown(raised.value)
+
+
+def test_openai_responses_stream_requires_terminal_event() -> None:
+    events = [FrozenModel({"type": "response.output_text.delta", "delta": "partial"})]
+    endpoint = SyncCreate(iter(events))
+    stream = make_responses_fn(
+        SimpleNamespace(responses=endpoint),
+        stream=True,
+    )({"model": "gpt-5.5", "input": "hello"})
+
+    with pytest.raises(OpenAIResponseError, match="without a terminal event") as raised:
+        list(stream)
+
+    assert raised.value.event_name == "response.stream_ended"
+    assert is_post_dispatch_outcome_unknown(raised.value)
 
 
 def test_openai_chat_stream_assembles_tool_fragments() -> None:
@@ -238,6 +364,7 @@ def test_anthropic_message_tool_stream_and_count_fixtures() -> None:
     result = adapter({"model": "claude-sonnet-4-6", "messages": []})
     assert result["text"] == "fixture message"
     assert result["usage"] == {"input_tokens": 12, "output_tokens": 4}
+    assert result["provider_usage"] == load("anthropic_message.json")["usage"]
     assert adapter.estimate_input_tokens(
         {"model": "claude-sonnet-4-6", "messages": []}
     ) == 17
@@ -265,6 +392,72 @@ def test_anthropic_message_tool_stream_and_count_fixtures() -> None:
     assert node.result["tool_calls"] == [
         {"id": "toolu_stream", "name": "weather", "input": {"city": "Boston"}}
     ]
+
+
+def test_anthropic_usage_includes_cached_input_tokens() -> None:
+    response = {
+        "content": [],
+        "usage": {
+            "input_tokens": 5,
+            "cache_creation_input_tokens": 7,
+            "cache_read_input_tokens": 11,
+            "output_tokens": 3,
+        },
+    }
+    endpoint = SyncCreate(FrozenModel(response))
+    result = make_messages_fn(SimpleNamespace(messages=endpoint))(
+        {"model": "claude-sonnet-4-6", "messages": [], "max_tokens": 32}
+    )
+
+    assert result["usage"] == {"input_tokens": 23, "output_tokens": 3}
+    assert result["provider_usage"] == response["usage"]
+
+
+def test_anthropic_stream_surfaces_error_event_details() -> None:
+    raw_event = {
+        "type": "error",
+        "error": {"type": "overloaded_error", "message": "fixture overloaded"},
+        "request_id": "req_fixture",
+    }
+    endpoint = SyncCreate(iter([FrozenModel(raw_event)]))
+    stream = make_messages_fn(
+        SimpleNamespace(messages=endpoint),
+        stream=True,
+    )({"model": "claude-sonnet-4-6", "messages": [], "max_tokens": 32})
+
+    with pytest.raises(AnthropicStreamError, match="fixture overloaded") as raised:
+        list(stream)
+
+    assert raised.value.event_name == "error"
+    assert raised.value.error_type == "overloaded_error"
+    assert raised.value.request_id == "req_fixture"
+    assert raised.value.raw_event == raw_event
+    assert is_post_dispatch_outcome_unknown(raised.value)
+
+
+def test_anthropic_stream_requires_message_stop() -> None:
+    endpoint = SyncCreate(
+        iter(
+            [
+                FrozenModel(
+                    {
+                        "type": "message_start",
+                        "message": {"usage": {"input_tokens": 2}},
+                    }
+                )
+            ]
+        )
+    )
+    stream = make_messages_fn(
+        SimpleNamespace(messages=endpoint),
+        stream=True,
+    )({"model": "claude-sonnet-4-6", "messages": [], "max_tokens": 32})
+
+    with pytest.raises(AnthropicStreamError, match="without message_stop") as raised:
+        list(stream)
+
+    assert raised.value.event_name == "stream_ended"
+    assert is_post_dispatch_outcome_unknown(raised.value)
 
 
 def test_anthropic_count_tokens_uses_a_positive_request_projection() -> None:
@@ -365,6 +558,7 @@ def test_bedrock_converse_normalizes_tools_usage_and_count_tokens() -> None:
     assert isinstance(result, dict)
     assert result["text"] == "fixture bedrock"
     assert result["usage"] == {"input_tokens": 10, "output_tokens": 6}
+    assert result["provider_usage"] == load("bedrock_converse.json")["usage"]
     assert result["tool_calls"] == [
         {
             "toolUseId": "tooluse_weather",
@@ -384,6 +578,27 @@ def test_bedrock_converse_normalizes_tools_usage_and_count_tokens() -> None:
             },
         }
     ]
+
+
+def test_bedrock_usage_includes_cached_input_tokens() -> None:
+    response = load("bedrock_converse.json")
+    response["usage"] = {
+        "inputTokens": 5,
+        "cacheReadInputTokens": 7,
+        "cacheWriteInputTokens": 11,
+        "outputTokens": 3,
+    }
+
+    class Client:
+        def converse(self, **_kwargs: Any) -> dict[str, Any]:
+            return response
+
+    result = make_converse_fn(Client())(
+        {"modelId": "us.amazon.nova-lite-v1:0", "messages": []}
+    )
+
+    assert result["usage"] == {"input_tokens": 23, "output_tokens": 3}
+    assert result["provider_usage"] == response["usage"]
 
 
 def test_bedrock_converse_stream_runs_through_pollard() -> None:
@@ -438,6 +653,20 @@ def test_bedrock_stream_surfaces_provider_errors() -> None:
     assert error.value.event_name == "throttlingException"
     assert error.value.raw_event == raw_event
     assert is_post_dispatch_outcome_unknown(error.value)
+
+
+def test_bedrock_stream_requires_message_stop() -> None:
+    class Client:
+        def converse_stream(self, **_kwargs: Any) -> dict[str, Any]:
+            return {"stream": iter([{"messageStart": {"role": "assistant"}}])}
+
+    stream = make_converse_fn(Client(), stream=True)(
+        {"modelId": "fixture", "messages": []}
+    )
+    with pytest.raises(BedrockStreamError, match="streamEnded") as raised:
+        list(stream)
+    assert raised.value.event_name == "streamEnded"
+    assert is_post_dispatch_outcome_unknown(raised.value)
 
 
 def test_async_openai_and_litellm_stream_factories() -> None:

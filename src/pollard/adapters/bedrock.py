@@ -2,13 +2,20 @@
 
 from __future__ import annotations
 
+import copy
 import json
 from collections.abc import Iterator, Mapping
 from contextlib import suppress
 from dataclasses import dataclass, field
 from typing import Any
 
-from ._common import as_dict, int_field, merge_request, post_dispatch_boundary
+from ._common import (
+    as_dict,
+    int_field,
+    merge_request,
+    post_dispatch_boundary,
+    set_normalized_usage,
+)
 
 
 class BedrockStreamError(RuntimeError):
@@ -19,7 +26,7 @@ class BedrockStreamError(RuntimeError):
         message = detail.get("message") if isinstance(detail, Mapping) else detail
         super().__init__(f"Bedrock stream {event_name}: {message}")
         self.event_name = event_name
-        self.raw_event = dict(raw_event)
+        self.raw_event = copy.deepcopy(raw_event)
 
 
 def make_converse_fn(
@@ -93,7 +100,20 @@ def normalize_converse(response: Any) -> dict[str, Any]:
     """Normalize one Bedrock Converse response into Pollard's result shape."""
 
     result = as_dict(response)
-    result["usage"] = bedrock_usage(result.get("usage"))
+    set_normalized_usage(
+        result,
+        bedrock_usage(result.get("usage")),
+        required_fields=(
+            ("inputTokens", "input_tokens"),
+            ("outputTokens", "output_tokens"),
+        ),
+        optional_fields=(
+            "cacheReadInputTokens",
+            "cache_read_input_tokens",
+            "cacheWriteInputTokens",
+            "cache_write_input_tokens",
+        ),
+    )
     message = _output_message(result)
     text = _message_text(message)
     if text:
@@ -106,7 +126,11 @@ def normalize_converse(response: Any) -> dict[str, Any]:
 
 def bedrock_usage(value: Any) -> dict[str, int]:
     return {
-        "input_tokens": int_field(value, "inputTokens", "input_tokens"),
+        "input_tokens": (
+            int_field(value, "inputTokens", "input_tokens")
+            + int_field(value, "cacheReadInputTokens", "cache_read_input_tokens")
+            + int_field(value, "cacheWriteInputTokens", "cache_write_input_tokens")
+        ),
         "output_tokens": int_field(value, "outputTokens", "output_tokens"),
     }
 
@@ -156,11 +180,11 @@ class _BedrockStreamState:
     role: str | None = None
     text: list[str] = field(default_factory=list)
     tool_calls: dict[int, dict[str, Any]] = field(default_factory=dict)
-    usage: dict[str, int] = field(
-        default_factory=lambda: {"input_tokens": 0, "output_tokens": 0}
-    )
+    usage: dict[str, int] | None = None
+    provider_usage: dict[str, Any] | None = None
     stop_reason: str | None = None
     metrics: dict[str, Any] = field(default_factory=dict)
+    completed: bool = False
 
 
 def _converse_stream(stream: Any) -> Iterator[dict[str, Any]]:
@@ -168,6 +192,8 @@ def _converse_stream(stream: Any) -> Iterator[dict[str, Any]]:
     with post_dispatch_boundary():
         for event in stream:
             yield _stream_event(as_dict(event), state)
+        if not state.completed:
+            raise BedrockStreamError("streamEnded", {"streamEnded": {}})
     yield {"result": _stream_result(state)}
 
 
@@ -191,12 +217,32 @@ def _stream_event(raw: dict[str, Any], state: _BedrockStreamState) -> dict[str, 
     message_stop = raw.get("messageStop")
     if isinstance(message_stop, Mapping) and isinstance(message_stop.get("stopReason"), str):
         state.stop_reason = str(message_stop["stopReason"])
+        state.completed = True
 
     metadata = raw.get("metadata")
     if isinstance(metadata, Mapping):
         usage = metadata.get("usage")
         if isinstance(usage, Mapping):
-            state.usage = bedrock_usage(usage)
+            usage_result: dict[str, Any] = {"usage": dict(usage)}
+            set_normalized_usage(
+                usage_result,
+                bedrock_usage(usage),
+                required_fields=(
+                    ("inputTokens", "input_tokens"),
+                    ("outputTokens", "output_tokens"),
+                ),
+                optional_fields=(
+                    "cacheReadInputTokens",
+                    "cache_read_input_tokens",
+                    "cacheWriteInputTokens",
+                    "cache_write_input_tokens",
+                ),
+            )
+            provider_usage = usage_result.get("provider_usage")
+            if isinstance(provider_usage, dict):
+                state.provider_usage = provider_usage
+            normalized = usage_result.get("usage")
+            state.usage = normalized if isinstance(normalized, dict) else None
         metrics = metadata.get("metrics")
         if isinstance(metrics, Mapping):
             state.metrics = dict(metrics)
@@ -243,10 +289,11 @@ def _apply_delta(
 
 
 def _stream_result(state: _BedrockStreamState) -> dict[str, Any]:
-    result: dict[str, Any] = {
-        "text": "".join(state.text),
-        "usage": state.usage,
-    }
+    result: dict[str, Any] = {"text": "".join(state.text)}
+    if state.usage is not None:
+        result["usage"] = state.usage
+    if state.provider_usage is not None:
+        result["provider_usage"] = state.provider_usage
     if state.role is not None:
         result["role"] = state.role
     if state.stop_reason is not None:

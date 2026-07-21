@@ -25,6 +25,12 @@ then settles the available precheck estimates, writes a content-free failure
 note, and re-raises that same native error. A token-count request is a separate
 precheck operation and is never proof that generation is available.
 
+Normalized results use `usage.input_tokens` and `usage.output_tokens` for
+portable accounting. OpenAI, Anthropic, and Bedrock adapters also retain the
+provider's original usage object under `provider_usage`, including cache and
+reasoning breakdowns. If a provider omits or corrupts usage, a meter with a
+precheck estimate settles that estimate and records `accounting_fallbacks`.
+
 ## Supported paths
 
 | Hosting path | Pollard integration | Install | Caller-owned configuration |
@@ -48,6 +54,11 @@ The direct OpenAI adapter supports Responses, Responses streaming, Chat
 Completions, and Chat Completions streaming. A caller supplies a configured
 sync or async OpenAI client. The first-party recipe uses Responses, disables
 SDK retries, caps output at 128 tokens, and passes `store=False`.
+
+`response.failed` is raised as `OpenAIResponseError` with its raw event,
+response ID, and provider code. `response.incomplete` remains a successful
+partial result with its terminal usage. A stream that closes without a terminal
+Responses event or Chat Completions finish reason is an unknown outcome.
 
 ```python
 from openai import OpenAI
@@ -82,6 +93,10 @@ before changing the recipe default.
 The direct Anthropic adapter supports Messages and Messages streaming. Its sync
 callable also implements Pollard's input-token estimator by calling Anthropic's
 token-count endpoint when installed in a `TokenMeter`.
+
+Mid-stream `error` events are raised as `AnthropicStreamError` with the raw
+event, error type, and request ID. Normalized input usage includes ordinary,
+cache-creation, and cache-read input tokens.
 
 The estimator builds a positive projection of fields accepted by the
 token-count operation instead of forwarding generation-only fields. The
@@ -169,6 +184,8 @@ abuse-monitoring or legal-retention obligations. See OpenAI's
 The Bedrock adapter targets the provider-neutral Converse API. It normalizes
 text, tool use, streaming deltas, and `inputTokens`/`outputTokens` into the
 Pollard result contract while retaining the original Bedrock response fields.
+Normalized input usage includes ordinary, cache-read, and cache-write input
+tokens.
 
 ```python
 import boto3

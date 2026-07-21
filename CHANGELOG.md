@@ -6,6 +6,33 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 
 ## [Unreleased]
 
+## [1.0.7] - 2026-07-21
+
+### Added
+
+- Retain provider-native token and cache breakdowns under `provider_usage`
+  beside Pollard's normalized `usage` in the direct OpenAI, Anthropic, and
+  Bedrock adapters.
+- Record an `accounting_fallbacks` audit marker when missing or invalid provider
+  usage is conservatively replaced by a precheck estimate.
+
+### Fixed
+
+- Settle dispatched reservations conservatively on operator interruption,
+  `SystemExit`, asynchronous cancellation, and stream-consumer failure instead
+  of releasing them as ordinary pre-dispatch errors.
+- Surface OpenAI failed terminal responses and Anthropic error events with
+  structured raw details, preserve OpenAI incomplete-response usage, and reject
+  OpenAI, Anthropic, or Bedrock streams that end without the provider's required
+  terminal event.
+- Include Anthropic cache creation/read tokens and Bedrock cache write/read
+  tokens in normalized input totals.
+- Keep a nonzero token precheck estimate when a completed provider result omits,
+  truncates, or corrupts normalized usage, while continuing to prefer valid
+  settled provider usage.
+- Record lease-renewal failures derived from `BaseException` instead of allowing
+  the heartbeat worker to terminate silently.
+
 ## [1.0.6] - 2026-07-21
 
 ### Added

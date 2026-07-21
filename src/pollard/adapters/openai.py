@@ -2,11 +2,43 @@
 
 from __future__ import annotations
 
-from collections.abc import AsyncIterator, Iterator
+import copy
+from collections.abc import AsyncIterator, Iterator, Mapping
 from dataclasses import dataclass, field
 from typing import Any
 
-from ._common import as_dict, int_field, merge_request, post_dispatch_boundary
+from ._common import (
+    as_dict,
+    int_field,
+    merge_request,
+    post_dispatch_boundary,
+    set_normalized_usage,
+)
+
+
+class OpenAIResponseError(RuntimeError):
+    """A terminal error returned by an OpenAI generation stream."""
+
+    def __init__(self, raw_event: dict[str, Any]) -> None:
+        response = raw_event.get("response")
+        response = response if isinstance(response, Mapping) else {}
+        detail = response.get("error")
+        if not isinstance(detail, Mapping):
+            detail = raw_event.get("error")
+        detail = detail if isinstance(detail, Mapping) else {}
+        message = detail.get("message")
+        if not isinstance(message, str) or not message:
+            message = "OpenAI generation stream ended without a terminal event"
+        super().__init__(message)
+        event_name = raw_event.get("type")
+        self.event_name = (
+            event_name if isinstance(event_name, str) else "response.failed"
+        )
+        self.raw_event = copy.deepcopy(raw_event)
+        response_id = response.get("id")
+        self.response_id = response_id if isinstance(response_id, str) else None
+        code = detail.get("code")
+        self.code = code if isinstance(code, str) else None
 
 
 def make_responses_fn(
@@ -107,7 +139,14 @@ def normalize_chat_completion(response: Any) -> dict[str, Any]:
     """Normalize one OpenAI-compatible chat completion."""
 
     result = as_dict(response)
-    result["usage"] = openai_usage(result)
+    set_normalized_usage(
+        result,
+        openai_usage(result),
+        required_fields=(
+            ("input_tokens", "prompt_tokens"),
+            ("output_tokens", "completion_tokens"),
+        ),
+    )
     choices = result.get("choices")
     if isinstance(choices, list) and choices:
         first = choices[0]
@@ -133,7 +172,18 @@ def openai_usage(response: dict[str, Any]) -> dict[str, int]:
 
 def _normalize_response(response: Any) -> dict[str, Any]:
     result = as_dict(response)
-    result["usage"] = openai_usage(result)
+    if result.get("status") == "failed":
+        raise OpenAIResponseError(
+            {"type": "response.failed", "response": result}
+        )
+    set_normalized_usage(
+        result,
+        openai_usage(result),
+        required_fields=(
+            ("input_tokens", "prompt_tokens"),
+            ("output_tokens", "completion_tokens"),
+        ),
+    )
     output_text = getattr(response, "output_text", None)
     if not isinstance(output_text, str):
         output_text = result.get("output_text")
@@ -191,8 +241,8 @@ def _responses_stream(stream: Any) -> Iterator[dict[str, Any]]:
             chunk, is_complete = _responses_event(as_dict(event), text_parts)
             completed = completed or is_complete
             yield chunk
-    if not completed:
-        yield {"result": {"text": "".join(text_parts), "usage": _empty_usage()}}
+        if not completed:
+            raise OpenAIResponseError({"type": "response.stream_ended"})
 
 
 async def _async_responses_stream(stream: Any) -> AsyncIterator[dict[str, Any]]:
@@ -203,8 +253,8 @@ async def _async_responses_stream(stream: Any) -> AsyncIterator[dict[str, Any]]:
             chunk, is_complete = _responses_event(as_dict(event), text_parts)
             completed = completed or is_complete
             yield chunk
-    if not completed:
-        yield {"result": {"text": "".join(text_parts), "usage": _empty_usage()}}
+        if not completed:
+            raise OpenAIResponseError({"type": "response.stream_ended"})
 
 
 def _responses_event(
@@ -218,12 +268,14 @@ def _responses_event(
         if isinstance(delta, str):
             text_parts.append(delta)
             chunk["delta"] = {"text": delta}
-    if event_type == "response.completed":
+    if event_type == "response.failed":
+        raise OpenAIResponseError(raw)
+    if event_type in {"response.completed", "response.incomplete"}:
         response = raw.get("response")
         if response is not None:
             chunk["result"] = _normalize_response(response)
         else:
-            chunk["result"] = {"text": "".join(text_parts), "usage": _empty_usage()}
+            chunk["result"] = {"text": "".join(text_parts)}
         return chunk, True
     return chunk, False
 
@@ -232,9 +284,8 @@ def _responses_event(
 class _ChatStreamState:
     text: list[str] = field(default_factory=list)
     tool_calls: dict[int, dict[str, Any]] = field(default_factory=dict)
-    usage: dict[str, int] = field(
-        default_factory=lambda: {"input_tokens": 0, "output_tokens": 0}
-    )
+    usage: dict[str, int] | None = None
+    provider_usage: dict[str, Any] | None = None
     response_id: str | None = None
     model: str | None = None
     finish_reason: str | None = None
@@ -245,6 +296,8 @@ def _chat_stream(stream: Any) -> Iterator[dict[str, Any]]:
     with post_dispatch_boundary():
         for item in stream:
             yield _chat_chunk(as_dict(item), state)
+        if state.finish_reason is None:
+            raise OpenAIResponseError({"type": "chat.completion.stream_ended"})
     yield {"result": _chat_final(state)}
 
 
@@ -253,6 +306,8 @@ async def _async_chat_stream(stream: Any) -> AsyncIterator[dict[str, Any]]:
     with post_dispatch_boundary():
         async for item in stream:
             yield _chat_chunk(as_dict(item), state)
+        if state.finish_reason is None:
+            raise OpenAIResponseError({"type": "chat.completion.stream_ended"})
     yield {"result": _chat_final(state)}
 
 
@@ -264,7 +319,20 @@ def _chat_chunk(raw: dict[str, Any], state: _ChatStreamState) -> dict[str, Any]:
     if isinstance(model, str):
         state.model = model
     if isinstance(raw.get("usage"), dict):
-        state.usage = openai_usage(raw)
+        usage_result: dict[str, Any] = {"usage": raw["usage"]}
+        set_normalized_usage(
+            usage_result,
+            openai_usage(usage_result),
+            required_fields=(
+                ("input_tokens", "prompt_tokens"),
+                ("output_tokens", "completion_tokens"),
+            ),
+        )
+        provider_usage = usage_result.get("provider_usage")
+        if isinstance(provider_usage, dict):
+            state.provider_usage = provider_usage
+        normalized = usage_result.get("usage")
+        state.usage = normalized if isinstance(normalized, dict) else None
     chunk: dict[str, Any] = {"event": raw}
     choices = raw.get("choices")
     if not isinstance(choices, list) or not choices or not isinstance(choices[0], dict):
@@ -307,10 +375,11 @@ def _merge_chat_tool_call(state: _ChatStreamState, fragment: dict[str, Any]) -> 
 
 
 def _chat_final(state: _ChatStreamState) -> dict[str, Any]:
-    result: dict[str, Any] = {
-        "text": "".join(state.text),
-        "usage": state.usage,
-    }
+    result: dict[str, Any] = {"text": "".join(state.text)}
+    if state.usage is not None:
+        result["usage"] = state.usage
+    if state.provider_usage is not None:
+        result["provider_usage"] = state.provider_usage
     if state.response_id is not None:
         result["id"] = state.response_id
     if state.model is not None:
@@ -320,7 +389,3 @@ def _chat_final(state: _ChatStreamState) -> dict[str, Any]:
     if state.tool_calls:
         result["tool_calls"] = [state.tool_calls[index] for index in sorted(state.tool_calls)]
     return result
-
-
-def _empty_usage() -> dict[str, int]:
-    return {"input_tokens": 0, "output_tokens": 0}

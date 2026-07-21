@@ -7,7 +7,7 @@ from importlib import import_module
 from types import ModuleType
 from typing import TYPE_CHECKING, Any
 
-__version__ = "1.0.6"
+__version__ = "1.0.7"
 
 if TYPE_CHECKING:
     from .aio import AsyncRun, AsyncRuntime

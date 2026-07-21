@@ -144,6 +144,9 @@ class _LeaseHeartbeat:
                     self._lost = f"renewal failed with {type(exc).__name__}"
                     return
                 continue
+            except BaseException as exc:
+                self._lost = f"renewal failed with {type(exc).__name__}"
+                return
             if not renewed:
                 self._lost = "reservation expired or closed before renewal"
                 return
@@ -477,7 +480,13 @@ class Run:
             meta: dict[str, Any] = {"created_at": _now_utc(), "duration_s": duration}
             for measurement in measurements:
                 meta.update(measurement.readings())
-            charges = self._charges(kind.value, identity_payload, result, meta)
+            charges = self._charges(
+                kind.value,
+                identity_payload,
+                result,
+                meta,
+                reservation=reservation,
+            )
             meta["charges"] = charges
             if isinstance(result, dict) and isinstance(result.get("usage"), dict):
                 meta["usage"] = result["usage"]
@@ -681,13 +690,34 @@ class Run:
         payload: dict[str, IdentityValue],
         result: dict[str, Any],
         meta: dict[str, Any],
+        *,
+        reservation: _Reservation | None = None,
     ) -> dict[str, int | float]:
         charges: dict[str, int | float] = {}
+        accounting_fallbacks: dict[str, dict[str, str]] = {}
         payload_any: dict[str, Any] = payload
         for meter in self._runtime.meters:
             amount = charge_to_decimal(meter.charge(kind, payload_any, result, meta))
+            estimate = (
+                reservation.estimates.get(meter.name)
+                if reservation is not None
+                else None
+            )
+            if (
+                amount == 0
+                and estimate is not None
+                and getattr(meter, "precheck_is_estimate", False) is True
+                and not _has_compatible_usage(result)
+            ):
+                amount = estimate
+                accounting_fallbacks[meter.name] = {
+                    "reason": "missing_or_invalid_provider_usage",
+                    "source": "precheck_estimate",
+                }
             if amount != 0:
                 charges[meter.name] = charge_to_json(amount)
+        if accounting_fallbacks:
+            meta["accounting_fallbacks"] = accounting_fallbacks
         return charges
 
     def _recorded_node(
@@ -1003,6 +1033,17 @@ def _estimated_charges(
     }
 
 
+def _has_compatible_usage(result: dict[str, Any]) -> bool:
+    usage = result.get("usage")
+    if not isinstance(usage, dict):
+        return False
+    for name in ("input_tokens", "output_tokens"):
+        value = usage.get(name)
+        if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+            return False
+    return True
+
+
 def _stop_lease(
     lease: _LeaseHeartbeat | None,
 ) -> tuple[str | None, BaseException | None]:
@@ -1100,7 +1141,7 @@ def _consume_step_result(
                 _merge_stream_value(result, delta)
             else:
                 _merge_stream_value(result, chunk)
-    except Exception as error:
+    except BaseException as error:
         if not received_chunk or is_post_dispatch_outcome_unknown(error):
             raise
         marked = mark_post_dispatch_outcome_unknown(error)
