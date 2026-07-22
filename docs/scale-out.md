@@ -1,13 +1,25 @@
 # Scale-Out Stores And Governance
 
-Pollard's shared-arbiter path coordinates worker teams through PostgreSQL across
-multiple hosts. SQLite uses the same transaction contract for processes sharing
-one database file on one host. MemoryStore and HashRopeStore remain local
-backends and use per-runtime budget checks.
+Pollard's shared-arbiter path coordinates worker teams through PostgreSQL,
+Redis, MongoDB, or Neo4j across multiple hosts. SQLite uses the same transaction
+contract for processes sharing one database file on one host. MemoryStore,
+HashRopeStore, and KafkaStore use per-runtime budget checks.
 
 This design has one hard boundary: all workers governed by one shared limit
 must use the same transactional store and logical store id. Pollard is not a
 consensus system and does not coordinate disconnected databases.
+
+| Backend | Shared arbiter | Required deployment boundary |
+|---|---:|---|
+| SQLite | Yes | One database file on one host |
+| PostgreSQL | Yes | One database and `store_id` |
+| Redis | Yes | One persistent no-eviction logical store and `store_id` |
+| MongoDB | Yes | One replica set or sharded deployment and `store_id` |
+| Neo4j | Yes | One primary-routed database and `store_id` |
+| Kafka | No | One single-partition infinite-retention topic for Store ordering only |
+
+Operational requirements for the added backends are in
+[Distributed store operations](https://github.com/jemsbhai/pollard/blob/main/docs/distributed-stores.md).
 
 ## Install And Connect
 

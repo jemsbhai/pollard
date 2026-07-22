@@ -145,6 +145,14 @@ After a server restart or backend termination, create a new `PostgresStore` or
 call `reconnect()` on the existing instance. A schema migration requirement or
 unknown schema version is intentional refusal, not a connectivity error.
 
+The same `reconnect()` rule applies to Redis, MongoDB, Neo4j, and Kafka. Redis
+requires persistent no-eviction storage. MongoDB refuses a standalone server
+because it cannot run the required transactions. Neo4j writes and reads are
+routed to a primary. Kafka refuses multiple partitions, compaction, finite
+retention, a truncated log, malformed events, or a changed store key. See the
+[distributed store runbook](https://github.com/jemsbhai/pollard/blob/main/docs/distributed-stores.md)
+for exact configuration checks and recovery steps.
+
 ## Import or merge failure
 
 Import verifies the full subtree before writing. Confirm the JSON is complete,

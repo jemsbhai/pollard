@@ -38,6 +38,13 @@ payload before the store replaces large string leaves with internal references.
 `get()` restores the full payload before returning a node. Stores with
 interning on and off return the same canonical payload bytes and node ids.
 
+Redis, MongoDB, Kafka, and Neo4j store canonical node records without payload
+interning. Their database or topic therefore contains the full identity
+payload, result, and metadata text. Configure encryption, access control,
+backup retention, and deletion in that system. A Kafka topic cannot selectively
+erase one node while retaining a complete event history; choose a different
+backend when per-record erasure is required.
+
 ## Redact Before Hash
 
 `redact(value, hint=None)` returns a marker containing a domain-separated

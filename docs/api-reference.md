@@ -1,5 +1,13 @@
 # Public API reference
 
+## Distributed store backends
+
+`RedisStore`, `MongoStore`, and `Neo4jStore` implement `Store`,
+`TransactionalArbiter`, and `RenewableArbiter`. `KafkaStore` implements the
+frozen `Store` protocol as an append-only event log, but intentionally does not
+implement shared arbitration or offline garbage collection. See
+[`scale-out.md`](scale-out.md) for the capability and operations boundaries.
+
 This reference covers the supported public Python surface in Pollard 1.x. Names
 listed in `pollard.__all__` can be imported from the package root. Provider
 adapters, meters, estimators, MCP helpers, and OpenTelemetry helpers live in
@@ -240,6 +248,10 @@ parents are distinct steps.
 | `MemoryStore` | `MemoryStore()` | Tests and one-process ephemeral runs |
 | `SQLiteStore` | `SQLiteStore(path, intern_payloads=True, intern_threshold=1024)` | Persistent one-host runs and moderate process sharing |
 | `PostgresStore` | `PostgresStore(conninfo, store_id="default", ...)` | Transactional multi-process and multi-host runs |
+| `RedisStore` | `RedisStore(url, store_id="default", prefix="pollard", watch_retries=64)` | Transactional shared runs on one Redis logical store |
+| `MongoStore` | `MongoStore(uri, database="pollard", store_id="default", ...)` | Transactional shared runs on a replica set or sharded deployment |
+| `Neo4jStore` | `Neo4jStore(uri, auth, database="neo4j", store_id="default", ...)` | Transactional shared runs routed through a graph primary |
+| `KafkaStore` | `KafkaStore(client_config, topic=..., store_id="default", ...)` | Ordered append-only audit and replay without shared arbitration |
 | `HashRopeStore` | `HashRopeStore(data=b"")` | In-process operation log and byte snapshot |
 
 `Store` is the frozen structural protocol with `put`, `get`, `exists`,
@@ -248,13 +260,19 @@ content-addressed identity, parent existence, deterministic child order, and
 the documented method meanings.
 
 SQLite and PostgreSQL intern large string payload leaves by default. Interning
-is a storage encoding, not redaction or encryption. PostgreSQL requires the
-`pg` extra. Hashrope requires the `hashrope` extra.
+is a storage encoding, not redaction or encryption. The remote extras are `pg`,
+`redis`, `mongodb`, `kafka`, and `neo4j`; `stores` installs all five drivers.
+Hashrope requires the `hashrope` extra.
 
 `PostgresStore.migrate(conninfo)` performs the explicit legacy-to-current
 schema migration and returns `(old_version, new_version)`. It requires a drained
 reservation table. `store.reconnect()` replaces a broken connection and checks
 the schema version before returning.
+
+`RedisStore`, `MongoStore`, and `Neo4jStore` are runtime-checkable
+`TransactionalArbiter` and `RenewableArbiter` implementations. `KafkaStore` is
+neither. Kafka also omits the private maintenance capability, so `gc()` refuses
+it instead of implying that an append-only broker log was physically erased.
 
 ## Nodes and reports
 

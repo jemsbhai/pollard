@@ -7,7 +7,7 @@ from importlib import import_module
 from types import ModuleType
 from typing import TYPE_CHECKING, Any
 
-__version__ = "1.0.7"
+__version__ = "1.1.0"
 
 if TYPE_CHECKING:
     from .aio import AsyncRun, AsyncRuntime
@@ -46,7 +46,15 @@ if TYPE_CHECKING:
     from .seal import SealEntry, SealReport, seal
     from .seal_custody import SealCustodyRecord, SQLiteSealSink
     from .store import MemoryStore, Store
-    from .stores import HashRopeStore, PostgresStore, SQLiteStore
+    from .stores import (
+        HashRopeStore,
+        KafkaStore,
+        MongoStore,
+        Neo4jStore,
+        PostgresStore,
+        RedisStore,
+        SQLiteStore,
+    )
     from .tree import Node, NodeKind
     from .verify import VerifyFinding, VerifyReport, verify
 
@@ -61,6 +69,9 @@ _EXPORTS = {
     "Decision": ("pollard.policy", "Decision"),
     "IntegrityError": ("pollard.errors", "IntegrityError"),
     "HashRopeStore": ("pollard.stores.hashrope", "HashRopeStore"),
+    "KafkaStore": ("pollard.stores.kafka", "KafkaStore"),
+    "MongoStore": ("pollard.stores.mongodb", "MongoStore"),
+    "Neo4jStore": ("pollard.stores.neo4j", "Neo4jStore"),
     "ExportReport": ("pollard.governance", "ExportReport"),
     "GCReport": ("pollard.governance", "GCReport"),
     "ImportReport": ("pollard.governance", "ImportReport"),
@@ -74,6 +85,7 @@ _EXPORTS = {
     "PolicyContext": ("pollard.policy", "PolicyContext"),
     "PolicyViolation": ("pollard.errors", "PolicyViolation"),
     "PostgresStore": ("pollard.stores", "PostgresStore"),
+    "RedisStore": ("pollard.stores.redis", "RedisStore"),
     "PollardError": ("pollard.errors", "PollardError"),
     "PostDispatchOutcomeUnknown": ("pollard.errors", "PostDispatchOutcomeUnknown"),
     "Registry": ("pollard.registry", "Registry"),
@@ -124,9 +136,12 @@ __all__ = [
     "HashRopeStore",
     "ImportReport",
     "IntegrityError",
+    "KafkaStore",
     "MemoryStore",
     "MergeReport",
     "MissingRecording",
+    "MongoStore",
+    "Neo4jStore",
     "Node",
     "NodeKind",
     "Policy",
@@ -135,6 +150,7 @@ __all__ = [
     "PollardError",
     "PostDispatchOutcomeUnknown",
     "PostgresStore",
+    "RedisStore",
     "Registry",
     "ReplayMode",
     "ReservationLeaseLost",

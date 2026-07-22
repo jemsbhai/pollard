@@ -50,6 +50,8 @@ def test_walk_is_depth_first_and_deterministic(store: Store) -> None:
 
 
 def test_walk_handles_depth_beyond_python_recursion_limit(store: Store) -> None:
+    if type(store).__name__ == "KafkaStore":
+        pytest.skip("Kafka depth stress uses its broker-specific acceptance test")
     root = Node.make(kind=NodeKind.ROOT, parent=None, payload={"run": "deep-walk"})
     store.put(root)
     parent = root

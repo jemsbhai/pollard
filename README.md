@@ -37,7 +37,8 @@ What you get:
 - Registry firewall: registered tool calls resolve against a versioned action set or fail closed.
 - Replay: record semantic steps once, then serve stored results in tests and CI.
 - Scale-out: share atomic budgets and sliding windows across workers through
-  SQLite or PostgreSQL, and merge disconnected stores later.
+  SQLite, PostgreSQL, Redis, MongoDB, or Neo4j, and merge disconnected stores
+  later. Kafka provides ordered audit and replay storage without shared limits.
 
 Budget semantics are honest about what can be controlled. If a precheck estimate proves a step would exceed budget, pollard records a refusal node and does not call your function. If the actual result charge exceeds budget after the function returns, that node still stands because the spend already happened; later steps are refused. Transactional stores reserve estimated charges before execution and settle actual charges afterward, so exact step and request prechecks stay within one shared limit under concurrent writers.
 
@@ -45,8 +46,11 @@ Current limits:
 
 - Replay of sampled model calls serves the recorded output. It does not re-check that a provider would return that output again.
 - Hosted API energy use is not measured. The NVML energy meter is for local GPU inference only.
-- SQLite serializes writers on one host. PostgreSQL is the shared backend for
-  worker teams and multiple hosts.
+- SQLite serializes writers on one host. PostgreSQL, Redis, MongoDB, and Neo4j
+  can coordinate worker teams when every worker uses the same backend and
+  logical store id.
+- Kafka is an append-only Store, not a shared budget arbiter. It requires a
+  dedicated single-partition topic with infinite retention and no compaction.
 - HashRopeStore is an in-process operation-log backend, not a multi-writer
   database. Explicit offline garbage collection rewrites its snapshot.
 - TokenmasterMeter reports tokenmaster state from the usage data your model client returns; it does not tokenize prompts itself.
@@ -79,6 +83,11 @@ Install only the integrations used by the application:
 | pydantic-ai | `pollard[pydantic-ai]` | One complete agent run recorded as a Pollard step |
 | MCP | `pollard[mcp]` | Discover MCP tools and expose them through a Pollard registry |
 | Shared PostgreSQL store | `pollard[pg]` | Transactional multi-process and multi-host coordination |
+| Shared Redis store | `pollard[redis]` | Exact shared coordination with Redis persistence and no-eviction prerequisites |
+| Shared MongoDB store | `pollard[mongodb]` | Exact shared coordination on a replica set or sharded deployment |
+| Kafka event store | `pollard[kafka]` | Ordered audit and replay on one dedicated topic; no shared arbitration |
+| Shared Neo4j store | `pollard[neo4j]` | Exact shared coordination through primary-routed graph transactions |
+| Every remote store driver | `pollard[stores]` | PostgreSQL, Redis, MongoDB, Kafka, and Neo4j drivers |
 | OpenTelemetry | `pollard[otel]` | Content-free live or offline span export |
 | OpenAI prompt estimate | `pollard[estimate-openai]` | Local tiktoken estimate plus an explicit output reservation |
 | Local GPU energy | `pollard[nvml]` | Whole-GPU NVML measurement for supported local hardware |
@@ -163,6 +172,9 @@ does not need OpenAI, Anthropic, AWS, Azure, or other model credentials. See
 [Scale-out stores and governance](https://github.com/jemsbhai/pollard/blob/main/docs/scale-out.md)
 for shared limits and [PostgreSQL operations](https://github.com/jemsbhai/pollard/blob/main/docs/postgres-operations.md)
 for schema migration, backup, restore, lease renewal, and reconnect procedures.
+Redis, MongoDB, and Neo4j use the same runtime reservation contract. Their
+connection examples, durability requirements, schema behavior, and recovery
+limits are in [Distributed store operations](https://github.com/jemsbhai/pollard/blob/main/docs/distributed-stores.md).
 
 ## Observability
 
@@ -308,10 +320,13 @@ retention.
 
 ## Store Backends
 
-Core pollard includes `MemoryStore` and `SQLiteStore`. `PostgresStore` is
-available through `pollard[pg]` for transactional multi-writer runs. The
-optional hashrope backend keeps an append-only operation log inside a hashrope
-rope:
+Core pollard includes `MemoryStore` and `SQLiteStore`. Transactional remote
+stores are available through `pollard[pg]`, `pollard[redis]`,
+`pollard[mongodb]`, and `pollard[neo4j]`. `pollard[kafka]` supplies an ordered
+non-arbiter event store. See
+[Distributed store operations](https://github.com/jemsbhai/pollard/blob/main/docs/distributed-stores.md)
+before selecting a remote backend. The optional hashrope backend keeps an
+append-only operation log inside a hashrope rope:
 
 ```powershell
 pip install "pollard[hashrope]"
