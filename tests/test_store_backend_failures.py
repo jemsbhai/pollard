@@ -135,6 +135,35 @@ def test_redis_server_time_fails_closed(value: object) -> None:
         _server_time(value)
 
 
+def test_neo4j_initial_schema_read_avoids_missing_property_notifications() -> None:
+    class Result:
+        def single(self) -> dict[str, object]:
+            return {
+                "properties": {
+                    "record_key": neo4j_module._record_key(
+                        "store", "schema", "version"
+                    ),
+                    "store_id": "store",
+                    "bucket": "schema",
+                    "item_key": "version",
+                    "value": "1",
+                }
+            }
+
+    class Transaction:
+        query = ""
+
+        def run(self, query: str, **_parameters: object) -> Result:
+            self.query = query
+            return Result()
+
+    transaction = Transaction()
+    kv = neo4j_module._Neo4jKVTransaction(transaction, "store")
+    assert kv.get("schema", "version") == "1"
+    assert "properties(record) AS properties" in transaction.query
+    assert "record.bucket AS bucket" not in transaction.query
+
+
 def test_transactional_store_refuses_corrupt_schema_and_nodes() -> None:
     store = _FakeStore()
     store.data["schema"]["version"] = "999"

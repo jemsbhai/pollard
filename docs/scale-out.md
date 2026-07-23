@@ -20,6 +20,10 @@ consensus system and does not coordinate disconnected databases.
 
 Operational requirements for the added backends are in
 [Distributed store operations](https://github.com/jemsbhai/pollard/blob/main/docs/distributed-stores.md).
+The
+[configured walkthrough](https://github.com/jemsbhai/pollard/blob/main/examples/README.md#configured-distributed-store-walkthrough)
+records, strictly replays, verifies, and seals one deterministic call against
+each remote backend without contacting a model provider.
 
 ## Install And Connect
 

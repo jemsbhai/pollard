@@ -175,6 +175,11 @@ for schema migration, backup, restore, lease renewal, and reconnect procedures.
 Redis, MongoDB, and Neo4j use the same runtime reservation contract. Their
 connection examples, durability requirements, schema behavior, and recovery
 limits are in [Distributed store operations](https://github.com/jemsbhai/pollard/blob/main/docs/distributed-stores.md).
+The configured
+[`09_distributed_stores.py`](https://github.com/jemsbhai/pollard/blob/main/examples/09_distributed_stores.py)
+walkthrough records, strictly replays, verifies, and seals one deterministic
+run against any of the five remote backends without contacting a model
+provider.
 
 ## Observability
 

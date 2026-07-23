@@ -233,17 +233,16 @@ class _Neo4jKVTransaction:
         record = self._transaction.run(
             f"""
             MATCH (record:{_KV_LABEL} {{record_key: $record_key}})
-            RETURN record.record_key AS record_key,
-                   record.store_id AS store_id,
-                   record.bucket AS bucket,
-                   record.item_key AS item_key,
-                   record.value AS value
+            RETURN properties(record) AS properties
             """,
             record_key=record_key,
         ).single()
         if record is None:
             return None
-        return self._validated_value(record, bucket, key, record_key)
+        properties = record["properties"]
+        if not isinstance(properties, dict):
+            raise IntegrityError("Neo4j record properties are invalid")
+        return self._validated_value(properties, bucket, key, record_key)
 
     def items(self, bucket: str) -> list[tuple[str, str]]:
         records = self._transaction.run(

@@ -6,7 +6,7 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 
 ## [Unreleased]
 
-## [1.1.0] - 2026-07-21
+## [1.1.0] - 2026-07-22
 
 ### Added
 
@@ -18,6 +18,8 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
   shared arbitration or physical garbage collection.
 - Add `redis`, `mongodb`, `kafka`, `neo4j`, and combined `stores` installation
   extras, plus real-service acceptance tests and operations documentation.
+- Add a configured five-backend walkthrough that records, strictly replays,
+  verifies, and seals a deterministic run without a model-provider request.
 
 ### Changed
 
@@ -25,6 +27,16 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
   all-backend coverage gate above 90 percent.
 - Update GitHub Actions checkout and Python setup actions to their current
   Node 24 based major versions.
+- Expand remote-store selection, lifecycle, uncertainty, authorization,
+  migration, Kafka provisioning, and recovery guidance before release.
+
+### Fixed
+
+- Avoid spurious Neo4j missing-property notifications while initializing an
+  empty database, without weakening stored-record validation.
+- Correct the configured walkthrough's repeat-run guidance: its settled budget
+  is intentionally persistent, so reused run labels fail closed with an
+  actionable instruction instead of being described as idempotent.
 
 ### Security
 

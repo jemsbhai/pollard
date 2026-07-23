@@ -1,9 +1,10 @@
 # Pollard examples
 
 The examples are runnable programs, not fragments. Run them from the repository
-root with Python 3.10 or newer. The quick walkthroughs use deterministic local
-functions and temporary or in-memory stores; they need no API key, cloud
-account, model download, or network connection.
+root with Python 3.10 or newer. Walkthroughs `01` through `08` use deterministic
+local functions and temporary or in-memory stores; they need no API key, cloud
+account, model download, or network connection. Walkthrough `09` is opt-in and
+contacts only the database or broker selected by the operator.
 
 Install the local checkout before running them:
 
@@ -87,6 +88,48 @@ stored semantic result was used. Change the payload and replay should fail with
 longer than the first five scripts. `08_phase8_scaleout.py` exercises the shared
 transaction contract with SQLite; PostgreSQL multi-host behavior is covered by
 the formal contention runner and CI service job.
+
+## Configured distributed-store walkthrough
+
+`09_distributed_stores.py` performs one deterministic record, strict replay,
+tree verification, and seal operation against PostgreSQL, Redis, MongoDB,
+Neo4j, or Kafka. It makes no model-provider request and has zero hosted-model
+cost. It does make live database or broker requests and leaves the example run
+in the selected logical store.
+
+Install the selected extra and set only its connection environment variables.
+For example, Redis uses:
+
+```powershell
+python -m pip install -e ".[redis]"
+$env:POLLARD_REDIS_URL = "rediss://user:password@redis.example:6379/0"
+python examples\09_distributed_stores.py `
+  --backend redis `
+  --store-id example-team
+```
+
+The other backend selectors and required variables are:
+
+| Backend | Install extra | Required environment |
+|---|---|---|
+| `postgresql` | `pollard[pg]` | `POLLARD_PG_DSN` |
+| `redis` | `pollard[redis]` | `POLLARD_REDIS_URL`; optional `POLLARD_REDIS_PREFIX` |
+| `mongodb` | `pollard[mongodb]` | `POLLARD_MONGODB_URI`; optional `POLLARD_MONGODB_DATABASE` |
+| `neo4j` | `pollard[neo4j]` | `POLLARD_NEO4J_URI`, `POLLARD_NEO4J_PASSWORD`; optional user and database variables |
+| `kafka` | `pollard[kafka]` | `POLLARD_KAFKA_BOOTSTRAP`, `POLLARD_KAFKA_TOPIC` |
+
+The JSON result contains `verified: true`, `replay_matched: true`, a seal
+digest, and `shared_arbiter`. The last field is true for PostgreSQL, Redis,
+MongoDB, and Neo4j, but false for Kafka. The one-step budget remains settled in
+transactional stores after the command completes. Reusing the same run label
+is therefore refused before the offline callable executes. Pass a fresh
+`--run-label` for each new recording; the strict replay is already performed
+inside the same invocation.
+
+Kafka's topic must already satisfy Pollard's partition and retention checks.
+The complete provisioning rules, security boundary, lifecycle, uncertainty
+handling, migration example, and recovery checklist are in the
+[distributed-store operations guide](https://github.com/jemsbhai/pollard/blob/main/docs/distributed-stores.md).
 
 ## Helper programs
 

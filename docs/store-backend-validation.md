@@ -10,7 +10,9 @@ submitted paper repository or its evidence.
 | Redis transactional storage | Production feature and hardening | Added exact optimistic transactions and documented failover limits |
 | MongoDB transactional storage | Production feature and hardening | Added replica-set transactions and standalone refusal |
 | Neo4j transactional storage | Production feature and hardening | Added explicit coordinator locking to prevent lost updates |
+| Neo4j empty-schema reads emitted missing-property notifications | Pollard production-hardening defect | Read the property map atomically and retain fail-closed field validation without server warning noise |
 | Kafka lacks arbitrary state compare-and-swap | External system behavior | Added Store-only event log; no shared-arbiter claim |
+| Configured example claimed repeated recording was idempotent | Example and documentation defect | Preserve the settled budget and refuse reuse with an actionable fresh-label instruction |
 | Existing PostgreSQL G2 behavior | Regression risk | Re-ran schema, lease, reconnect, duplicate, ambiguity, and custody tests |
 
 No experiment-runner defect or model-provider behavior is involved in these
@@ -56,10 +58,10 @@ as part of this audit.
 ## Observed Release Results
 
 - Python 3.12 full suite with PostgreSQL 18, Redis 8.0, MongoDB 8.0 replica
-  set, Neo4j 5.26 Community, and Apache Kafka 4.3.1: 468 passed, one
-  broker-depth test intentionally skipped, and 90.11 percent package line
+  set, Neo4j 5.26 Community, and Apache Kafka 4.3.1: 480 passed, one
+  broker-depth test intentionally skipped, and 90.08 percent package line
   coverage from a fresh coverage database.
-- Python 3.10 and 3.14 storage suites: 153 passed on each interpreter, with
+- Python 3.10 and 3.14 storage-critical suites: 217 passed on each interpreter, with
   the same explicit Kafka depth skip.
 - PostgreSQL 14, 15, 16, and 17 acceptance: 97 passed on each version.
   PostgreSQL 18 ran in the full all-backend suite.
@@ -67,6 +69,10 @@ as part of this audit.
   same-object `reconnect()` for Redis, MongoDB, Neo4j, and Kafka. Transactional
   stores also retained settlement tombstones and rejected changed duplicate
   charges after restart.
+- The configured walkthrough completed record, strict replay, verification,
+  and sealing against all five remote backends. A repeated transactional run
+  label was refused before execution with a fresh-label instruction, and an
+  empty Neo4j store initialized without missing-property notifications.
 - Release artifacts: Twine accepted both archives; the wheel plus `stores`
   extra and the source archive each passed an isolated install and import
   canary outside the source checkout.

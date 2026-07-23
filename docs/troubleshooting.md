@@ -153,6 +153,33 @@ retention, a truncated log, malformed events, or a changed store key. See the
 [distributed store runbook](https://github.com/jemsbhai/pollard/blob/main/docs/distributed-stores.md)
 for exact configuration checks and recovery steps.
 
+## Remote Store Refusal Or Uncertain Outcome
+
+Treat schema, topology, and topic-configuration errors as intentional
+fail-closed checks:
+
+- Redis needs an intact store identity and revision. Confirm persistence,
+  `maxmemory-policy noeviction`, the URL, prefix, and `store_id`.
+- MongoDB needs a replica set or sharded deployment. Do not use
+  `directConnection=true` as a production substitute for normal topology
+  discovery.
+- Neo4j needs write routing, access to the selected database, and permission to
+  create or use the two Pollard uniqueness constraints.
+- Kafka needs one pre-created topic, exactly one partition, delete-only cleanup,
+  infinite time and byte retention, and history beginning at offset zero.
+
+`ReservationUncertain` and `SettlementUncertain` mean the server may have
+committed even though the client could not confirm it. Stop new dispatch for
+that logical store and reconcile the same reservation id and exact request or
+charges. Do not create a replacement id or release capacity based only on a
+transport error. Account for an ambiguous dispatched call at its reserved
+ceiling until reconciliation succeeds.
+
+`ReservationLeaseLost` means a completed call outlived its last confirmed
+lease. The call and available accounting evidence remain recorded, but the
+shared precheck guarantee no longer covers that interval. Investigate database
+latency, failover, worker scheduling, and lease duration before resuming.
+
 ## Import or merge failure
 
 Import verifies the full subtree before writing. Confirm the JSON is complete,

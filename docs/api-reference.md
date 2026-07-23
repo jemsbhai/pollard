@@ -274,6 +274,38 @@ the schema version before returning.
 neither. Kafka also omits the private maintenance capability, so `gc()` refuses
 it instead of implying that an append-only broker log was physically erased.
 
+Every remote-store constructor establishes a live connection and validates or
+initializes its schema before returning. Each implements `close()`,
+`reconnect()`, `__enter__`, and `__exit__`; use a context manager for bounded
+work. These adapters are synchronous. Applications that use an asynchronous
+runtime must keep blocking store calls off latency-sensitive event-loop paths.
+
+Remote driver packages are imported lazily. Importing `pollard` does not
+require them, while constructing a store without its extra raises an
+`ImportError` that names the required installation command.
+
+Backend-specific constructor behavior:
+
+- `RedisStore` creates keys beneath `prefix`, hashes `store_id` into a common
+  Redis key tag, and retries at most `watch_retries` optimistic conflicts. It
+  accepts a URL, not a preconstructed cluster client.
+- `MongoStore` passes additional keyword arguments to `pymongo.MongoClient`.
+  `collection_prefix` defaults to `pollard` and may contain only letters,
+  digits, and underscores after an initial letter.
+- `Neo4jStore` passes additional keyword arguments to
+  `GraphDatabase.driver`. `auth` is the driver authentication value and
+  `database` defaults to `neo4j`.
+- `KafkaStore` accepts a confluent-kafka client configuration mapping and a
+  positive operation `timeout`. It requires an existing dedicated topic. It
+  controls acknowledgements, idempotence, consumer group and offset behavior,
+  isolation, and earliest replay; unrelated TLS, SASL, and transport settings
+  pass through.
+
+See the
+[distributed-store operations guide](https://github.com/jemsbhai/pollard/blob/main/docs/distributed-stores.md)
+for environment mappings, a runnable record/replay example, production
+requirements, uncertainty handling, migration, and recovery.
+
 ## Nodes and reports
 
 `Node` is an immutable dataclass with `id`, `parent`, `kind`, `attempt`,

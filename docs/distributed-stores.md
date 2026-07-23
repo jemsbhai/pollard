@@ -24,6 +24,65 @@ compare a proposed reservation with current arbitrary budget state. Pollard
 therefore exposes Kafka only as a Store. Each Runtime checks its own budget;
 several runtimes do not share a Kafka limit.
 
+## Choose A Backend
+
+PostgreSQL remains the default choice when an application needs mature
+transactional durability, shared limits, and familiar backup and failover
+operations. Select another backend when its existing operational platform is a
+material advantage and its limits below are acceptable.
+
+| Backend | Good fit | Do not select it when |
+|---|---|---|
+| Redis | Low-latency coordination on an already durable, persistent Redis deployment | An acknowledged write must survive asynchronous failover with PostgreSQL-like guarantees |
+| MongoDB | The application already operates replica-set or sharded transactions | Only a standalone server is available or transaction retry behavior is not understood |
+| Neo4j | Pollard records should live beside graph-managed application data | One coordinator node per logical store is an unacceptable write bottleneck |
+| Kafka | Complete ordered audit and replay is required without shared limits | Shared budgets, physical record GC, bounded cold-start time, or finite retention is required |
+
+The tested Redis adapter uses the standard redis-py `Redis` client. Its keys
+carry one cluster hash tag, but Redis Cluster and Sentinel topology discovery
+are not part of the supported release matrix. Validate a managed failover
+endpoint in the application's own environment before production use.
+
+## End-To-End Configured Example
+
+The repository's `examples/09_distributed_stores.py` program opens one selected
+backend, records a deterministic model-shaped call without contacting a model
+provider, replays it with a callable that fails if executed, verifies the tree,
+and creates a seal. It does not print a connection string or credential.
+
+```powershell
+python -m pip install -e ".[stores]"
+python examples\09_distributed_stores.py --help
+```
+
+Configure one backend, then run it. A MongoDB example is:
+
+```powershell
+$env:POLLARD_MONGODB_URI = "mongodb://user:password@db.example/pollard?replicaSet=rs0"
+$env:POLLARD_MONGODB_DATABASE = "pollard"
+python examples\09_distributed_stores.py `
+  --backend mongodb `
+  --store-id support-prod
+```
+
+| Selector | Required environment | Optional environment |
+|---|---|---|
+| `postgresql` | `POLLARD_PG_DSN` | None |
+| `redis` | `POLLARD_REDIS_URL` | `POLLARD_REDIS_PREFIX` |
+| `mongodb` | `POLLARD_MONGODB_URI` | `POLLARD_MONGODB_DATABASE` |
+| `neo4j` | `POLLARD_NEO4J_URI`, `POLLARD_NEO4J_PASSWORD` | `POLLARD_NEO4J_USER`, `POLLARD_NEO4J_DATABASE` |
+| `kafka` | `POLLARD_KAFKA_BOOTSTRAP`, `POLLARD_KAFKA_TOPIC` | None |
+
+Expected JSON includes `verified: true`, `replay_matched: true`, and a seal
+digest. `shared_arbiter` is false only for Kafka. The program contacts the
+configured database or broker, leaves its run in that store, makes no hosted
+model request, and incurs zero model-provider spend.
+
+The example settles a one-step budget. Do not reuse its run label for another
+record attempt: fail-closed accounting will refuse it before the local callable
+executes. Pass a fresh `--run-label` for each new recording. The command already
+performs strict replay of the recording it just created.
+
 ## Redis
 
 Install and connect:
@@ -142,6 +201,28 @@ store = KafkaStore(
 )
 ```
 
+Create the dedicated topic explicitly. Set the replication factor to the
+cluster's production durability policy. Run this from a Kafka administration
+environment where `kafka-topics.sh` is on `PATH`:
+
+```powershell
+kafka-topics.sh `
+  --bootstrap-server broker-1:9092 `
+  --create `
+  --topic pollard-support-prod `
+  --partitions 1 `
+  --replication-factor 3 `
+  --config cleanup.policy=delete `
+  --config retention.ms=-1 `
+  --config retention.bytes=-1
+```
+
+TLS and SASL settings remain caller-owned confluent-kafka configuration. Pass
+them in `client_config` rather than committing them or placing them in node
+payloads. Pollard overrides acknowledgement, idempotence, consumer offset, and
+isolation settings required by its replay contract; it passes unrelated
+transport and authentication options through to the clients.
+
 One dedicated topic is one logical Pollard store. Pollard validates all of the
 following before replay:
 
@@ -164,6 +245,101 @@ break complete replay. Use topic-level retention and deletion under the
 operator's data policy, or choose a record-deletable backend. A topic in the
 same cluster is not independent external seal custody.
 
+## Lifecycle, Reconnect, And Uncertain Outcomes
+
+All five remote stores are synchronous context managers. Keep a store open for
+the application's worker lifetime and close it during orderly shutdown:
+
+```python
+import os
+
+from pollard import RedisStore, Runtime
+
+with RedisStore(
+    os.environ["POLLARD_REDIS_URL"],
+    store_id="support-prod",
+) as store:
+    runtime = Runtime(store)
+    # Run application work here.
+```
+
+`close()` is safe during normal cleanup. `reconnect()` replaces the underlying
+connection or client pool and refuses a missing or incompatible Pollard schema
+before returning. Do not call `reconnect()` concurrently with work on the same
+store object; pause that worker or replace the object under the application's
+own synchronization.
+
+Redis, MongoDB, Neo4j, and PostgreSQL can lose a connection after the server
+commits but before the client receives acknowledgement. Pollard retries an
+exact reservation or settlement once with the same identity. If the outcome
+still cannot be confirmed, it raises `ReservationUncertain` or
+`SettlementUncertain` instead of treating the operation as absent. A lease
+that cannot be renewed through its deadline becomes `ReservationLeaseLost`.
+
+Use this incident sequence:
+
+1. Stop new provider and tool dispatch for the affected logical store.
+2. Retain the content-free exception type, reservation id, store id, and time.
+3. Reconnect and verify the schema and required run roots.
+4. Reconcile the reservation using the same id, request, and settlement
+   charges. Never invent a replacement id for an ambiguous operation.
+5. Until reconciliation proves otherwise, account for an ambiguous dispatched
+   call at its conservative reserved ceiling.
+6. Resume traffic only after active leases and independently retained seals
+   agree with the intended continuation point.
+
+Kafka has no reservation methods and therefore does not raise the arbiter
+uncertainty types. It uses deterministic operation ids, broker acknowledgement,
+and replay confirmation. A Kafka integrity or uncertain-write error should
+stop writes to that topic until `reconnect()`, complete replay, and required
+root verification succeed.
+
+## Logical Isolation And Authorization
+
+`store_id` separates records for PostgreSQL, Redis, MongoDB, and Neo4j. It is
+not an authorization or encryption boundary. Use database roles, ACLs, TLS,
+network policy, and separate databases or accounts when tenants require access
+isolation. Every worker sharing a limit must use the same physical backend,
+logical store id, meter configuration, and run root.
+
+Kafka requires a dedicated topic for each logical store. Do not place two
+store ids or unrelated producers in one topic; replay refuses an unexpected
+message key or event. Topic ACLs are the authorization boundary.
+
+First construction initializes the current schema for an empty logical store.
+Later construction refuses an unknown version. Only PostgreSQL exposes a
+legacy schema migration method; the other adapters do not guess how to rewrite
+future or externally modified data.
+
+## Move Existing Recordings
+
+`merge(destination, source)` copies node trees but does not copy active budget
+reservations, settled budget counters, rate-window events, or leases. Drain
+calls before moving a recording and start a new governance scope in the target.
+For example, copy an offline SQLite recording into Redis as follows:
+
+```python
+import os
+
+from pollard import RedisStore, SQLiteStore, merge, seal, verify
+
+with (
+    RedisStore(os.environ["POLLARD_REDIS_URL"], store_id="import-2026-07") as target,
+    SQLiteStore("recording.db") as source,
+):
+    report = merge(target, source, replay=True)
+    for root_id in source.roots():
+        assert verify(target, root_id).ok
+        print(root_id, seal(target, root_id).digest)
+    print(report.to_dict())
+```
+
+Import into an empty logical store and compare the printed digests with seals
+kept outside both stores. Kafka import appends the complete node history and is
+not physically reversible through Pollard. The CLI does not construct Redis,
+MongoDB, Neo4j, or Kafka clients; perform these moves through the Python API so
+the application owns credentials and transport policy.
+
 ## Recovery And External Custody
 
 For every backend, stop provider traffic before a destructive restore. Restore
@@ -176,6 +352,13 @@ fail if executed.
 under different credentials and backup control from the primary database or
 broker. No backend can make a seal independent by writing it beside the data it
 is meant to check.
+
+Before production enablement, run a deployment-specific acceptance check that
+uses non-production data and covers concurrent exact reservations, process
+restart, primary failover, credential rotation, backup restore into a separate
+target, strict replay, `verify()`, and comparison with an externally retained
+seal. The release's one-node containers prove adapter behavior and persistence,
+not safety during a multi-node network partition.
 
 ## Upstream References
 

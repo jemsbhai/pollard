@@ -151,7 +151,9 @@ can be imported only when the target already contains that parent.
   for audit.
 - Keep secrets out of results, metadata, labels, run names, and redaction hints.
 - Restrict filesystem and database access independently of Pollard.
-- Define a retention period and schedule explicit `drop-pruned` and `compact`
-  operations.
+- Define a retention period. For record-deletable stores, schedule explicit
+  `drop-pruned` and `compact` operations. For Kafka, govern retention and
+  deletion at the dedicated-topic level; use another backend when selective
+  node erasure is required.
 - Save export seal digests outside the exported file when independent evidence
   is required.
