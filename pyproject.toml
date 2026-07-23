@@ -50,7 +50,7 @@ mongodb = ["pymongo>=4.11,<5"]
 kafka = ["confluent-kafka>=2.15,<3"]
 neo4j = ["neo4j>=5.26,<7"]
 stores = ["psycopg[binary]>=3.2", "redis>=6,<9", "pymongo>=4.11,<5", "confluent-kafka>=2.15,<3", "neo4j>=5.26,<7"]
-dev = ["pytest>=8", "pytest-cov>=5", "hypothesis>=6.100", "ruff>=0.5", "mypy>=1.10", "build", "twine", "tomli>=2; python_version < '3.11'", "hashrope>=0.2.2", "tokenmaster>=0.1.0", "opentelemetry-sdk>=1.25", "psycopg[binary]>=3.2", "redis>=6,<9", "pymongo>=4.11,<5", "confluent-kafka>=2.15,<3", "neo4j>=5.26,<7", "mcp>=1.26,<2"]
+dev = ["pytest>=8", "pytest-cov>=5", "hypothesis>=6.100", "ruff>=0.5", "mypy>=1.10", "build", "hatchling>=1.25", "twine", "tomli>=2; python_version < '3.11'", "hashrope>=0.2.2", "tokenmaster>=0.1.0", "opentelemetry-sdk>=1.25", "psycopg[binary]>=3.2", "redis>=6,<9", "pymongo>=4.11,<5", "confluent-kafka>=2.15,<3", "neo4j>=5.26,<7", "mcp>=1.26,<2"]
 
 [project.scripts]
 pollard = "pollard.cli:main"
