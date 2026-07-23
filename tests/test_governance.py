@@ -54,6 +54,10 @@ def test_gc_drops_only_pruned_subtrees_and_seals_survivors(tmp_path: Path) -> No
 
 
 def test_gc_works_for_every_builtin_store(store: Store) -> None:
+    if type(store).__name__ == "KafkaStore":
+        with pytest.raises(TypeError, match="does not support offline garbage"):
+            gc(store)
+        return
     root, keep, pruned, descendant = _tree(store)
     report = gc(store)
     assert report.removed_nodes == tuple(sorted((pruned.id, descendant.id)))

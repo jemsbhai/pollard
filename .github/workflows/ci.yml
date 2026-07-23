@@ -15,12 +15,12 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
-        python-version: ["3.10", "3.13"]
+        python-version: ["3.10", "3.14"]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -58,19 +58,14 @@ jobs:
         include:
           - postgres-version: "14"
             python-version: "3.10"
-            coverage: false
           - postgres-version: "15"
             python-version: "3.13"
-            coverage: false
           - postgres-version: "16"
             python-version: "3.13"
-            coverage: false
           - postgres-version: "17"
             python-version: "3.13"
-            coverage: false
           - postgres-version: "18"
             python-version: "3.13"
-            coverage: true
     services:
       postgres:
         image: postgres:${{ matrix.postgres-version }}-alpine
@@ -89,28 +84,120 @@ jobs:
       POLLARD_TEST_POSTGRES_DSN: postgresql://pollard:pollard@localhost:5432/pollard
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
 
       - name: Install
         run: python -m pip install -e ".[dev]"
 
-      - name: Full PostgreSQL coverage gate
-        if: matrix.coverage == true
-        run: >-
-          python -m pytest
-          --cov
-          --cov-report=term-missing
-          --cov-fail-under=90
-
       - name: Supported release acceptance
-        if: matrix.coverage == false
         run: >-
           python -m pytest
           tests/test_store_shared.py
           tests/test_store_postgres.py
           tests/test_governance.py
           tests/test_window_meter.py
+
+  remote-stores:
+    name: All remote stores and coverage on Python 3.13
+    runs-on: ubuntu-latest
+    env:
+      POLLARD_TEST_POSTGRES_DSN: postgresql://postgres:pollard@localhost:15432/pollard
+      POLLARD_TEST_REDIS_URL: redis://localhost:16379/0
+      POLLARD_TEST_MONGODB_URI: mongodb://localhost:27018/?replicaSet=rs0&directConnection=true
+      POLLARD_TEST_NEO4J_URI: bolt://localhost:17687
+      POLLARD_TEST_NEO4J_USER: neo4j
+      POLLARD_TEST_NEO4J_PASSWORD: test-password
+      POLLARD_TEST_KAFKA_BOOTSTRAP: localhost:19092
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Install
+        run: python -m pip install -e ".[dev]"
+
+      - name: Start disposable services
+        run: |
+          docker run -d --name pollard-ci-pg -p 15432:5432 \
+            -e POSTGRES_PASSWORD=pollard -e POSTGRES_DB=pollard postgres:18
+          docker run -d --name pollard-ci-redis -p 16379:6379 redis:8.0 \
+            redis-server --appendonly yes --appendfsync always \
+            --maxmemory-policy noeviction
+          docker run -d --name pollard-ci-mongo -p 27018:27017 \
+            --add-host host.docker.internal:host-gateway mongo:8.0 \
+            --replSet rs0 --bind_ip_all
+          docker run -d --name pollard-ci-neo4j -p 17687:7687 \
+            -e NEO4J_AUTH=neo4j/test-password neo4j:5.26-community
+          docker run -d --name pollard-ci-kafka -p 19092:9092 \
+            -e KAFKA_NODE_ID=1 \
+            -e KAFKA_PROCESS_ROLES=broker,controller \
+            -e KAFKA_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093 \
+            -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://localhost:19092 \
+            -e KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER \
+            -e KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT \
+            -e KAFKA_CONTROLLER_QUORUM_VOTERS=1@localhost:9093 \
+            -e KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1 \
+            -e KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1 \
+            -e KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1 \
+            apache/kafka:4.3.1
+
+      - name: Initialize and confirm services
+        run: |
+          for attempt in {1..30}; do
+            if docker exec pollard-ci-mongo mongosh --quiet \
+              --eval "db.adminCommand('ping').ok"; then break; fi
+            sleep 1
+          done
+          docker exec pollard-ci-mongo mongosh --quiet --eval \
+            "rs.initiate({_id:'rs0',members:[{_id:0,host:'host.docker.internal:27018'}]})"
+          python - <<'PY'
+          import time
+          from confluent_kafka.admin import AdminClient
+          from neo4j import GraphDatabase
+          from psycopg import connect
+          from pymongo import MongoClient
+          from redis import Redis
+
+          checks = {
+              "postgres": lambda: connect(
+                  "postgresql://postgres:pollard@localhost:15432/pollard",
+                  connect_timeout=1,
+              ).close() is None,
+              "redis": lambda: Redis.from_url("redis://localhost:16379/0").ping(),
+              "mongodb": lambda: MongoClient(
+                  "mongodb://localhost:27018/?replicaSet=rs0&directConnection=true",
+                  serverSelectionTimeoutMS=1000,
+              ).admin.command("hello").get("isWritablePrimary"),
+              "neo4j": lambda: GraphDatabase.driver(
+                  "bolt://localhost:17687", auth=("neo4j", "test-password")
+              ).verify_connectivity() is None,
+              "kafka": lambda: bool(
+                  AdminClient({"bootstrap.servers": "localhost:19092"})
+                  .list_topics(timeout=2).brokers
+              ),
+          }
+          for name, check in checks.items():
+              for _ in range(60):
+                  try:
+                      if check():
+                          break
+                  except Exception:
+                      pass
+                  time.sleep(1)
+              else:
+                  raise RuntimeError(f"{name} did not become ready")
+          PY
+
+      - name: Full all-backend coverage gate
+        run: >-
+          python -m pytest
+          --cov=pollard
+          --cov-report=term-missing
+          --cov-fail-under=90

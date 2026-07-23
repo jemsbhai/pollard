@@ -6,6 +6,44 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-07-22
+
+### Added
+
+- Add `RedisStore`, `MongoStore`, and `Neo4jStore` as transactional shared
+  stores with exact Decimal reservations, lease renewal, permanent retry
+  tombstones, server-time admission, and explicit reconnect uncertainty.
+- Add `KafkaStore` as a single-partition, infinite-retention, append-only Store
+  for deterministic audit and replay. It intentionally does not advertise
+  shared arbitration or physical garbage collection.
+- Add `redis`, `mongodb`, `kafka`, `neo4j`, and combined `stores` installation
+  extras, plus real-service acceptance tests and operations documentation.
+- Add a configured five-backend walkthrough that records, strictly replays,
+  verifies, and seals a deterministic run without a model-provider request.
+
+### Changed
+
+- Raise the supported Python test surface through Python 3.14 and enforce an
+  all-backend coverage gate above 90 percent.
+- Update GitHub Actions checkout and Python setup actions to their current
+  Node 24 based major versions.
+- Expand remote-store selection, lifecycle, uncertainty, authorization,
+  migration, Kafka provisioning, and recovery guidance before release.
+
+### Fixed
+
+- Avoid spurious Neo4j missing-property notifications while initializing an
+  empty database, without weakening stored-record validation.
+- Correct the configured walkthrough's repeat-run guidance: its settled budget
+  is intentionally persistent, so reused run labels fail closed with an
+  actionable instruction instead of being described as idempotent.
+
+### Security
+
+- Fail closed on unsupported remote-store schemas, incompatible Kafka topic
+  retention or partitioning, MongoDB deployments without transactions, corrupt
+  backend records, changed reservation retries, and changed settlement charges.
+
 ## [1.0.7] - 2026-07-21
 
 ### Added

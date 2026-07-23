@@ -47,3 +47,15 @@ def test_formal_experiment_runner_help_is_offline(script: str) -> None:
         text=True,
     )
     assert "usage:" in result.stdout
+
+
+def test_distributed_store_example_help_is_offline() -> None:
+    result = subprocess.run(
+        [sys.executable, "examples/09_distributed_stores.py", "--help"],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    assert "postgresql" in result.stdout
+    assert "kafka" in result.stdout

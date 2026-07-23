@@ -81,3 +81,39 @@ def test_example_index_names_every_python_file() -> None:
     index = (ROOT / "examples" / "README.md").read_text(encoding="utf-8")
     for script in sorted((ROOT / "examples").glob("*.py")):
         assert script.name in index, script
+
+
+def test_distributed_store_guide_covers_operational_contract() -> None:
+    guide = (ROOT / "docs" / "distributed-stores.md").read_text(encoding="utf-8")
+    required = (
+        "examples/09_distributed_stores.py",
+        "POLLARD_PG_DSN",
+        "POLLARD_REDIS_URL",
+        "POLLARD_MONGODB_URI",
+        "POLLARD_NEO4J_URI",
+        "POLLARD_KAFKA_BOOTSTRAP",
+        "POLLARD_KAFKA_TOPIC",
+        "## Lifecycle, Reconnect, And Uncertain Outcomes",
+        "ReservationUncertain",
+        "SettlementUncertain",
+        "ReservationLeaseLost",
+        "## Logical Isolation And Authorization",
+        "## Move Existing Recordings",
+        "merge(destination, source)",
+        "Redis Cluster",
+        "Sentinel topology discovery",
+        "cleanup.policy=delete",
+        "retention.ms=-1",
+        "external seal",
+    )
+    assert all(text in guide for text in required)
+
+
+def test_kafka_retention_boundary_is_consistent_across_guides() -> None:
+    governance = (ROOT / "docs" / "data-governance.md").read_text(encoding="utf-8")
+    distributed = (ROOT / "docs" / "distributed-stores.md").read_text(
+        encoding="utf-8"
+    )
+    assert "dedicated-topic level" in governance
+    assert "selective" in governance and "node erasure" in governance
+    assert "KafkaStore has no physical GC method" in distributed
