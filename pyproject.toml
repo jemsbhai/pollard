@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pollard"
-version = "1.1.0"
+version = "1.1.1"
 description = "Governed execution trees for AI agents: budget it, gate it, replay it."
 readme = "README.md"
 requires-python = ">=3.10"

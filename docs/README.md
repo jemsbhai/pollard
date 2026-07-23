@@ -20,6 +20,10 @@ failure boundaries, and complete commands needed to operate or review Pollard.
 | Run a configured PostgreSQL, Redis, MongoDB, Neo4j, or Kafka example | [Distributed-store walkthrough](https://github.com/jemsbhai/pollard/blob/main/examples/README.md#configured-distributed-store-walkthrough) |
 | Migrate, back up, restore, or reconnect PostgreSQL | [PostgreSQL operations](https://github.com/jemsbhai/pollard/blob/main/docs/postgres-operations.md) |
 | Operate Redis, MongoDB, Kafka, or Neo4j stores | [Distributed store operations](https://github.com/jemsbhai/pollard/blob/main/docs/distributed-stores.md) |
+| Deploy and recover Redis, including caller-owned Sentinel discovery | [Redis operations](https://github.com/jemsbhai/pollard/blob/main/docs/redis-operations.md) |
+| Deploy and recover a MongoDB replica-set or sharded store | [MongoDB operations](https://github.com/jemsbhai/pollard/blob/main/docs/mongodb-operations.md) |
+| Deploy and recover a routed Neo4j store | [Neo4j operations](https://github.com/jemsbhai/pollard/blob/main/docs/neo4j-operations.md) |
+| Provision and recover a Kafka audit topic | [Kafka operations](https://github.com/jemsbhai/pollard/blob/main/docs/kafka-operations.md) |
 | Review backend classifications, tests, spend, and remaining limits | [Store backend validation](https://github.com/jemsbhai/pollard/blob/main/docs/store-backend-validation.md) |
 | Understand exactly what a subtree seal covers | [Seal design](https://github.com/jemsbhai/pollard/blob/main/docs/seal.md) |
 | Depend on the stable 1.x contracts | [API stability policy](https://github.com/jemsbhai/pollard/blob/main/docs/api-stability.md) |

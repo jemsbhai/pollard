@@ -15,6 +15,7 @@ from ._transactional import KVTransaction, TransactionalKVStore
 
 T = TypeVar("T")
 _PREFIX = re.compile(r"^[A-Za-z][A-Za-z0-9_]*$")
+_MongoConnection = tuple[Any, Any, Any, Any]
 
 
 class MongoStore(TransactionalKVStore):
@@ -65,7 +66,7 @@ class MongoStore(TransactionalKVStore):
         self._database: Any = None
         self._records: Any = None
         self._coordinators: Any = None
-        self._open()
+        self._set_connection(self._connect())
         try:
             self._initialize_transactional_store()
         except BaseException:
@@ -83,29 +84,45 @@ class MongoStore(TransactionalKVStore):
             self._client.close()
 
     def reconnect(self) -> None:
-        self.close()
-        self._open()
-        self._require_transactional_store()
+        """Atomically replace the client after topology and schema validation."""
 
-    def _open(self) -> None:
-        self._client = self._pymongo.MongoClient(self.uri, **self._client_options)
+        replacement = self._connect()
+        previous = self._connection()
+        self._set_connection(replacement)
         try:
-            topology = self._client.admin.command("hello")
+            self._require_transactional_store()
+        except BaseException:
+            self._set_connection(previous)
+            replacement[0].close()
+            raise
+        previous[0].close()
+
+    def _connect(self) -> _MongoConnection:
+        client = self._pymongo.MongoClient(self.uri, **self._client_options)
+        try:
+            topology = client.admin.command("hello")
             if topology.get("setName") is None and topology.get("msg") != "isdbgrid":
                 raise ValueError(
                     "MongoStore requires a replica set or sharded MongoDB deployment"
                 )
-            self._database = self._client[self.database_name]
-            self._records = self._database[f"{self.collection_prefix}_records"]
-            self._coordinators = self._database[
+            database = client[self.database_name]
+            records = database[f"{self.collection_prefix}_records"]
+            coordinators = database[
                 f"{self.collection_prefix}_coordinators"
             ]
-            self._records.create_index(
+            records.create_index(
                 [("store_id", 1), ("bucket", 1), ("key", 1)], unique=True
             )
+            return client, database, records, coordinators
         except BaseException:
-            self._client.close()
+            client.close()
             raise
+
+    def _connection(self) -> _MongoConnection:
+        return self._client, self._database, self._records, self._coordinators
+
+    def _set_connection(self, connection: _MongoConnection) -> None:
+        self._client, self._database, self._records, self._coordinators = connection
 
     def _read(self, callback: Callable[[KVTransaction], T]) -> T:
         read_concern = import_module("pymongo.read_concern").ReadConcern("snapshot")

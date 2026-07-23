@@ -8,12 +8,15 @@ submitted paper repository or its evidence.
 | Finding | Classification | Release action |
 |---|---|---|
 | Redis transactional storage | Production feature and hardening | Added exact optimistic transactions and documented failover limits |
+| Redis URL-only client construction | Pollard hardening opportunity | Added a caller-owned fresh-client factory and forced Sentinel failover acceptance |
 | MongoDB transactional storage | Production feature and hardening | Added replica-set transactions and standalone refusal |
+| MongoDB reconnect discarded the prior client before replacement validation | Pollard hardening defect | Replacement now passes topology, index, and schema checks before the previous client closes |
 | Neo4j transactional storage | Production feature and hardening | Added explicit coordinator locking to prevent lost updates |
 | Neo4j empty-schema reads emitted missing-property notifications | Pollard production-hardening defect | Read the property map atomically and retain fail-closed field validation without server warning noise |
 | Kafka lacks arbitrary state compare-and-swap | External system behavior | Added Store-only event log; no shared-arbiter claim |
 | Configured example claimed repeated recording was idempotent | Example and documentation defect | Preserve the settled budget and refuse reuse with an actionable fresh-label instruction |
 | Existing PostgreSQL G2 behavior | Regression risk | Re-ran schema, lease, reconnect, duplicate, ambiguity, and custody tests |
+| Remote-store operating detail was concentrated in one overview | Documentation hardening | Added four backend-specific production, security, monitoring, failover, rotation, and recovery guides |
 
 No experiment-runner defect or model-provider behavior is involved in these
 storage additions.
@@ -51,17 +54,19 @@ as part of this audit.
   behavior.
 - Compatibility acceptance: supported Python versions, PostgreSQL 14 through
   18, real Redis, MongoDB replica-set, Neo4j Community, and Apache Kafka
-  containers, plus source and wheel installation tests.
+  containers, plus source and wheel installation tests. The 1.1.1 pass adds
+  Redis Sentinel failover, a three-member MongoDB replica set, and a
+  three-broker Kafka minimum-ISR topology.
 - Coverage acceptance: total package line coverage must remain above 90
   percent with the remote-service suite enabled.
 
 ## Observed Release Results
 
 - Python 3.12 full suite with PostgreSQL 18, Redis 8.0, MongoDB 8.0 replica
-  set, Neo4j 5.26 Community, and Apache Kafka 4.3.1: 480 passed, one
-  broker-depth test intentionally skipped, and 90.08 percent package line
-  coverage from a fresh coverage database.
-- Python 3.10 and 3.14 storage-critical suites: 217 passed on each interpreter, with
+  set, Neo4j 5.26 Community, and Apache Kafka 4.3.1: 491 passed, one
+  broker-depth test intentionally skipped, and more than 90.5 percent package
+  line coverage from a fresh coverage database.
+- Python 3.10 and 3.14 storage-critical suites passed on each interpreter with
   the same explicit Kafka depth skip.
 - PostgreSQL 14, 15, 16, and 17 acceptance: 97 passed on each version.
   PostgreSQL 18 ran in the full all-backend suite.
@@ -69,6 +74,17 @@ as part of this audit.
   same-object `reconnect()` for Redis, MongoDB, Neo4j, and Kafka. Transactional
   stores also retained settlement tombstones and rejected changed duplicate
   charges after restart.
+- Redis Sentinel acceptance used three Sentinel processes, one primary, and
+  one synchronized replica. After forced primary loss, the caller-owned
+  factory followed the promoted replica, same-object reconnect retained the
+  node, and changed settlement retry remained an integrity error.
+- MongoDB failover acceptance used three replica-set members. After forced
+  primary loss, a new primary was elected, atomic reconnect retained the node,
+  and duplicate-settlement validation remained fail closed.
+- Kafka failover acceptance used three brokers, replication factor 3, and
+  `min.insync.replicas=2`. One-broker loss retained writes and replay; a
+  second loss refused the write; recovery plus deterministic retry produced
+  one valid tree state.
 - The configured walkthrough completed record, strict replay, verification,
   and sealing against all five remote backends. A repeated transactional run
   label was refused before execution with a fresh-label instruction, and an
@@ -87,8 +103,9 @@ spend is `0.00 USD` of the `8.00 USD` ceiling. No local GPU was used.
 
 - Redis durability depends on persistence, replication, and failover policy;
   asynchronous failover is not PostgreSQL-equivalent durability.
-- MongoDB needs a replica set or sharded deployment. One-member test topology
-  does not represent production fault tolerance.
+- MongoDB needs a replica set or sharded deployment. The same-host
+  three-member acceptance validates election and reconnect, not independent
+  failure domains or arbitrary network partitions.
 - Neo4j serializes each logical store through one coordinator node. This favors
   exact accounting over maximum write throughput.
 - Kafka has no shared budget arbitration or record-level GC. Cold replay and
@@ -96,7 +113,11 @@ spend is `0.00 USD` of the `8.00 USD` ceiling. No local GPU was used.
 - The command-line store selector remains PostgreSQL-focused. New remote
   backends are configured through the Python API so callers retain ownership
   of credential and client-policy construction.
-- The local service matrix uses one-node deployments. It validates adapter
-  recovery and persistence, not multi-node failover safety under partition.
+- Neo4j cluster failover remains unvalidated because Community Edition is
+  single-instance. Enterprise Edition or Aura access and the associated
+  licensing decision are external prerequisites.
+- The local multi-node Redis, MongoDB, and Kafka checks force process loss on
+  one host. They do not establish safety for every managed service, Region,
+  storage failure, or network partition.
 - Pollard does not coordinate limits across disconnected databases or across
   different logical store ids.

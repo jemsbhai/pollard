@@ -185,6 +185,34 @@ def test_redis_requires_noeviction_and_refuses_future_schema() -> None:
 
 
 @pytest.mark.skipif(
+    not os.environ.get("POLLARD_TEST_REDIS_URL"), reason="Redis is not configured"
+)
+def test_redis_caller_owned_client_factory_reconnects() -> None:
+    from redis import Redis
+
+    url = os.environ["POLLARD_TEST_REDIS_URL"]
+    clients: list[Redis] = []
+
+    def factory() -> Redis:
+        client = Redis.from_url(url, decode_responses=True)
+        clients.append(client)
+        return client
+
+    store_id = f"factory-{uuid4().hex}"
+    with RedisStore(client_factory=factory, store_id=store_id) as store:
+        root = Node.make(
+            kind=NodeKind.ROOT,
+            parent=None,
+            payload={"run": "redis-client-factory"},
+        )
+        store.put(root)
+        store.reconnect()
+        assert store.get(root.id) == root
+
+    assert len(clients) == 2
+
+
+@pytest.mark.skipif(
     not os.environ.get("POLLARD_TEST_MONGODB_URI"), reason="MongoDB is not configured"
 )
 def test_mongodb_refuses_future_schema() -> None:

@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from collections.abc import Callable
 from dataclasses import replace
+from datetime import datetime, timezone
 from decimal import Decimal
 from operator import attrgetter
 from types import SimpleNamespace
@@ -79,7 +80,20 @@ def test_optional_backend_import_errors_are_actionable(
 @pytest.mark.parametrize(
     ("constructor", "args", "kwargs", "message"),
     [
+        (redis_module.RedisStore, (), {}, "either url or client_factory"),
         (redis_module.RedisStore, ("",), {}, "url"),
+        (
+            redis_module.RedisStore,
+            ("redis://unused",),
+            {"client_factory": lambda: object()},
+            "not both",
+        ),
+        (
+            redis_module.RedisStore,
+            (),
+            {"client_factory": 1},
+            "client_factory",
+        ),
         (redis_module.RedisStore, ("redis://unused",), {"store_id": ""}, "store_id"),
         (redis_module.RedisStore, ("redis://unused",), {"prefix": ""}, "prefix"),
         (
@@ -133,6 +147,257 @@ def test_remote_constructor_validation(
 def test_redis_server_time_fails_closed(value: object) -> None:
     with pytest.raises(IntegrityError, match="TIME"):
         _server_time(value)
+
+
+def test_redis_client_factory_owns_construction_and_reconnect(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    class Client:
+        def __init__(self) -> None:
+            self.closed = False
+
+        def ping(self) -> bool:
+            return True
+
+        def close(self) -> None:
+            self.closed = True
+
+    clients = [Client(), Client()]
+    created: list[Client] = []
+
+    def factory() -> Client:
+        client = clients[len(created)]
+        created.append(client)
+        return client
+
+    fake_redis = SimpleNamespace(
+        exceptions=SimpleNamespace(WatchError=RuntimeError),
+        Redis=SimpleNamespace(
+            from_url=lambda *_args, **_kwargs: pytest.fail("URL client was used")
+        ),
+    )
+    monkeypatch.setattr(redis_module, "import_module", lambda _name: fake_redis)
+    monkeypatch.setattr(
+        redis_module.RedisStore,
+        "_initialize_identity",
+        lambda _self: None,
+    )
+    monkeypatch.setattr(
+        redis_module.RedisStore,
+        "_initialize_transactional_store",
+        lambda _self: None,
+    )
+    monkeypatch.setattr(
+        redis_module.RedisStore,
+        "_require_identity_and_schema",
+        lambda _self: None,
+    )
+
+    store = redis_module.RedisStore(client_factory=factory)
+    assert store.url is None
+    assert store._client is clients[0]
+    store.reconnect()
+    assert clients[0].closed
+    assert store._client is clients[1]
+    assert not clients[1].closed
+    store.close()
+    assert clients[1].closed
+
+
+def test_redis_client_factory_must_return_fresh_client(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    client = SimpleNamespace(ping=lambda: True, close=lambda: None)
+    fake_redis = SimpleNamespace(
+        exceptions=SimpleNamespace(WatchError=RuntimeError),
+        Redis=SimpleNamespace(from_url=lambda *_args, **_kwargs: client),
+    )
+    monkeypatch.setattr(redis_module, "import_module", lambda _name: fake_redis)
+    monkeypatch.setattr(
+        redis_module.RedisStore,
+        "_initialize_identity",
+        lambda _self: None,
+    )
+    monkeypatch.setattr(
+        redis_module.RedisStore,
+        "_initialize_transactional_store",
+        lambda _self: None,
+    )
+
+    store = redis_module.RedisStore(client_factory=lambda: client)
+    with pytest.raises(RuntimeError, match="fresh Redis client"):
+        store.reconnect()
+
+
+def test_mongodb_reconnect_keeps_previous_client_until_schema_is_valid(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    class Client:
+        def __init__(self) -> None:
+            self.closed = False
+
+        def close(self) -> None:
+            self.closed = True
+
+    previous_client = Client()
+    replacement_client = Client()
+    previous = (previous_client, "old-db", "old-records", "old-coordinators")
+    replacement = (
+        replacement_client,
+        "new-db",
+        "new-records",
+        "new-coordinators",
+    )
+    store = object.__new__(mongodb_module.MongoStore)
+    store._set_connection(previous)
+    monkeypatch.setattr(store, "_connect", lambda: replacement)
+
+    def invalid_schema() -> NoReturn:
+        raise IntegrityError("unsupported MongoDB schema version: 999")
+
+    monkeypatch.setattr(store, "_require_transactional_store", invalid_schema)
+    with pytest.raises(IntegrityError, match="schema version"):
+        store.reconnect()
+    assert store._connection() == previous
+    assert not previous_client.closed
+    assert replacement_client.closed
+
+    replacement_client.closed = False
+    monkeypatch.setattr(store, "_require_transactional_store", lambda: None)
+    store.reconnect()
+    assert store._connection() == replacement
+    assert previous_client.closed
+    assert not replacement_client.closed
+
+
+def test_mongodb_connect_refuses_standalone_and_closes_candidate() -> None:
+    class Client:
+        closed = False
+        admin = SimpleNamespace(command=lambda _name: {})
+
+        def close(self) -> None:
+            self.closed = True
+
+    client = Client()
+    store = object.__new__(mongodb_module.MongoStore)
+    store.uri = "mongodb://unused"
+    store.database_name = "pollard"
+    store.collection_prefix = "pollard"
+    store._client_options = {}
+    store._pymongo = SimpleNamespace(MongoClient=lambda *_args, **_kwargs: client)
+
+    with pytest.raises(ValueError, match="replica set or sharded"):
+        store._connect()
+    assert client.closed
+
+
+def test_mongodb_transaction_fails_closed_on_corrupt_records_and_time() -> None:
+    record_id = mongodb_module._record_id("store", "bucket", "key")
+    valid = {
+        "_id": record_id,
+        "store_id": "store",
+        "bucket": "bucket",
+        "key": "key",
+        "value": "value",
+    }
+
+    class Cursor(list[dict[str, object]]):
+        def sort(self, *_args: object) -> Cursor:
+            return self
+
+    class Records:
+        database = SimpleNamespace(
+            command=lambda *_args, **_kwargs: {
+                "localTime": datetime(2026, 1, 1, tzinfo=timezone.utc)
+            }
+        )
+
+        def __init__(self, record: dict[str, object] | None) -> None:
+            self.record = record
+            self.aggregate_result: list[dict[str, object]] = []
+
+        def find_one(self, *_args: object, **_kwargs: object) -> object:
+            return self.record
+
+        def find(self, *_args: object, **_kwargs: object) -> Cursor:
+            return Cursor([] if self.record is None else [self.record])
+
+        def aggregate(
+            self, *_args: object, **_kwargs: object
+        ) -> list[dict[str, object]]:
+            return self.aggregate_result
+
+    records = Records({**valid, "value": 1})
+    tx = mongodb_module._MongoTransaction(
+        records, object(), "store", timestamp=None
+    )
+    with pytest.raises(IntegrityError, match="value must be a string"):
+        tx.get("bucket", "key")
+
+    records.record = {**valid, "key": 1}
+    with pytest.raises(IntegrityError, match="invalid MongoDB Pollard record"):
+        tx.items("bucket")
+
+    records.record = {**valid, "store_id": "other"}
+    with pytest.raises(IntegrityError, match="collision or corruption"):
+        tx.get("bucket", "key")
+
+    records.record = None
+    assert tx.now() == datetime(2026, 1, 1, tzinfo=timezone.utc).timestamp()
+    assert tx.now() == datetime(2026, 1, 1, tzinfo=timezone.utc).timestamp()
+
+    invalid_time = Records(None)
+    invalid_time.database = SimpleNamespace(
+        command=lambda *_args, **_kwargs: {"localTime": None}
+    )
+    with pytest.raises(IntegrityError, match="current time"):
+        mongodb_module._MongoTransaction(
+            invalid_time, object(), "store", timestamp=None
+        ).now()
+
+
+def test_redis_transaction_fails_closed_on_corrupt_values_and_types() -> None:
+    class Pipe:
+        value: object = None
+        bucket: object = {}
+
+        def hget(self, *_args: object) -> object:
+            return self.value
+
+        def hgetall(self, *_args: object) -> object:
+            return self.bucket
+
+    pipe = Pipe()
+    tx = redis_module._RedisTransaction(pipe, lambda bucket: bucket, 1.5)
+    pipe.value = b"bytes"
+    with pytest.raises(IntegrityError, match="stored value"):
+        tx.get("bucket", "key")
+    pipe.bucket = []
+    with pytest.raises(IntegrityError, match="must be a hash"):
+        tx.items("bucket")
+    pipe.bucket = {1: "value"}
+    with pytest.raises(IntegrityError, match="entries must be strings"):
+        tx.items("bucket")
+    with pytest.raises(TypeError, match="keys and values"):
+        tx.put("bucket", "key", 1)  # type: ignore[arg-type]
+    with pytest.raises(TypeError, match="keys must be strings"):
+        tx.delete("bucket", 1)  # type: ignore[arg-type]
+
+    pipe.bucket = {"keep": "old", "drop": "old"}
+    tx.put("bucket", "keep", "new")
+    tx.delete("bucket", "drop")
+    tx.put("other", "ignored", "value")
+    assert tx.get("bucket", "keep") == "new"
+    assert tx.items("bucket") == [("keep", "new")]
+
+    writes: list[tuple[str, str, str | None]] = []
+    destination = SimpleNamespace(
+        hset=lambda bucket, key, value: writes.append((bucket, key, value)),
+        hdel=lambda bucket, key: writes.append((bucket, key, None)),
+    )
+    tx.queue_writes(destination)
+    assert ("bucket", "keep", "new") in writes
+    assert ("bucket", "drop", None) in writes
 
 
 def test_neo4j_initial_schema_read_avoids_missing_property_notifications() -> None:

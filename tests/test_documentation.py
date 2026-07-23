@@ -101,12 +101,35 @@ def test_distributed_store_guide_covers_operational_contract() -> None:
         "## Move Existing Recordings",
         "merge(destination, source)",
         "Redis Cluster",
-        "Sentinel topology discovery",
+        "client_factory",
         "cleanup.policy=delete",
         "retention.ms=-1",
         "external seal",
     )
     assert all(text in guide for text in required)
+
+
+def test_remote_store_guides_cover_each_production_lifecycle() -> None:
+    guides = {
+        "redis-operations.md": ("Sentinel", "noeviction", "WATCH"),
+        "mongodb-operations.md": ("replica set", "majority", "timeoutMS"),
+        "neo4j-operations.md": ("neo4j+s://", "Enterprise", "routing"),
+        "kafka-operations.md": (
+            "min.insync.replicas",
+            "unclean leader election",
+            "offset zero",
+        ),
+    }
+    shared = (
+        "## Monitoring",
+        "Credential Rotation",
+        "## Production Acceptance",
+        "Backup",
+        "seal",
+    )
+    for name, backend_terms in guides.items():
+        guide = (ROOT / "docs" / name).read_text(encoding="utf-8")
+        assert all(term in guide for term in (*shared, *backend_terms)), name
 
 
 def test_kafka_retention_boundary_is_consistent_across_guides() -> None:

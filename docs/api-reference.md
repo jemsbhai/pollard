@@ -248,7 +248,7 @@ parents are distinct steps.
 | `MemoryStore` | `MemoryStore()` | Tests and one-process ephemeral runs |
 | `SQLiteStore` | `SQLiteStore(path, intern_payloads=True, intern_threshold=1024)` | Persistent one-host runs and moderate process sharing |
 | `PostgresStore` | `PostgresStore(conninfo, store_id="default", ...)` | Transactional multi-process and multi-host runs |
-| `RedisStore` | `RedisStore(url, store_id="default", prefix="pollard", watch_retries=64)` | Transactional shared runs on one Redis logical store |
+| `RedisStore` | `RedisStore(url=None, *, client_factory=None, store_id="default", prefix="pollard", watch_retries=64)` | Transactional shared runs on one Redis logical store |
 | `MongoStore` | `MongoStore(uri, database="pollard", store_id="default", ...)` | Transactional shared runs on a replica set or sharded deployment |
 | `Neo4jStore` | `Neo4jStore(uri, auth, database="neo4j", store_id="default", ...)` | Transactional shared runs routed through a graph primary |
 | `KafkaStore` | `KafkaStore(client_config, topic=..., store_id="default", ...)` | Ordered append-only audit and replay without shared arbitration |
@@ -287,8 +287,10 @@ require them, while constructing a store without its extra raises an
 Backend-specific constructor behavior:
 
 - `RedisStore` creates keys beneath `prefix`, hashes `store_id` into a common
-  Redis key tag, and retries at most `watch_retries` optimistic conflicts. It
-  accepts a URL, not a preconstructed cluster client.
+  Redis key tag, and retries at most `watch_retries` optimistic conflicts.
+  Pass either a URL or a zero-argument `client_factory`. The factory must
+  return a fresh synchronous redis-py client with decoded string responses;
+  Pollard calls it again on reconnect.
 - `MongoStore` passes additional keyword arguments to `pymongo.MongoClient`.
   `collection_prefix` defaults to `pollard` and may contain only letters,
   digits, and underscores after an initial letter.

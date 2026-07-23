@@ -6,6 +6,29 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-07-22
+
+### Added
+
+- Add a caller-owned Redis client factory for Sentinel and managed-primary
+  discovery without moving credentials or failover policy into Pollard.
+- Add dedicated Redis, MongoDB, Neo4j, and Kafka production guides covering
+  topology, security, timeouts, durability, monitoring, rotation, recovery,
+  and acceptance testing.
+
+### Fixed
+
+- Keep the prior validated MongoDB client installed until a replacement has
+  passed topology, index, and Pollard schema validation.
+- Refuse a Redis reconnect factory that returns the currently installed client,
+  which would otherwise be closed after replacement.
+
+### Security
+
+- Document least-privilege command and role boundaries, Redis no-eviction and
+  Sentinel requirements, MongoDB discovery and timeouts, Neo4j routed cluster
+  URIs, and Kafka minimum-ISR and unclean-election policy.
+
 ## [1.1.0] - 2026-07-22
 
 ### Added
