@@ -14,8 +14,11 @@ logical store.
 
 Neo4j Community Edition is a single-instance deployment. Clustering and online
 backup are Enterprise Edition capabilities; Aura is the managed alternative.
-A local Community container proves transaction and reconnect behavior, not
-cluster failover or partition safety.
+The release matrix uses Community for routine transaction compatibility and a
+three-primary Enterprise evaluation cluster for forced writer-loss acceptance.
+That local cluster proves routing, election, reconnect, retry tombstones,
+replay, verification, and external-seal behavior on one Docker host. It does
+not prove arbitrary partition safety or independent failure-domain durability.
 
 ## Install And Connect
 
@@ -103,6 +106,11 @@ and availability follow the primary path, not a read-replica path.
 For cluster entry, prefer a discoverable DNS name with several addresses or a
 caller-owned custom resolver. Connecting through only one seed is less
 available when that seed is unreachable before the routing table is obtained.
+`reconnect()` constructs a new driver from the original URI, so at least one
+address produced by that URI or resolver must still be a reachable router.
+Allow the connection-acquisition and transaction-retry deadlines to cover
+routing refresh and leader election; a list that includes live members does
+not make an unrealistically short deadline reliable.
 
 ## Monitoring
 
@@ -165,8 +173,13 @@ Before enabling provider traffic, test:
 - backup restore to a separate target; and
 - strict replay, `verify()`, and external seal comparison.
 
-The release matrix does not claim the cluster checks until they run against a
-licensed Enterprise cluster or Aura deployment.
+The 1.1.1 release matrix includes a local Neo4j 5.26 Enterprise evaluation
+cluster with three primary allocations. The exact writer was killed, a routed
+write completed after election, `reconnect()` used a surviving seed, unchanged
+settlement replay remained idempotent, changed charges failed closed, and
+strict replay, verification, and external-seal custody passed. Production
+deployments must still run the remaining topology-, network-, TLS-, backup-,
+and credential-specific checks above.
 
 Official references: [Neo4j Python connections](https://neo4j.com/docs/python-manual/current/connect/),
 [advanced connection configuration](https://neo4j.com/docs/python-manual/current/connect-advanced/),

@@ -13,6 +13,7 @@ submitted paper repository or its evidence.
 | MongoDB reconnect discarded the prior client before replacement validation | Pollard hardening defect | Replacement now passes topology, index, and schema checks before the previous client closes |
 | Neo4j transactional storage | Production feature and hardening | Added explicit coordinator locking to prevent lost updates |
 | Neo4j empty-schema reads emitted missing-property notifications | Pollard production-hardening defect | Read the property map atomically and retain fail-closed field validation without server warning noise |
+| Neo4j cluster failover had not been exercised | Validation gap, not a Pollard defect | Accepted forced writer loss on a local three-primary Enterprise evaluation cluster |
 | Kafka lacks arbitrary state compare-and-swap | External system behavior | Added Store-only event log; no shared-arbiter claim |
 | Configured example claimed repeated recording was idempotent | Example and documentation defect | Preserve the settled budget and refuse reuse with an actionable fresh-label instruction |
 | Existing PostgreSQL G2 behavior | Regression risk | Re-ran schema, lease, reconnect, duplicate, ambiguity, and custody tests |
@@ -55,8 +56,9 @@ as part of this audit.
 - Compatibility acceptance: supported Python versions, PostgreSQL 14 through
   18, real Redis, MongoDB replica-set, Neo4j Community, and Apache Kafka
   containers, plus source and wheel installation tests. The 1.1.1 pass adds
-  Redis Sentinel failover, a three-member MongoDB replica set, and a
-  three-broker Kafka minimum-ISR topology.
+  Redis Sentinel failover, a three-member MongoDB replica set, a three-primary
+  Neo4j Enterprise evaluation cluster, and a three-broker Kafka minimum-ISR
+  topology.
 - Coverage acceptance: total package line coverage must remain above 90
   percent with the remote-service suite enabled.
 
@@ -81,6 +83,12 @@ as part of this audit.
 - MongoDB failover acceptance used three replica-set members. After forced
   primary loss, a new primary was elected, atomic reconnect retained the node,
   and duplicate-settlement validation remained fail closed.
+- Neo4j failover acceptance used three 5.26.28 Enterprise primary allocations.
+  After the exact writer was killed, a routed write completed through a
+  surviving seed, a replacement writer was elected, same-object reconnect
+  retained the run, duplicate settlement remained idempotent, changed charges
+  failed closed, and strict replay, verification, and independent
+  `SQLiteSealSink` custody passed.
 - Kafka failover acceptance used three brokers, replication factor 3, and
   `min.insync.replicas=2`. One-broker loss retained writes and replay; a
   second loss refused the write; recovery plus deterministic retry produced
@@ -113,11 +121,11 @@ spend is `0.00 USD` of the `8.00 USD` ceiling. No local GPU was used.
 - The command-line store selector remains PostgreSQL-focused. New remote
   backends are configured through the Python API so callers retain ownership
   of credential and client-policy construction.
-- Neo4j cluster failover remains unvalidated because Community Edition is
-  single-instance. Enterprise Edition or Aura access and the associated
-  licensing decision are external prerequisites.
-- The local multi-node Redis, MongoDB, and Kafka checks force process loss on
-  one host. They do not establish safety for every managed service, Region,
-  storage failure, or network partition.
+- A new Neo4j driver, including one created by `reconnect()`, still needs a
+  reachable router from the configured URI or caller-owned resolver. Cluster
+  routing cannot recover a client whose only seed is down before discovery.
+- The local multi-node Redis, MongoDB, Neo4j, and Kafka checks force process
+  loss on one host. They do not establish safety for every managed service,
+  Region, storage failure, or network partition.
 - Pollard does not coordinate limits across disconnected databases or across
   different logical store ids.

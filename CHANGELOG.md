@@ -15,6 +15,9 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 - Add dedicated Redis, MongoDB, Neo4j, and Kafka production guides covering
   topology, security, timeouts, durability, monitoring, rotation, recovery,
   and acceptance testing.
+- Add forced-writer-loss acceptance on a local three-primary Neo4j Enterprise
+  evaluation cluster, including reconnect, retry-tombstone, strict-replay,
+  verification, and external-seal custody checks.
 
 ### Fixed
 
