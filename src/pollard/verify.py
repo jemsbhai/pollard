@@ -31,7 +31,11 @@ def verify(store: Store, node_id: str) -> VerifyReport:
             findings.append(VerifyFinding(current_id, "cycle detected in ancestry"))
             break
         seen.add(current_id)
-        node = store.get(current_id)
+        try:
+            node = store.get(current_id)
+        except KeyError:
+            findings.append(VerifyFinding(current_id, "node is missing"))
+            break
         if node.id != node.expected_id:
             findings.append(VerifyFinding(node.id, "node id does not match identity fields"))
         if node.result_text is not None:

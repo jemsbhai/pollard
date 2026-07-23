@@ -22,7 +22,7 @@ from pollard.tree import Node
 
 
 class SQLiteStore:
-    """Transactional SQLite store with WAL enabled."""
+    """Transactional SQLite store with optional query-only replay access."""
 
     def __init__(
         self,
@@ -30,12 +30,29 @@ class SQLiteStore:
         *,
         intern_payloads: bool = True,
         intern_threshold: int = 1024,
+        read_only: bool = False,
     ) -> None:
         if isinstance(intern_threshold, bool) or intern_threshold < 1:
             raise ValueError("intern_threshold must be a positive integer")
+        if not isinstance(read_only, bool):
+            raise TypeError("read_only must be a boolean")
         self.path = Path(path)
         self.intern_payloads = intern_payloads
         self.intern_threshold = intern_threshold
+        self.read_only = read_only
+        if read_only:
+            if not self.path.is_file():
+                raise FileNotFoundError(self.path)
+            uri = f"{self.path.resolve().as_uri()}?mode=ro"
+            self._conn = sqlite3.connect(uri, uri=True)
+            self._conn.execute("PRAGMA query_only=ON")
+            self._conn.execute("PRAGMA busy_timeout=30000")
+            try:
+                self._validate_read_only_schema()
+            except BaseException:
+                self._conn.close()
+                raise
+            return
         self._conn = sqlite3.connect(self.path)
         self._conn.execute("PRAGMA journal_mode=WAL")
         self._conn.execute("PRAGMA synchronous=NORMAL")
@@ -551,6 +568,28 @@ class SQLiteStore:
             self._conn.execute(
                 "INSERT OR REPLACE INTO kv (k, v) VALUES (?, ?)",
                 ("schema_version", "3"),
+            )
+
+    def _validate_read_only_schema(self) -> None:
+        required = {"nodes", "kv", "blobs", "blob_literals"}
+        rows = self._conn.execute(
+            "SELECT name FROM sqlite_master WHERE type = 'table'"
+        ).fetchall()
+        present = {str(row[0]) for row in rows}
+        missing = sorted(required - present)
+        if missing:
+            raise IntegrityError(
+                f"read-only SQLite recording is missing tables: {', '.join(missing)}"
+            )
+        row = self._conn.execute(
+            "SELECT v FROM kv WHERE k = ?",
+            ("schema_version",),
+        ).fetchone()
+        if row is None or str(row[0]) != "3":
+            version = "missing" if row is None else str(row[0])
+            raise IntegrityError(
+                "read-only replay requires SQLite schema version 3 "
+                f"(found {version}); open a writable copy once to migrate it"
             )
 
     def _migrate_blob_literals(self) -> None:

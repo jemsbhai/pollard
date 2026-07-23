@@ -213,6 +213,75 @@ def test_async_replay_hit_never_awaits_fn() -> None:
     asyncio.run(replay())
 
 
+def test_async_replay_structural_nodes_are_read_only() -> None:
+    store = MemoryStore()
+    recorded = AsyncRuntime(store).run("async-structural")
+    first = recorded.note({"stage": "one"})
+    with recorded.branch(attempt=3) as branch:
+        second = branch.note({"stage": "two"})
+    before = list(store.walk(recorded.root_id))
+
+    async def scenario() -> None:
+        replay = AsyncRuntime(store, mode="replay").run(
+            "async-structural",
+            budget=Budget(steps=0),
+        )
+        assert replay.note({"stage": "one"}).id == first.id
+        async with replay.branch(attempt=3) as branch:
+            assert branch.note({"stage": "two"}).id == second.id
+        with pytest.raises(RuntimeError, match="read-only"):
+            replay.prune()
+
+    asyncio.run(scenario())
+    assert list(store.walk(recorded.root_id)) == before
+
+
+def test_async_registered_replay_skips_live_handler_and_policy() -> None:
+    store = MemoryStore()
+    recorded_registry = make_registry()
+
+    async def scenario() -> None:
+        recorded = AsyncRuntime(store, registry=recorded_registry).run(
+            "async-registered-replay"
+        )
+        expected = await recorded.atool_call("echo", {"text": "stored"})
+
+        async def unavailable_handler(
+            _args: dict[str, object],
+        ) -> dict[str, object]:
+            raise AssertionError("strict replay called the registered handler")
+
+        original = recorded_registry.get("echo")
+        replay_registry = Registry(
+            [
+                ActionSpec(
+                    original.name,
+                    original.version,
+                    original.description,
+                    original.schema,
+                    original.side_effects,
+                    unavailable_handler,
+                )
+            ]
+        )
+
+        class UnavailablePolicy:
+            def decide(self, _context: object) -> None:
+                raise AssertionError("strict replay evaluated a live policy")
+
+        replay = AsyncRuntime(
+            store,
+            registry=replay_registry,
+            policies=[UnavailablePolicy()],  # type: ignore[list-item]
+            mode="replay",
+        ).run("async-registered-replay")
+        replayed = await replay.atool_call("echo", {"text": "stored"})
+        assert replayed.id == expected.id
+        assert replayed.result["text"] == "stored"
+
+    asyncio.run(scenario())
+
+
 def test_async_registered_tool_awaits_handler() -> None:
     async def scenario() -> None:
         run = AsyncRuntime(MemoryStore(), registry=make_registry()).run("async-tool")

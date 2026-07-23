@@ -1,10 +1,11 @@
 # Pollard examples
 
 The examples are runnable programs, not fragments. Run them from the repository
-root with Python 3.10 or newer. Walkthroughs `01` through `08` use deterministic
-local functions and temporary or in-memory stores; they need no API key, cloud
-account, model download, or network connection. Walkthrough `09` is opt-in and
-contacts only the database or broker selected by the operator.
+root with Python 3.10 or newer. Walkthroughs `01` through `08` and `10` through
+`13` use deterministic local functions and temporary or in-memory stores; they
+need no API key, cloud account, model download, or network connection.
+Walkthrough `09` is opt-in and contacts only the database or broker selected by
+the operator.
 
 Install the local checkout before running them:
 
@@ -24,6 +25,10 @@ python -m pip install -e .
 | `06_phase4_benchmarks.py` | Deterministic mock checks for shared prefixes, budget refusal, and registry refusal | None | JSON with three passing experiment summaries |
 | `07_phase7_storage.py` | SQLite payload interning preserves identity while changing file growth in a synthetic workload | Temporary files removed on exit | JSON points, fitted finite-range exponents, ratio, and `identity_parity: true` |
 | `08_phase8_scaleout.py` | A resumed SQLite request window refuses the next call, and two disconnected stores merge cleanly | Temporary files removed on exit | JSON with a window refusal, copied count, and `verify_clean: true` |
+| `10_streaming_replay.py` | Retained stream chunks are emitted live and again during strict replay without calling the model function | None | Matching live and replay chunk counts plus avoided charges |
+| `11_sensitive_fields.py` | A schema-marked secret reaches its handler but only a deterministic redaction marker reaches the audit tree | None | Plaintext handling and storage checks plus a digest prefix |
+| `12_dry_run_confirmation.py` | A side effect is suppressed during preview and paused for an explicit confirmation token before execution | None | Three lifecycle flags showing preview, pause, and execution |
+| `13_async_workflow.py` | Async model and tool functions share the same governed budget and audit tree | None | Model text, transformed tool text, and settled charges |
 
 Run them individually:
 
@@ -36,6 +41,10 @@ python examples\05_replay_ci.py
 python examples\06_phase4_benchmarks.py
 python examples\07_phase7_storage.py
 python examples\08_phase8_scaleout.py
+python examples\10_streaming_replay.py
+python examples\11_sensitive_fields.py
+python examples\12_dry_run_confirmation.py
+python examples\13_async_workflow.py
 ```
 
 These commands make no provider request and incur 0 USD of hosted-model spend.
@@ -88,6 +97,37 @@ stored semantic result was used. Change the payload and replay should fail with
 longer than the first five scripts. `08_phase8_scaleout.py` exercises the shared
 transaction contract with SQLite; PostgreSQL multi-host behavior is covered by
 the formal contention runner and CI service job.
+
+### Streaming and strict replay
+
+`10_streaming_replay.py` consumes a deterministic stream, forwards each chunk
+to a callback, and retains the chunks on the result. A second runtime opens the
+same in-memory store in strict replay mode. Its replacement model function
+raises if called, so matching callback output demonstrates that replay came
+entirely from the recording.
+
+### Sensitive registry fields
+
+`11_sensitive_fields.py` marks a registry schema's `token` property as
+`sensitive`. The registered handler receives the original value at execution
+time, while the node payload contains only a domain-separated digest marker.
+The script also checks every stored payload and does not print the example
+secret.
+
+### Dry-run and confirmation
+
+`12_dry_run_confirmation.py` first records a side-effectful registered action
+with `dry_run=True`, proving the handler was suppressed. It then applies a
+policy that returns `Decision.CONFIRM`, catches the resume token, and explicitly
+confirms the pending action. Confirmation tokens are in-memory capabilities for
+the active run; applications decide how an authorized human or service grants
+them.
+
+### Async workflow
+
+`13_async_workflow.py` uses `AsyncRuntime`, `amodel_call`, and `atool_call`
+inside an async context manager. Async execution changes the calling convention,
+not the budget, identity, registry, replay, or audit semantics.
 
 ## Configured distributed-store walkthrough
 

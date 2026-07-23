@@ -56,8 +56,10 @@ Before tagging, all of these statements must be true:
    and documented with credentials and cost boundaries.
 7. The full local quality gate and the GitHub CI matrix pass.
 8. Source and wheel artifacts contain the intended files and nothing secret.
-9. Artifact hashes are recorded before any upload.
-10. The signed-off Git tag, GitHub release assets, and PyPI files are the same
+9. Wheel metadata contains the standalone `Author: Muntaser Syed` field consumed
+   by PyPI and pepy.tech.
+10. Artifact hashes are recorded before any upload.
+11. The signed-off Git tag, GitHub release assets, and PyPI files are the same
     bytes.
 
 ## 1. Prepare the release pull request
@@ -149,6 +151,33 @@ the project README metadata. Confirm that the source archive has tests,
 examples, recipes, docs, evidence, license, changelog, and no local databases,
 credentials, virtual environments, caches, or editor files.
 
+Inspect the wheel's core metadata separately. The author assertion is
+intentional: under PEP 621, combining a name and email in one `authors` entry
+emits only `Author-email`, which leaves PyPI's `info.author` and pepy.tech's
+author display empty.
+
+```powershell
+@'
+from email.parser import BytesParser
+from email.policy import default
+from pathlib import Path
+import zipfile
+
+wheel = next(Path("dist").glob("*.whl"))
+with zipfile.ZipFile(wheel) as archive:
+    metadata_path = next(
+        name for name in archive.namelist()
+        if name.endswith(".dist-info/METADATA")
+    )
+    metadata = BytesParser(policy=default).parsebytes(
+        archive.read(metadata_path)
+    )
+
+assert metadata["Author"] == "Muntaser Syed"
+print(f"Author: {metadata['Author']}")
+'@ | python -
+```
+
 Install the wheel into a fresh virtual environment and run offline smoke checks:
 
 ```powershell
@@ -225,6 +254,21 @@ python examples\exp_006_verify.py
 Check the PyPI project page manually. The description must render, every README
 link must resolve, the version and Python classifiers must match, and both the
 wheel and source archive must be present.
+
+Verify the machine-readable PyPI author field:
+
+```powershell
+$metadata = Invoke-RestMethod https://pypi.org/pypi/pollard/json
+$metadata.info.author
+if ($metadata.info.author -ne "Muntaser Syed") {
+    throw "PyPI info.author is missing or incorrect"
+}
+```
+
+pepy.tech syncs this field from PyPI release metadata rather than from an
+`Authors` section in the README. After its metadata refresh, confirm that the
+pepy.tech project page also shows `Muntaser Syed` as the author. A source change
+cannot update either service until a new version is uploaded to PyPI.
 
 ## 7. Close the release
 
