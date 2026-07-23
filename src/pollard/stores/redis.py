@@ -39,14 +39,21 @@ class RedisStore(TransactionalKVStore):
 
     def __init__(
         self,
-        url: str,
+        url: str | None = None,
         *,
+        client_factory: Callable[[], Any] | None = None,
         store_id: str = "default",
         prefix: str = "pollard",
         watch_retries: int = 64,
     ) -> None:
-        if not isinstance(url, str) or not url:
+        if url is None and client_factory is None:
+            raise ValueError("pass either url or client_factory")
+        if url is not None and (not isinstance(url, str) or not url):
             raise ValueError("url must be a non-empty string")
+        if url is not None and client_factory is not None:
+            raise ValueError("pass either url or client_factory, not both")
+        if client_factory is not None and not callable(client_factory):
+            raise ValueError("client_factory must be callable")
         if not isinstance(store_id, str) or not store_id:
             raise ValueError("store_id must be a non-empty string")
         if not isinstance(prefix, str) or not prefix:
@@ -64,6 +71,7 @@ class RedisStore(TransactionalKVStore):
             ) from exc
 
         self.url = url
+        self._client_factory = client_factory
         self.store_id = store_id
         self.prefix = prefix
         self.watch_retries = watch_retries
@@ -108,6 +116,8 @@ class RedisStore(TransactionalKVStore):
         previous = self._client
         was_closed = self._closed
         replacement = self._new_client()
+        if replacement is previous:
+            raise RuntimeError("client_factory must return a fresh Redis client")
         self._client = replacement
         self._closed = False
         try:
@@ -174,6 +184,8 @@ class RedisStore(TransactionalKVStore):
         return isinstance(exc, self._connection_errors)
 
     def _new_client(self) -> Any:
+        if self._client_factory is not None:
+            return self._client_factory()
         return self._redis.Redis.from_url(self.url, decode_responses=True)
 
     def _bucket_key(self, bucket: str) -> str:

@@ -38,10 +38,18 @@ material advantage and its limits below are acceptable.
 | Neo4j | Pollard records should live beside graph-managed application data | One coordinator node per logical store is an unacceptable write bottleneck |
 | Kafka | Complete ordered audit and replay is required without shared limits | Shared budgets, physical record GC, bounded cold-start time, or finite retention is required |
 
-The tested Redis adapter uses the standard redis-py `Redis` client. Its keys
-carry one cluster hash tag, but Redis Cluster and Sentinel topology discovery
-are not part of the supported release matrix. Validate a managed failover
-endpoint in the application's own environment before production use.
+The URL path creates a standard redis-py `Redis` client. A caller-owned
+`client_factory` can return a fresh Sentinel-managed primary client during
+construction and reconnect. Redis Cluster remains outside the supported
+release matrix because Pollard's complete server-time transaction path has not
+passed cluster acceptance.
+
+Detailed deployment and recovery guides:
+
+- [Redis operations](https://github.com/jemsbhai/pollard/blob/main/docs/redis-operations.md)
+- [MongoDB operations](https://github.com/jemsbhai/pollard/blob/main/docs/mongodb-operations.md)
+- [Neo4j operations](https://github.com/jemsbhai/pollard/blob/main/docs/neo4j-operations.md)
+- [Kafka operations](https://github.com/jemsbhai/pollard/blob/main/docs/kafka-operations.md)
 
 ## End-To-End Configured Example
 
@@ -119,6 +127,13 @@ Production requirements:
 revision, or unknown schema. If a reservation or settlement remains uncertain
 after one reconnect and idempotent retry, Pollard raises the existing typed
 uncertainty exception.
+
+Applications that use Sentinel or a managed-primary resolver should pass a
+fresh synchronous redis-py client through `client_factory`. The client must
+decode responses as strings. Pollard calls the factory again on reconnect and
+does not own the resolver, Sentinel credentials, or failover policy. See the
+[Redis operations guide](https://github.com/jemsbhai/pollard/blob/main/docs/redis-operations.md)
+for a complete example.
 
 ## MongoDB
 

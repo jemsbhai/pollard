@@ -175,6 +175,12 @@ for schema migration, backup, restore, lease renewal, and reconnect procedures.
 Redis, MongoDB, and Neo4j use the same runtime reservation contract. Their
 connection examples, durability requirements, schema behavior, and recovery
 limits are in [Distributed store operations](https://github.com/jemsbhai/pollard/blob/main/docs/distributed-stores.md).
+Dedicated [Redis](https://github.com/jemsbhai/pollard/blob/main/docs/redis-operations.md),
+[MongoDB](https://github.com/jemsbhai/pollard/blob/main/docs/mongodb-operations.md),
+[Neo4j](https://github.com/jemsbhai/pollard/blob/main/docs/neo4j-operations.md),
+and [Kafka](https://github.com/jemsbhai/pollard/blob/main/docs/kafka-operations.md)
+guides cover topology, least privilege, monitoring, failover acceptance, and
+recovery.
 The configured
 [`09_distributed_stores.py`](https://github.com/jemsbhai/pollard/blob/main/examples/09_distributed_stores.py)
 walkthrough records, strictly replays, verifies, and seals one deterministic

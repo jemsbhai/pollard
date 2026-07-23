@@ -130,6 +130,9 @@ Kafka's topic must already satisfy Pollard's partition and retention checks.
 The complete provisioning rules, security boundary, lifecycle, uncertainty
 handling, migration example, and recovery checklist are in the
 [distributed-store operations guide](https://github.com/jemsbhai/pollard/blob/main/docs/distributed-stores.md).
+Applications that discover a Redis primary through Sentinel use the
+caller-owned factory example in the
+[Redis operations guide](https://github.com/jemsbhai/pollard/blob/main/docs/redis-operations.md).
 
 ## Helper programs
 
