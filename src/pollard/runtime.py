@@ -61,6 +61,7 @@ from .replay import (
     normalize_mode,
     record_avoided_charges,
     recorded_node_or_missing,
+    replay_node_or_missing,
 )
 from .store import MemoryStore, Store
 from .stores import SQLiteStore
@@ -172,16 +173,18 @@ class Runtime:
             or reservation_lease_seconds <= 0
         ):
             raise ValueError("reservation_lease_seconds must be positive")
-        self.store: Store = _coerce_store(store)
+        self.mode = normalize_mode(mode)
+        self.store: Store = _coerce_store(store, mode=self.mode)
         self.meters = meters or [StepMeter(), DepthMeter(), WallClockMeter(), TokenMeter()]
         self.registry = registry
         self.policies = policies or []
         self.dry_run = dry_run
-        self.mode = normalize_mode(mode)
         self.on_node = on_node
         self.reservation_lease_seconds = float(reservation_lease_seconds)
 
     def _put(self, node: Node) -> Node:
+        if self.mode == ReplayMode.REPLAY:
+            return replay_node_or_missing(self.store, node)
         is_new = not self.store.exists(node.id)
         self.store.put(node)
         stored = self.store.get(node.id)
@@ -198,7 +201,10 @@ class Runtime:
 
     def run(self, label: str, *, budget: Budget | None = None, attempt: int = 0) -> Run:
         root = Node.make(kind=NodeKind.ROOT, parent=None, payload={"run": label}, attempt=attempt)
-        root = self._put(root) if not self.store.exists(root.id) else self.store.get(root.id)
+        if self.mode == ReplayMode.REPLAY:
+            root = self._put(root)
+        else:
+            root = self._put(root) if not self.store.exists(root.id) else self.store.get(root.id)
         self._bind_registry(root.id)
         scopes = [] if budget is None else [_BudgetScope(budget=budget, anchor_id=root.id)]
         return Run(
@@ -211,7 +217,11 @@ class Runtime:
 
     def resume(self, label: str, *, budget: Budget | None = None, attempt: int = 0) -> Run:
         root = Node.make(kind=NodeKind.ROOT, parent=None, payload={"run": label}, attempt=attempt)
-        stored_root = self.store.get(root.id)
+        stored_root = (
+            self._put(root)
+            if self.mode == ReplayMode.REPLAY
+            else self.store.get(root.id)
+        )
         self._bind_registry(stored_root.id)
         scopes = [] if budget is None else [_BudgetScope(budget=budget, anchor_id=stored_root.id)]
         return Run(
@@ -230,6 +240,8 @@ class Runtime:
         if existing is not None and existing != self.registry.registry_digest:
             raise IntegrityError("run root is already bound to a different registry")
         if existing is None:
+            if self.mode == ReplayMode.REPLAY:
+                raise IntegrityError("replay run root is not bound to the current registry")
             self.store.update_meta(root_id, {"registry_digest": self.registry.registry_digest})
 
 
@@ -313,7 +325,6 @@ class Run:
         )
 
     def note(self, payload: dict[str, IdentityValue], *, attempt: int = 0) -> Node:
-        self._precheck(NodeKind.NOTE.value, payload)
         node = Node.make(
             kind=NodeKind.NOTE,
             parent=self.cursor_id,
@@ -321,13 +332,14 @@ class Run:
             attempt=attempt,
             meta={"created_at": _now_utc()},
         )
+        if self._runtime.mode != ReplayMode.REPLAY:
+            self._precheck(NodeKind.NOTE.value, payload)
         node = self._runtime._put(node)
         self.cursor_id = node.id
         return node
 
     def branch(self, *, attempt: int = 0, budget: Budget | None = None) -> RunBranch:
         payload: dict[str, IdentityValue] = {"branch": True}
-        self._precheck(NodeKind.NOTE.value, payload)
         anchor = Node.make(
             kind=NodeKind.NOTE,
             parent=self.cursor_id,
@@ -335,6 +347,8 @@ class Run:
             attempt=attempt,
             meta={"created_at": _now_utc()},
         )
+        if self._runtime.mode != ReplayMode.REPLAY:
+            self._precheck(NodeKind.NOTE.value, payload)
         anchor = self._runtime._put(anchor)
         scopes = [*_copy_scopes(self._budget_scopes)]
         if budget is not None:
@@ -362,6 +376,8 @@ class Run:
         return self.cursor
 
     def prune(self) -> None:
+        if self._runtime.mode == ReplayMode.REPLAY:
+            raise RuntimeError("replay mode is read-only")
         self.store.update_meta(self.cursor_id, {"pruned": True})
 
     def report(self) -> dict[str, dict[str, float]]:
@@ -624,6 +640,10 @@ class Run:
             "spec_digest": spec.spec_digest,
             "registry_digest": registry.registry_digest,
         }
+        if self._runtime.mode == ReplayMode.REPLAY:
+            recorded = self._recorded_node(NodeKind.TOOL_CALL, payload, attempt)
+            assert recorded is not None
+            return recorded
         for policy in self._runtime.policies:
             decision = policy.decide(
                 PolicyContext(
@@ -993,11 +1013,18 @@ class _Measurement(Protocol):
     def readings(self) -> dict[str, float]: ...
 
 
-def _coerce_store(store: str | Path | Store | None) -> Store:
+def _coerce_store(
+    store: str | Path | Store | None,
+    *,
+    mode: ReplayMode,
+) -> Store:
     if store is None:
         return MemoryStore()
     if isinstance(store, str | Path):
-        return SQLiteStore(store)
+        path = Path(store)
+        if mode == ReplayMode.REPLAY and not path.exists():
+            return MemoryStore()
+        return SQLiteStore(path, read_only=mode == ReplayMode.REPLAY)
     return store
 
 

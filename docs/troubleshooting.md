@@ -65,15 +65,21 @@ does not execute a side-effectful handler.
 
 ## MissingRecording
 
-Replay never falls back to a live call. `MissingRecording` means the computed
-node ID was not present with a stored result. Compare the recorded and current:
+Replay never falls back to live execution. `MissingRecording` means the
+computed run root, structural node, or result-bearing node was not present.
+Compare the recorded and current:
 
 - parent node ID;
 - node kind and attempt number;
 - complete payload, including model, prompt, tools, provider metadata, and
   reserved `_pollard` fields; and
-- registry name, version, schema, policy state, and redaction marker where
-  applicable.
+- registry name, version, schema, and redaction marker where applicable.
+
+Strict replay does not evaluate current policy hooks because it cannot execute
+the action. Record and hybrid modes apply current policies before execution or
+reuse. When a SQLite path is passed directly to a replay runtime, Pollard opens
+it query-only; a legacy schema must be migrated deliberately through a writable
+copy before it can be replayed read-only.
 
 Use hybrid mode only during deliberate recording. CI should use replay mode and
 must not receive provider credentials.

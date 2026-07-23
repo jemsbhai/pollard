@@ -53,12 +53,17 @@ def recorded_node_or_missing(
             _raise_missing(candidate, kind.value, payload)
         return None
     if mode == ReplayMode.REPLAY:
-        report = verify(store, node.id)
-        if not report.ok:
-            details = "; ".join(
-                f"{finding.node_id}: {finding.message}" for finding in report.findings
-            )
-            raise IntegrityError(f"recording integrity check failed: {details}")
+        _verify_recording(store, node.id)
+    return node
+
+
+def replay_node_or_missing(store: Store, candidate: Node) -> Node:
+    """Return an exact structural replay node without mutating the store."""
+
+    if not store.exists(candidate.id):
+        _raise_missing(candidate, candidate.kind, candidate.payload)
+    node = store.get(candidate.id)
+    _verify_recording(store, node.id)
     return node
 
 
@@ -111,6 +116,9 @@ def _raise_missing(
 
 def payload_summary(kind: str, payload: dict[str, IdentityValue]) -> str:
     parts = [kind]
+    run = payload.get("run")
+    if kind == NodeKind.ROOT.value and isinstance(run, str):
+        parts.append(f"run={run}")
     model = payload.get("model")
     if kind == NodeKind.MODEL_CALL.value and isinstance(model, str):
         parts.append(f"model={model}")
@@ -121,3 +129,13 @@ def payload_summary(kind: str, payload: dict[str, IdentityValue]) -> str:
         parts.append(f"tool={label}")
     parts.append(f"digest={digest_payload(payload)}")
     return " ".join(parts)
+
+
+def _verify_recording(store: Store, node_id: str) -> None:
+    report = verify(store, node_id)
+    if report.ok:
+        return
+    details = "; ".join(
+        f"{finding.node_id}: {finding.message}" for finding in report.findings
+    )
+    raise IntegrityError(f"recording integrity check failed: {details}")

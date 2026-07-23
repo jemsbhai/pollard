@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from collections.abc import Iterator
+from copy import deepcopy
 from dataclasses import replace
 from typing import Any, cast
 
@@ -18,7 +19,7 @@ from hashrope import (  # type: ignore[import-untyped]
 
 from pollard._canon import canonical_bytes
 from pollard.errors import IntegrityError
-from pollard.store import _validate_for_put
+from pollard.store import _copy_node, _validate_for_put
 from pollard.tree import Node
 
 
@@ -37,7 +38,7 @@ class HashRopeStore:
             self._append({"op": "put", **_node_record(node)})
 
     def get(self, node_id: str) -> Node:
-        return self._nodes[node_id]
+        return _copy_node(self._nodes[node_id])
 
     def exists(self, node_id: str) -> bool:
         return node_id in self._nodes
@@ -131,7 +132,7 @@ class HashRopeStore:
         existing = self._nodes.get(node.id)
         if existing is not None:
             return self._handle_existing(existing, node)
-        self._nodes[node.id] = node
+        self._nodes[node.id] = _copy_node(node)
         if node.parent is not None:
             self._children.setdefault(node.parent, set()).add(node.id)
         return True
@@ -142,7 +143,12 @@ class HashRopeStore:
         if incoming.result_text is None or incoming.result_text == existing.result_text:
             return False
         conflicts = list(existing.meta.get("result_conflicts", []))
-        conflicts.append({"result_digest": incoming.result_digest, "result": incoming.result})
+        conflicts.append(
+            {
+                "result_digest": incoming.result_digest,
+                "result": deepcopy(incoming.result),
+            }
+        )
         self._nodes[existing.id] = replace(
             existing,
             meta={**existing.meta, "result_conflicts": conflicts},
@@ -151,7 +157,10 @@ class HashRopeStore:
 
     def _apply_meta(self, node_id: str, patch: dict[str, object]) -> None:
         node = self._nodes[node_id]
-        self._nodes[node_id] = replace(node, meta={**node.meta, **patch})
+        self._nodes[node_id] = replace(
+            node,
+            meta=deepcopy({**node.meta, **patch}),
+        )
 
     def _rebuild_children(self) -> None:
         self._children = {}

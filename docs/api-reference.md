@@ -61,6 +61,7 @@ Runtime(
 - `dry_run`: when true, registered actions marked `side_effects=True` are
   recorded without executing their handlers.
 - `mode`: `record`, `hybrid`, or `replay`, as a string or `ReplayMode`.
+  Path-based SQLite stores are opened query-only in replay mode.
 - `on_node`: optional callback invoked after a new node is safely stored. A
   callback error becomes a warning and does not discard the node.
 - `reservation_lease_seconds`: positive lease used by transactional stores for
@@ -235,18 +236,24 @@ label, and current settled counters.
 
 `ReplayMode.RECORD` always executes a step function and stores its result.
 `ReplayMode.HYBRID` reuses an exact existing result or executes on a miss.
-`ReplayMode.REPLAY` never executes and raises `MissingRecording` on a miss.
+`ReplayMode.REPLAY` never executes a step function, registered handler, or live
+policy hook and raises `MissingRecording` on a run, structural-node, or result
+miss.
 
-Replay validates stored ancestry before serving a result. Identity includes the
-parent, kind, payload, and attempt, so equivalent payloads beneath different
-parents are distinct steps.
+Replay validates stored ancestry before returning roots, notes, branch anchors,
+or results. It does not create nodes, bind registry metadata, record refusals,
+persist avoided charges, or permit pruning. Identity includes the parent, kind,
+payload, and attempt, so equivalent payloads beneath different parents are
+distinct steps. Registered-tool replay still resolves and validates the frozen
+registry identity, including redaction, before lookup; it does not re-evaluate
+live policies because no action is executed.
 
 ## Stores
 
 | Store | Constructor | Intended scope |
 |---|---|---|
 | `MemoryStore` | `MemoryStore()` | Tests and one-process ephemeral runs |
-| `SQLiteStore` | `SQLiteStore(path, intern_payloads=True, intern_threshold=1024)` | Persistent one-host runs and moderate process sharing |
+| `SQLiteStore` | `SQLiteStore(path, intern_payloads=True, intern_threshold=1024, read_only=False)` | Persistent one-host runs; query-only inspection or replay with `read_only=True` |
 | `PostgresStore` | `PostgresStore(conninfo, store_id="default", ...)` | Transactional multi-process and multi-host runs |
 | `RedisStore` | `RedisStore(url=None, *, client_factory=None, store_id="default", prefix="pollard", watch_retries=64)` | Transactional shared runs on one Redis logical store |
 | `MongoStore` | `MongoStore(uri, database="pollard", store_id="default", ...)` | Transactional shared runs on a replica set or sharded deployment |
@@ -257,7 +264,8 @@ parents are distinct steps.
 `Store` is the frozen structural protocol with `put`, `get`, `exists`,
 `children`, `update_meta`, `walk`, and `roots`. Custom stores must preserve
 content-addressed identity, parent existence, deterministic child order, and
-the documented method meanings.
+the documented method meanings. Values returned by `get` and `walk` must be
+detached from mutable stored state.
 
 SQLite and PostgreSQL intern large string payload leaves by default. Interning
 is a storage encoding, not redaction or encryption. The remote extras are `pg`,

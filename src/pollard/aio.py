@@ -77,7 +77,10 @@ class AsyncRuntime(Runtime):
 
     def run(self, label: str, *, budget: Budget | None = None, attempt: int = 0) -> AsyncRun:
         root = Node.make(kind=NodeKind.ROOT, parent=None, payload={"run": label}, attempt=attempt)
-        root = self._put(root) if not self.store.exists(root.id) else self.store.get(root.id)
+        if self.mode == ReplayMode.REPLAY:
+            root = self._put(root)
+        else:
+            root = self._put(root) if not self.store.exists(root.id) else self.store.get(root.id)
         self._bind_registry(root.id)
         scopes = [] if budget is None else [_BudgetScope(budget=budget, anchor_id=root.id)]
         return AsyncRun(
@@ -90,7 +93,11 @@ class AsyncRuntime(Runtime):
 
     def resume(self, label: str, *, budget: Budget | None = None, attempt: int = 0) -> AsyncRun:
         root = Node.make(kind=NodeKind.ROOT, parent=None, payload={"run": label}, attempt=attempt)
-        stored_root = self.store.get(root.id)
+        stored_root = (
+            self._put(root)
+            if self.mode == ReplayMode.REPLAY
+            else self.store.get(root.id)
+        )
         self._bind_registry(stored_root.id)
         scopes = [] if budget is None else [_BudgetScope(budget=budget, anchor_id=stored_root.id)]
         return AsyncRun(
@@ -161,7 +168,6 @@ class AsyncRun(Run):
 
     def branch(self, *, attempt: int = 0, budget: Budget | None = None) -> AsyncRunBranch:
         payload: dict[str, IdentityValue] = {"branch": True}
-        self._precheck(NodeKind.NOTE.value, payload)
         anchor = Node.make(
             kind=NodeKind.NOTE,
             parent=self.cursor_id,
@@ -169,6 +175,8 @@ class AsyncRun(Run):
             attempt=attempt,
             meta={"created_at": _now_utc()},
         )
+        if self._runtime.mode != ReplayMode.REPLAY:
+            self._precheck(NodeKind.NOTE.value, payload)
         anchor = self._runtime._put(anchor)
         scopes = [*_copy_scopes(self._budget_scopes)]
         if budget is not None:
@@ -377,6 +385,10 @@ class AsyncRun(Run):
             "spec_digest": spec.spec_digest,
             "registry_digest": registry.registry_digest,
         }
+        if self._runtime.mode == ReplayMode.REPLAY:
+            recorded = self._recorded_node(NodeKind.TOOL_CALL, payload, attempt)
+            assert recorded is not None
+            return recorded
         for policy in self._runtime.policies:
             decision = policy.decide(
                 PolicyContext(

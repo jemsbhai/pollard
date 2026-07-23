@@ -147,6 +147,26 @@ def test_reopening_schema_three_database_is_read_only(tmp_path: Path) -> None:
     assert after == before
 
 
+def test_explicit_read_only_store_never_creates_or_migrates(tmp_path: Path) -> None:
+    missing = tmp_path / "missing.db"
+    with pytest.raises(FileNotFoundError):
+        SQLiteStore(missing, read_only=True)
+    assert not missing.exists()
+
+    path = tmp_path / "query-only.db"
+    with SQLiteStore(path) as writable:
+        root = Node.make(kind=NodeKind.ROOT, parent=None, payload={"run": "query-only"})
+        writable.put(root)
+    before = path.read_bytes()
+
+    with SQLiteStore(path, read_only=True) as read_only:
+        assert read_only.get(root.id) == root
+        with pytest.raises(sqlite3.OperationalError, match="readonly"):
+            read_only.update_meta(root.id, {"changed": True})
+
+    assert path.read_bytes() == before
+
+
 def test_concurrent_sqlite_puts_and_meta_patches_are_serialized(tmp_path: Path) -> None:
     path = tmp_path / "writers.db"
     with SQLiteStore(path):

@@ -19,7 +19,7 @@ from typing import Any
 
 from pollard._canon import canonical_bytes
 from pollard.errors import IntegrityError
-from pollard.store import _validate_for_put
+from pollard.store import _copy_node, _validate_for_put
 from pollard.tree import Node
 
 KAFKA_EVENT_VERSION = 1
@@ -175,7 +175,7 @@ class KafkaStore:
         with self._lock:
             self._require_open()
             self._sync_current()
-            return self._nodes[node_id]
+            return _copy_node(self._nodes[node_id])
 
     def exists(self, node_id: str) -> bool:
         with self._lock:
@@ -217,7 +217,7 @@ class KafkaStore:
             pending = [root_id]
             while pending:
                 node_id = pending.pop()
-                ordered.append(self._nodes[node_id])
+                ordered.append(_copy_node(self._nodes[node_id]))
                 children = sorted(
                     self._children.get(node_id, set()),
                     key=lambda item: (self._nodes[item].kind, item),

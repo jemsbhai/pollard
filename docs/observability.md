@@ -100,6 +100,12 @@ show historical avoided work. Pure replay stays read-only; its avoided charges
 remain available from `run.report()` during that process. Mutable metadata is
 excluded from the seal by design.
 
+Read-only replay covers roots, notes, branch anchors, results, registry
+bindings, refusals, and prune metadata. Constructing a replay `Runtime` from a
+SQLite path also opens the database with SQLite query-only access. Passing an
+already-open custom store relies on that store's own connection mode, while the
+runtime still issues no replay writes.
+
 ## OpenTelemetry
 
 Install the bridge and configure any OpenTelemetry SDK and exporter your

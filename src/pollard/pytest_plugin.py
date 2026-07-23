@@ -47,7 +47,10 @@ def pollard_run(request: FixtureRequest) -> Iterator[Run]:
     recordings_dir = _recordings_dir(request.config)
     recordings_dir.mkdir(parents=True, exist_ok=True)
     db_path = recordings_dir / f"{_module_stem(request)}.db"
-    with SQLiteStore(db_path) as store, Runtime(store, mode=mode).run(
+    with SQLiteStore(
+        db_path,
+        read_only=mode.value == "replay",
+    ) as store, Runtime(store, mode=mode).run(
         request.node.nodeid
     ) as run:
         yield run

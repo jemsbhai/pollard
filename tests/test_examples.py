@@ -17,6 +17,10 @@ ROOT = Path(__file__).resolve().parents[1]
         "examples/05_replay_ci.py",
         "examples/06_phase4_benchmarks.py",
         "examples/08_phase8_scaleout.py",
+        "examples/10_streaming_replay.py",
+        "examples/11_sensitive_fields.py",
+        "examples/12_dry_run_confirmation.py",
+        "examples/13_async_workflow.py",
     ],
 )
 def test_example_script_runs_offline(script: str) -> None:

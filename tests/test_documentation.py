@@ -1,6 +1,9 @@
 import ast
 import subprocess
 import sys
+import zipfile
+from email.parser import BytesParser
+from email.policy import default
 from pathlib import Path
 
 import pollard
@@ -40,8 +43,37 @@ def test_release_runbook_declares_local_only_production_upload() -> None:
         "python -m twine upload --non-interactive --repository pypi",
         "python -m pip install --no-cache-dir",
         "python examples\\exp_006_verify.py",
+        "Author: Muntaser Syed",
+        "info.author",
     )
     assert all(text in runbook for text in required)
+
+
+def test_built_wheel_exposes_standalone_author_for_pepy(tmp_path: Path) -> None:
+    subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "build",
+            "--wheel",
+            "--no-isolation",
+            "--outdir",
+            str(tmp_path),
+        ],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    wheel = next(tmp_path.glob("*.whl"))
+    with zipfile.ZipFile(wheel) as archive:
+        metadata_path = next(
+            name for name in archive.namelist() if name.endswith(".dist-info/METADATA")
+        )
+        metadata = BytesParser(policy=default).parsebytes(archive.read(metadata_path))
+
+    assert metadata["Author"] == "Muntaser Syed"
+    assert metadata["Maintainer-Email"] == "Muntaser Syed <jemsbhai@gmail.com>"
 
 
 def test_docs_index_names_every_top_level_document() -> None:

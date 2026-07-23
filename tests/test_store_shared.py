@@ -43,6 +43,32 @@ def test_update_meta_merges_top_level_keys(store: Store) -> None:
     assert store.get(root.id).meta == {"a": 1, "b": 2}
 
 
+def test_put_get_and_walk_do_not_expose_mutable_stored_state(store: Store) -> None:
+    root = Node.make(
+        kind=NodeKind.ROOT,
+        parent=None,
+        payload={"run": "detached", "nested": {"value": "stored"}},
+        result={"items": ["stored"]},
+        meta={"nested": {"value": "stored"}},
+    )
+    store.put(root)
+    root.payload["nested"]["value"] = "mutated after put"  # type: ignore[index]
+    root.result["items"][0] = "mutated after put"
+    root.meta["nested"]["value"] = "mutated after put"
+
+    fetched = store.get(root.id)
+    fetched.payload["nested"]["value"] = "mutated after get"  # type: ignore[index]
+    fetched.result["items"][0] = "mutated after get"
+    fetched.meta["nested"]["value"] = "mutated after get"
+    walked = next(store.walk(root.id))
+    walked.result["items"][0] = "mutated after walk"
+
+    stored = store.get(root.id)
+    assert stored.payload["nested"] == {"value": "stored"}
+    assert stored.result == {"items": ["stored"]}
+    assert stored.meta == {"nested": {"value": "stored"}}
+
+
 def test_walk_is_depth_first_and_deterministic(store: Store) -> None:
     root, _children = root_and_children(store)
     walked = [node.id for node in store.walk(root.id)]

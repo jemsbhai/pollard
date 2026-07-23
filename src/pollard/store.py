@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterator
+from copy import deepcopy
 from dataclasses import replace
 from typing import Protocol
 
@@ -42,12 +43,12 @@ class MemoryStore:
         if existing is not None:
             self._handle_existing(existing, node)
             return
-        self._nodes[node.id] = node
+        self._nodes[node.id] = _copy_node(node)
         if node.parent is not None:
             self._children.setdefault(node.parent, set()).add(node.id)
 
     def get(self, node_id: str) -> Node:
-        return self._nodes[node_id]
+        return _copy_node(self._nodes[node_id])
 
     def exists(self, node_id: str) -> bool:
         return node_id in self._nodes
@@ -60,7 +61,10 @@ class MemoryStore:
 
     def update_meta(self, node_id: str, patch: dict[str, object]) -> None:
         node = self._nodes[node_id]
-        self._nodes[node_id] = replace(node, meta={**node.meta, **patch})
+        self._nodes[node_id] = replace(
+            node,
+            meta=deepcopy({**node.meta, **patch}),
+        )
 
     def walk(self, root_id: str) -> Iterator[Node]:
         pending = [root_id]
@@ -96,7 +100,7 @@ class MemoryStore:
         conflicts.append(
             {
                 "result_digest": incoming.result_digest,
-                "result": incoming.result,
+                "result": deepcopy(incoming.result),
             }
         )
         self._nodes[existing.id] = replace(
@@ -117,3 +121,9 @@ def _validate_for_put(node: Node) -> None:
         raise IntegrityError(f"node result digest does not match result: {node.id}")
     if node.kind == NodeKind.ROOT.value and node.parent is not None:
         raise IntegrityError("root node cannot have a parent")
+
+
+def _copy_node(node: Node) -> Node:
+    """Return a detached node so callers cannot mutate stored state."""
+
+    return deepcopy(node)

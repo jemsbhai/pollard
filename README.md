@@ -288,9 +288,14 @@ How it compares:
 
 - `record`: execute the function and store the result.
 - `hybrid`: serve a stored result when the computed node id already exists, otherwise execute and store.
-- `replay`: never call the function. A missing result raises `MissingRecording`.
+- `replay`: never call a step function, registered handler, or live policy hook.
+  A missing run, structural node, or result raises `MissingRecording`.
 
-Replay mode verifies the stored node ancestry before serving a result. When `hybrid` or `replay` serves a stored result, `run.report()["avoided"]` records the charges that were skipped for that run.
+Replay mode verifies stored ancestry before returning any node and does not
+create or patch recording state. A SQLite path passed directly to `Runtime` is
+opened in query-only mode. When `hybrid` or `replay` serves a stored result,
+`run.report()["avoided"]` records the charges that were skipped for that run.
+Those pure-replay counters remain process-local.
 
 For pytest, install pollard with the `dev` extra or with pytest available, then use the fixture:
 

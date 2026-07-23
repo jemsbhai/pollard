@@ -6,6 +6,41 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-07-23
+
+### Added
+
+- Add offline walkthroughs for retained streaming replay, schema-driven
+  sensitive-field redaction, dry-run plus confirmation policy, and async model
+  and tool execution.
+- Add query-only `SQLiteStore(..., read_only=True)` access and use it
+  automatically when a replay runtime is constructed from a database path.
+
+### Changed
+
+- Make strict replay require an existing, integrity-valid run root, note, and
+  branch anchor; exact structural hits bypass current budget prechecks just like
+  recorded model and tool results.
+- Resolve registered-tool identity during strict replay without executing the
+  current handler or policy hooks.
+- Return detached node snapshots from in-process stores so callers cannot
+  mutate stored payloads, results, or metadata through a prior read.
+
+### Fixed
+
+- Emit `Muntaser Syed` in the standalone core-metadata `Author` field so PyPI
+  and pepy.tech can display the package author.
+- Keep strict replay read-only on missing roots, notes, branches, registry
+  bindings, and prune attempts.
+- Report a missing stored ancestor as an integrity failure instead of leaking a
+  backend `KeyError`.
+
+### Security
+
+- Fail closed when structural replay history or registry binding is absent, and
+  prevent replay callers from changing future in-memory or HashRope results by
+  mutating returned objects.
+
 ## [1.1.1] - 2026-07-22
 
 ### Added
