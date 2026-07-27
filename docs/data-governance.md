@@ -99,6 +99,25 @@ Handler results and metadata are outside the sensitive-field transform. A
 handler that returns its input token will place that token in the result. Keep
 secrets out of handler return values and caller-supplied metadata.
 
+## Live Revalidation Data
+
+`revalidate_model_call()` and `arevalidate_model_call()` execute a new live
+observation in `record` mode. The observation is stored as a sibling model-call
+node and is governed exactly like any other model result: its payload and full
+result are retained, and its identity and result digest are integrity-protected.
+Use a separate `live_payload` only when the new request is safe to retain.
+
+The comparison is stored in a child note. Built-in comparators record equality,
+the comparator name, and differing JSON Pointer paths without copying the
+values at those paths. A path can still disclose a sensitive field name, so
+classify schemas and field names as well as values. Custom comparators must
+follow the same value-free evidence rule.
+
+Execution-contract fields are caller declarations, not provider attestations.
+Do not place credentials or other secrets in a `ReplayContract`. The immutable
+comparison note is covered by node identity; mutable metadata remains outside
+subtree seals, as it does for every node.
+
 ## Retention And Garbage Collection
 
 Pollard never removes nodes implicitly. `run.prune()` marks the current node;

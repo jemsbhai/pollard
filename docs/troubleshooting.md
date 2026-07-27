@@ -84,6 +84,27 @@ copy before it can be replayed read-only.
 Use hybrid mode only during deliberate recording. CI should use replay mode and
 must not receive provider credentials.
 
+## Live revalidation failure or mismatch
+
+Live revalidation is deliberately separate from strict replay. Call it from a
+`record` runtime while the cursor is positioned at the golden model call, and
+supply the exact recorded payload and attempt number. Pollard verifies the
+golden node before dispatch. A missing or changed golden recording raises
+`MissingRecording` without calling the provider.
+
+A completed comparison does not raise merely because results differ. Inspect
+`report.matched` and the value-free evidence in `report.comparison`. The
+built-in normalized comparator ignores documented volatile response IDs and
+usage fields and normalizes tool-call IDs and JSON arguments; use the exact
+comparator when byte-for-byte result equality is the contract.
+
+The live observation is a separately metered provider call. Provider failures
+propagate, and any dispatched work must be accounted for like an ordinary live
+call. A comparator failure records a content-free failure note and then
+propagates the error. Reusing an existing observation identity is refused to
+prevent accidental sequential duplicate dispatch, but this is not distributed
+idempotency across independent writers.
+
 ## IntegrityError or verify findings
 
 Stop using the recording as evidence. Do not repair node IDs or result digests

@@ -36,6 +36,8 @@ What you get:
 - Audit: each node id commits to its ancestry and identity payload.
 - Registry firewall: registered tool calls resolve against a versioned action set or fail closed.
 - Replay: record semantic steps once, then serve stored results in tests and CI.
+- Revalidation: compare a recording with a separately stored, budgeted live
+  observation without replacing the golden result.
 - Scale-out: share atomic budgets and sliding windows across workers through
   SQLite, PostgreSQL, Redis, MongoDB, or Neo4j, and merge disconnected stores
   later. Kafka provides ordered audit and replay storage without shared limits.
@@ -44,7 +46,9 @@ Budget semantics are honest about what can be controlled. If a precheck estimate
 
 Current limits:
 
-- Replay of sampled model calls serves the recorded output. It does not re-check that a provider would return that output again.
+- Strict replay deterministically serves the recorded output and never
+  resamples the provider. Explicit live revalidation can detect observable
+  drift, but cannot guarantee that a hosted provider reproduces a prior sample.
 - Hosted API energy use is not measured. The NVML energy meter is for local GPU inference only.
 - SQLite serializes writers on one host. PostgreSQL, Redis, MongoDB, and Neo4j
   can coordinate worker teams when every worker uses the same backend and
@@ -53,7 +57,9 @@ Current limits:
   dedicated single-partition topic with infinite retention and no compaction.
 - HashRopeStore is an in-process operation-log backend, not a multi-writer
   database. Explicit offline garbage collection rewrites its snapshot.
-- TokenmasterMeter reports tokenmaster state from the usage data your model client returns; it does not tokenize prompts itself.
+- `TokenmasterMeter` can apply a caller-supplied prompt estimator before
+  dispatch and settles tokenmaster state from the usage data the model client
+  returns. Without an estimator, it has no prompt precheck.
 - Prompt estimators are approximations. Images, tool schemas, provider-added
   instructions, and wire-format changes can make the settled usage differ.
 - Shared arbitration requires every worker to use the same transactional store
@@ -282,7 +288,7 @@ How it compares:
 - Action firewall products judge tool calls by content policy. pollard uses structural registry gating: an action resolves against a versioned registry or it does not execute.
 - HTTP recorders pin transport bytes. pollard pins semantic steps, so recordings can outlive SDK or provider changes.
 
-## Record And Replay
+## Record, Replay, And Revalidate
 
 `Runtime(mode=...)` accepts three modes:
 
@@ -296,6 +302,13 @@ create or patch recording state. A SQLite path passed directly to `Runtime` is
 opened in query-only mode. When `hybrid` or `replay` serves a stored result,
 `run.report()["avoided"]` records the charges that were skipped for that run.
 Those pure-replay counters remain process-local.
+
+Live provider comparison is a separate, explicit operation. In `record` mode,
+`run.revalidate_model_call(...)` verifies the golden recording before dispatch,
+stores the live result under a new budgeted observation node, and writes
+value-free comparison evidence without changing the golden node. See
+[Replay and live revalidation](https://github.com/jemsbhai/pollard/blob/main/docs/revalidation.md)
+for execution fingerprints, comparators, async use, and interpretation limits.
 
 For pytest, install pollard with the `dev` extra or with pytest available, then use the fixture:
 
@@ -368,30 +381,41 @@ for scripts that run without network access.
 The optional tokenmaster meter records Pollard model-call usage into tokenmaster and stores the resulting gauge plus advice on each node:
 
 ```powershell
-pip install "pollard[tokenmaster]"
+pip install "pollard[tokenmaster,estimate-openai]"
 ```
 
 ```python
 from pollard import Budget, Runtime
+from pollard.estimators.openai import OpenAITokenEstimator
 from pollard.meters import StepMeter, TokenmasterMeter
 
 rt = Runtime(
     meters=[
         StepMeter(),
-        TokenmasterMeter(model="anthropic:claude-sonnet-4-6", expected_remaining_turns=5),
+        TokenmasterMeter(
+            model="openai:gpt-5.4",
+            estimator=OpenAITokenEstimator(model="gpt-5.4"),
+            reserved_output=1_024,
+            expected_remaining_turns=5,
+        ),
     ]
 )
 
 with rt.run("tokenmaster-demo", budget=Budget(tokens=120_000, steps=20)) as run:
     node = run.model_call(
-        {"model": "anthropic:claude-sonnet-4-6"},
+        {"model": "gpt-5.4", "input": "Summarize the incident."},
         fn=lambda _payload: {"usage": {"input_tokens": 1000, "output_tokens": 300}},
     )
     print(node.meta["charges"]["tokens"])
     print(node.meta["tokenmaster"]["state"]["zone"])
 ```
 
-Use `TokenmasterMeter` instead of the built-in `TokenMeter` when you want tokenmaster state and recommendations in the audit record. The budget charge remains the per-call token volume, including cache and reasoning token fields when present.
+Use `TokenmasterMeter` instead of the built-in `TokenMeter` when you want
+tokenmaster state and recommendations in the audit record. Its optional
+estimator plus `reserved_output` enables a conservative precheck before model
+dispatch. The settled budget charge remains the per-call token volume,
+including cache and reasoning token fields when present. Estimation remains an
+approximation and the model client remains the source of actual usage.
 
 ## End-to-End Case Studies
 

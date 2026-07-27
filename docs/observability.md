@@ -100,6 +100,12 @@ show historical avoided work. Pure replay stays read-only; its avoided charges
 remain available from `run.report()` during that process. Mutable metadata is
 excluded from the seal by design.
 
+Live revalidation adds a sibling model-call observation and a child comparison
+note beneath the golden node's parent. The observation's actual charges are
+included in reports. Default `show` output exposes only node topology, labels,
+and accounting; `--payloads` also reveals the retained golden and live payloads,
+results, and value-free comparison evidence.
+
 Read-only replay covers roots, notes, branch anchors, results, registry
 bindings, refusals, and prune metadata. Constructing a replay `Runtime` from a
 SQLite path also opens the database with SQLite query-only access. Passing an

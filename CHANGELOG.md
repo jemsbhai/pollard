@@ -6,6 +6,24 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-07-27
+
+### Added
+
+- Allow `TokenmasterMeter` to use a caller-supplied prompt estimator and output
+  reservation for conservative token-budget prechecks before model dispatch.
+- Add sync and async live model revalidation with caller-declared execution
+  fingerprints, budgeted observation nodes, normalized or exact comparators,
+  value-free drift evidence, and an offline walkthrough.
+
+### Changed
+
+- Document that strict replay returns the recorded result deterministically;
+  checking a provider for behavioral drift is an explicit record-mode
+  revalidation operation that preserves the golden recording.
+- Validate `TokenmasterMeter` output reservations as nonnegative integers,
+  rejecting ambiguous booleans, floating-point values, and negative values.
+
 ## [1.2.0] - 2026-07-23
 
 ### Added
