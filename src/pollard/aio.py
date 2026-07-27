@@ -22,6 +22,11 @@ from .meters import Meter
 from .policy import Decision, Policy, PolicyContext
 from .registry import ActionSpec, Registry
 from .replay import ReplayMode
+from .revalidation import (
+    ReplayContract,
+    RevalidationComparator,
+    RevalidationReport,
+)
 from .runtime import (
     NodeCallback,
     Run,
@@ -137,6 +142,46 @@ class AsyncRun(Run):
             keep_chunks=keep_chunks,
         )
 
+    async def arevalidate_model_call(
+        self,
+        payload: dict[str, IdentityValue],
+        *,
+        fn: AsyncStepFn,
+        contract: ReplayContract,
+        comparator: RevalidationComparator | None = None,
+        live_payload: dict[str, IdentityValue] | None = None,
+        attempt: int = 0,
+        observation_id: str | None = None,
+        on_delta: AsyncDeltaCallback | None = None,
+        keep_chunks: bool = False,
+    ) -> RevalidationReport:
+        """Compare a recording with one separately stored async live observation."""
+
+        prepared = self._prepare_model_revalidation(
+            payload,
+            contract=contract,
+            comparator=comparator,
+            live_payload=live_payload,
+            attempt=attempt,
+            observation_id=observation_id,
+        )
+
+        def call_original(
+            _observation_payload: dict[str, Any],
+        ) -> Awaitable[AsyncStepResult] | AsyncIterator[dict[str, Any]]:
+            return fn(prepared.live_payload)
+
+        live = await self._acall(
+            NodeKind.MODEL_CALL,
+            prepared.observation_payload,
+            fn=call_original,
+            attempt=0,
+            on_delta=on_delta,
+            keep_chunks=keep_chunks,
+            _meter_payload=prepared.live_payload,
+        )
+        return self._finish_model_revalidation(prepared, live)
+
     async def atool_call(
         self,
         name: str,
@@ -199,13 +244,19 @@ class AsyncRun(Run):
         attempt: int,
         on_delta: AsyncDeltaCallback | None = None,
         keep_chunks: bool = False,
+        _meter_payload: dict[str, IdentityValue] | None = None,
     ) -> Node:
         identity_payload = _snapshot_payload(payload)
+        meter_payload = (
+            identity_payload
+            if _meter_payload is None
+            else _snapshot_payload(_meter_payload)
+        )
         recorded = self._recorded_node(kind, identity_payload, attempt)
         if recorded is not None:
             await _areemit_chunks(recorded, on_delta)
             return recorded
-        reservation = self._precheck(kind.value, identity_payload)
+        reservation = self._precheck(kind.value, meter_payload)
         lease: _LeaseHeartbeat | None = None
         measurements: list[_Measurement] = []
         result: dict[str, Any] | None = None
@@ -303,7 +354,7 @@ class AsyncRun(Run):
                 meta.update(measurement.readings())
             charges = self._charges(
                 kind.value,
-                identity_payload,
+                meter_payload,
                 result,
                 meta,
                 reservation=reservation,

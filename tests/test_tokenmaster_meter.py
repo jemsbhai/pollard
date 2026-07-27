@@ -1,7 +1,7 @@
 import pytest
 from tokenmaster import Meter, ModelProfile
 
-from pollard import Budget, MemoryStore, Runtime
+from pollard import Budget, BudgetExceeded, MemoryStore, Runtime
 from pollard.meters import StepMeter, TokenmasterMeter
 
 
@@ -97,3 +97,96 @@ def test_runtime_can_budget_with_tokenmaster_meter() -> None:
 
     assert node.meta["charges"]["tokens"] == 35
     assert node.meta["tokenmaster"]["state"]["used_tokens"] == 35
+
+
+class FixedEstimator:
+    def estimate_input_tokens(self, payload: dict[str, object]) -> int:
+        assert payload["model"] == "test:model"
+        return 7
+
+
+def test_tokenmaster_meter_estimates_input_and_reserves_output() -> None:
+    meter = TokenmasterMeter(
+        meter=_tokenmaster_meter(),
+        estimator=FixedEstimator(),
+        reserved_output=5,
+    )
+
+    assert meter.precheck_estimate("model_call", {"model": "test:model"}) == 12
+    assert meter.precheck_estimate("tool_call", {}) is None
+    assert meter.precheck_is_estimate is True
+
+
+@pytest.mark.parametrize("estimate", [-1, True, 1.5])
+def test_tokenmaster_meter_rejects_invalid_estimates(estimate: object) -> None:
+    class InvalidEstimator:
+        def estimate_input_tokens(self, payload: dict[str, object]) -> object:
+            del payload
+            return estimate
+
+    meter = TokenmasterMeter(estimator=InvalidEstimator())  # type: ignore[arg-type]
+    with pytest.raises(ValueError, match="non-negative int or None"):
+        meter.precheck_estimate("model_call", {})
+
+
+@pytest.mark.parametrize("reserved_output", [-1, True, 1.5])
+def test_tokenmaster_meter_rejects_invalid_output_reservation(
+    reserved_output: object,
+) -> None:
+    with pytest.raises(ValueError, match="reserved_output"):
+        TokenmasterMeter(reserved_output=reserved_output)  # type: ignore[arg-type]
+
+
+def test_tokenmaster_estimator_refuses_before_model_dispatch() -> None:
+    called = False
+
+    def fn(_payload: dict[str, object]) -> dict[str, object]:
+        nonlocal called
+        called = True
+        return {}
+
+    run = Runtime(
+        MemoryStore(),
+        meters=[
+            StepMeter(),
+            TokenmasterMeter(
+                meter=_tokenmaster_meter(),
+                estimator=FixedEstimator(),
+                reserved_output=5,
+            ),
+        ],
+    ).run("tokenmaster-estimated-refusal", budget=Budget(tokens=11))
+
+    with pytest.raises(BudgetExceeded) as exc_info:
+        run.model_call({"model": "test:model"}, fn=fn)
+
+    refusal = run.store.get(exc_info.value.refusal_id)
+    assert refusal.payload["estimated"] == "true"
+    assert refusal.payload["requested"] == "12"
+    assert not called
+
+
+def test_tokenmaster_estimate_is_conservative_fallback_without_usage() -> None:
+    run = Runtime(
+        MemoryStore(),
+        meters=[
+            StepMeter(),
+            TokenmasterMeter(
+                meter=_tokenmaster_meter(),
+                estimator=FixedEstimator(),
+                reserved_output=5,
+            ),
+        ],
+    ).run("tokenmaster-estimated-fallback", budget=Budget(tokens=20))
+
+    with pytest.warns(UserWarning, match="no compatible usage"):
+        node = run.model_call(
+            {"model": "test:model"},
+            fn=lambda _payload: {"text": "completed without usage"},
+        )
+
+    assert node.meta["charges"]["tokens"] == 12
+    assert node.meta["accounting_fallbacks"]["tokens"] == {
+        "reason": "missing_or_invalid_provider_usage",
+        "source": "precheck_estimate",
+    }

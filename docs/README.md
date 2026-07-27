@@ -14,6 +14,7 @@ failure boundaries, and complete commands needed to operate or review Pollard.
 | Choose a direct cloud adapter or LiteLLM route | [Cloud-hosted providers](https://github.com/jemsbhai/pollard/blob/main/docs/cloud-providers.md) |
 | Review provider failure classifications, conservative accounting, and the cloud ledger | [Provider boundary hardening](https://github.com/jemsbhai/pollard/blob/main/docs/provider-boundary-hardening.md) |
 | Inspect, verify, report, seal, or export a run | [Observability](https://github.com/jemsbhai/pollard/blob/main/docs/observability.md) |
+| Compare a recording with a deliberate live provider observation | [Replay and live revalidation](https://github.com/jemsbhai/pollard/blob/main/docs/revalidation.md) |
 | Diagnose refusals, replay misses, integrity, providers, or stores | [Troubleshooting](https://github.com/jemsbhai/pollard/blob/main/docs/troubleshooting.md) |
 | Classify, redact, retain, or delete recorded data | [Data governance](https://github.com/jemsbhai/pollard/blob/main/docs/data-governance.md) |
 | Share budgets across processes or hosts | [Scale-out stores](https://github.com/jemsbhai/pollard/blob/main/docs/scale-out.md) |
@@ -41,7 +42,8 @@ credentials, retries, provider account limits, and the safety of side effects.
 
 The repository separates three kinds of runnable material:
 
-- `examples/01_*` through `08_*` are small, offline walkthroughs.
+- `examples/01_*` through `08_*` and `10_*` through `14_*` are small, offline
+  walkthroughs.
 - `examples/exp_*` are controlled evidence runners with their own protocols and
   prerequisites. They do not call hosted model providers.
 - `docs/recipes/*.py` are opt-in integration recipes. Provider-backed recipes

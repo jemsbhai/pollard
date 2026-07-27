@@ -102,6 +102,67 @@ chunk dictionaries.
 ordered chunks under `result["chunks"]`; replay re-emits them. Charges settle
 once after complete stream consumption.
 
+### revalidate_model_call
+
+```python
+run.revalidate_model_call(
+    payload,
+    *,
+    fn,
+    contract,
+    comparator=None,
+    live_payload=None,
+    attempt=0,
+    observation_id=None,
+    on_delta=None,
+    keep_chunks=False,
+) -> RevalidationReport
+```
+
+`revalidate_model_call` is an explicitly live operation available only in
+`record` mode. Before dispatch it derives and integrity-verifies the golden
+model-call node from the current parent, payload, and attempt. A missing
+recording, invalid ancestry, reused observation ID, non-record mode, or dry run
+fails before `fn` executes.
+
+The new provider result is stored under a unique sibling model-call node and is
+metered, reserved, and settled like any other live call. A value-free immutable
+note below that observation records result digests, comparator status, and JSON
+Pointer difference paths. The golden node is not changed, and after success the
+cursor advances to it. `AsyncRun.arevalidate_model_call` provides async and
+async-streaming parity.
+
+The generated observation ID is unique by default. The existing-node check for
+a caller-supplied ID prevents sequential reuse but is not a distributed
+dispatch lock; workers must not coordinate provider idempotency through this
+field.
+
+By default the live callable receives the recorded payload. `live_payload`
+allows deliberate comparison against a different model or request while the
+first `payload` continues to identify the golden node. If an explicit live
+payload is bound to a `ReplayContract`, that fingerprint must equal `contract`
+or Pollard refuses before dispatch.
+
+`ReplayContract(provider, ...)` is a caller-declared execution fingerprint.
+Optional fields are `model_revision`, `api_version`, `adapter`,
+`adapter_version`, `sdk`, `sdk_version`, `application_revision`, and an
+identity-safe `environment` object. `ReplayContract.bind(payload)` returns a
+copy containing the fingerprint under reserved `_pollard.replay_contract`
+metadata. It is a declaration, not provider attestation.
+
+The default `NormalizedModelComparator` compares normalized text, tool calls,
+refusals, or structured output while excluding volatile provider identity and
+accounting fields. `ExactResultComparator` compares the complete result.
+Caller-defined `RevalidationComparator` implementations return a
+`RevalidationComparison`; comparator names should be versioned and difference
+paths must not contain values.
+
+`RevalidationReport` exposes `observation_id`, recorded/live/evidence node IDs,
+comparator name, `matched`, `exact_match`, result digests, difference paths,
+recorded and live contracts, live charges, and `to_dict()`. See
+[`revalidation.md`](revalidation.md) for the storage layout, examples, and
+interpretation limits.
+
 ### tool_call
 
 ```python
@@ -198,6 +259,12 @@ dollar charge is not a provider-account hard limit.
 Optional meters include `EnergyMeter` in `pollard.meters.energy` and
 `TokenmasterMeter` in `pollard.meters`. The OpenAI prompt estimator is
 `pollard.estimators.openai.OpenAITokenEstimator`.
+
+`TokenmasterMeter(model=None, *, meter=None, estimator=None,
+reserved_output=0, expected_remaining_turns=None, task=None, policy=None)`
+accepts the same estimator protocol as `TokenMeter`. When configured, its
+precheck is the estimated input plus `reserved_output`; actual tokenmaster
+state and the settled charge still come from provider usage.
 
 ## Registry and policies
 

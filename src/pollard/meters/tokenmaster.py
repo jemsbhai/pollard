@@ -4,7 +4,10 @@ from __future__ import annotations
 
 import warnings
 from importlib import import_module
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from . import Estimator
 
 
 class TokenmasterMeter:
@@ -12,7 +15,9 @@ class TokenmasterMeter:
 
     The returned charge remains a per-call token volume, so it can replace
     ``TokenMeter`` in Pollard budgets. The richer tokenmaster gauge and advice
-    are stored under ``meta["tokenmaster"]`` on each charged node.
+    are stored under ``meta["tokenmaster"]`` on each charged node. An optional
+    estimator plus ``reserved_output`` enables a conservative precheck before
+    model dispatch.
     """
 
     name = "tokens"
@@ -22,6 +27,7 @@ class TokenmasterMeter:
         model: str | None = None,
         *,
         meter: Any | None = None,
+        estimator: Estimator | None = None,
         reserved_output: int = 0,
         expected_remaining_turns: int | None = None,
         task: Any | None = None,
@@ -31,14 +37,22 @@ class TokenmasterMeter:
             raise ValueError("pass either model or meter, not both")
         if expected_remaining_turns is not None and task is not None:
             raise ValueError("pass either expected_remaining_turns or task, not both")
+        if (
+            isinstance(reserved_output, bool)
+            or not isinstance(reserved_output, int)
+            or reserved_output < 0
+        ):
+            raise ValueError("reserved_output must be a non-negative int")
         self._model = model
         self._meter = meter
+        self._estimator = estimator
         self._reserved_output = reserved_output
         self._expected_remaining_turns = expected_remaining_turns
         self._task = task
         self._policy = policy
         self._warned_missing_usage = False
         self._warned_missing_model = False
+        self.precheck_is_estimate = estimator is not None
 
     def charge(
         self,
@@ -79,9 +93,19 @@ class TokenmasterMeter:
         meta["tokenmaster"] = tokenmaster_meta
         return int(turn.context_total())
 
-    def precheck_estimate(self, node_kind: str, payload: dict[str, Any]) -> None:
-        del node_kind, payload
-        return None
+    def precheck_estimate(
+        self,
+        node_kind: str,
+        payload: dict[str, Any],
+    ) -> int | None:
+        if node_kind != "model_call" or self._estimator is None:
+            return None
+        estimate = self._estimator.estimate_input_tokens(payload)
+        if estimate is None:
+            return None
+        if isinstance(estimate, bool) or not isinstance(estimate, int) or estimate < 0:
+            raise ValueError("token estimator must return a non-negative int or None")
+        return estimate + self._reserved_output
 
     def _ensure_meter(self, model_id: str | None) -> Any | None:
         if self._meter is not None:

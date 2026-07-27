@@ -63,6 +63,17 @@ from .replay import (
     recorded_node_or_missing,
     replay_node_or_missing,
 )
+from .revalidation import (
+    NormalizedModelComparator,
+    ReplayContract,
+    RevalidationComparator,
+    RevalidationComparison,
+    RevalidationReport,
+    extract_replay_contract,
+    make_revalidation_evidence,
+    make_revalidation_failure_evidence,
+    make_revalidation_payload,
+)
 from .store import MemoryStore, Store
 from .stores import SQLiteStore
 from .tree import Node, NodeKind
@@ -93,6 +104,18 @@ class _PendingToolCall:
 class _Reservation:
     reservation_id: str | None
     estimates: dict[str, Decimal]
+
+
+@dataclass(frozen=True)
+class _PreparedRevalidation:
+    recorded: Node
+    observation_payload: dict[str, IdentityValue]
+    live_payload: dict[str, IdentityValue]
+    observation_id: str
+    comparator: RevalidationComparator
+    comparator_name: str
+    recorded_contract: dict[str, IdentityValue] | None
+    live_contract: dict[str, IdentityValue]
 
 
 class _LeaseHeartbeat:
@@ -295,6 +318,44 @@ class Run:
             keep_chunks=keep_chunks,
         )
 
+    def revalidate_model_call(
+        self,
+        payload: dict[str, IdentityValue],
+        *,
+        fn: StepFn,
+        contract: ReplayContract,
+        comparator: RevalidationComparator | None = None,
+        live_payload: dict[str, IdentityValue] | None = None,
+        attempt: int = 0,
+        observation_id: str | None = None,
+        on_delta: DeltaCallback | None = None,
+        keep_chunks: bool = False,
+    ) -> RevalidationReport:
+        """Compare one recorded result with a separately stored live observation."""
+
+        prepared = self._prepare_model_revalidation(
+            payload,
+            contract=contract,
+            comparator=comparator,
+            live_payload=live_payload,
+            attempt=attempt,
+            observation_id=observation_id,
+        )
+
+        def call_original(_observation_payload: dict[str, Any]) -> StepResult:
+            return fn(prepared.live_payload)
+
+        live = self._call(
+            NodeKind.MODEL_CALL,
+            prepared.observation_payload,
+            fn=call_original,
+            attempt=0,
+            on_delta=on_delta,
+            keep_chunks=keep_chunks,
+            _meter_payload=prepared.live_payload,
+        )
+        return self._finish_model_revalidation(prepared, live)
+
     def tool_call(
         self,
         name: str,
@@ -395,8 +456,14 @@ class Run:
         attempt: int,
         on_delta: DeltaCallback | None = None,
         keep_chunks: bool = False,
+        _meter_payload: dict[str, IdentityValue] | None = None,
     ) -> Node:
         identity_payload = _snapshot_payload(payload)
+        meter_payload = (
+            identity_payload
+            if _meter_payload is None
+            else _snapshot_payload(_meter_payload)
+        )
         recorded = self._recorded_node(
             kind,
             identity_payload,
@@ -405,7 +472,7 @@ class Run:
         )
         if recorded is not None:
             return recorded
-        reservation = self._precheck(kind.value, identity_payload)
+        reservation = self._precheck(kind.value, meter_payload)
         lease: _LeaseHeartbeat | None = None
         measurements: list[_Measurement] = []
         result: dict[str, Any] | None = None
@@ -498,7 +565,7 @@ class Run:
                 meta.update(measurement.readings())
             charges = self._charges(
                 kind.value,
-                identity_payload,
+                meter_payload,
                 result,
                 meta,
                 reservation=reservation,
@@ -543,6 +610,176 @@ class Run:
                 node.id,
             )
         return node
+
+    def _prepare_model_revalidation(
+        self,
+        payload: dict[str, IdentityValue],
+        *,
+        contract: ReplayContract,
+        comparator: RevalidationComparator | None,
+        live_payload: dict[str, IdentityValue] | None,
+        attempt: int,
+        observation_id: str | None,
+    ) -> _PreparedRevalidation:
+        if self._runtime.mode != ReplayMode.RECORD:
+            raise RuntimeError("live revalidation requires record mode")
+        if self._runtime.dry_run:
+            raise RuntimeError("live revalidation is unavailable in dry-run mode")
+        if not isinstance(contract, ReplayContract):
+            raise TypeError("contract must be a ReplayContract")
+        live_contract = contract.to_dict()
+        selected = NormalizedModelComparator() if comparator is None else comparator
+        comparator_name = getattr(selected, "name", None)
+        compare = getattr(selected, "compare", None)
+        if (
+            not isinstance(comparator_name, str)
+            or not comparator_name.strip()
+            or not callable(compare)
+        ):
+            raise TypeError("comparator must expose a non-empty name and compare method")
+        identity_payload = _snapshot_payload(payload)
+        recorded = recorded_node_or_missing(
+            mode=ReplayMode.REPLAY,
+            store=self.store,
+            kind=NodeKind.MODEL_CALL,
+            parent_id=self.cursor_id,
+            payload=identity_payload,
+            attempt=attempt,
+        )
+        assert recorded is not None
+        if not isinstance(recorded.result, dict) or recorded.result_digest is None:
+            raise IntegrityError("recorded model result is not a replayable object")
+        try:
+            recorded_contract = extract_replay_contract(recorded.payload)
+        except ValueError as exc:
+            raise IntegrityError(str(exc)) from exc
+        live_source = payload if live_payload is None else live_payload
+        live_identity_payload = _snapshot_payload(live_source)
+        if live_payload is not None:
+            try:
+                bound_live_contract = extract_replay_contract(live_identity_payload)
+            except ValueError as exc:
+                raise ValueError(str(exc)) from exc
+            if (
+                bound_live_contract is not None
+                and bound_live_contract != live_contract
+            ):
+                raise ValueError(
+                    "live payload replay contract does not match the live contract"
+                )
+        resolved_observation_id = uuid4().hex if observation_id is None else observation_id
+        observation_payload = make_revalidation_payload(
+            live_identity_payload,
+            observation_id=resolved_observation_id,
+            recorded_node_id=recorded.id,
+            recorded_result_digest=recorded.result_digest,
+            contract=contract,
+            comparator_name=comparator_name,
+        )
+        candidate = Node.make(
+            kind=NodeKind.MODEL_CALL,
+            parent=self.cursor_id,
+            payload=observation_payload,
+        )
+        if self.store.exists(candidate.id):
+            raise IntegrityError(
+                f"revalidation observation already exists: {resolved_observation_id}"
+            )
+        return _PreparedRevalidation(
+            recorded=recorded,
+            observation_payload=observation_payload,
+            live_payload=live_source,
+            observation_id=resolved_observation_id,
+            comparator=selected,
+            comparator_name=comparator_name,
+            recorded_contract=recorded_contract,
+            live_contract=live_contract,
+        )
+
+    def _finish_model_revalidation(
+        self,
+        prepared: _PreparedRevalidation,
+        live: Node,
+    ) -> RevalidationReport:
+        recorded = prepared.recorded
+        if (
+            not isinstance(recorded.result, dict)
+            or recorded.result_digest is None
+            or recorded.result_text is None
+            or not isinstance(live.result, dict)
+            or live.result_digest is None
+            or live.result_text is None
+        ):
+            raise IntegrityError("revalidation requires recorded and live result objects")
+        comparator_name = prepared.comparator_name
+        try:
+            recorded_result = json.loads(recorded.result_text)
+            live_result = json.loads(live.result_text)
+            if not isinstance(recorded_result, dict) or not isinstance(live_result, dict):
+                raise IntegrityError("revalidation result text must contain objects")
+            comparison = prepared.comparator.compare(recorded_result, live_result)
+            if not isinstance(comparison, RevalidationComparison):
+                raise TypeError("revalidation comparator must return RevalidationComparison")
+            exact_match = recorded.result_text == live.result_text
+            evidence = Node.make(
+                kind=NodeKind.NOTE,
+                parent=live.id,
+                payload=make_revalidation_evidence(
+                    observation_id=prepared.observation_id,
+                    recorded_node_id=recorded.id,
+                    live_node_id=live.id,
+                    recorded_result_digest=recorded.result_digest,
+                    live_result_digest=live.result_digest,
+                    comparator_name=comparator_name,
+                    comparison=comparison,
+                    exact_match=exact_match,
+                    recorded_contract=prepared.recorded_contract,
+                    live_contract=prepared.live_contract,
+                ),
+                meta={"created_at": _now_utc()},
+            )
+            evidence = self._runtime._put(evidence)
+            charges_value = live.meta.get("charges")
+            charges = dict(charges_value) if isinstance(charges_value, dict) else {}
+            return RevalidationReport(
+                observation_id=prepared.observation_id,
+                recorded_node_id=recorded.id,
+                live_node_id=live.id,
+                evidence_node_id=evidence.id,
+                comparator=comparator_name,
+                matched=comparison.matched,
+                exact_match=exact_match,
+                recorded_result_digest=recorded.result_digest,
+                live_result_digest=live.result_digest,
+                difference_paths=comparison.difference_paths,
+                differences_truncated=comparison.truncated,
+                recorded_contract=prepared.recorded_contract,
+                live_contract=prepared.live_contract,
+                charges=charges,
+            )
+        except BaseException as error:
+            cleanup_errors: list[BaseException] = []
+            try:
+                failure = Node.make(
+                    kind=NodeKind.NOTE,
+                    parent=live.id,
+                    payload=make_revalidation_failure_evidence(
+                        observation_id=prepared.observation_id,
+                        recorded_node_id=recorded.id,
+                        live_node_id=live.id,
+                        recorded_result_digest=recorded.result_digest,
+                        live_result_digest=live.result_digest,
+                        comparator_name=comparator_name,
+                        error=error,
+                    ),
+                    meta={"created_at": _now_utc()},
+                )
+                self._runtime._put(failure)
+            except BaseException as cleanup_error:
+                cleanup_errors.append(cleanup_error)
+            _raise_primary(error, cleanup_errors)
+        finally:
+            self.cursor_id = recorded.id
 
     def _record_unknown_outcome(
         self,

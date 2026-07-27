@@ -2,7 +2,7 @@
 
 The examples are runnable programs, not fragments. Run them from the repository
 root with Python 3.10 or newer. Walkthroughs `01` through `08` and `10` through
-`13` use deterministic local functions and temporary or in-memory stores; they
+`14` use deterministic local functions and temporary or in-memory stores; they
 need no API key, cloud account, model download, or network connection.
 Walkthrough `09` is opt-in and contacts only the database or broker selected by
 the operator.
@@ -29,6 +29,7 @@ python -m pip install -e .
 | `11_sensitive_fields.py` | A schema-marked secret reaches its handler but only a deterministic redaction marker reaches the audit tree | None | Plaintext handling and storage checks plus a digest prefix |
 | `12_dry_run_confirmation.py` | A side effect is suppressed during preview and paused for an explicit confirmation token before execution | None | Three lifecycle flags showing preview, pause, and execution |
 | `13_async_workflow.py` | Async model and tool functions share the same governed budget and audit tree | None | Model text, transformed tool text, and settled charges |
+| `14_revalidate_recording.py` | A golden result is compared with a separately stored live observation without changing the recording | None | A structured report whose semantic match is true and exact match is false |
 
 Run them individually:
 
@@ -45,6 +46,7 @@ python examples\10_streaming_replay.py
 python examples\11_sensitive_fields.py
 python examples\12_dry_run_confirmation.py
 python examples\13_async_workflow.py
+python examples\14_revalidate_recording.py
 ```
 
 These commands make no provider request and incur 0 USD of hosted-model spend.
@@ -128,6 +130,15 @@ them.
 `13_async_workflow.py` uses `AsyncRuntime`, `amodel_call`, and `atool_call`
 inside an async context manager. Async execution changes the calling convention,
 not the budget, identity, registry, replay, or audit semantics.
+
+### Live revalidation
+
+`14_revalidate_recording.py` records a result under one caller-declared
+`ReplayContract`, then explicitly executes a deterministic local replacement
+under a newer contract. The normalized comparator treats unchanged text as a
+semantic match while `exact_match` remains false because response identity and
+usage changed. The live result and value-free comparison evidence are new nodes;
+the golden node remains byte-for-byte unchanged.
 
 ## Configured distributed-store walkthrough
 

@@ -7,7 +7,7 @@ from importlib import import_module
 from types import ModuleType
 from typing import TYPE_CHECKING, Any
 
-__version__ = "1.2.0"
+__version__ = "1.3.0"
 
 if TYPE_CHECKING:
     from .aio import AsyncRun, AsyncRuntime
@@ -42,6 +42,14 @@ if TYPE_CHECKING:
     from .redaction import redact
     from .registry import ActionSpec, Registry
     from .replay import ReplayMode
+    from .revalidation import (
+        ExactResultComparator,
+        NormalizedModelComparator,
+        ReplayContract,
+        RevalidationComparator,
+        RevalidationComparison,
+        RevalidationReport,
+    )
     from .runtime import Run, Runtime
     from .seal import SealEntry, SealReport, seal
     from .seal_custody import SealCustodyRecord, SQLiteSealSink
@@ -92,6 +100,15 @@ _EXPORTS = {
     "ReservationLeaseLost": ("pollard.errors", "ReservationLeaseLost"),
     "ReservationUncertain": ("pollard.errors", "ReservationUncertain"),
     "ReplayMode": ("pollard.replay", "ReplayMode"),
+    "ReplayContract": ("pollard.revalidation", "ReplayContract"),
+    "RevalidationComparator": ("pollard.revalidation", "RevalidationComparator"),
+    "RevalidationComparison": ("pollard.revalidation", "RevalidationComparison"),
+    "RevalidationReport": ("pollard.revalidation", "RevalidationReport"),
+    "ExactResultComparator": ("pollard.revalidation", "ExactResultComparator"),
+    "NormalizedModelComparator": (
+        "pollard.revalidation",
+        "NormalizedModelComparator",
+    ),
     "Run": ("pollard.runtime", "Run"),
     "Runtime": ("pollard.runtime", "Runtime"),
     "SealEntry": ("pollard.seal", "SealEntry"),
@@ -131,6 +148,7 @@ __all__ = [
     "CallCleanupError",
     "ConfirmationRequired",
     "Decision",
+    "ExactResultComparator",
     "ExportReport",
     "GCReport",
     "HashRopeStore",
@@ -144,6 +162,7 @@ __all__ = [
     "Neo4jStore",
     "Node",
     "NodeKind",
+    "NormalizedModelComparator",
     "Policy",
     "PolicyContext",
     "PolicyViolation",
@@ -152,9 +171,13 @@ __all__ = [
     "PostgresStore",
     "RedisStore",
     "Registry",
+    "ReplayContract",
     "ReplayMode",
     "ReservationLeaseLost",
     "ReservationUncertain",
+    "RevalidationComparator",
+    "RevalidationComparison",
+    "RevalidationReport",
     "Run",
     "Runtime",
     "SQLiteSealSink",
