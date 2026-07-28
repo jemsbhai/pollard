@@ -6,6 +6,13 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 
 ## [Unreleased]
 
+### Added
+
+- Add end-to-end LangChain incident-response and support-policy RAG, Pydantic
+  refund, and pydantic-ai claim-triage recipes with deterministic offline
+  execution, SQLite recording, and strict replay. Both LangChain recipes and
+  the pydantic-ai recipe also provide an explicit OpenAI-backed `--live` mode.
+
 ## [1.3.0] - 2026-07-27
 
 ### Added

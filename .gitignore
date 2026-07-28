@@ -20,6 +20,10 @@ runs.db
 openai-tool-loop.db
 anthropic-tool-loop.db
 langgraph-node.db
+langchain-support-rag.db
+langchain-incident.db
+pydantic-refund.db
+pydantic-ai-claim.db
 pydantic-ai.db
 mcp-registry.db
 *.db-wal

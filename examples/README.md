@@ -13,6 +13,13 @@ Install the local checkout before running them:
 python -m pip install -e .
 ```
 
+Framework-specific workflows live in the
+[integration recipe index](https://github.com/jemsbhai/pollard/blob/main/docs/recipes/README.md).
+The LangChain incident-response, LangChain support-policy RAG, Pydantic refund,
+and pydantic-ai claim-triage recipes have deterministic offline defaults and
+persistent SQLite recordings. They use optional installation extras so the
+Pollard core remains dependency-free.
+
 ## Quick offline walkthroughs
 
 | Script | What it proves | Persistent files | Expected result |
@@ -289,10 +296,24 @@ before replacing a committed result. The research synthesis is model-generated.
 The code-fix and household candidate controllers are deterministic with model
 review; those artifacts do not prove autonomous candidate invention.
 
-## Live providers and frameworks
+## Provider and framework recipes
 
+Four end-to-end workflow recipes run locally without a credential or network
+connection:
+
+- `langchain_support_rag.py` records and replays local return-policy retrieval
+  followed by a typed support answer.
+- `langchain_incident_response.py` records and replays typed incident triage
+  through LangChain.
+- `pydantic_refund_workflow.py` previews, confirms, records, and strictly
+  replays a schema-driven refund without a second side effect.
+- `pydantic_ai_claim_triage.py` records and replays typed claim triage through
+  pydantic-ai's deterministic test path.
+
+The two LangChain scripts and the pydantic-ai script accept `--live` for an
+explicit OpenAI-backed run. The Pydantic refund script has no live mode.
 OpenAI, Anthropic, Azure OpenAI, Amazon Bedrock, other LiteLLM cloud routes,
-LangGraph, pydantic-ai, and MCP have separate, opt-in
+LangGraph, and MCP also have separate
 [integration recipes](https://github.com/jemsbhai/pollard/blob/main/docs/recipes/README.md).
-Those provider recipes can incur charges and are never part of offline example
-or CI execution.
+Any provider-backed path can incur charges; read its safety and cost contract
+before running it.
