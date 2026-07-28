@@ -86,7 +86,9 @@ Install only the integrations used by the application:
 | Amazon Bedrock | `pollard[bedrock]` | Converse and ConverseStream, optional CountTokens precheck |
 | Other cloud providers | `pollard[litellm]` | LiteLLM chat routes for Vertex AI, Azure AI, SageMaker, OCI, Watsonx, Databricks, and others |
 | LangGraph | `pollard[langgraph]` | OpenAI-backed LangGraph node integration recipe |
-| pydantic-ai | `pollard[pydantic-ai]` | One complete agent run recorded as a Pollard step |
+| LangChain | `pollard[langchain]` | Offline incident-response and support-policy RAG workflows with typed output and replay; optional OpenAI live modes |
+| Pydantic models | `pollard[pydantic]` | Model-generated registry schema with dry-run, confirmation, redaction, and replay |
+| pydantic-ai | `pollard[pydantic-ai]` | Typed claim agent with governed model requests and registered tool execution |
 | MCP | `pollard[mcp]` | Discover MCP tools and expose them through a Pollard registry |
 | Shared PostgreSQL store | `pollard[pg]` | Transactional multi-process and multi-host coordination |
 | Shared Redis store | `pollard[redis]` | Exact shared coordination with Redis persistence and no-eviction prerequisites |
@@ -105,6 +107,10 @@ credential chain of its caller-owned SDK. The complete provider, endpoint,
 model, IAM, cost, and data-retention boundaries are in
 [Cloud-hosted model providers](https://github.com/jemsbhai/pollard/blob/main/docs/cloud-providers.md)
 and the runnable [integration recipes](https://github.com/jemsbhai/pollard/blob/main/docs/recipes/README.md).
+The LangChain incident-response, LangChain support-policy RAG, Pydantic refund,
+and pydantic-ai claim-triage recipes use deterministic local paths by default.
+Only an explicit `--live` flag on either LangChain recipe or the pydantic-ai
+recipe enables hosted inference.
 
 ## Offline Mock Demo
 

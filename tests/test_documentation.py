@@ -9,6 +9,20 @@ from pathlib import Path
 import pollard
 
 ROOT = Path(__file__).resolve().parents[1]
+EXPECTED_RECIPES = {
+    "anthropic_tool_loop.py",
+    "azure_openai.py",
+    "bedrock_converse.py",
+    "langchain_incident_response.py",
+    "langchain_support_rag.py",
+    "langgraph_node.py",
+    "litellm_cloud.py",
+    "mcp_registry.py",
+    "openai_tool_loop.py",
+    "pydantic_ai_claim_triage.py",
+    "pydantic_ai_wrap.py",
+    "pydantic_refund_workflow.py",
+}
 
 
 def test_github_workflows_cannot_publish() -> None:
@@ -94,7 +108,7 @@ def test_recipe_index_and_offline_help_cover_every_recipe() -> None:
     recipe_dir = ROOT / "docs" / "recipes"
     index = (recipe_dir / "README.md").read_text(encoding="utf-8")
     scripts = sorted(recipe_dir.glob("*.py"))
-    assert len(scripts) == 8
+    assert {script.name for script in scripts} == EXPECTED_RECIPES
     for script in scripts:
         assert script.name in index
         tree = ast.parse(script.read_text(encoding="utf-8"), filename=str(script))

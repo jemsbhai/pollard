@@ -5,12 +5,26 @@ from pathlib import Path
 from pollard import SQLiteStore, verify
 
 ROOT = Path(__file__).parents[1]
+EXPECTED_RECIPES = {
+    "anthropic_tool_loop.py",
+    "azure_openai.py",
+    "bedrock_converse.py",
+    "langchain_incident_response.py",
+    "langchain_support_rag.py",
+    "langgraph_node.py",
+    "litellm_cloud.py",
+    "mcp_registry.py",
+    "openai_tool_loop.py",
+    "pydantic_ai_claim_triage.py",
+    "pydantic_ai_wrap.py",
+    "pydantic_refund_workflow.py",
+}
 
 
 def test_recipe_scripts_compile() -> None:
     recipe_dir = ROOT / "docs" / "recipes"
     scripts = sorted(recipe_dir.glob("*.py"))
-    assert len(scripts) == 8
+    assert {script.name for script in scripts} == EXPECTED_RECIPES
     for script in scripts:
         compile(script.read_text(encoding="utf-8"), str(script), "exec")
 
