@@ -41,9 +41,82 @@ timeout policy. Prefer a discoverable multi-host or `mongodb+srv` URI in
 production. `directConnection=true` is intended for isolated development
 topologies and disables normal member discovery.
 
-The constructor confirms a replica set or mongos response, opens
-`<prefix>_records` and `<prefix>_coordinators`, and creates the unique
-record index. It then initializes or validates Pollard schema version 1.
+With the default `create=True`, the constructor confirms a replica set or
+mongos response and classifies the exact logical namespace before writing.
+For a fresh namespace it creates or validates the unique record index, then
+initializes schema version 1 and the coordinator identity/revision in one
+MongoDB transaction. Index DDL is a separate physical operation and is not
+part of that logical transaction; an empty records collection and index can
+remain if later initialization fails. A retry may reuse that unambiguous empty
+shell. Schema-only, coordinator-only, data-without-schema, malformed
+coordinator, and incompatible-index states fail closed without repair.
+
+Pass `create=False` to validate the topology, schema, coordinator, and unique
+record index without creating collections, indexes, coordinator state, or
+schema records. Reconnect always uses this non-mutating validation path.
+
+## CLI Access And Merge Destinations
+
+The CLI accepts MongoDB only through an environment-backed URI specification:
+
+```powershell
+$env:POLLARD_MONGODB_URI = "mongodb://pollard_app:password@db-a.example,db-b.example,db-c.example/pollard?replicaSet=rs0&tls=true&retryWrites=true&timeoutMS=10000"
+$mongoStore = "mongo-env:POLLARD_MONGODB_URI?database=pollard&prefix=pollard#support-prod"
+pollard runs $mongoStore --json
+pollard show $mongoStore <root-id>
+pollard report $mongoStore <root-id> --json
+pollard verify $mongoStore --json
+pollard seal $mongoStore <root-id> --output seal.json --json
+pollard export $mongoStore <root-id> subtree.json --json
+pollard merge combined.db $mongoStore --json
+pollard merge $mongoStore local-recording.db --json
+$mongoArchive = "mongo-env:POLLARD_MONGODB_URI?database=pollard_archive&prefix=pollard_import#archive-2026-07"
+pollard merge $mongoArchive local-recording.db --initialize-if-missing --json
+```
+
+The grammar is
+`mongo-env:VARIABLE?database=DATABASE&prefix=PREFIX#store-id`. Database,
+collection prefix, and store id default to `pollard`, `pollard`, and `default`
+for sources. A mutating destination must explicitly provide all three; the
+database is not inferred from the URI path. CLI output uses the
+environment-variable name and selector values, never the URI. Direct
+`mongodb://` and `mongodb+srv://`
+arguments are rejected because a URI on the command line can expose credentials
+to process inspection and shell history.
+
+Sources and ordinary destinations construct `MongoStore(create=False)`. An
+unused or mistyped database/prefix/store-id combination therefore fails closed
+without creating collections, indexes, coordinator state, or schema records.
+`--initialize-if-missing` is the only explicit opt-in to a new destination.
+Pollard may validate the destination selector and flag combination first, but
+does not read its environment value or construct a client. It fully traverses
+and validates every source into a private disk-backed spool, closes each source,
+and validates all finalized spools before resolving the destination environment
+variable or constructing its client. Topology validation still requires a
+replica set or mongos.
+
+MongoDB is supported as an observational/read source for `show`, `report`,
+`verify`, `seal`, `export`, and `runs`, and as a `merge` source or destination.
+`import` and `gc` remain SQLite-only. Each individual read uses a snapshot
+transaction, but a CLI traversal spans multiple transactions and is not one
+point-in-time snapshot. Destination application is also node-by-node rather
+than one all-node transaction. Quiesce both source and destination writers;
+after success or partial failure, repeat the exact merge if needed, run
+`verify`, and seal required roots. Exact reruns are idempotent, but concurrent
+destination writers can race merge-metadata updates. Prepared plans for all
+sources are retained as private disk-backed spools rather than in aggregate
+RAM. Temporary disk must hold all prepared data. Spools contain full node
+content and cleanup is attempted on every exit. Cleanup failure can leave
+private artifacts and makes an otherwise successful command fail; combined
+failures preserve their primary attribution and add a fixed cleanup notice.
+Creation, serialization, disk-write, finalization, corruption, and truncation
+fail before destination access. Cleanup failure after application does not roll
+back accepted MongoDB writes.
+
+This CLI path constructs an ordinary URI-backed PyMongo client. Use the Python
+API when the deployment requires a caller-owned Stable API object, CA file,
+compressors, application name, timeout policy, or another option that cannot be
+represented in the URI.
 
 ## Authentication And Least Privilege
 
@@ -52,11 +125,17 @@ environment, not in a Pollard payload or committed URI. Require TLS and verify
 the server certificate. Scope the database user to the selected database and
 collections.
 
-The application role needs collection creation on first use when the
+The application or initializing CLI role needs collection creation on first use when the
 collections do not exist, index creation for `<prefix>_records`, and find,
 insert, update, and remove access on both Pollard collections. An administrator
 can create the collections and unique index first, after which the application
 role can omit schema-creation privileges.
+
+An observational or existing-only CLI role needs connection and
+transaction-session access, `find` on both Pollard collections, and permission
+to list indexes on `<prefix>_records`. Existing-only construction does not call
+`createIndex` and does not write coordinator or schema state. Normal
+destination merging additionally needs insert and update access.
 
 `store_id` is logical record isolation, not authorization. Use separate
 databases, users, encryption keys, and network policies when tenants require an
@@ -81,11 +160,12 @@ absent.
 
 ## Reconnect And Topology Change
 
-`reconnect()` builds a replacement MongoClient, confirms the topology,
-creates or checks the index, and validates the existing Pollard schema before
-closing the previous client. If replacement validation fails, the prior
-validated client remains installed. Do not invoke reconnect concurrently on
-the same store object.
+`reconnect()` builds a replacement MongoClient, confirms the topology, and
+validates the existing Pollard schema, coordinator, and exact unique index
+before closing the previous client. It never creates or repairs them, even
+when the object was originally opened with `create=True`. If replacement validation
+fails, the prior validated client remains installed. Do not invoke reconnect
+concurrently on the same store object.
 
 A successful reconnect does not prove that every replica contains the latest
 acknowledged write. Use majority write concern, monitor majority commit lag,

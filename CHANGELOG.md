@@ -6,12 +6,117 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-07-30
+
 ### Added
 
 - Add end-to-end LangChain incident-response and support-policy RAG, Pydantic
   refund, and pydantic-ai claim-triage recipes with deterministic offline
   execution, SQLite recording, and strict replay. Both LangChain recipes and
   the pydantic-ai recipe also provide an explicit OpenAI-backed `--live` mode.
+- Accept non-empty JSON Schema `anyOf` arrays whose branches use Pollard's
+  existing zero-dependency schema subset, including Pydantic nullable unions.
+- Accept integer `minimum`, `maximum`, `exclusiveMinimum`, and
+  `exclusiveMaximum` bounds, nonnegative string `minLength` and `maxLength`
+  constraints, and nonnegative array `minItems` and `maxItems` constraints.
+- Allow `pollard show`, `report`, `verify`, `seal`, and `export` to accept
+  PostgreSQL store specifications and credential-safe `pg-env:` references
+  while keeping `import` and `gc` SQLite-only.
+- Add credential-safe `redis-env:VARIABLE?prefix=PREFIX#store-id` sources for
+  `show`, `report`, `verify`, `seal`, `export`, `runs`, and merge input, plus
+  Redis merge destinations. Sources and ordinary destinations require an
+  existing logical namespace. Redis destinations require an explicit prefix
+  and store id; `--initialize-if-missing` is the only opt-in to atomically
+  initialize a missing `redis-env:` destination after every source has been
+  fully traversed, validated, and finalized into private disk-backed preparation.
+  Direct `redis://` and `rediss://`
+  arguments remain legacy source-only forms and are rejected as destinations.
+  Malformed percent escapes, ambiguous whitespace selectors, and Redis URL
+  overrides of Pollard's text-decoding settings fail before client creation.
+  Redis merge is idempotent on an exact rerun but is not a cross-node or
+  cross-backend transaction. `import` and `gc` remain SQLite-only.
+- Add environment-backed
+  `mongo-env:VARIABLE?database=DATABASE&prefix=PREFIX#store-id` sources for
+  `show`, `report`, `verify`, `seal`, `export`, `runs`, and merge input, plus
+  MongoDB merge destinations. Destinations are accepted only through
+  `mongo-env:`, require an explicit database, collection prefix, and store id,
+  and are existing-only by default. `--initialize-if-missing` explicitly
+  initializes a fresh logical namespace after every source has been fully
+  traversed. Direct MongoDB URI arguments remain rejected. Existing-only
+  access performs no writes or index creation; missing, partial, ambiguous, or
+  incompatibly indexed namespaces fail closed without implicit repair. Merge
+  application is node-by-node and non-atomic, while an exact rerun is
+  idempotent. `import` and `gc` remain SQLite-only.
+- Add basic-auth
+  `neo4j-env:URI_VAR?user-env=USER_VAR&password-env=PASSWORD_VAR&database=DB#store-id`
+  sources for `show`, `report`, `verify`, `seal`, `export`, `runs`, and merge
+  input, plus Neo4j merge destinations. Destinations are accepted only through
+  `neo4j-env:`, require explicit URI, user, and password environment references,
+  database, and store id, and are existing-only by default. Direct Neo4j and
+  Bolt URI arguments remain rejected. `--initialize-if-missing` opts into a
+  fresh logical namespace only after every source has been spooled and validated.
+  Existing-only access validates the exact schema, coordinator, two shared
+  global constraints, and their owned online range indexes without writing or
+  issuing constraint DDL. Fresh setup
+  creates both database-wide constraints in one schema transaction, or
+  validates their exact existing state, outside the logical transaction, then
+  initializes schema and coordinator together in one
+  transaction. Partial or ambiguous logical state and partial, incompatible, or
+  offline constraint/index state fail closed without implicit repair. Merge
+  application is node-by-node and
+  non-atomic, while an exact rerun is idempotent. `import` and `gc` remain
+  SQLite-only.
+- Add environment-backed
+  `kafka-env:CONFIG_VAR?topic=TOPIC&timeout=SECONDS#store-id` sources for
+  `show`, `report`, `verify`, `seal`, `export`, `runs`, and merge input, plus
+  narrow Kafka merge destinations. Destinations require an explicit
+  configuration reference, topic, and store id, and accept only an existing
+  populated topic whose fully replayed history proves that identity. Missing,
+  empty, wrong-identity, corrupt, truncated, or incompatibly configured topics
+  fail before producer construction and publish nothing. Direct `kafka://`
+  broker specifications remain refused. Pollard never creates topics, and
+  `--initialize-if-missing` remains invalid for Kafka. Read-only construction
+  creates no producer and freezes one fully replayed topic prefix at its
+  construction-time high watermark; writable CLI construction creates the
+  producer only after topic, configuration, history, and prefix validation.
+  Source preparation and spool validation finish before destination
+  configuration lookup or access. Destination application is append-by-append
+  and irreversible rather
+  than atomic, while an exact rerun publishes no new events. Kafka remains
+  neither an import nor a garbage-collection target and still provides no
+  shared budget arbitration or record-level GC.
+
+### Changed
+
+- Bound aggregate CLI merge preparation memory by serializing each fully
+  traversed and validated source, in deterministic order, into a unique private
+  SQLite spool. Every spool is finalized and independently validated before the
+  CLI reads destination environment values, constructs a destination client,
+  initializes a namespace, or writes. Spools preserve exact node fields and
+  per-source ordering, and cleanup is attempted on every exit. A cleanup failure
+  can leave private artifacts and makes an otherwise successful command fail;
+  combined failures preserve the primary attribution and add a fixed cleanup
+  notice. Creation, serialization, disk-write, finalization, corruption, and
+  truncation fail closed before destination access. Destination application
+  remains node-by-node and non-atomic; exact reruns remain idempotent.
+
+### Fixed
+
+- Make Kafka reconnect and post-acknowledgement replay repair failure-atomic,
+  close rejected replacement clients, and reject a changed prior record prefix.
+- Keep a malformed Kafka command from poisoning an exact-offset replay retry.
+- Fully traverse and materialize every CLI merge source before opening the
+  destination so an invalid or unreadable source cannot leave an explicitly
+  initialized Redis, MongoDB, or Neo4j destination behind, construct a Kafka
+  producer, or publish a Kafka event.
+- Make MongoDB reconnect and ordinary writes validate an existing exact
+  coordinator and unique record index instead of recreating missing state.
+  Fresh schema and coordinator revision state initialize in one MongoDB
+  transaction; collection/index setup remains a separate physical operation.
+- Make Neo4j reconnect and ordinary writes validate an existing exact
+  coordinator and both required uniqueness constraints instead of repairing
+  missing state. Reconnect performs read-only validation even when the store
+  was originally opened with `create=True`.
 
 ## [1.3.0] - 2026-07-27
 

@@ -20,7 +20,16 @@ _SUPPORTED_KEYS = {
     "properties",
     "required",
     "enum",
+    "anyOf",
     "items",
+    "minimum",
+    "maximum",
+    "exclusiveMinimum",
+    "exclusiveMaximum",
+    "minLength",
+    "maxLength",
+    "minItems",
+    "maxItems",
     "additionalProperties",
     "title",
     "description",
@@ -143,8 +152,46 @@ def _check_schema(schema: IdentityValue, path: str) -> None:
             if item_bytes in encoded:
                 raise UnsupportedSchema(f"{path}.enum: values must be unique")
             encoded.add(item_bytes)
+    any_of = schema.get("anyOf")
+    if any_of is not None:
+        if not isinstance(any_of, list) or not any_of:
+            raise UnsupportedSchema(
+                f"{path}.anyOf: must be a non-empty list of schemas"
+            )
+        for index, child_schema in enumerate(any_of):
+            _check_schema(child_schema, f"{path}.anyOf[{index}]")
     if "items" in schema:
         _check_schema(schema["items"], f"{path}.items")
+    for keyword in (
+        "minimum",
+        "maximum",
+        "exclusiveMinimum",
+        "exclusiveMaximum",
+    ):
+        if keyword in schema:
+            _check_constraint(
+                schema[keyword],
+                keyword=keyword,
+                path=path,
+                schema_type=schema_type,
+                required_type="integer",
+                nonnegative=False,
+            )
+    for keyword, required_type in (
+        ("minLength", "string"),
+        ("maxLength", "string"),
+        ("minItems", "array"),
+        ("maxItems", "array"),
+    ):
+        if keyword in schema:
+            _check_constraint(
+                schema[keyword],
+                keyword=keyword,
+                path=path,
+                schema_type=schema_type,
+                required_type=required_type,
+                nonnegative=True,
+            )
     additional = schema.get("additionalProperties")
     if additional is not None and not isinstance(additional, bool):
         raise UnsupportedSchema(f"{path}.additionalProperties: must be a boolean")
@@ -155,7 +202,7 @@ def _check_schema(schema: IdentityValue, path: str) -> None:
     sensitive = schema.get("sensitive")
     if sensitive is not None and not isinstance(sensitive, bool):
         raise UnsupportedSchema(f"{path}.sensitive: must be a boolean")
-    if sensitive is True and schema_type != "string":
+    if sensitive is True and not _is_sensitive_string_schema(schema):
         raise UnsupportedSchema(f"{path}.sensitive: only string fields may be sensitive")
     canonical_bytes(schema)
 
@@ -166,14 +213,28 @@ def _redact_sensitive(
 ) -> IdentityValue:
     if schema.get("sensitive") is True and isinstance(value, str):
         return redact(value)
+    any_of = schema.get("anyOf")
+    if isinstance(any_of, list):
+        branches = [
+            branch_schema
+            for branch_schema in any_of
+            if isinstance(branch_schema, dict)
+        ]
+        matching = [
+            branch_schema
+            for branch_schema in branches
+            if _validate_value(value, branch_schema, "$") is None
+        ]
+        for branch_schema in matching or branches:
+            value = _redact_sensitive(value, branch_schema)
     if isinstance(value, dict):
         properties = schema.get("properties")
         if not isinstance(properties, dict):
             return value
         result = dict(value)
-        for name, child_schema in properties.items():
-            if name in result and isinstance(child_schema, dict):
-                result[name] = _redact_sensitive(result[name], child_schema)
+        for name, property_schema in properties.items():
+            if name in result and isinstance(property_schema, dict):
+                result[name] = _redact_sensitive(result[name], property_schema)
         return result
     if isinstance(value, list):
         item_schema = schema.get("items")
@@ -193,6 +254,29 @@ def _validate_value(
     enum = schema.get("enum")
     if isinstance(enum, list) and not any(_json_equal(value, item) for item in enum):
         return f"{path}: value not in enum"
+    any_of = schema.get("anyOf")
+    if isinstance(any_of, list) and not any(
+        isinstance(child_schema, dict)
+        and _validate_value(value, child_schema, path) is None
+        for child_schema in any_of
+    ):
+        return f"{path}: value does not match anyOf"
+    if expected_type == "integer" and isinstance(value, int) and not isinstance(value, bool):
+        finding = _validate_integer_bounds(value, schema, path)
+        if finding is not None:
+            return finding
+    if expected_type == "string" and isinstance(value, str):
+        finding = _validate_length(
+            value, schema, path, "minLength", "maxLength", "length"
+        )
+        if finding is not None:
+            return finding
+    if expected_type == "array" and isinstance(value, list):
+        finding = _validate_length(
+            value, schema, path, "minItems", "maxItems", "item count"
+        )
+        if finding is not None:
+            return finding
     if expected_type == "object" or (
         expected_type is None
         and (
@@ -249,3 +333,85 @@ def _matches_type(value: IdentityValue, expected: str) -> bool:
 
 def _json_equal(left: IdentityValue, right: IdentityValue) -> bool:
     return canonical_bytes(left) == canonical_bytes(right)
+
+
+def _check_constraint(
+    value: IdentityValue,
+    *,
+    keyword: str,
+    path: str,
+    schema_type: IdentityValue,
+    required_type: str,
+    nonnegative: bool,
+) -> None:
+    if schema_type != required_type:
+        raise UnsupportedSchema(
+            f"{path}.{keyword}: requires type {required_type!r}"
+        )
+    if isinstance(value, bool) or not isinstance(value, int):
+        raise UnsupportedSchema(f"{path}.{keyword}: must be an integer")
+    if nonnegative and value < 0:
+        raise UnsupportedSchema(f"{path}.{keyword}: must be nonnegative")
+
+
+def _validate_integer_bounds(
+    value: int,
+    schema: dict[str, IdentityValue],
+    path: str,
+) -> str | None:
+    minimum = schema.get("minimum")
+    if isinstance(minimum, int) and not isinstance(minimum, bool) and value < minimum:
+        return f"{path}: value must be at least {minimum}"
+    maximum = schema.get("maximum")
+    if isinstance(maximum, int) and not isinstance(maximum, bool) and value > maximum:
+        return f"{path}: value must be at most {maximum}"
+    exclusive_minimum = schema.get("exclusiveMinimum")
+    if (
+        isinstance(exclusive_minimum, int)
+        and not isinstance(exclusive_minimum, bool)
+        and value <= exclusive_minimum
+    ):
+        return f"{path}: value must be greater than {exclusive_minimum}"
+    exclusive_maximum = schema.get("exclusiveMaximum")
+    if (
+        isinstance(exclusive_maximum, int)
+        and not isinstance(exclusive_maximum, bool)
+        and value >= exclusive_maximum
+    ):
+        return f"{path}: value must be less than {exclusive_maximum}"
+    return None
+
+
+def _validate_length(
+    value: str | list[IdentityValue],
+    schema: dict[str, IdentityValue],
+    path: str,
+    minimum_keyword: str,
+    maximum_keyword: str,
+    measure: str,
+) -> str | None:
+    minimum = schema.get(minimum_keyword)
+    if isinstance(minimum, int) and not isinstance(minimum, bool) and len(value) < minimum:
+        return f"{path}: {measure} must be at least {minimum}"
+    maximum = schema.get(maximum_keyword)
+    if isinstance(maximum, int) and not isinstance(maximum, bool) and len(value) > maximum:
+        return f"{path}: {measure} must be at most {maximum}"
+    return None
+
+
+def _is_sensitive_string_schema(schema: dict[str, IdentityValue]) -> bool:
+    schema_type = schema.get("type")
+    if schema_type == "string":
+        return True
+    any_of = schema.get("anyOf")
+    if not isinstance(any_of, list) or not any_of:
+        return False
+    branch_types: set[str] = set()
+    for child_schema in any_of:
+        if not isinstance(child_schema, dict):
+            return False
+        child_type = child_schema.get("type")
+        if not isinstance(child_type, str):
+            return False
+        branch_types.add(child_type)
+    return "string" in branch_types and branch_types <= {"string", "null"}

@@ -23,6 +23,26 @@ content-free CLI and HTML defaults prevent accidental display, but they do not
 change what is at rest. `--payloads` displays every non-redacted payload and
 result value.
 
+## Merge Preparation Spools
+
+The CLI's multi-source merge preparation writes each fully traversed and
+validated source to a uniquely named SQLite spool in a private operating-system
+temporary directory. This bounds aggregate preparation RAM, but the spools
+contain the exact retained node payloads, results, and metadata. They are
+internal preparation artifacts, not redacted exports, backups, or independent
+evidence.
+
+Pollard requests private directory and file permissions, never chooses a
+caller-supplied output path, and closes handles before removal for Windows
+compatibility. It attempts to remove the entire private directory on every exit,
+including source, destination-constructor, and destination-body failure.
+Cleanup failure can leave sensitive private artifacts and makes an otherwise
+successful command fail. With another failure, Pollard preserves its primary
+source or destination attribution and adds a fixed cleanup notice. Restrict and
+monitor the operating system's temporary storage, provision enough capacity for
+all prepared sources, and promptly secure and remove any residual directory
+reported after cleanup failure.
+
 ## Interning Is Not Redaction
 
 `SQLiteStore` and `PostgresStore` intern payload string leaves whose UTF-8 form
@@ -162,6 +182,13 @@ an exported seal digest in an independently controlled record when later
 tamper detection matters. A detached subtree whose root has an external parent
 can be imported only when the target already contains that parent.
 
+For a Kafka CLI source, export uses the observer's frozen high-watermark prefix
+and projects its materialized Pollard subtree. The file does not preserve the
+Kafka topic, configuration, offsets, command ordering, operation ids, duplicate
+events, or metadata-patch history, so it is not a Kafka backup. Treat the file
+as sensitive: unlike default `show` output, it includes retained payload,
+result, and metadata content.
+
 ## Operator Checklist
 
 - Classify payload, result, and metadata fields before recording production
@@ -170,9 +197,13 @@ can be imported only when the target already contains that parent.
   for audit.
 - Keep secrets out of results, metadata, labels, run names, and redaction hints.
 - Restrict filesystem and database access independently of Pollard.
+- Apply the same retention and access controls to the operating system's
+  temporary directory used by CLI merge preparation, and investigate any
+  reported spool cleanup failure.
 - Define a retention period. For record-deletable stores, schedule explicit
-  `drop-pruned` and `compact` operations. For Kafka, govern retention and
-  deletion at the dedicated-topic level; use another backend when selective
-  node erasure is required.
+  `drop-pruned` and `compact` operations. For Kafka, keep the required infinite
+  retention while the store is active and govern whole-store deletion at the
+  dedicated-topic level; use another backend when selective node erasure is
+  required.
 - Save export seal digests outside the exported file when independent evidence
   is required.

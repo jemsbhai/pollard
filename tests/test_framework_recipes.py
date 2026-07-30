@@ -226,6 +226,7 @@ def test_pydantic_refund_preview_approval_redaction_and_replay(
     assert document["framework"] == "pydantic"
     assert document["schema_generated_from_model"] is True
     assert document["local_refs_resolved"] is True
+    assert document["schema_constraints_registered"] is True
     assert document["preview"] == {
         "dry_run": True,
         "handler_executed": False,

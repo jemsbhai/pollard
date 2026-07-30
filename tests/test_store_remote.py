@@ -187,6 +187,28 @@ def test_redis_requires_noeviction_and_refuses_future_schema() -> None:
 @pytest.mark.skipif(
     not os.environ.get("POLLARD_TEST_REDIS_URL"), reason="Redis is not configured"
 )
+def test_redis_create_false_rejects_missing_namespace_without_writes() -> None:
+    from redis import Redis
+
+    url = os.environ["POLLARD_TEST_REDIS_URL"]
+    client = Redis.from_url(url, decode_responses=True)
+    before = client.dbsize()
+    try:
+        with pytest.raises(IntegrityError, match="identity is missing"):
+            RedisStore(
+                url,
+                store_id=f"missing-{uuid4().hex}",
+                prefix=f"pollard-read-only-{uuid4().hex}",
+                create=False,
+            )
+        assert client.dbsize() == before
+    finally:
+        client.close()
+
+
+@pytest.mark.skipif(
+    not os.environ.get("POLLARD_TEST_REDIS_URL"), reason="Redis is not configured"
+)
 def test_redis_caller_owned_client_factory_reconnects() -> None:
     from redis import Redis
 
@@ -229,6 +251,42 @@ def test_mongodb_refuses_future_schema() -> None:
 
 
 @pytest.mark.skipif(
+    not os.environ.get("POLLARD_TEST_MONGODB_URI"), reason="MongoDB is not configured"
+)
+def test_mongodb_create_false_missing_namespace_has_no_side_effects() -> None:
+    from pymongo import MongoClient
+
+    uri = os.environ["POLLARD_TEST_MONGODB_URI"]
+    database = os.environ.get(
+        "POLLARD_TEST_MONGODB_DATABASE",
+        "pollard_test",
+    )
+    unique = uuid4().hex
+    collection_prefix = f"pollard_missing_{unique}"
+    client = MongoClient(uri)
+    selected = client[database]
+    before_databases = set(client.list_database_names())
+    before_collections = set(selected.list_collection_names())
+
+    try:
+        with pytest.raises(IntegrityError, match="schema version: missing"):
+            MongoStore(
+                uri,
+                database=database,
+                store_id=f"missing-{unique}",
+                collection_prefix=collection_prefix,
+                create=False,
+            )
+
+        assert set(client.list_database_names()) == before_databases
+        assert set(selected.list_collection_names()) == before_collections
+        assert f"{collection_prefix}_records" not in before_collections
+        assert f"{collection_prefix}_coordinators" not in before_collections
+    finally:
+        client.close()
+
+
+@pytest.mark.skipif(
     not os.environ.get("POLLARD_TEST_NEO4J_URI"), reason="Neo4j is not configured"
 )
 def test_neo4j_refuses_future_schema() -> None:
@@ -248,3 +306,72 @@ def test_neo4j_refuses_future_schema() -> None:
             store.reconnect()
     finally:
         store.close()
+
+
+@pytest.mark.skipif(
+    not (
+        os.environ.get("POLLARD_TEST_NEO4J_URI")
+        and os.environ.get("POLLARD_TEST_NEO4J_PASSWORD")
+    ),
+    reason="Neo4j is not configured",
+)
+def test_neo4j_create_false_missing_namespace_has_no_side_effects() -> None:
+    from neo4j import GraphDatabase
+
+    uri = os.environ["POLLARD_TEST_NEO4J_URI"]
+    auth = (
+        os.environ.get("POLLARD_TEST_NEO4J_USER", "neo4j"),
+        os.environ["POLLARD_TEST_NEO4J_PASSWORD"],
+    )
+    database = os.environ.get("POLLARD_TEST_NEO4J_DATABASE", "neo4j")
+    store_id = f"missing-{uuid4().hex}"
+    driver = GraphDatabase.driver(uri, auth=auth)
+
+    def snapshot() -> tuple[int, tuple[dict[str, object], ...]]:
+        with driver.session(database=database) as session:
+            count_record = session.run(
+                """
+                MATCH (node)
+                WHERE node.store_id = $store_id
+                RETURN count(node) AS node_count
+                """,
+                store_id=store_id,
+            ).single()
+            assert count_record is not None
+            constraints = tuple(
+                record.data()
+                for record in session.run(
+                    """
+                    SHOW CONSTRAINTS
+                    YIELD name, type, entityType, labelsOrTypes, properties
+                    RETURN name, type, entityType, labelsOrTypes, properties
+                    ORDER BY name
+                    """
+                )
+            )
+            return count_record["node_count"], constraints
+
+    before = snapshot()
+    assert before[0] == 0
+    try:
+        with pytest.raises(IntegrityError, match="schema version: missing"):
+            Neo4jStore(
+                uri,
+                auth,
+                database=database,
+                store_id=store_id,
+                create=False,
+            )
+
+        assert snapshot() == before
+    finally:
+        with driver.session(database=database) as session:
+            session.run(
+                """
+                MATCH (node)
+                WHERE node.store_id = $store_id
+                DETACH DELETE node
+                """,
+                store_id=store_id,
+            ).consume()
+        driver.close()

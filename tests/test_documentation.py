@@ -63,7 +63,9 @@ def test_release_runbook_declares_local_only_production_upload() -> None:
     assert all(text in runbook for text in required)
 
 
-def test_built_wheel_exposes_standalone_author_for_pepy(tmp_path: Path) -> None:
+def test_built_wheel_exposes_consistent_version_and_author_metadata(
+    tmp_path: Path,
+) -> None:
     subprocess.run(
         [
             sys.executable,
@@ -86,8 +88,56 @@ def test_built_wheel_exposes_standalone_author_for_pepy(tmp_path: Path) -> None:
         )
         metadata = BytesParser(policy=default).parsebytes(archive.read(metadata_path))
 
+    try:
+        import tomllib
+    except ModuleNotFoundError:
+        import tomli as tomllib  # type: ignore[no-redef]
+
+    with (ROOT / "pyproject.toml").open("rb") as project_file:
+        project_version = tomllib.load(project_file)["project"]["version"]
+
+    assert project_version == pollard.__version__
+    assert metadata["Version"] == project_version
     assert metadata["Author"] == "Muntaser Syed"
     assert metadata["Maintainer-Email"] == "Muntaser Syed <jemsbhai@gmail.com>"
+
+    installed = tmp_path / "installed"
+    subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "pip",
+            "install",
+            "--no-deps",
+            "--target",
+            str(installed),
+            str(wheel),
+        ],
+        cwd=tmp_path,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    subprocess.run(
+        [
+            sys.executable,
+            "-I",
+            "-c",
+            (
+                "import importlib.metadata as metadata, sys; "
+                "sys.path.insert(0, sys.argv[1]); "
+                "import pollard; "
+                "assert pollard.__version__ == sys.argv[2]; "
+                "assert metadata.version('pollard') == sys.argv[2]"
+            ),
+            str(installed),
+            project_version,
+        ],
+        cwd=tmp_path,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
 
 
 def test_docs_index_names_every_top_level_document() -> None:

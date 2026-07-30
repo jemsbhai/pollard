@@ -70,7 +70,8 @@ Current limits:
 
 Pollard requires Python 3.10 or newer. The core package has no runtime
 dependency and includes in-memory and SQLite stores, the registry firewall,
-budgets, replay, seals, merge, governance helpers, and the offline CLI:
+budgets, replay, seals, merge, governance helpers, and a CLI with offline
+SQLite inspection:
 
 ```powershell
 pip install pollard
@@ -201,8 +202,13 @@ provider.
 
 ## Observability
 
-The core package includes an offline CLI. Tree inspection commands accept
-SQLite recordings, while `runs` and `merge` also accept PostgreSQL store specs:
+The core package includes a CLI that remains fully offline for SQLite
+recordings. `show`, `report`, `verify`, `seal`, and `export` accept SQLite
+recording paths, PostgreSQL store specs, URL-backed Redis read specs, or
+environment-backed MongoDB, Neo4j, or Kafka read specs. `runs` accepts the same
+sources. `merge` accepts Redis, MongoDB, Neo4j, and Kafka sources, and accepts
+environment-backed Redis, MongoDB, Neo4j, and Kafka logical stores as
+destinations:
 
 ```powershell
 pollard runs runs.db
@@ -211,8 +217,214 @@ pollard merge combined.db team-a.db team-b.db
 pollard show runs.db <root-id>
 pollard report runs.db <root-id> --json
 pollard verify runs.db
+pollard seal runs.db <root-id> --output seal.json --json
+pollard export runs.db <root-id> subtree.json --json
 pollard show runs.db <root-id> --html run.html
 ```
+
+Keep a PostgreSQL DSN out of process arguments by using a `pg-env:` reference:
+
+```powershell
+$env:POLLARD_PG_DSN = "postgresql://pollard_app:password@db.example/pollard"
+pollard show "pg-env:POLLARD_PG_DSN#support-prod" <root-id>
+pollard report "pg-env:POLLARD_PG_DSN#support-prod" <root-id> --json
+pollard verify "pg-env:POLLARD_PG_DSN#support-prod" --json
+pollard seal "pg-env:POLLARD_PG_DSN#support-prod" <root-id> --output seal.json --json
+pollard export "pg-env:POLLARD_PG_DSN#support-prod" <root-id> subtree.json --json
+```
+
+Use `redis-env:VARIABLE?prefix=PREFIX#store-id` for a credential-safe Redis
+source or merge destination without placing its URL in the process arguments:
+
+```powershell
+$env:POLLARD_REDIS_URL = "rediss://pollard_app:password@redis.example:6379/0"
+pollard show "redis-env:POLLARD_REDIS_URL?prefix=pollard#support-prod" <root-id>
+pollard verify "redis-env:POLLARD_REDIS_URL?prefix=pollard#support-prod" --json
+pollard merge combined.db "redis-env:POLLARD_REDIS_URL?prefix=pollard#support-prod" --json
+pollard merge "redis-env:POLLARD_REDIS_URL?prefix=pollard-archive#existing-archive" runs.db --json
+pollard merge "redis-env:POLLARD_REDIS_URL?prefix=pollard-import#archive-2026-07" runs.db --initialize-if-missing --json
+```
+
+Direct `redis://...#store-id` and `rediss://...#store-id` forms are legacy
+source-only forms that use the default `pollard` prefix and can expose
+credentials to process inspection. They are rejected as merge destinations;
+use `redis-env:` for every new command and for all Redis destinations. A source
+opens with `create=False`, so an unused or mistyped prefix/store-id combination
+fails closed. Every Redis destination must explicitly include both
+`?prefix=PREFIX` and `#store-id`. By default it also opens with `create=False`,
+so a missing or mistyped namespace fails closed.
+
+Pass `--initialize-if-missing` to opt into creating a missing destination.
+That flag is valid only with an explicit `redis-env:`, `mongo-env:`, or
+`neo4j-env:` destination. Pollard may validate the destination selector's
+syntax and eligibility first, but does not read its environment variables or
+construct a destination client at that stage. After every source has been
+opened, fully traversed, validated, serialized to a private disk-backed spool,
+closed, and the completed spool has passed an independent integrity check,
+Pollard uses
+`create=True`. Redis atomically initializes identity, schema, and revision in
+one Redis transaction; MongoDB's distinct physical-index and logical-state
+boundaries and Neo4j's separate global-constraint and logical-state boundaries
+are described below. Because this opt-in can turn a destination typo into a
+different logical namespace, review every selector before using it. Malformed
+percent escapes and ambiguous whitespace selectors are rejected. Kafka
+destinations never accept this flag: topics are provisioned by an operator, and
+the CLI requires an existing populated topic whose retained Pollard history
+proves its store identity.
+
+Merge copies nodes and metadata, not active budget, window, reservation, or
+lease state. Every source is fully traversed before the destination
+configuration is resolved or the destination is opened,
+but destination application is node-by-node rather than one cross-node or
+cross-backend transaction. An error can leave nodes already accepted by the
+destination; repeating the exact merge is idempotent. Quiesce source and
+destination writers, then verify and seal the result. Concurrent destination
+writers can race metadata updates. Redis, MongoDB, and Neo4j source traversal
+are not stable whole-store snapshots during concurrent writes.
+
+CLI merge keeps only a bounded preparation working set in RAM and stores each
+complete prepared source in its own uniquely named SQLite spool inside a
+private temporary directory. The spools preserve exact node fields,
+deterministic source and node ordering, result and metadata conflict behavior,
+and per-source JSON reports. They contain retained payloads, results, and
+metadata, so the temporary filesystem needs appropriate access controls and
+enough free space for all sources. Pollard attempts to remove the private
+directory on every exit. A cleanup failure can leave sensitive private
+artifacts and makes an otherwise successful command fail; when another failure
+already exists, the error preserves its source or destination attribution and
+adds a fixed cleanup-failure notice. Creation, serialization, disk-write,
+finalization, corruption, or truncation errors before spool finalization do not
+access the destination. A cleanup error after application does not roll back
+destination writes, so inspect and rerun the exact merge.
+`import` and `gc` remain SQLite-only. Sentinel or `client_factory` construction
+remains a Python API concern, while Redis Cluster remains outside the supported
+release matrix.
+
+Use `mongo-env:VARIABLE?database=DATABASE&prefix=PREFIX#store-id` for a MongoDB
+source or merge destination:
+
+```powershell
+$env:POLLARD_MONGODB_URI = "mongodb://pollard_app:password@db-a.example,db-b.example/pollard?replicaSet=rs0&tls=true"
+$mongoStore = "mongo-env:POLLARD_MONGODB_URI?database=pollard&prefix=pollard#support-prod"
+pollard show $mongoStore <root-id>
+pollard verify $mongoStore --json
+pollard merge combined.db $mongoStore --json
+pollard merge $mongoStore runs.db --json
+$mongoArchive = "mongo-env:POLLARD_MONGODB_URI?database=pollard_archive&prefix=pollard_import#archive-2026-07"
+pollard merge $mongoArchive runs.db --initialize-if-missing --json
+```
+
+The defaults are database `pollard`, collection prefix `pollard`, and store id
+`default` for sources. A destination must spell out all three values and is
+existing-only by default. `--initialize-if-missing` is the explicit creation
+opt-in. Existing-only construction creates no collections, indexes,
+coordinator state, or schema records. Fresh creation establishes the unique
+record index first, then initializes schema and coordinator revision together
+in one MongoDB transaction. Because MongoDB index DDL is outside that logical
+transaction, an index-only empty shell can remain after a later construction
+failure; it is safe to inspect and retry, but partial logical or incompatible
+index states are never repaired implicitly. Only `mongo-env:` is accepted;
+direct `mongodb://` and `mongodb+srv://` arguments are rejected.
+
+The deployment must still be a replica set or mongos. MongoDB CLI traversal
+spans multiple snapshot transactions and is not one point-in-time snapshot.
+Quiesce source and destination writers for evidence-grade transfer, verify the
+destination after success or partial failure, and seal required roots. MongoDB
+is not an import or garbage-collection target. Client options that cannot be
+expressed in the URI remain a Python API concern.
+
+Use `neo4j-env:URI_VAR?user-env=USER_VAR&password-env=PASSWORD_VAR&database=DB#store-id`
+to provide a URI and basic-auth values without placing them in process
+arguments:
+
+```powershell
+$env:POLLARD_NEO4J_URI = "neo4j+s://graph.example"
+$env:POLLARD_NEO4J_USER = "pollard_reader"
+$env:POLLARD_NEO4J_PASSWORD = "<secret>"
+$neo4jStore = "neo4j-env:POLLARD_NEO4J_URI?user-env=POLLARD_NEO4J_USER&password-env=POLLARD_NEO4J_PASSWORD&database=neo4j#support-prod"
+pollard show $neo4jStore <root-id>
+pollard verify $neo4jStore --json
+pollard merge combined.db $neo4jStore --json
+pollard merge $neo4jStore runs.db --json
+$neo4jArchive = "neo4j-env:POLLARD_NEO4J_URI?user-env=POLLARD_NEO4J_USER&password-env=POLLARD_NEO4J_PASSWORD&database=pollard_archive#archive-2026-07"
+pollard merge $neo4jArchive runs.db --initialize-if-missing --json
+```
+
+Both auth references are required. Database and store id default to `neo4j`
+and `default` for sources and must match the writer. A destination must spell
+out the URI, user, and password environment references, database, and store id,
+and is existing-only by default. CLI labels omit both auth references and
+never include their values. Direct Neo4j and Bolt URI arguments are rejected.
+
+Existing-only construction validates the exact Pollard schema, coordinator,
+two named database-wide uniqueness constraints, and their owned online range
+indexes without writes or constraint DDL. `--initialize-if-missing` is the
+explicit fresh-namespace opt-in. For a
+fresh logical namespace, Pollard creates or validates the shared global
+constraints outside the logical transaction, then initializes coordinator and
+schema together in one managed transaction. Missing, incompatible, or offline
+constraint/index state and every partial or ambiguous logical state fail closed
+without implicit repair. Because constraints and their indexes are shared by all Pollard
+stores in the database, use a dedicated database and appropriately privileged
+role when initialization must create them.
+
+Reads remain write-routed to a primary. A command can span several
+read-committed transactions and is not a command-wide snapshot. Neo4j
+destination application is node-by-node rather than one transaction; an error
+can leave accepted nodes, and an exact rerun is idempotent. Quiesce source and
+destination writers, verify the result, and seal required roots. Concurrent
+destination writers can race merge metadata updates. Neo4j is not an import or
+garbage-collection target. The CLI supports basic auth only; authentication
+managers, custom resolvers, client certificates, and advanced driver
+configuration remain Python API concerns.
+
+Use `kafka-env:CONFIG_VAR?topic=TOPIC&timeout=SECONDS#store-id` to inspect or
+merge into one pre-provisioned Kafka topic through an environment-backed
+confluent-kafka configuration:
+
+```powershell
+$env:POLLARD_KAFKA_CONFIG = '{"bootstrap.servers":"broker-1.example:9093,broker-2.example:9093","security.protocol":"SASL_SSL","sasl.mechanism":"SCRAM-SHA-512","sasl.username":"pollard_reader","sasl.password":"<secret>"}'
+$kafkaStore = "kafka-env:POLLARD_KAFKA_CONFIG?topic=pollard-support-prod&timeout=120#support-prod"
+pollard runs $kafkaStore --json
+pollard verify $kafkaStore --json
+pollard export $kafkaStore <root-id> subtree.json --json
+pollard merge combined.db $kafkaStore --json
+pollard merge $kafkaStore runs.db --json
+```
+
+The topic is required, timeout defaults to 30 seconds, and store id defaults to
+`default` for sources. A destination must explicitly provide the configuration
+environment reference, topic, and a nonempty `#store-id` fragment. The
+environment value is a JSON object whose values are strings, booleans, integers,
+or finite numbers; duplicate keys and nested values are rejected. CLI labels
+include the configuration reference, topic, and store id, but omit the timeout
+and every referenced configuration value. Direct `kafka://` arguments are
+rejected.
+
+Kafka CLI source access uses `KafkaStore(read_only=True)`: it creates no
+producer, validates the existing topic, and freezes the complete committed
+prefix from offset zero through the exclusive high watermark observed during
+construction. Every read in that command uses the same in-memory view;
+reconnecting captures a new prefix. A destination is existing-and-populated
+only: full replay must
+materialize at least one node and prove that every retained event belongs to
+the explicit store id. Missing, empty, wrong-identity, corrupt, truncated, or
+incompatibly configured topics fail before producer construction and publish
+nothing. Pollard never creates topics, and `--initialize-if-missing` is invalid
+for Kafka; seed the first valid node through a reviewed Python writer after an
+operator provisions the topic.
+
+Only after all source spools are finalized and validated does the CLI read the
+destination configuration. After the destination topic, configuration, history,
+and prefix validate, it constructs the producer. KafkaStore
+forces `acks=all`, idempotence, deterministic operation ids, and replay
+confirmation. Merge still appends node and metadata commands one at a time, so
+a failure can leave irreversible accepted events. An exact rerun publishes no
+new events. Quiesce writers, inspect and rerun after failure, then verify and
+seal. Kafka remains neither an import nor a garbage-collection target, has no
+shared budget arbitration or record-level GC, and retains its linear cold
+replay and memory-growth limits. Callback-based authentication and other
+non-JSON client configuration remain Python API concerns.
 
 `show` defaults to an ASCII, content-free tree. Payloads and results require an
 explicit `--payloads` flag. The HTML export is one static file with no remote

@@ -180,20 +180,114 @@ retention, a truncated log, malformed events, or a changed store key. See the
 [distributed store runbook](https://github.com/jemsbhai/pollard/blob/main/docs/distributed-stores.md)
 for exact configuration checks and recovery steps.
 
+For MongoDB CLI inspection, merge sources, and merge destinations, use
+`mongo-env:VARIABLE?database=DATABASE&prefix=PREFIX#store-id`. Direct
+`mongodb://` and `mongodb+srv://` arguments are rejected to keep credentials out
+of supported process arguments. Confirm that the URI variable is set and that
+the database, collection prefix, and store id match the writer exactly.
+Destinations must explicitly provide all three and are existing-only by
+default. Missing schema is an intentional refusal, not an empty store.
+
+For Neo4j CLI inspection, merge sources, and merge destinations, use
+`neo4j-env:URI_VAR?user-env=USER_VAR&password-env=PASSWORD_VAR&database=DB#store-id`.
+Both auth references are required, while database and store id default to
+`neo4j` and `default` for sources. Destinations must explicitly provide all
+three environment references, database, and store id. CLI labels intentionally
+omit both auth references. Confirm every variable, the selected database, the
+logical store id, and primary routing. Direct Neo4j and Bolt URI arguments are
+rejected. Missing schema, coordinator, exact constraint metadata, or an owned
+online range index is an
+intentional existing-only refusal, not an empty logical store.
+
+For Kafka CLI inspection, merge sources, and merge destinations, use
+`kafka-env:CONFIG_VAR?topic=TOPIC&timeout=SECONDS#store-id`. Topic is required,
+timeout defaults to 30 seconds, and store id defaults to `default` for sources.
+A destination requires the explicit configuration reference, topic, and
+nonempty store-id fragment. Confirm that the environment variable contains a
+JSON object with unique keys, a nonempty string `bootstrap.servers`, and only
+string, boolean, integer, or finite-number values. Direct `kafka://` broker
+arguments are rejected. A timeout during open can mean that complete replay
+from offset zero needs a larger positive integer, not that Pollard can safely
+skip older events.
+
+The Kafka CLI label intentionally omits timeout and every client-configuration
+value. `plugin.library.paths`, nested configuration, and non-scalar callbacks
+are not supported on this path. Use the Python API when the deployment requires
+callback-based authentication or another configuration object.
+
 ## Remote Store Refusal Or Uncertain Outcome
 
 Treat schema, topology, and topic-configuration errors as intentional
 fail-closed checks:
 
 - Redis needs an intact store identity and revision. Confirm persistence,
-  `maxmemory-policy noeviction`, the URL, prefix, and `store_id`.
-- MongoDB needs a replica set or sharded deployment. Do not use
+  `maxmemory-policy noeviction`, the URL, prefix, and `store_id`. A Redis source
+  uses `create=False`, so a missing namespace is an error. A merge destination
+  must use `redis-env:` with an explicit prefix and store id and also uses
+  `create=False` by default. Pass `--initialize-if-missing` only when a missing
+  `redis-env:` destination should be created. Review both selectors first
+  because a misspelling can create a different namespace when that flag is
+  present. Direct `redis://` and `rediss://` forms are legacy source-only
+  selectors and are rejected as destinations.
+- MongoDB needs a replica set or sharded deployment plus an exact schema,
+  coordinator, and compatible unique record index at the selected database,
+  collection prefix, and `store_id`. Missing, partial, or ambiguous state is an
+  integrity refusal; do not add records or indexes manually to make it pass.
+  Inspect the exact two collections and index metadata, recover from a known
+  backup, or remove only a proven-empty mistyped namespace. A destination uses
+  `create=False` unless `--initialize-if-missing` is supplied. Fresh
+  initialization creates index DDL separately from its atomic
+  schema/coordinator transaction, so a later failure can leave an empty
+  index-only shell that should be inspected before exact retry. Do not use
   `directConnection=true` as a production substitute for normal topology
-  discovery.
-- Neo4j needs write routing, access to the selected database, and permission to
-  create or use the two Pollard uniqueness constraints.
+  discovery. Stabilize writers for verification, seal, export, or merge because
+  traversal spans multiple snapshot transactions and merge application is
+  node-by-node.
+- Neo4j needs write routing and access to the selected database. Existing-only
+  sources and destinations need read privilege on `_PollardKV` and
+  `_PollardCoordinator` nodes plus permission to inspect the exact two named
+  uniqueness constraints. They issue no writes or constraint DDL. A destination
+  also needs Pollard node-write privileges. Pass `--initialize-if-missing` only
+  for a reviewed, explicit `neo4j-env:` destination that should create a
+  completely fresh logical namespace. That path needs constraint-create
+  privilege unless an administrator already installed the exact shared
+  constraints. Constraint DDL is database-wide and outside the atomic
+  schema/coordinator transaction; never delete shared constraints as automatic
+  cleanup. Schema-only, coordinator-only, data-only, wrong-identity, and
+  incompatible or offline constraint/index states are integrity refusals and
+  are not repaired.
+  Quiesce writes when verification, sealing, export, or transfer must represent
+  one evidence boundary because a command can span multiple read-committed
+  transactions.
 - Kafka needs one pre-created topic, exactly one partition, delete-only cleanup,
-  infinite time and byte retention, and history beginning at offset zero.
+  infinite time and byte retention, and history beginning at offset zero. Its
+  observational role needs topic metadata, DESCRIBE_CONFIGS, READ, and, where
+  coordinator discovery is authorized separately, GROUP DESCRIBE on the
+  deterministic `pollard-observer-<sha256(topic + NUL + store_id)>` group. It
+  does not need a producer, topic WRITE, or IDEMPOTENT_WRITE. A completely
+  pristine cluster can initialize broker-owned `__consumer_offsets`
+  infrastructure in response to librdkafka's `FindCoordinator`; pre-provision
+  that state when even broker-internal first use is prohibited.
+  A merge destination additionally needs topic WRITE, the cluster permission
+  required for an idempotent producer, and narrowly scoped GROUP DESCRIBE for
+  `pollard-reader-<sha256(topic + NUL + store_id)>`. It needs no CREATE, ALTER,
+  or DELETE privilege because Pollard never provisions or removes topics.
+  Destinations must already be populated: replay must materialize at least one
+  node proving the explicit store id. Missing, empty, wrong-identity, corrupt,
+  truncated, or incompatible topics fail before producer construction and
+  publish nothing. `--initialize-if-missing` is invalid for Kafka; provision
+  the topic administratively and seed the first node with a reviewed Python
+  writer.
+
+A Kafka read-only source replays `[0, high)` once and freezes that view.
+Concurrent appends become visible only after `reconnect()`. If a verification,
+seal, or export must represent a drained final topic rather than a coherent
+historical prefix, stop writers and independently record the topic, partition
+zero, and exclusive high watermark. A wrong store id fails when a retained
+event is decoded, but an empty topic has no event that can prove which store id
+was intended. If reconnect reports that history changed before the prior replay
+boundary, treat topic truncation, deletion/recreation, or same-offset rewriting
+as an integrity incident; the prior clients and frozen view remain installed.
 
 `ReservationUncertain` and `SettlementUncertain` mean the server may have
 committed even though the client could not confirm it. Stop new dispatch for
@@ -215,7 +309,43 @@ the seal report matches, and any external parent already exists in the target.
 Merge rejects unequal identity fields under the same node ID. In default mode,
 result or metadata conflicts are retained in destination metadata; in
 `--replay` mode, a result conflict is an integrity error. Repeating a successful
-merge is idempotent.
+merge is idempotent. The CLI may reject an invalid destination selector or flag
+combination first, but that check does not read a referenced destination
+environment variable or construct a client. It then opens every source in
+command-line order, traverses and validates it fully, serializes its exact nodes
+to a uniquely named SQLite spool in a private temporary directory, closes the
+source, and validates the finalized spool. All source spools must finish before
+the CLI resolves destination configuration or constructs a Redis, MongoDB,
+Neo4j, or Kafka destination, so source open, traversal, validation,
+serialization, disk-write, finalization, corruption, and truncation failures
+leave the destination untouched. Missing remote destinations fail before
+writes by default. With `--initialize-if-missing`, Redis initializes
+identity, schema, and revision atomically; MongoDB initializes schema and
+coordinator revision atomically after separate physical index setup; Neo4j
+initializes schema and coordinator atomically after separate global constraint
+setup. The flag is invalid for Kafka. A Kafka destination instead proves a
+populated existing identity through full replay and constructs its producer
+only after topic, configuration, history, and prefix validation. Copying nodes
+and metadata is still not one cross-node or cross-backend transaction.
+If copying fails, accepted changes can remain; quiesce destination writers,
+inspect the destination, rerun the exact merge, verify, and seal. Concurrent
+writers can race merge metadata updates. Kafka destination events accepted
+before failure are irreversible through Pollard; an exact rerun publishes no
+new events. Preparation uses bounded working memory but temporary disk
+proportional to all sources. Spools contain payloads, results, and metadata, so
+check the operating system's temporary-directory permissions, free space, quota,
+antivirus or backup interference, and filesystem health after a preparation
+error. Pollard attempts to remove the private spool directory on every exit,
+including source, constructor, and destination-body failures. A cleanup failure
+can leave sensitive private artifacts and returns exit code `2`. On its own it
+uses a fixed credential-safe error. When another failure already exists, that
+primary source or destination attribution remains and a fixed cleanup notice is
+added. If cleanup failure follows destination application, accepted writes
+remain; inspect the destination and rerun the exact merge after manually
+securing and removing any residual private preparation directory. A Kafka merge
+source supplies the materialized node tree,
+not the original Kafka offsets, operation ids, or command history. `import` and
+`gc` remain SQLite-only.
 
 ## CLI exit codes
 

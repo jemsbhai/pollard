@@ -39,6 +39,80 @@ The URL path selects the Redis database for a non-clustered deployment.
 `watch_retries` limits only optimistic transaction conflicts. Network retry,
 connect timeout, socket timeout, health checks, and TLS policy belong to the
 redis-py client configuration.
+Pollard owns string decoding for URL-backed clients. Do not put
+`decode_responses`, `encoding`, or `encoding_errors` in the Redis URL query;
+these options are rejected before the client is created.
+
+## CLI Observation And Merge Transfer
+
+The CLI can construct a standard URL-backed Redis client for observation,
+source-side transfer, and a merge destination. Keep the URL in an environment
+variable and identify the exact prefix and logical store id in each
+specification:
+
+```powershell
+$env:POLLARD_REDIS_URL = "rediss://pollard_app:password@redis.example:6379/0"
+$redisSource = "redis-env:POLLARD_REDIS_URL?prefix=pollard#support-prod"
+$redisArchive = "redis-env:POLLARD_REDIS_URL?prefix=pollard-archive#existing-archive"
+$redisNewArchive = "redis-env:POLLARD_REDIS_URL?prefix=pollard-import#archive-2026-07"
+pollard runs $redisSource --json
+pollard show $redisSource <root-id>
+pollard report $redisSource <root-id> --json
+pollard verify $redisSource --json
+pollard seal $redisSource <root-id> --output seal.json --json
+pollard export $redisSource <root-id> subtree.json --json
+pollard merge combined.db $redisSource --json
+pollard merge $redisArchive local-recording.db --replay --json
+pollard merge $redisNewArchive local-recording.db --replay --initialize-if-missing --json
+```
+
+The grammar is `redis-env:VARIABLE?prefix=PREFIX#store-id`. As a source, the CLI
+uses `RedisStore(create=False)` and requires the identity, schema, and revision
+to exist and match. An unused or mistyped source namespace therefore fails
+closed without creating keys. Source traversal performs multiple reads and is
+not a stable snapshot under concurrent writes. Quiesce writes or otherwise hold
+the namespace stable for evidence-grade verification, sealing, or export.
+
+A Redis merge destination must use `redis-env:` and explicitly include both
+`?prefix=PREFIX` and `#store-id`. By default, the CLI constructs it with
+`RedisStore(create=False)`, so the identity, schema, and revision must already
+exist and match. A missing or mistyped destination therefore fails closed
+without creating keys.
+
+Pass `--initialize-if-missing` to opt into creating a missing destination. The
+flag is valid for Redis only with an explicit `redis-env:` destination. The CLI
+may validate that selector and flag combination first without reading the
+referenced environment value. It then fully traverses and validates every
+source into a private disk-backed spool, closes each source, validates all
+finalized spools, and only then reads the destination environment value and
+constructs the destination with `RedisStore(create=True)`. A missing
+namespace initializes identity, schema, and revision atomically in one Redis
+transaction; an existing namespace must match. Because the opt-in can turn a
+destination typo into a different logical namespace, review both selectors
+before using it. Malformed percent escapes and whitespace in a destination
+prefix or store id are rejected.
+
+Direct `redis://...#store-id` and `rediss://...#store-id` arguments remain
+legacy source-only forms. They use the default `pollard` prefix, can expose
+credentials to process inspection, and are rejected as destinations. Prefer
+`redis-env:` for sources as well.
+
+Merge copies node trees and metadata only. It does not copy active budget
+reservations, settled counters, rate-window events, or leases, and it is not
+one cross-node or cross-backend transaction. A failure while copying can retain
+nodes or metadata already accepted by Redis. Repeating the exact merge is
+idempotent. Preparation uses bounded working memory and temporary disk
+proportional to all source trees. Private spools contain full node content and
+cleanup is attempted on every exit. Cleanup failure can leave private artifacts
+and makes an otherwise successful command fail. Combined failures preserve
+their primary attribution and add a fixed cleanup notice. Creation,
+serialization, disk-write, finalization, corruption, or truncation fail before
+destination access. After application, accepted Redis writes remain and an
+exact rerun is safe. `import` and `gc` remain SQLite-only.
+
+This CLI path cannot express Sentinel discovery or a caller-owned
+`client_factory`; use the Python API for those deployments. Redis Cluster
+remains outside Pollard's supported release matrix.
 
 ## Sentinel And Caller-Owned Client Construction
 

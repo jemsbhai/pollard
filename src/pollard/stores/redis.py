@@ -6,6 +6,7 @@ import hashlib
 from collections.abc import Callable
 from importlib import import_module
 from typing import Any, TypeVar
+from urllib.parse import parse_qsl, urlsplit
 
 from pollard.errors import IntegrityError
 
@@ -33,6 +34,8 @@ class RedisStore(TransactionalKVStore):
     Writes use ``WATCH``/``MULTI``/``EXEC`` around a per-store revision key,
     while all arithmetic remains in the shared Python implementation so exact
     decimal strings are never narrowed through Redis numeric operations.
+    ``create=False`` validates an existing logical store without initializing
+    a missing namespace.
     """
 
     backend_name = "Redis"
@@ -44,12 +47,15 @@ class RedisStore(TransactionalKVStore):
         client_factory: Callable[[], Any] | None = None,
         store_id: str = "default",
         prefix: str = "pollard",
+        create: bool = True,
         watch_retries: int = 64,
     ) -> None:
         if url is None and client_factory is None:
             raise ValueError("pass either url or client_factory")
         if url is not None and (not isinstance(url, str) or not url):
             raise ValueError("url must be a non-empty string")
+        if url is not None:
+            _validate_url_text_options(url)
         if url is not None and client_factory is not None:
             raise ValueError("pass either url or client_factory, not both")
         if client_factory is not None and not callable(client_factory):
@@ -58,6 +64,8 @@ class RedisStore(TransactionalKVStore):
             raise ValueError("store_id must be a non-empty string")
         if not isinstance(prefix, str) or not prefix:
             raise ValueError("prefix must be a non-empty string")
+        if not isinstance(create, bool):
+            raise TypeError("create must be a boolean")
         if isinstance(watch_retries, bool) or not isinstance(watch_retries, int):
             raise ValueError("watch_retries must be a positive integer")
         if watch_retries < 1:
@@ -74,6 +82,7 @@ class RedisStore(TransactionalKVStore):
         self._client_factory = client_factory
         self.store_id = store_id
         self.prefix = prefix
+        self.create = create
         self.watch_retries = watch_retries
         self._redis = redis
         self._watch_error = redis.exceptions.WatchError
@@ -88,8 +97,10 @@ class RedisStore(TransactionalKVStore):
         self._client: Any = self._new_client()
         try:
             self._client.ping()
-            self._initialize_identity()
-            self._initialize_transactional_store()
+            if create:
+                self._initialize_identity()
+            else:
+                self._require_identity_and_schema()
             self._initialized = True
         except BaseException:
             self._close_client(self._client)
@@ -155,6 +166,7 @@ class RedisStore(TransactionalKVStore):
                         pipe,
                         self._bucket_key,
                         _server_time(pipe.time()),
+                        revision=revision,
                     )
                     result = callback(transaction)
                     if not allow_writes and transaction.has_writes:
@@ -207,25 +219,40 @@ class RedisStore(TransactionalKVStore):
 
     def _initialize_identity(self) -> None:
         def initialize(tx: KVTransaction) -> None:
+            if not isinstance(tx, _RedisTransaction):
+                raise TypeError("Redis initialization requires a Redis transaction")
             identity = tx.get(_IDENTITY_BUCKET, _IDENTITY_KEY)
-            if identity is None:
+            version = tx.get(_IDENTITY_BUCKET, _SCHEMA_VERSION_KEY)
+            if tx.revision is None:
                 if any(tx.items(bucket) for bucket in _KNOWN_BUCKETS):
-                    raise IntegrityError("Redis store identity is missing")
+                    raise IntegrityError(
+                        "Redis store initialization state is partial"
+                    )
                 tx.put(_IDENTITY_BUCKET, _IDENTITY_KEY, self.store_id)
+                tx.put(_IDENTITY_BUCKET, _SCHEMA_VERSION_KEY, _SCHEMA_VERSION)
                 return
+            if identity is None:
+                raise IntegrityError("Redis store identity is missing")
             if identity != self.store_id:
                 raise IntegrityError("Redis store identity does not match store_id")
+            if version != _SCHEMA_VERSION:
+                shown = "missing" if version is None else ascii(version)[1:-1]
+                raise IntegrityError(
+                    f"unsupported Redis schema version: {shown}"
+                )
 
         self._write(initialize)
 
     def _require_identity_and_schema(self) -> None:
         def validate(tx: KVTransaction) -> None:
             identity = tx.get(_IDENTITY_BUCKET, _IDENTITY_KEY)
+            if identity is None:
+                raise IntegrityError("Redis store identity is missing")
             if identity != self.store_id:
                 raise IntegrityError("Redis store identity does not match store_id")
             version = tx.get(_IDENTITY_BUCKET, _SCHEMA_VERSION_KEY)
             if version != _SCHEMA_VERSION:
-                shown = "missing" if version is None else version
+                shown = "missing" if version is None else ascii(version)[1:-1]
                 raise IntegrityError(
                     f"unsupported Redis schema version: {shown}"
                 )
@@ -247,11 +274,18 @@ class _RedisTransaction:
         pipe: Any,
         bucket_key: Callable[[str], str],
         now: float,
+        *,
+        revision: str | None = None,
     ) -> None:
         self._pipe = pipe
         self._bucket_key = bucket_key
         self._now = now
+        self._revision = revision
         self._pending: dict[tuple[str, str], str | None] = {}
+
+    @property
+    def revision(self) -> str | None:
+        return self._revision
 
     @property
     def has_writes(self) -> bool:
@@ -336,3 +370,16 @@ def _connection_error_types(redis: Any) -> tuple[type[BaseException], ...]:
         for value in values
         if isinstance(value, type) and issubclass(value, BaseException)
     )
+
+
+def _validate_url_text_options(url: str) -> None:
+    try:
+        query = urlsplit(url).query
+        parameters = parse_qsl(query, keep_blank_values=True)
+    except (UnicodeDecodeError, ValueError):
+        raise ValueError("Redis URL query is invalid") from None
+    reserved = {"decode_responses", "encoding", "encoding_errors"}
+    if any(name in reserved for name, _value in parameters):
+        raise ValueError(
+            "Redis URL must not override Pollard text decoding options"
+        )

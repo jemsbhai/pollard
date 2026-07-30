@@ -53,10 +53,111 @@ sessions to a primary. A `bolt://` URI targets one machine and bypasses the
 routing table; use it only when that is the intended topology. Prefer
 `neo4j+s://` with CA-validated encryption for production.
 
-Additional keyword arguments pass to `GraphDatabase.driver`. Driver creation
-is caller-owned, including resolver, authentication manager, client
-certificate, pool sizing, telemetry choice, acquisition timeout, and retry
-time.
+For Python construction, additional keyword arguments pass to
+`GraphDatabase.driver`. Advanced driver policy remains caller-owned, including
+resolver, authentication manager, client certificate, pool sizing, telemetry
+choice, acquisition timeout, and retry time.
+
+With the default `create=True`, construction first classifies the logical
+namespace without writing. An exact existing schema and coordinator must also
+have both exact named uniqueness constraints and their exact owned, online
+range indexes; Pollard does not repair them. Only a completely fresh namespace
+proceeds to create or confirm those
+database-global constraints, then initializes schema version 1 and coordinator
+revision 1 together in one managed data transaction. Constraint DDL is outside
+that logical transaction.
+
+Pass `create=False` to verify connectivity and require the exact existing
+schema, coordinator, constraints, and backing indexes without creating nodes,
+properties, constraints, indexes, or schema records. Schema-only,
+coordinator-only, data-only, wrong-identity, future-version, and partial,
+incompatible, or offline constraint/index states all fail closed.
+
+## CLI Access And Merge Destinations
+
+The CLI accepts Neo4j only through an environment-backed URI and two required
+basic-auth references:
+
+```powershell
+$env:POLLARD_NEO4J_URI = "neo4j+s://graph.example"
+$env:POLLARD_NEO4J_USER = "pollard_reader"
+$env:POLLARD_NEO4J_PASSWORD = "<secret>"
+$neo4jStore = "neo4j-env:POLLARD_NEO4J_URI?user-env=POLLARD_NEO4J_USER&password-env=POLLARD_NEO4J_PASSWORD&database=neo4j#support-prod"
+pollard runs $neo4jStore --json
+pollard show $neo4jStore <root-id>
+pollard report $neo4jStore <root-id> --json
+pollard verify $neo4jStore --json
+pollard seal $neo4jStore <root-id> --output seal.json --json
+pollard export $neo4jStore <root-id> subtree.json --json
+pollard merge combined.db $neo4jStore --json
+pollard merge $neo4jStore runs.db --json
+$neo4jArchive = "neo4j-env:POLLARD_NEO4J_URI?user-env=POLLARD_NEO4J_USER&password-env=POLLARD_NEO4J_PASSWORD&database=pollard_archive#archive-2026-07"
+pollard merge $neo4jArchive runs.db --initialize-if-missing --json
+```
+
+The grammar is
+`neo4j-env:URI_VAR?user-env=USER_VAR&password-env=PASSWORD_VAR&database=DB#store-id`.
+Both auth references are required. Database and store id default to `neo4j` and
+`default` for sources and must match the writer configuration. Every
+destination must explicitly provide the URI, user, and password environment
+references, database, and store id. CLI labels show the URI reference,
+database, and store id, but omit both auth references and all environment
+values.
+
+Direct `neo4j://`, `neo4j+s://`, `neo4j+ssc://`, `bolt://`, `bolt+s://`, and
+`bolt+ssc://` arguments are rejected. Keeping connection and auth values in the
+environment keeps them out of Pollard process arguments. Inject production
+values with a secret manager or another mechanism that does not record the
+assignment itself in shell history.
+
+Sources and ordinary destinations construct `Neo4jStore(create=False)`. An
+unused database/store-id combination, missing coordinator, or missing or
+changed constraint or backing index therefore fails closed without writes or
+DDL.
+`--initialize-if-missing` is valid only for an explicit `neo4j-env:`
+destination. Pollard may validate that selector and flag combination first
+without reading the referenced environment values. After every source has been
+fully traversed and validated into a private disk-backed spool, closed, and
+every finalized spool has passed validation, that opt-in reads the destination
+environment values and constructs it with `create=True`. Review every
+reference, database, and store id first: a typo can otherwise create a
+different fresh logical namespace.
+
+Fresh construction classifies logical and physical state before constraint
+DDL. It creates both shared database-wide constraints in one schema
+transaction, or validates the exact existing pair and their backing indexes,
+outside the logical transaction. It then creates the coordinator and schema
+together in one managed data transaction. A later failure can therefore leave
+only the global constraints and indexes, which may also serve other Pollard
+stores. Do not delete shared constraints as automatic cleanup. Partial or
+ambiguous logical states and partial,
+incompatible, alternate-name, or offline constraint/index states are never
+repaired implicitly.
+
+Reads remain write-routed to a primary, including on a cluster. Neo4j uses
+read-committed isolation, and one CLI command can span several managed
+transactions rather than one command-wide snapshot. Merge destination
+application is also node-by-node, not one cross-node transaction. A failure can
+retain accepted nodes or metadata; repeating the exact merge is idempotent.
+Quiesce source and destination writers, inspect and rerun after a failure,
+verify the destination, and seal required roots. Concurrent destination writers
+can race mutable merge metadata.
+
+Preparation uses bounded working memory and temporary disk proportional to all
+source trees. Private spools contain full node content and cleanup is attempted
+on every exit. Cleanup failure can leave private artifacts and makes an
+otherwise successful command fail. Combined failures preserve their primary
+attribution and add a fixed cleanup notice. Creation, serialization,
+disk-write, finalization, corruption, or truncation fail before destination
+access. After application, accepted Neo4j nodes or metadata remain and an exact
+rerun is safe.
+
+Neo4j supports `show`, `report`, `verify`, `seal`, `export`, and `runs`, and can
+be a `merge` source or an environment-backed merge destination. It is not an
+import or garbage-collection target. The CLI constructs basic tuple auth only.
+Use the Python API for authentication managers, bearer or Kerberos auth, custom
+resolvers, client certificates, impersonation, pool tuning, telemetry choice,
+and other advanced driver configuration.
 
 ## Schema And Least Privilege
 
@@ -67,10 +168,23 @@ Pollard creates two uniqueness constraints:
 - `pollard_neo4j_coordinator_key` on
   `_PollardCoordinator(coordinator_key)`.
 
-The first application connection needs permission to create these constraints
-and to match, create, update, and delete Pollard-labeled nodes. An administrator
-can create the constraints first and then remove schema-write permission from
-the application role.
+The constraints and their owned range indexes are global to the selected
+database and shared by all Pollard logical store ids. Only a fresh
+`create=True` construction attempts their
+creation. That identity needs permission to create constraints and to match,
+create, update, and delete Pollard-labeled nodes. An administrator can create
+the exact constraints first and then remove schema-write permission from the
+application role.
+
+An observational or existing-only CLI role needs access to the selected
+database, `MATCH` privilege for all properties on `_PollardKV` and
+`_PollardCoordinator` nodes, and permission to inspect constraint and index
+metadata with `SHOW CONSTRAINTS` and `SHOW INDEXES`.
+Write routing selects a primary but does not replace Neo4j authorization.
+Existing-only construction needs no node-write or constraint-create privilege.
+A merge destination additionally needs permission to create and update Pollard
+nodes. Fresh initialization also needs constraint-create privilege unless an
+administrator has already installed the exact shared constraints.
 
 Do not grant the application permission to drop constraints, drop the database,
 or modify unrelated labels. `store_id` is a logical key, not an authorization
@@ -94,10 +208,12 @@ becomes explicit reservation or settlement uncertainty.
 
 ## Reconnect And Routing
 
-`reconnect()` creates a new driver, verifies connectivity, ensures the
-constraints exist, and checks the existing schema before replacing the
-previous driver. It fails closed on a missing or changed schema. Do not call it
-concurrently with operations on the same Neo4jStore object.
+`reconnect()` creates a new driver and validates the exact existing schema,
+coordinator, and constraints before replacing the previous driver. Reconnect
+never issues constraint DDL or repairs state, even when the object was
+originally constructed with `create=True`. All modes fail closed on missing,
+partial, or changed state. Do not call reconnect concurrently with operations
+on the same Neo4jStore object.
 
 All sessions use write routing, including structural reads. This avoids serving
 a follower view immediately after a Pollard commit. It also means read capacity

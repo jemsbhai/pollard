@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import time
 from collections.abc import Iterator, Mapping
 from contextlib import suppress
@@ -52,6 +53,9 @@ _CONTROLLED_CONFIG = {
     "group.id",
     "isolation.level",
     "auto.offset.reset",
+    "allow.auto.create.topics",
+    "group.instance.id",
+    "group.protocol",
 }
 
 
@@ -64,6 +68,10 @@ class KafkaStore:
 
     ``KafkaStore`` is not a shared budget arbiter.  In particular it exposes no
     ``_pollard_reserve`` or ``_pollard_renew`` methods.
+    ``read_only=True`` validates and replays an existing topic without creating
+    a producer, and refuses later mutation attempts. ``require_existing=True``
+    additionally requires replay to materialize at least one node before a
+    producer can be created.
     """
 
     def __init__(
@@ -72,6 +80,8 @@ class KafkaStore:
         *,
         topic: str,
         store_id: str = "default",
+        read_only: bool = False,
+        require_existing: bool = False,
         timeout: int | float = 30,
     ) -> None:
         if not isinstance(client_config, Mapping):
@@ -80,11 +90,17 @@ class KafkaStore:
             raise ValueError("topic must be a non-empty string")
         if not isinstance(store_id, str) or not store_id:
             raise ValueError("store_id must be a non-empty string")
-        if (
-            isinstance(timeout, bool)
-            or not isinstance(timeout, int | float)
-            or timeout <= 0
-        ):
+        if not isinstance(read_only, bool):
+            raise TypeError("read_only must be a boolean")
+        if not isinstance(require_existing, bool):
+            raise TypeError("require_existing must be a boolean")
+        if isinstance(timeout, bool) or not isinstance(timeout, int | float):
+            raise ValueError("timeout must be positive")
+        try:
+            normalized_timeout = float(timeout)
+        except OverflowError:
+            raise ValueError("timeout must be positive") from None
+        if not math.isfinite(normalized_timeout) or normalized_timeout <= 0:
             raise ValueError("timeout must be positive")
 
         try:
@@ -106,7 +122,9 @@ class KafkaStore:
             )
         self.topic = topic
         self.store_id = store_id
-        self.timeout = float(timeout)
+        self.read_only = read_only
+        self.require_existing = require_existing
+        self.timeout = normalized_timeout
         self._kafka = kafka
         self._kafka_admin = kafka_admin
         self._lock = RLock()
@@ -118,10 +136,14 @@ class KafkaStore:
         self._operations: dict[str, str] = {}
         self._operation_offsets: dict[str, int] = {}
         self._outcomes: dict[str, tuple[str, str | None]] = {}
+        self._event_digests: list[str] = []
         self._next_offset = 0
+        self._snapshot_high_offset: int | None = None
 
         try:
             self._open_clients()
+            if not self.read_only:
+                self._open_producer()
         except BaseException:
             self._shutdown_clients()
             raise
@@ -142,23 +164,56 @@ class KafkaStore:
             self._shutdown_clients()
 
     def reconnect(self) -> None:
-        """Replace both clients, revalidate the topic, and replay from offset zero."""
+        """Atomically replace clients and replay a fresh topic snapshot.
+
+        Previously observed record digests must remain an exact prefix. If
+        opening, replaying, or prefix validation fails, the prior clients and
+        in-memory view remain installed.
+        """
 
         with self._lock:
             self._require_open()
-            self._shutdown_clients()
+            previous_clients = (self._consumer, self._producer)
+            previous_view = (
+                self._nodes,
+                self._children,
+                self._operations,
+                self._operation_offsets,
+                self._outcomes,
+                self._event_digests,
+                self._next_offset,
+                self._snapshot_high_offset,
+            )
+            self._consumer = None
+            self._producer = None
             self._reset_view()
             try:
                 self._open_clients()
+                self._require_history_prefix(previous_view[5])
+                if not self.read_only:
+                    self._open_producer()
             except BaseException:
                 self._shutdown_clients()
+                self._consumer, self._producer = previous_clients
+                (
+                    self._nodes,
+                    self._children,
+                    self._operations,
+                    self._operation_offsets,
+                    self._outcomes,
+                    self._event_digests,
+                    self._next_offset,
+                    self._snapshot_high_offset,
+                ) = previous_view
                 raise
+            self._close_clients(*previous_clients)
 
     def put(self, node: Node) -> None:
         _validate_for_put(node)
         body = _node_record(node)
         with self._lock:
             self._require_open()
+            self._require_writable()
             self._sync_current()
             if node.parent is not None and node.parent not in self._nodes:
                 raise KeyError(node.parent)
@@ -203,6 +258,7 @@ class KafkaStore:
         body: dict[str, Any] = {"id": node_id, "patch": patch}
         with self._lock:
             self._require_open()
+            self._require_writable()
             self._sync_current()
             if node_id not in self._nodes:
                 raise KeyError(node_id)
@@ -240,28 +296,17 @@ class KafkaStore:
 
     def _open_clients(self) -> None:
         self._validate_topic()
-        base_config = {
-            key: value
-            for key, value in self.client_config.items()
-            if key not in _CONTROLLED_CONFIG
-        }
-        producer_config = {
-            **base_config,
-            "acks": "all",
-            "enable.idempotence": True,
-        }
+        base_config = self._base_client_config()
         consumer_config = {
             **base_config,
-            "group.id": "pollard-" + hashlib.sha256(
-                f"{self.topic}\0{self.store_id}\0{id(self)}".encode()
-            ).hexdigest(),
+            "group.id": self._consumer_group_id(),
+            "group.protocol": "classic",
             "enable.auto.commit": False,
             "enable.auto.offset.store": False,
             "enable.partition.eof": False,
             "auto.offset.reset": "earliest",
             "isolation.level": "read_committed",
         }
-        self._producer = self._kafka.Producer(producer_config)
         self._consumer = self._kafka.Consumer(consumer_config)
         self._consumer.assign(
             [
@@ -273,11 +318,30 @@ class KafkaStore:
             ]
         )
         self._sync_current()
+        if self.require_existing and not self._nodes:
+            raise IntegrityError(
+                "Kafka logical store has no materialized nodes; "
+                "store identity cannot be confirmed"
+            )
+
+    def _open_producer(self) -> None:
+        if self.read_only:
+            raise RuntimeError("read-only KafkaStore cannot create a producer")
+        producer_config = {
+            **self._base_client_config(),
+            "acks": "all",
+            "enable.idempotence": True,
+        }
+        self._producer = self._kafka.Producer(producer_config)
 
     def _shutdown_clients(self) -> None:
         consumer, producer = self._consumer, self._producer
         self._consumer = None
         self._producer = None
+        self._close_clients(consumer, producer)
+
+    @staticmethod
+    def _close_clients(consumer: Any, producer: Any) -> None:
         if consumer is not None:
             with suppress(Exception):
                 consumer.close()
@@ -290,22 +354,39 @@ class KafkaStore:
                 with suppress(Exception):
                     producer.flush(0)
 
+    def _base_client_config(self) -> dict[str, object]:
+        config = {
+            **{
+                key: value
+                for key, value in self.client_config.items()
+                if key not in _CONTROLLED_CONFIG
+            },
+            "allow.auto.create.topics": False,
+        }
+        if self.read_only:
+            # Broker telemetry is unnecessary for a frozen observational view.
+            config["enable.metrics.push"] = False
+        return config
+
+    def _consumer_group_id(self) -> str:
+        role = "observer" if self.read_only else "reader"
+        identity = hashlib.sha256(
+            f"{self.topic}\0{self.store_id}".encode()
+        ).hexdigest()
+        return f"pollard-{role}-{identity}"
+
     def _reset_view(self) -> None:
         self._nodes = {}
         self._children = {}
         self._operations = {}
         self._operation_offsets = {}
         self._outcomes = {}
+        self._event_digests = []
         self._next_offset = 0
+        self._snapshot_high_offset = None
 
     def _validate_topic(self) -> None:
-        admin = self._kafka_admin.AdminClient(
-            {
-                key: value
-                for key, value in self.client_config.items()
-                if key not in _CONTROLLED_CONFIG
-            }
-        )
+        admin = self._kafka_admin.AdminClient(self._base_client_config())
         try:
             # Passing a topic name to list_topics can auto-create it on some
             # clusters.  Fetching all metadata keeps topic creation explicit.
@@ -318,7 +399,7 @@ class KafkaStore:
         topic_error = getattr(topic_metadata, "error", None)
         if topic_error is not None:
             raise IntegrityError(
-                f"Kafka topic metadata is unavailable for {self.topic}: {topic_error}"
+                f"Kafka topic metadata is unavailable for {self.topic}"
             )
         partitions = getattr(topic_metadata, "partitions", None)
         if not isinstance(partitions, Mapping) or set(partitions) != {0}:
@@ -355,6 +436,7 @@ class KafkaStore:
                 raise IntegrityError(f"KafkaStore requires {name}=-1")
 
     def _append_command(self, operation: str, body: dict[str, Any]) -> str:
+        self._require_writable()
         self._sync_current()
         event, operation_id = _event(self.store_id, operation, body)
         if operation_id in self._operations:
@@ -379,9 +461,7 @@ class KafkaStore:
             # transient consumer failure cannot turn a committed command into an
             # unexplained application result.
             try:
-                self._shutdown_clients()
-                self._reset_view()
-                self._open_clients()
+                self.reconnect()
             except BaseException as replay_error:
                 raise IntegrityError(
                     "Kafka command was acknowledged but replay confirmation failed "
@@ -395,6 +475,7 @@ class KafkaStore:
         return operation_id
 
     def _produce_with_recovery(self, *, value: bytes, operation_id: str) -> int:
+        self._require_writable()
         last_error: BaseException | None = None
         for _attempt in range(2):
             try:
@@ -419,6 +500,9 @@ class KafkaStore:
         raise error from last_error
 
     def _produce_once(self, value: bytes) -> int:
+        self._require_writable()
+        if self._producer is None:
+            raise RuntimeError("KafkaStore has no producer")
         delivered = Event()
         result: dict[str, Any] = {}
 
@@ -458,6 +542,8 @@ class KafkaStore:
         return offset
 
     def _sync_current(self) -> None:
+        if self.read_only and self._snapshot_high_offset is not None:
+            return
         try:
             low, high = self._consumer.get_watermark_offsets(
                 self._kafka.TopicPartition(self.topic, 0),
@@ -475,6 +561,8 @@ class KafkaStore:
             raise IntegrityError("Kafka high watermark moved behind the replay cursor")
         if high_offset > self._next_offset:
             self._sync_to_offset(high_offset - 1)
+        if self.read_only:
+            self._snapshot_high_offset = high_offset
 
     def _sync_to_offset(self, target_offset: int) -> None:
         if target_offset < self._next_offset:
@@ -494,7 +582,7 @@ class KafkaStore:
                 continue
             error = message.error()
             if error is not None:
-                raise IntegrityError(f"Kafka replay returned an error: {error}")
+                raise IntegrityError("Kafka replay returned a broker error")
             if message.topic() != self.topic or int(message.partition()) != 0:
                 raise IntegrityError("Kafka replay crossed the configured topic partition")
             offset = int(message.offset())
@@ -503,12 +591,14 @@ class KafkaStore:
                     "Kafka log contains an offset gap: expected "
                     f"{self._next_offset}, received {offset}"
                 )
-            self._apply_message(offset, message.key(), message.value())
+            key, value = message.key(), message.value()
+            self._apply_message(offset, key, value)
+            self._event_digests.append(_record_digest(key, value))
             self._next_offset += 1
 
     def _apply_message(self, offset: int, key: object, value: object) -> None:
         expected_key = self.store_id.encode("utf-8")
-        if key != expected_key:
+        if not isinstance(key, bytes) or key != expected_key:
             raise IntegrityError(f"Kafka log offset {offset} has the wrong store key")
         if not isinstance(value, bytes):
             raise IntegrityError(f"Kafka log offset {offset} is not a byte record")
@@ -524,8 +614,6 @@ class KafkaStore:
                     f"Kafka operation id collision at offset {offset}: {operation_id}"
                 )
             return
-        self._operations[operation_id] = request_digest
-        self._operation_offsets[operation_id] = offset
         operation = event["operation"]
         body = event["body"]
         if not isinstance(operation, str) or not isinstance(body, dict):
@@ -533,11 +621,12 @@ class KafkaStore:
         if operation == "put":
             node = _node_from_record(body, offset=offset)
             self._apply_put(operation_id, node)
-            return
-        if operation == "meta":
+        elif operation == "meta":
             self._apply_meta(operation_id, body, offset=offset)
-            return
-        raise IntegrityError(f"Kafka log offset {offset} has unknown operation")
+        else:
+            raise IntegrityError(f"Kafka log offset {offset} has unknown operation")
+        self._operations[operation_id] = request_digest
+        self._operation_offsets[operation_id] = offset
 
     def _apply_put(self, operation_id: str, node: Node) -> None:
         _validate_for_put(node)
@@ -604,6 +693,16 @@ class KafkaStore:
         if self._closed:
             raise RuntimeError("KafkaStore is closed")
 
+    def _require_writable(self) -> None:
+        if self.read_only:
+            raise PermissionError("KafkaStore is read-only")
+
+    def _require_history_prefix(self, previous_digests: list[str]) -> None:
+        if self._event_digests[: len(previous_digests)] != previous_digests:
+            raise IntegrityError(
+                "Kafka history changed before the previous replay boundary"
+            )
+
 
 def _event(
     store_id: str,
@@ -627,6 +726,13 @@ def _event(
         },
         operation_id,
     )
+
+
+def _record_digest(key: object, value: object) -> str:
+    if not isinstance(key, bytes) or not isinstance(value, bytes):
+        raise IntegrityError("Kafka log record has invalid byte fields")
+    framed = len(key).to_bytes(8, "big") + key + value
+    return hashlib.sha256(framed).hexdigest()
 
 
 def _parse_event(value: bytes, *, offset: int, store_id: str) -> dict[str, Any]:
