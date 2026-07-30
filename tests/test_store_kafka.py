@@ -1180,7 +1180,8 @@ def test_kafka_real_cli_merge_destination_is_existing_and_idempotent(
             assert reopened.get(anchor.id) == anchor
             assert reopened.get(source_root.id) == source_root
             assert reopened.get(source_child.id) == source_child
-            assert verify(reopened).ok
+            assert verify(reopened, anchor.id).ok
+            assert verify(reopened, source_root.id).ok
             assert seal(reopened, source_root.id).root_id == source_root.id
 
         assert (

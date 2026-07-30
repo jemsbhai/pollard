@@ -67,6 +67,18 @@ _REMOTE_STORE_PREFIXES = (
 )
 
 
+def _parse_query_parameters(query: str) -> list[tuple[str, str]]:
+    """Parse a non-empty store query consistently across supported Python versions."""
+    if not query:
+        return []
+    return parse_qsl(
+        query,
+        keep_blank_values=True,
+        strict_parsing=True,
+        errors="strict",
+    )
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     parser = _parser()
     args = parser.parse_args(argv)
@@ -901,12 +913,7 @@ def _redis_env_reference(spec: str) -> tuple[str, str, str]:
     if "?" in parsed.fragment:
         raise ValueError("redis-env query must precede the store id fragment")
     try:
-        parameters = parse_qsl(
-            parsed.query,
-            keep_blank_values=True,
-            strict_parsing=True,
-            errors="strict",
-        )
+        parameters = _parse_query_parameters(parsed.query)
     except ValueError as exc:
         raise ValueError("redis-env store spec has an invalid query") from exc
     if len(parameters) > 1 or (
@@ -959,12 +966,7 @@ def _mongo_env_reference(spec: str) -> tuple[str, str, str, str]:
     if "?" in parsed.fragment:
         raise ValueError("mongo-env query must precede the store id fragment")
     try:
-        parameters = parse_qsl(
-            parsed.query,
-            keep_blank_values=True,
-            strict_parsing=True,
-            errors="strict",
-        )
+        parameters = _parse_query_parameters(parsed.query)
     except ValueError as exc:
         raise ValueError("mongo-env store spec has an invalid query") from exc
     values: dict[str, str] = {}
@@ -1070,12 +1072,7 @@ def _neo4j_env_reference(spec: str) -> tuple[str, str, str, str, str]:
     if "?" in parsed.fragment:
         raise ValueError("neo4j-env query must precede the store id fragment")
     try:
-        parameters = parse_qsl(
-            parsed.query,
-            keep_blank_values=True,
-            strict_parsing=True,
-            errors="strict",
-        )
+        parameters = _parse_query_parameters(parsed.query)
     except ValueError as exc:
         raise ValueError("neo4j-env store spec has an invalid query") from exc
     values: dict[str, str] = {}
@@ -1196,12 +1193,7 @@ def _kafka_env_reference(spec: str) -> tuple[str, str, str, int]:
     if "?" in parsed.fragment:
         raise ValueError("kafka-env query must precede the store id fragment")
     try:
-        parameters = parse_qsl(
-            parsed.query,
-            keep_blank_values=True,
-            strict_parsing=True,
-            errors="strict",
-        )
+        parameters = _parse_query_parameters(parsed.query)
     except ValueError:
         raise ValueError("kafka-env store spec has an invalid query") from None
     values: dict[str, str] = {}
@@ -1412,12 +1404,7 @@ def _require_explicit_mongo_destination(spec: str) -> None:
     _variable, database, store_id, collection_prefix = _mongo_env_reference(spec)
     try:
         parsed = urlsplit(spec)
-        parameters = parse_qsl(
-            parsed.query,
-            keep_blank_values=True,
-            strict_parsing=True,
-            errors="strict",
-        )
+        parameters = _parse_query_parameters(parsed.query)
     except ValueError:
         raise ValueError("invalid mongo-env store spec") from None
     names = {name for name, _value in parameters}
@@ -1446,12 +1433,7 @@ def _require_explicit_neo4j_destination(spec: str) -> None:
     ) = _neo4j_env_reference(spec)
     try:
         parsed = urlsplit(spec)
-        parameters = parse_qsl(
-            parsed.query,
-            keep_blank_values=True,
-            strict_parsing=True,
-            errors="strict",
-        )
+        parameters = _parse_query_parameters(parsed.query)
     except ValueError:
         raise ValueError("invalid neo4j-env store spec") from None
     names = {name for name, _value in parameters}
@@ -1480,12 +1462,7 @@ def _require_explicit_kafka_destination(spec: str) -> None:
     variable, topic, store_id, _timeout = _kafka_env_reference(spec)
     try:
         parsed = urlsplit(spec)
-        parameters = parse_qsl(
-            parsed.query,
-            keep_blank_values=True,
-            strict_parsing=True,
-            errors="strict",
-        )
+        parameters = _parse_query_parameters(parsed.query)
     except ValueError:
         raise ValueError("invalid kafka-env store spec") from None
     names = {name for name, _value in parameters}
