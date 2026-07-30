@@ -65,7 +65,7 @@ class TransactionalKVStore(ABC):
         def require(tx: KVTransaction) -> None:
             version = tx.get(_SCHEMA_BUCKET, "version")
             if version != str(_SCHEMA_VERSION):
-                label = "missing" if version is None else version
+                label = "missing" if version is None else ascii(version)[1:-1]
                 raise IntegrityError(
                     f"unsupported {self.backend_name} schema version: {label}"
                 )

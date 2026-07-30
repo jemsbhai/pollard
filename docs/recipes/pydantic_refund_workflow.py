@@ -45,8 +45,14 @@ def main() -> None:
     class CustomerAuthorization(BaseModel):
         model_config = ConfigDict(extra="forbid")
 
-        customer_id: str = Field(description="Customer that owns the order")
+        customer_id: str = Field(
+            min_length=1,
+            max_length=128,
+            description="Customer that owns the order",
+        )
         approval_token: str = Field(
+            min_length=1,
+            max_length=512,
             description="Secret token authorizing the refund",
             json_schema_extra={"sensitive": True},
         )
@@ -54,10 +60,24 @@ def main() -> None:
     class RefundRequest(BaseModel):
         model_config = ConfigDict(extra="forbid")
 
-        order_id: str = Field(description="Order to refund")
-        amount_cents: int = Field(description="Refund amount in integer cents")
+        order_id: str = Field(
+            min_length=1,
+            max_length=128,
+            description="Order to refund",
+        )
+        amount_cents: int = Field(
+            gt=0,
+            le=1_000_000,
+            description="Refund amount in integer cents",
+        )
         reason: Literal["duplicate", "service_failure", "fraud"]
         authorization: CustomerAuthorization
+        operator_note: str | None = Field(
+            default=None,
+            min_length=1,
+            max_length=256,
+            description="Optional non-sensitive audit note",
+        )
 
     class RefundReceipt(BaseModel):
         model_config = ConfigDict(extra="forbid")
@@ -177,6 +197,16 @@ def main() -> None:
             "local_refs_resolved": (
                 "$defs" not in resolved_schema_text
                 and "$ref" not in resolved_schema_text
+            ),
+            "schema_constraints_registered": all(
+                keyword in resolved_schema_text
+                for keyword in (
+                    "anyOf",
+                    "exclusiveMinimum",
+                    "maximum",
+                    "minLength",
+                    "maxLength",
+                )
             ),
             "preview": {
                 "handler_executed": preview.result is not None,

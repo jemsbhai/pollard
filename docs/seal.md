@@ -23,7 +23,7 @@ print(report.digest)
 print(report.to_dict())
 ```
 
-From the offline CLI:
+From the CLI:
 
 ```powershell
 pollard seal runs.db <root-id>
@@ -34,7 +34,7 @@ pollard seal runs.db <root-id> --output seal.json --json
 The short human-readable form is suitable for copying a digest. `--output`
 writes the complete report, including every entry, for independent inspection.
 Keep the expected final digest in a system controlled separately from the
-SQLite database or exported subtree when later tamper detection matters.
+Pollard store or exported subtree when later tamper detection matters.
 
 ## Validation before hashing
 
@@ -48,6 +48,22 @@ For every visited node, Pollard first checks:
 Any mismatch raises `IntegrityError`; Pollard does not issue a seal over known
 invalid data. A successful seal therefore covers validated identities and
 result digests in the subtree present at that moment.
+
+When the CLI seals MongoDB, traversal spans multiple snapshot transactions
+rather than one point-in-time snapshot. Quiesce writes or otherwise stabilize
+the namespace when the seal must represent one evidence boundary.
+
+Neo4j CLI reads are write-routed to a primary but use read-committed isolation,
+not snapshot isolation. A command can span multiple managed transactions.
+Quiesce writes or otherwise stabilize the logical store when a Neo4j seal must
+represent one evidence boundary.
+
+Kafka CLI construction captures the exclusive high watermark, fully replays
+the committed prefix `[0, high)`, and freezes that in-memory view. A seal is
+therefore internally consistent while writers append, but it covers only that
+captured prefix. Reconnecting captures a new prefix. Quiesce writers only when
+the seal must represent a drained final topic, and independently record the
+topic, partition zero, low watermark zero, and exclusive high watermark.
 
 Run `pollard verify runs.db <root-id>` when a findings-oriented integrity report
 is more useful than an exception. Run `pollard seal` when a deterministic
@@ -114,7 +130,10 @@ As a consequence:
 The seal also does not cover the database file as a byte-for-byte container,
 indexes, SQLite page layout, PostgreSQL schema, encryption configuration,
 backups, external attachments, provider logs, or the report file containing the
-seal itself.
+seal itself. For Kafka, it also excludes the topic name and configuration,
+partition offsets and watermarks, event envelopes and operation ids, duplicate
+commands, and metadata-patch history. Distinct valid Kafka logs can materialize
+the same sealed Pollard tree.
 
 ## Export and import
 
@@ -134,6 +153,10 @@ An export includes mutable metadata for utility, but the seal does not cover
 that metadata. If metadata needs an immutable evidence boundary, serialize the
 required fields in an application-owned signed manifest or record them as a new
 Pollard note payload before sealing.
+
+A Kafka export is a projection of the materialized subtree from the observer's
+frozen prefix. It is not a broker-log backup and does not preserve the source
+topic, offsets, command order, or operation history.
 
 ## Threat model and signatures
 

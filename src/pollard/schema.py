@@ -66,6 +66,11 @@ def resolve_local_refs(schema: dict[str, Any]) -> dict[str, Any]:
                     )
                     for property_name, property_schema in child.items()
                 }
+            elif name == "anyOf" and isinstance(child, list):
+                children[name] = [
+                    resolve(item, f"{path}.anyOf[{index}]", active)
+                    for index, item in enumerate(child)
+                ]
             elif name == "items":
                 children[name] = resolve(child, f"{path}.items", active)
             else:
@@ -90,6 +95,9 @@ def schema_has_local_refs(schema: dict[str, Any]) -> bool:
             properties = value.get("properties")
             if isinstance(properties, dict):
                 pending.extend(properties.values())
+            any_of = value.get("anyOf")
+            if isinstance(any_of, list):
+                pending.extend(any_of)
             if "items" in value:
                 pending.append(value["items"])
     return False

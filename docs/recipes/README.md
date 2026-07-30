@@ -368,10 +368,11 @@ With no arguments, the recipe writes `pydantic-refund.db` and uses order
 changed while keeping the token illustrative.
 
 The generated schema intentionally uses Pollard's supported finite subset:
-objects, strings, integers, booleans, arrays, enums, local references, and
-standard annotations. Pydantic fields that emit `anyOf`, `number`, `format`,
-range, or length keywords require a different schema boundary because Pollard
-rejects unsupported validation keywords at registration.
+objects, strings, integers, booleans, arrays, enums, finite `anyOf` branches,
+local references, integer bounds, string and array length constraints, and
+standard annotations. Pydantic fields that emit `number`, `format`, `pattern`,
+`multipleOf`, or other unsupported validation keywords require a different
+schema boundary because Pollard rejects them at registration.
 
 ## pydantic-ai claim triage
 
@@ -522,7 +523,7 @@ undo a confirmed side effect or delete a provider-side log.
 | Missing recording in replay | Payload, parent, kind, attempt, and model must match the recorded identity exactly |
 | Duplicate or surprising live charge | SDK retries, framework retries, a hybrid cache miss, or a framework-internal request outside Pollard |
 | Offline workflow asks for a credential | Confirm that `--live` was not passed and that the selected mode and recipe are the intended ones |
-| Generated Pydantic schema is refused | Use Pollard's supported schema subset; inspect unions, numeric types, formats, and constraint keywords |
+| Generated Pydantic schema is refused | Use Pollard's supported schema subset; inspect `number`, `format`, `pattern`, `multipleOf`, other constraint keywords, and each union branch for unsupported features |
 | MCP tool refused | Tool was discovered, schema is supported, version is `mcp`, arguments validate, and policy permits it |
 | Empty tool-call list | Model supports tool use, tool schema is valid, and the prompt makes the requested action clear |
 

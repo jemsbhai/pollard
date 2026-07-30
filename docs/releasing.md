@@ -174,7 +174,9 @@ with zipfile.ZipFile(wheel) as archive:
     )
 
 assert metadata["Author"] == "Muntaser Syed"
+assert metadata["Version"] == "X.Y.Z"
 print(f"Author: {metadata['Author']}")
+print(f"Version: {metadata['Version']}")
 '@ | python -
 ```
 
@@ -184,7 +186,7 @@ Install the wheel into a fresh virtual environment and run offline smoke checks:
 python -m venv .release-venv
 .\.release-venv\Scripts\python -m pip install --no-deps (Get-ChildItem dist\*.whl)
 .\.release-venv\Scripts\pollard --help
-.\.release-venv\Scripts\python -c "import pollard; print(pollard.__version__)"
+.\.release-venv\Scripts\python -c "import importlib.metadata as m, pollard; assert pollard.__version__ == 'X.Y.Z'; assert m.version('pollard') == 'X.Y.Z'; print(pollard.__version__)"
 ```
 
 Delete the temporary environment after the release is complete. It is not a

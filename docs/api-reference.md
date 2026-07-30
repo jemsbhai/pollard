@@ -278,17 +278,30 @@ registry rejects duplicate names and computes `registry_digest` from its sorted
 spec digests. A run root binds to one registry digest.
 
 The zero-dependency schema subset accepts `type`, `properties`, `required`,
-`enum`, `items`, `additionalProperties`, the non-validation annotations `title`,
-`description`, and `default`, and Pollard's `sensitive` marker. Types are object,
-string, integer, boolean, array, and null. Finite local `$ref` values into
-`$defs` or legacy `definitions` are expanded when the spec is constructed.
-Missing, external, and cyclic references raise `UnsupportedSchema`, as do
-unsupported validation keywords or types. An annotation does not change
-argument validation, but remains part of the action spec digest.
+`enum`, `items`, `additionalProperties`, non-empty `anyOf` arrays,
+`minimum`, `maximum`, `exclusiveMinimum`, `exclusiveMaximum`, `minLength`,
+`maxLength`, `minItems`, `maxItems`, the non-validation annotations `title`,
+`description`, and `default`, and Pollard's `sensitive` marker. Each `anyOf`
+branch uses the same supported subset. Types are object, string, integer,
+boolean, array, and null.
+
+The four minimum and maximum keywords require `type: "integer"` and integer
+bounds. `minLength` and `maxLength` require `type: "string"` and nonnegative
+integer counts. `minItems` and `maxItems` require `type: "array"` and
+nonnegative integer counts. `number`, `format`, `pattern`, `multipleOf`, and
+other JSON Schema validation keywords remain unsupported.
+
+Finite local `$ref` values into `$defs` or legacy `definitions` are expanded
+when the spec is constructed. Missing, external, and cyclic references raise
+`UnsupportedSchema`, as do unsupported validation keywords or types. An
+annotation does not change argument validation, but remains part of the action
+spec digest.
 
 `sensitive: true` is valid on string fields. Pollard validates the original
 argument, supplies it to policies and the handler, but hashes and stores a
-redaction marker. Handler results and metadata are not automatically redacted.
+redaction marker. For `anyOf`, redaction follows every matching branch; if an
+invalid value matches none, Pollard applies every branch before recording a
+refusal. Handler results and metadata are not automatically redacted.
 
 A policy implements:
 
@@ -322,10 +335,10 @@ live policies because no action is executed.
 | `MemoryStore` | `MemoryStore()` | Tests and one-process ephemeral runs |
 | `SQLiteStore` | `SQLiteStore(path, intern_payloads=True, intern_threshold=1024, read_only=False)` | Persistent one-host runs; query-only inspection or replay with `read_only=True` |
 | `PostgresStore` | `PostgresStore(conninfo, store_id="default", ...)` | Transactional multi-process and multi-host runs |
-| `RedisStore` | `RedisStore(url=None, *, client_factory=None, store_id="default", prefix="pollard", watch_retries=64)` | Transactional shared runs on one Redis logical store |
-| `MongoStore` | `MongoStore(uri, database="pollard", store_id="default", ...)` | Transactional shared runs on a replica set or sharded deployment |
-| `Neo4jStore` | `Neo4jStore(uri, auth, database="neo4j", store_id="default", ...)` | Transactional shared runs routed through a graph primary |
-| `KafkaStore` | `KafkaStore(client_config, topic=..., store_id="default", ...)` | Ordered append-only audit and replay without shared arbitration |
+| `RedisStore` | `RedisStore(url=None, *, client_factory=None, store_id="default", prefix="pollard", create=True, watch_retries=64)` | Transactional shared runs on one Redis logical store |
+| `MongoStore` | `MongoStore(uri, database="pollard", store_id="default", collection_prefix="pollard", create=True, ...)` | Transactional shared runs on a replica set or sharded deployment |
+| `Neo4jStore` | `Neo4jStore(uri, auth, database="neo4j", store_id="default", create=True, ...)` | Transactional shared runs routed through a graph primary |
+| `KafkaStore` | `KafkaStore(client_config, topic=..., store_id="default", read_only=False, require_existing=False, timeout=30)` | Ordered append-only audit and replay without shared arbitration |
 | `HashRopeStore` | `HashRopeStore(data=b"")` | In-process operation log and byte snapshot |
 
 `Store` is the frozen structural protocol with `put`, `get`, `exists`,
@@ -349,11 +362,12 @@ the schema version before returning.
 neither. Kafka also omits the private maintenance capability, so `gc()` refuses
 it instead of implying that an append-only broker log was physically erased.
 
-Every remote-store constructor establishes a live connection and validates or
-initializes its schema before returning. Each implements `close()`,
-`reconnect()`, `__enter__`, and `__exit__`; use a context manager for bounded
-work. These adapters are synchronous. Applications that use an asynchronous
-runtime must keep blocking store calls off latency-sensitive event-loop paths.
+Every remote-store constructor establishes a live connection and validates its
+backend contract, initializing a schema where applicable, before returning.
+Each implements `close()`, `reconnect()`, `__enter__`, and `__exit__`; use a
+context manager for bounded work. These adapters are synchronous. Applications
+that use an asynchronous runtime must keep blocking store calls off
+latency-sensitive event-loop paths.
 
 Remote driver packages are imported lazily. Importing `pollard` does not
 require them, while constructing a store without its extra raises an
@@ -363,20 +377,172 @@ Backend-specific constructor behavior:
 
 - `RedisStore` creates keys beneath `prefix`, hashes `store_id` into a common
   Redis key tag, and retries at most `watch_retries` optimistic conflicts.
+  With `create=True`, an empty logical namespace initializes its identity,
+  schema, and revision atomically in one Redis transaction; an existing
+  namespace must match its identity and schema.
+  Pass `create=False` to require an existing identity, schema, and revision
+  without initializing a missing logical namespace.
+  URL-backed construction rejects `decode_responses`, `encoding`, and
+  `encoding_errors` query options because Pollard owns string decoding.
   Pass either a URL or a zero-argument `client_factory`. The factory must
   return a fresh synchronous redis-py client with decoded string responses;
   Pollard calls it again on reconnect.
 - `MongoStore` passes additional keyword arguments to `pymongo.MongoClient`.
   `collection_prefix` defaults to `pollard` and may contain only letters,
-  digits, and underscores after an initial letter.
+  digits, and underscores after an initial letter. With `create=True`, it
+  classifies the namespace first. A fresh store gets the unique record index,
+  then schema and coordinator identity/revision initialize in one transaction.
+  Index DDL is outside that transaction. Existing or partial state is never
+  repaired implicitly. Pass `create=False` to validate a replica-set or mongos
+  topology and require an exact schema, coordinator, and unique index without
+  creating collections, indexes, coordinator state, or schema records.
+  Reconnect uses the same non-mutating validation.
 - `Neo4jStore` passes additional keyword arguments to
   `GraphDatabase.driver`. `auth` is the driver authentication value and
-  `database` defaults to `neo4j`.
+  `database` defaults to `neo4j`. With `create=True`, it first classifies the
+  logical namespace without writing. An existing namespace must have the exact
+  schema, coordinator, and both named uniqueness constraints. A completely
+  fresh namespace creates or confirms the database-global constraints outside
+  the logical transaction, then initializes schema and coordinator together in
+  one managed transaction. Pass `create=False` to require the same exact
+  existing state without writes or constraint DDL. Partial, ambiguous, and
+  incompatible states are not repaired. `reconnect()` always uses this
+  non-mutating existing-state validation, regardless of the original
+  `create` value.
 - `KafkaStore` accepts a confluent-kafka client configuration mapping and a
-  positive operation `timeout`. It requires an existing dedicated topic. It
-  controls acknowledgements, idempotence, consumer group and offset behavior,
-  isolation, and earliest replay; unrelated TLS, SASL, and transport settings
-  pass through.
+  positive finite operation `timeout`. It requires an existing dedicated topic.
+  It controls topic auto-creation, acknowledgements, idempotence, consumer group
+  and offset behavior, isolation, and earliest replay; unrelated TLS, SASL, and
+  transport settings pass through. `read_only=True` creates no producer and
+  refuses `put()` and `update_meta()`. It also disables client metrics push,
+  captures the exclusive high watermark during construction, replays the
+  committed prefix `[0, high)`, and serves every read from that frozen in-memory
+  view. `reconnect()` atomically captures a new prefix only when every
+  previously observed Kafka record digest remains unchanged at its original
+  offset; failed replacement or prefix validation leaves the prior clients and
+  view installed. Writable construction validates the existing topic,
+  configuration, complete history, and retained prefix before constructing the
+  producer. `require_existing=True` additionally refuses producer construction
+  unless replay materializes at least one node; the CLI uses that mode for
+  destinations. KafkaStore still does not create or initialize a topic.
+
+The Redis CLI form is
+`redis-env:VARIABLE?prefix=PREFIX#store-id`. Observation and merge sources open
+with `RedisStore(create=False)` and require the selected logical namespace to
+exist. A merge destination must use `redis-env:` with an explicit prefix and
+store id. It also opens with `RedisStore(create=False)` by default, requiring a
+matching existing namespace.
+
+For every CLI merge, Pollard first validates only the destination selector's
+syntax and whether the requested flags are eligible for that selector. This
+stage does not read destination environment values or construct a destination
+client. The CLI then opens each source in command-line order, traverses and
+validates it completely, serializes every exact `Node` field into a
+uniquely-named SQLite spool in a private temporary directory, closes the source,
+and finalizes and validates the spool. Spool records carry deterministic
+positions plus record and whole-spool digests. All source spools must pass
+SQLite integrity, schema, completion, size, ordering, node-id, record-digest,
+and aggregate-digest checks before destination environment lookup, client
+construction, initialization, or writes.
+
+Preparation retains only a bounded working set in RAM; temporary disk use grows
+with the total prepared sources. The spools are internal artifacts rather than
+portable exports and contain payload, result, and metadata content. Pollard
+creates unique private paths, never selects a user output path, closes database
+handles before removal for Windows compatibility, and attempts to remove the
+whole private directory on every exit. Spool creation,
+serialization, disk-write, finalization, corruption, or truncation errors are
+attributed to the source and fail before destination access. A cleanup error can
+leave private artifacts and is a command error with a credential-safe message.
+If another error already exists, it retains its source or destination
+attribution and receives a fixed cleanup-failure notice. If cleanup fails after
+destination application, writes may already have succeeded; inspect the
+destination and rerun the exact idempotent merge.
+
+For Redis, `--initialize-if-missing` is valid only for an explicit `redis-env:`
+destination. With that flag, the CLI finalizes and validates every source spool
+before constructing the destination with
+`RedisStore(create=True)`. A missing destination atomically initializes
+identity, schema, and revision; an existing one must match. Malformed percent
+escapes and whitespace in a destination prefix or store id are rejected.
+Direct `redis://` and `rediss://` specifications remain legacy source-only
+forms and are rejected as destinations. Redis merge copies nodes and metadata
+rather than mutable governance state, is not one cross-node or cross-backend
+transaction, and is idempotent on an exact rerun. `import` and `gc` remain
+SQLite-only.
+
+The MongoDB CLI form is
+`mongo-env:VARIABLE?database=DATABASE&prefix=PREFIX#store-id`. Sources may use
+the `pollard`, `pollard`, and `default` selector defaults. A merge destination
+must explicitly provide database, prefix, and store id and uses
+`MongoStore(create=False)` by default. Direct `mongodb://` and
+`mongodb+srv://` arguments are rejected.
+
+`--initialize-if-missing` may be used with an explicit `mongo-env:`
+destination. Only after all source spools are finalized and validated does the
+CLI resolve the destination environment value and construct
+`MongoStore(create=True)`.
+Missing, partial, malformed-coordinator, or incompatibly indexed existing
+state fails closed. Physical index setup is separate from the transaction that
+initializes schema and coordinator revision, so a failed construction can leave
+an empty index-only shell; Pollard does not infer repairs for partial logical
+state. Labels, warnings, and driver failures never render the URI. MongoDB
+merge is node-by-node and non-atomic, exact reruns are idempotent, and active
+governance state is not copied. Quiesce writers, then verify and seal. `import`
+and `gc` remain SQLite-only.
+
+The Neo4j CLI form is
+`neo4j-env:URI_VAR?user-env=USER_VAR&password-env=PASSWORD_VAR&database=DB#store-id`.
+Both auth references are required. Sources may use the `neo4j` database and
+`default` store-id defaults. A merge destination must explicitly provide the
+URI, user, and password environment references, database, and store id and uses
+`Neo4jStore(create=False)` by default. Direct Neo4j and Bolt URI arguments are
+rejected.
+
+`--initialize-if-missing` may be used with an explicit `neo4j-env:`
+destination. Only after all source spools are finalized and validated does the
+CLI resolve the environment values and construct `Neo4jStore(create=True)`.
+Existing-only
+construction validates schema, coordinator, exact constraint metadata, and
+owned online range-index metadata without writes. Fresh initialization checks
+logical emptiness before creating
+or validating the shared global constraints, then initializes schema and
+coordinator atomically. Constraint DDL is a separate database-wide operation;
+partial logical states and partial, incompatible, or offline constraint/index
+states fail closed. Labels,
+warnings, and driver failures omit credential values. Neo4j merge is
+node-by-node and non-atomic, exact reruns are idempotent, and active governance
+state is not copied. Quiesce writers, inspect and rerun after partial failure,
+then verify and seal. `import` and `gc` remain SQLite-only.
+
+The Kafka CLI form is
+`kafka-env:CONFIG_VAR?topic=TOPIC&timeout=SECONDS#store-id`. Topic is required,
+timeout is a positive integer defaulting to `30`, and store id defaults to
+`default` for sources. A merge destination requires the explicit configuration
+reference, topic, and nonempty store-id fragment. The referenced JSON object
+must have unique keys, a nonempty string `bootstrap.servers`, and only string,
+boolean, integer, or finite-number values. The CLI rejects plugins and
+suppresses native debug/log output. Its label contains the configuration
+reference, topic, and store id, but not timeout or any configuration value.
+
+Observation and merge sources use `KafkaStore(read_only=True)` and freeze one
+producer-free prefix. A merge destination is existing-and-populated only: full
+replay must materialize at least one node and prove the explicit store id.
+Missing, empty, wrong-identity, corrupt, truncated, or incompatibly configured
+topics fail before producer construction and publish nothing. Pollard never
+creates topics, and `--initialize-if-missing` is invalid for Kafka. An operator
+must provision the topic and a reviewed Python writer must seed its first node.
+Every source spool is finalized and validated before destination configuration
+lookup or access; the producer is constructed only after destination topic,
+configuration, history, and prefix validation.
+
+Kafka merge appends deterministic node and metadata commands one at a time
+using `acks=all`, idempotence, and replay confirmation. It is non-atomic and
+accepted events are irreversible through Pollard, while an exact rerun
+publishes no new events. Quiesce writers, inspect and rerun after partial
+failure, then verify and seal. Concurrent writers can race merge metadata.
+Kafka remains neither an import nor a garbage-collection target and does not
+provide shared arbitration or record-level GC.
 
 See the
 [distributed-store operations guide](https://github.com/jemsbhai/pollard/blob/main/docs/distributed-stores.md)
@@ -419,6 +585,12 @@ appends a `SealCustodyRecord` to a database kept outside the Pollard store.
 the selected root when performing a whole-tree verification. `seal` raises on
 invalid nodes and produces a rolling digest over node IDs and result digests.
 `merge` unions disconnected stores; replay mode rejects result conflicts.
+Merge is not a cross-node or cross-backend transaction, so a failure can retain
+changes already accepted by the destination. Repeating the exact merge is
+idempotent. CLI merge prepares every source into a private disk-backed spool
+before destination access and bounds its aggregate preparation working set in
+RAM. Concurrent destination writers can race metadata updates; quiesce them for
+an evidence-grade transfer.
 Export includes a complete seal, and import verifies it before any write.
 Garbage collection is explicit and offline; supported modes are `drop-pruned`
 and `compact`.
