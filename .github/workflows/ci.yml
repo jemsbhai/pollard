@@ -7,6 +7,10 @@ on:
 permissions:
   contents: read
 
+env:
+  # Remove after tokenmaster 0.2.0 is available from the package index.
+  TOKENMASTER_CI_BOOTSTRAP: "tokenmaster @ git+https://github.com/jemsbhai/tokenmaster.git@15e8063956f5288fdf97e22707e267c606a15b0d#subdirectory=python/tokenmaster"
+
 jobs:
   test:
     name: Python ${{ matrix.python-version }} on ${{ matrix.os }}
@@ -25,7 +29,9 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install
-        run: python -m pip install -e ".[dev,estimate-openai]"
+        run: |
+          python -m pip install "${{ env.TOKENMASTER_CI_BOOTSTRAP }}"
+          python -m pip install -e ".[dev,estimate-openai]"
 
       - name: Ruff
         run: python -m ruff check src tests examples docs/recipes
@@ -61,7 +67,9 @@ jobs:
           python-version: "3.14"
 
       - name: Install
-        run: python -m pip install -e ".[dev,langchain,pydantic-ai]"
+        run: |
+          python -m pip install "${{ env.TOKENMASTER_CI_BOOTSTRAP }}"
+          python -m pip install -e ".[dev,langchain,pydantic-ai]"
 
       - name: Recipe checks
         run: >-
@@ -112,7 +120,9 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install
-        run: python -m pip install -e ".[dev]"
+        run: |
+          python -m pip install "${{ env.TOKENMASTER_CI_BOOTSTRAP }}"
+          python -m pip install -e ".[dev]"
 
       - name: Supported release acceptance
         run: >-
@@ -142,7 +152,9 @@ jobs:
           python-version: "3.13"
 
       - name: Install
-        run: python -m pip install -e ".[dev]"
+        run: |
+          python -m pip install "${{ env.TOKENMASTER_CI_BOOTSTRAP }}"
+          python -m pip install -e ".[dev]"
 
       - name: Start disposable services
         run: |
