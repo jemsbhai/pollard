@@ -6,6 +6,7 @@ import json
 import time
 import warnings
 from collections.abc import Callable, Iterator
+from contextlib import suppress
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from decimal import Decimal
@@ -48,6 +49,7 @@ from .hashing import digest_payload
 from .meters import (
     DepthMeter,
     Meter,
+    MeterPrecheckRefusal,
     StepMeter,
     TokenMeter,
     WallClockMeter,
@@ -960,15 +962,24 @@ class Run:
                 if reservation is not None
                 else None
             )
-            if (
-                amount == 0
-                and estimate is not None
-                and getattr(meter, "precheck_is_estimate", False) is True
-                and not _has_compatible_usage(result)
+            fallback_reason: str | None = None
+            if amount == 0 and estimate is not None and (
+                getattr(meter, "precheck_is_estimate", False) is True
             ):
+                if not _has_compatible_usage(result):
+                    fallback_reason = "missing_or_invalid_provider_usage"
+                else:
+                    reason_hook = getattr(meter, "precheck_fallback_reason", None)
+                    if callable(reason_hook):
+                        with suppress(Exception):
+                            candidate = reason_hook(kind, payload_any, result, meta)
+                            if isinstance(candidate, str) and candidate:
+                                fallback_reason = candidate
+            if fallback_reason is not None:
+                assert estimate is not None
                 amount = estimate
                 accounting_fallbacks[meter.name] = {
-                    "reason": "missing_or_invalid_provider_usage",
+                    "reason": fallback_reason,
                     "source": "precheck_estimate",
                 }
             if amount != 0:
@@ -1098,7 +1109,20 @@ class Run:
         approximate: set[str] = set()
         payload_any: dict[str, Any] = payload
         for meter in self._runtime.meters:
-            estimate = meter.precheck_estimate(kind, payload_any)
+            try:
+                estimate = meter.precheck_estimate(kind, payload_any)
+            except MeterPrecheckRefusal as refusal:
+                self._refuse(
+                    None,
+                    kind,
+                    payload,
+                    meter_name=meter.name,
+                    reason=refusal.reason,
+                    detail=refusal.detail,
+                    audit_meta=refusal.validated_audit_meta(),
+                    requested=refusal.requested,
+                    remaining=refusal.remaining,
+                )
             if estimate is not None:
                 estimates[meter.name] = charge_to_decimal(estimate)
                 if getattr(meter, "precheck_is_estimate", False) is True:
@@ -1109,23 +1133,36 @@ class Run:
 
     def _refuse(
         self,
-        check: BudgetCheck,
+        check: BudgetCheck | None,
         blocked_kind: str,
         blocked_payload: dict[str, IdentityValue],
         *,
         estimated: bool = False,
         reason: str = "budget",
         window_seconds: float | None = None,
-    ) -> None:
-        meter = check.meter or "unknown"
+        meter_name: str | None = None,
+        detail: str | None = None,
+        audit_meta: dict[str, Any] | None = None,
+        requested: str | None = None,
+        remaining: str | None = None,
+    ) -> NoReturn:
+        meter = meter_name or (check.meter if check is not None else None) or "unknown"
         payload: dict[str, IdentityValue] = {
             "reason": reason,
             "meter": meter,
-            "requested": str(check.requested),
-            "remaining": str(check.remaining),
             "blocked_kind": blocked_kind,
             "blocked_payload_digest": digest_payload(blocked_payload),
         }
+        if check is not None:
+            payload["requested"] = str(check.requested)
+            payload["remaining"] = str(check.remaining)
+        else:
+            if requested is not None:
+                payload["requested"] = requested
+            if remaining is not None:
+                payload["remaining"] = remaining
+        if detail is not None:
+            payload["detail"] = detail
         if estimated:
             payload["estimated"] = "true"
         if window_seconds is not None:
@@ -1134,15 +1171,19 @@ class Run:
                 if window_seconds.is_integer()
                 else str(window_seconds)
             )
+        meta: dict[str, Any] = {"created_at": _now_utc()}
+        if audit_meta is not None:
+            meta.update(audit_meta)
         node = Node.make(
             kind=NodeKind.REFUSAL,
             parent=self.cursor_id,
             payload=payload,
-            meta={"created_at": _now_utc()},
+            meta=meta,
         )
         node = self._runtime._put(node)
         self.cursor_id = node.id
-        raise BudgetExceeded(f"budget exceeded for {meter}", node.id)
+        message = detail if check is None and detail is not None else f"budget exceeded for {meter}"
+        raise BudgetExceeded(message, node.id)
 
     def _refuse_policy(
         self,

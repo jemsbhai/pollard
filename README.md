@@ -58,8 +58,12 @@ Current limits:
 - HashRopeStore is an in-process operation-log backend, not a multi-writer
   database. Explicit offline garbage collection rewrites its snapshot.
 - `TokenmasterMeter` can apply a caller-supplied prompt estimator before
-  dispatch and settles tokenmaster state from the usage data the model client
-  returns. Without an estimator, it has no prompt precheck.
+  dispatch. Per-request profile checks are opt-in and are separate from the
+  cumulative `Budget(tokens=...)` ledger. A post-response limit diagnostic
+  records what happened but cannot undo a provider call that already completed.
+- `TokenmasterCostMeter` uses tokenmaster's tiered request pricing. Its
+  preflight estimate is conservative, and it enforces dollars only when the
+  run supplies `Budget(usd=...)`; the provider's bill remains authoritative.
 - Prompt estimators are approximations. Images, tool schemas, provider-added
   instructions, and wire-format changes can make the settled usage differ.
 - Shared arbitration requires every worker to use the same transactional store
@@ -101,7 +105,7 @@ Install only the integrations used by the application:
 | OpenAI prompt estimate | `pollard[estimate-openai]` | Local tiktoken estimate plus an explicit output reservation |
 | Local GPU energy | `pollard[nvml]` | Whole-GPU NVML measurement for supported local hardware |
 | Hashrope store | `pollard[hashrope]` | In-process append-only operation-log backend |
-| tokenmaster meter | `pollard[tokenmaster]` | tokenmaster state and advice stored in node metadata |
+| tokenmaster governance | `pollard[tokenmaster]` | profile limits, state and advice, and tier-aware USD accounting |
 
 Pollard itself needs no model-provider credential. A live recipe uses the
 credential chain of its caller-owned SDK. The complete provider, endpoint,
@@ -594,9 +598,11 @@ assert reopened.get(run.root_id).payload == {"run": "hashrope-demo"}
 See the [offline examples](https://github.com/jemsbhai/pollard/tree/main/examples)
 for scripts that run without network access.
 
-## Tokenmaster Meter
+## Tokenmaster Governance
 
-The optional tokenmaster meter records Pollard model-call usage into tokenmaster and stores the resulting gauge plus advice on each node:
+The optional tokenmaster integration records model-call usage, can enforce a
+registered model's per-request limits before dispatch, and can account for
+tiered request prices:
 
 ```powershell
 pip install "pollard[tokenmaster,estimate-openai]"
@@ -605,35 +611,87 @@ pip install "pollard[tokenmaster,estimate-openai]"
 ```python
 from pollard import Budget, Runtime
 from pollard.estimators.openai import OpenAITokenEstimator
-from pollard.meters import StepMeter, TokenmasterMeter
+from pollard.meters import StepMeter, TokenmasterCostMeter, TokenmasterMeter
 
 rt = Runtime(
     meters=[
         StepMeter(),
         TokenmasterMeter(
-            model="openai:gpt-5.4",
-            estimator=OpenAITokenEstimator(model="gpt-5.4"),
+            model="openai:gpt-5.6-sol",
+            estimator=OpenAITokenEstimator(model="gpt-5.6"),
             reserved_output=1_024,
             expected_remaining_turns=5,
+            enforce_profile_limits=True,
+        ),
+        TokenmasterCostMeter(
+            model="openai:gpt-5.6-sol",
+            estimator=OpenAITokenEstimator(model="gpt-5.6"),
+            reserved_output=1_024,
         ),
     ]
 )
 
-with rt.run("tokenmaster-demo", budget=Budget(tokens=120_000, steps=20)) as run:
+with rt.run(
+    "tokenmaster-demo",
+    budget=Budget(tokens=120_000, usd="5.00", steps=20),
+) as run:
     node = run.model_call(
-        {"model": "gpt-5.4", "input": "Summarize the incident."},
+        {
+            "model": "gpt-5.6",
+            "input": "Summarize the incident.",
+            "max_output_tokens": 1_024,
+        },
         fn=lambda _payload: {"usage": {"input_tokens": 1000, "output_tokens": 300}},
     )
     print(node.meta["charges"]["tokens"])
+    print(node.meta["charges"]["usd"])
     print(node.meta["tokenmaster"]["state"]["zone"])
 ```
 
 Use `TokenmasterMeter` instead of the built-in `TokenMeter` when you want
 tokenmaster state and recommendations in the audit record. Its optional
 estimator plus `reserved_output` enables a conservative precheck before model
-dispatch. The settled budget charge remains the per-call token volume,
-including cache and reasoning token fields when present. Estimation remains an
-approximation and the model client remains the source of actual usage.
+dispatch. `enforce_profile_limits=True` also checks the selected tokenmaster
+profile's input, context, and explicit output limits for each request and
+requires an estimator. These profile limits are not a `Budget(tokens=...)`:
+the budget remains cumulative across calls. The settled token charge includes
+cache and reasoning fields when present. If settled usage crosses a profile
+limit, Pollard records diagnostics on the completed node; it does not rewrite
+history or pretend that provider work was avoided.
+
+If the installed `tiktoken` release does not yet recognize a GPT-5-family model
+or its `openai:` alias, `OpenAITokenEstimator` uses the GPT-5-family
+`o200k_base` fallback. The result remains an estimate, not a provider token
+count.
+
+`TokenmasterCostMeter` selects the tokenmaster pricing tier for the request,
+uses a conservative preflight estimate, and settles from provider usage. It
+records an audit charge whenever configured, but only an explicit
+`Budget(usd=...)` turns that charge into a run limit. This is an
+application-side governance limit, not a provider-account billing cap, and the
+provider's invoice is authoritative.
+When `provider_usage` is available, settlement derives exclusive
+ordinary-input, cache-read, cache-write, output, and reasoning categories from
+it; otherwise it uses normalized exclusive usage. It never adds an inclusive
+aggregate a second time.
+
+For direct OpenAI calls, an omitted meter model may be inferred from the
+request and completed provider result. Bind `model="openai:..."` explicitly
+when the request's `model` is an Azure deployment name, gateway route, or other
+alias whose underlying model Pollard cannot prove. An explicit binding is not
+replaced by a provider-returned model name. Pricing that cannot be derived from
+per-request usage fails closed; in particular, Gemini token-hour cache-storage
+charges require separate caller-side accounting and are not approximated by
+`TokenmasterCostMeter`.
+
+Pollard and tokenmaster registry lookup are offline at import and runtime.
+Neither package fetches provider pages or silently changes a model profile or
+price while an application is running. A tokenmaster maintainer explicitly runs
+`tokenmaster-models check`, `propose`, `discover`, or `apply`, reviews the
+result, and releases the updated registry; its weekly workflow only reports
+drift and uploads evidence. Pollard consumes the reviewed registry version
+installed by the application. See tokenmaster's
+[registry refresh contract](https://github.com/jemsbhai/tokenmaster/blob/main/docs/registry-refresh.md).
 
 ## End-to-End Case Studies
 

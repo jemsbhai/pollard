@@ -32,7 +32,7 @@ class OpenAITokenEstimator:
         except KeyError:
             encoding = None
         if encoding is None:
-            encoding = tiktoken.get_encoding("cl100k_base")
+            encoding = tiktoken.get_encoding(_fallback_encoding_name(model))
         total = _count_textual_leaves(payload, encoding)
         messages = payload.get("messages")
         if isinstance(messages, list):
@@ -51,3 +51,22 @@ def _count_textual_leaves(value: Any, encoding: Any, *, key: str | None = None) 
     if isinstance(value, Sequence) and not isinstance(value, bytes | bytearray | str):
         return sum(_count_textual_leaves(item, encoding) for item in value)
     return 0
+
+
+def _fallback_encoding_name(model: Any) -> str:
+    """Choose a family-safe fallback when an older tiktoken lacks a model id."""
+
+    if not isinstance(model, str):
+        return "cl100k_base"
+    model_name = model.rsplit(":", 1)[-1].lower()
+    modern_prefixes = (
+        "gpt-5",
+        "gpt-4.5",
+        "gpt-4.1",
+        "gpt-4o",
+        "chatgpt-4o",
+        "o1",
+        "o3",
+        "o4-mini",
+    )
+    return "o200k_base" if model_name.startswith(modern_prefixes) else "cl100k_base"

@@ -13,6 +13,7 @@ failure boundaries, and complete commands needed to operate or review Pollard.
 | Use OpenAI, Anthropic, Azure, Bedrock, another cloud, or an agent framework | [Live recipes](https://github.com/jemsbhai/pollard/blob/main/docs/recipes/README.md) |
 | Choose a direct cloud adapter or LiteLLM route | [Cloud-hosted providers](https://github.com/jemsbhai/pollard/blob/main/docs/cloud-providers.md) |
 | Review provider failure classifications, conservative accounting, and the cloud ledger | [Provider boundary hardening](https://github.com/jemsbhai/pollard/blob/main/docs/provider-boundary-hardening.md) |
+| Configure tokenmaster model limits, tiered USD governance, or cloud-model bindings | [Cloud-hosted providers](https://github.com/jemsbhai/pollard/blob/main/docs/cloud-providers.md#tokenmaster-profile-and-price-binding) |
 | Inspect, verify, report, seal, or export a run | [Observability](https://github.com/jemsbhai/pollard/blob/main/docs/observability.md) |
 | Compare a recording with a deliberate live provider observation | [Replay and live revalidation](https://github.com/jemsbhai/pollard/blob/main/docs/revalidation.md) |
 | Diagnose refusals, replay misses, integrity, providers, or stores | [Troubleshooting](https://github.com/jemsbhai/pollard/blob/main/docs/troubleshooting.md) |
