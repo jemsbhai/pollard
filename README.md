@@ -611,24 +611,16 @@ pip install "pollard[tokenmaster,estimate-openai]"
 ```python
 from pollard import Budget, Runtime
 from pollard.estimators.openai import OpenAITokenEstimator
-from pollard.meters import StepMeter, TokenmasterCostMeter, TokenmasterMeter
+from pollard.meters import tokenmaster_governance_meters
 
 rt = Runtime(
-    meters=[
-        StepMeter(),
-        TokenmasterMeter(
-            model="openai:gpt-5.6-sol",
-            estimator=OpenAITokenEstimator(model="gpt-5.6"),
-            reserved_output=1_024,
-            expected_remaining_turns=5,
-            enforce_profile_limits=True,
-        ),
-        TokenmasterCostMeter(
-            model="openai:gpt-5.6-sol",
-            estimator=OpenAITokenEstimator(model="gpt-5.6"),
-            reserved_output=1_024,
-        ),
-    ]
+    meters=tokenmaster_governance_meters(
+        model="openai:gpt-5.6-sol",
+        estimator=OpenAITokenEstimator(model="gpt-5.6"),
+        reserved_output=1_024,
+        expected_remaining_turns=5,
+        enforce_profile_limits=True,
+    )
 )
 
 with rt.run(
@@ -670,6 +662,14 @@ records an audit charge whenever configured, but only an explicit
 `Budget(usd=...)` turns that charge into a run limit. This is an
 application-side governance limit, not a provider-account billing cap, and the
 provider's invoice is authoritative.
+
+Tokenmaster governance is deliberately opt-in. Passing
+`tokenmaster_governance_meters(...)` is the shortest safe configuration path:
+it retains Pollard's standard step, depth, and wall-clock accounting, replaces
+the default token meter, and adds USD accounting. Existing `Runtime()` and
+`AsyncRuntime()` defaults are unchanged. Applications that need a custom meter
+set may continue to construct `TokenmasterMeter` and `TokenmasterCostMeter`
+directly.
 When `provider_usage` is available, settlement derives exclusive
 ordinary-input, cache-read, cache-write, output, and reasoning categories from
 it; otherwise it uses normalized exclusive usage. It never adds an inclusive
@@ -692,6 +692,9 @@ result, and releases the updated registry; its weekly workflow only reports
 drift and uploads evidence. Pollard consumes the reviewed registry version
 installed by the application. See tokenmaster's
 [registry refresh contract](https://github.com/jemsbhai/tokenmaster/blob/main/docs/registry-refresh.md).
+
+The complete classified inventory of package limits is in
+[Documented limitations](https://github.com/jemsbhai/pollard/blob/main/docs/limitations.md).
 
 ## End-to-End Case Studies
 

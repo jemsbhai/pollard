@@ -273,6 +273,14 @@ estimator protocol as `TokenMeter`. When configured, its token precheck is the
 estimated input plus `reserved_output`; actual tokenmaster state and the
 settled charge still come from provider usage.
 
+`tokenmaster_governance_meters(model=None, *, estimator, reserved_output=0,
+expected_remaining_turns=None, task=None, policy=None,
+enforce_profile_limits=False, profile_capacity="nominal", cost_name="usd")`
+returns the standard `StepMeter`, `DepthMeter`, and `WallClockMeter` followed by
+configured `TokenmasterMeter` and `TokenmasterCostMeter` instances. Pass the
+result explicitly as `Runtime(meters=...)` or `AsyncRuntime(meters=...)`.
+It does not change either runtime's defaults.
+
 `enforce_profile_limits=True` additionally checks each request against the
 selected tokenmaster profile and requires an estimator. Input and context
 checks use estimated input and the greater of `reserved_output` and an explicit
@@ -708,7 +716,7 @@ All Pollard exceptions derive from `PollardError`:
 | `IntegrityError` | Stored or transferred data failed integrity validation | Exception message |
 | `PostDispatchOutcomeUnknown` | A caller explicitly reports an external call with unknown outcome | `error` |
 | `CallCleanupError` | Secondary cleanup errors chained behind a primary call error | `errors` |
-| `ReservationLeaseLost` | A completed call lost its shared reservation lease | `reservation_id`, `node_id` |
+| `ReservationLeaseLost` | A completed call lost its shared reservation lease | `reservation_id`, `node_id`, `detail` |
 | `ReservationUncertain` | Reserve or release could not be confirmed after reconnect | `reservation_id` |
 | `SettlementUncertain` | A completed call's shared settlement could not be confirmed | `reservation_id` |
 | `UnsupportedSchema` | Action schema uses an unsupported keyword or type | Exception message |

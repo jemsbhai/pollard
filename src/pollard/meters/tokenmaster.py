@@ -9,7 +9,7 @@ from decimal import Decimal
 from importlib import import_module
 from typing import TYPE_CHECKING, Any
 
-from . import MeterPrecheckRefusal
+from . import DepthMeter, Meter, MeterPrecheckRefusal, StepMeter, WallClockMeter
 
 if TYPE_CHECKING:
     from . import Estimator
@@ -552,6 +552,51 @@ class TokenmasterCostMeter:
             return
         self._warned_missing_usage = True
         _warn_safely("pollard tokenmaster cost meter saw no compatible usage payload")
+
+
+def tokenmaster_governance_meters(
+    model: str | None = None,
+    *,
+    estimator: Estimator,
+    reserved_output: int = 0,
+    expected_remaining_turns: int | None = None,
+    task: Any | None = None,
+    policy: Any | None = None,
+    enforce_profile_limits: bool = False,
+    profile_capacity: str = "nominal",
+    cost_name: str = "usd",
+) -> list[Meter]:
+    """Build the standard Runtime meter set with explicit Tokenmaster governance.
+
+    This factory replaces only the built-in ``TokenMeter``. It retains step,
+    depth, and wall-clock accounting, then adds Tokenmaster token and USD
+    meters that share the caller's model binding, estimator, and output
+    reservation. Passing the returned list to ``Runtime(meters=...)`` or
+    ``AsyncRuntime(meters=...)`` is always explicit; Runtime defaults remain
+    backward compatible.
+    """
+
+    return [
+        StepMeter(),
+        DepthMeter(),
+        WallClockMeter(),
+        TokenmasterMeter(
+            model,
+            estimator=estimator,
+            reserved_output=reserved_output,
+            expected_remaining_turns=expected_remaining_turns,
+            task=task,
+            policy=policy,
+            enforce_profile_limits=enforce_profile_limits,
+            profile_capacity=profile_capacity,
+        ),
+        TokenmasterCostMeter(
+            model,
+            estimator=estimator,
+            reserved_output=reserved_output,
+            name=cost_name,
+        ),
+    ]
 
 
 def _load_tokenmaster() -> Any:

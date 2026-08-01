@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import time
 from collections.abc import Iterator
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import contextmanager
@@ -22,6 +23,21 @@ from pollard.stores.kafka import _event, _parse_event
 from pollard.tree import Node, NodeKind
 
 
+def _wait_for_topic_metadata(admin: object, topic: str, *, timeout: float = 10) -> None:
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        metadata = admin.list_topics(timeout=min(2, timeout))  # type: ignore[attr-defined]
+        topic_metadata = metadata.topics.get(topic)
+        if (
+            topic_metadata is not None
+            and topic_metadata.error is None
+            and topic_metadata.partitions
+        ):
+            return
+        time.sleep(0.05)
+    raise RuntimeError(f"Kafka topic metadata did not become visible for {topic}")
+
+
 @contextmanager
 def _topic(*, partitions: int = 1, valid: bool = True) -> Iterator[str]:
     if not os.environ.get("POLLARD_TEST_KAFKA_BOOTSTRAP"):
@@ -39,6 +55,7 @@ def _topic(*, partitions: int = 1, valid: bool = True) -> Iterator[str]:
     admin.create_topics([NewTopic(name, partitions, 1, config=config)])[name].result(
         timeout=10
     )
+    _wait_for_topic_metadata(admin, name)
     try:
         yield name
     finally:

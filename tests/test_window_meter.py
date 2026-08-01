@@ -297,7 +297,13 @@ def test_lost_reservation_lease_is_recorded_and_reported(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     with SQLiteStore(tmp_path / "lost-lease.db") as store:
-        monkeypatch.setattr(store, "_pollard_renew", lambda *_args: False)
+        renewal_attempted = Event()
+
+        def lose_lease(*_args: object) -> bool:
+            renewal_attempted.set()
+            return False
+
+        monkeypatch.setattr(store, "_pollard_renew", lose_lease)
         run = Runtime(
             store,
             meters=[WindowMeter("requests", 1, 60)],
@@ -306,8 +312,13 @@ def test_lost_reservation_lease_is_recorded_and_reported(
         with pytest.raises(ReservationLeaseLost) as error:
             run.model_call(
                 {"model": "slow"},
-                fn=lambda _payload: time.sleep(0.2) or {"ok": True},
+                fn=lambda _payload: (
+                    {"ok": True}
+                    if renewal_attempted.wait(timeout=2)
+                    else pytest.fail("reservation renewal was not attempted")
+                ),
             )
+        assert error.value.detail == "reservation expired or closed before renewal"
         node = store.get(error.value.node_id)
         assert node.result == {"ok": True}
         assert node.meta["reservation_lease"]["status"] == "lost"
