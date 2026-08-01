@@ -5,14 +5,104 @@ from __future__ import annotations
 import hashlib
 import json
 import warnings
-from decimal import Decimal
+from collections.abc import Mapping
+from decimal import Decimal, InvalidOperation
 from importlib import import_module
 from typing import TYPE_CHECKING, Any, Protocol, TypeAlias
 
 if TYPE_CHECKING:
-    from .tokenmaster import TokenmasterMeter as TokenmasterMeter
+    from .tokenmaster import (
+        TokenmasterCostMeter as TokenmasterCostMeter,
+    )
+    from .tokenmaster import (
+        TokenmasterMeter as TokenmasterMeter,
+    )
 
 ChargeAmount: TypeAlias = int | float | Decimal
+
+_PRECHECK_RESERVED_META_KEYS = frozenset(
+    {
+        "accounting_fallbacks",
+        "avoided",
+        "charges",
+        "created_at",
+        "duration_s",
+        "reservation_id",
+        "reservation_lease",
+        "settlement",
+        "usage",
+    }
+)
+
+
+class MeterPrecheckRefusal(Exception):
+    """Ask the runtime to record an auditable refusal before dispatch.
+
+    Meter implementations should use this only for expected governance
+    decisions. Programming, configuration, and dependency errors should be
+    raised normally so the runtime does not misreport them as refusals.
+    ``audit_meta`` must contain JSON-safe, non-sensitive diagnostic data.
+    """
+
+    def __init__(
+        self,
+        reason: str,
+        detail: str | None = None,
+        *,
+        audit_meta: Mapping[str, Any] | None = None,
+        requested: ChargeAmount | str | None = None,
+        remaining: ChargeAmount | str | None = None,
+    ) -> None:
+        if not isinstance(reason, str) or not reason:
+            raise ValueError("meter precheck refusal reason must be a non-empty string")
+        if detail is not None and (not isinstance(detail, str) or not detail):
+            raise ValueError("meter precheck refusal detail must be a non-empty string or None")
+        copied_meta = _copy_precheck_audit_meta(audit_meta)
+        self.reason = reason
+        self.detail = reason if detail is None else detail
+        self.audit_meta = copied_meta
+        self.requested = _precheck_amount(requested, "requested")
+        self.remaining = _precheck_amount(remaining, "remaining")
+        super().__init__(self.detail)
+
+    def validated_audit_meta(self) -> dict[str, Any] | None:
+        """Return a fresh, runtime-safe copy even if public metadata was mutated."""
+
+        return _copy_precheck_audit_meta(self.audit_meta)
+
+
+def _copy_precheck_audit_meta(
+    audit_meta: Mapping[str, Any] | None,
+) -> dict[str, Any] | None:
+    if audit_meta is None:
+        return None
+    try:
+        loaded_meta = json.loads(json.dumps(dict(audit_meta), allow_nan=False))
+    except (TypeError, ValueError) as exc:
+        raise TypeError("meter precheck audit_meta must be JSON serializable") from exc
+    if not isinstance(loaded_meta, dict):  # pragma: no cover - Mapping encodes as object
+        raise TypeError("meter precheck audit_meta must be a JSON object")
+    conflicts = sorted(_PRECHECK_RESERVED_META_KEYS.intersection(loaded_meta))
+    if conflicts:
+        raise ValueError(
+            "meter precheck audit_meta cannot override runtime metadata: "
+            + ", ".join(conflicts)
+        )
+    return loaded_meta
+
+
+def _precheck_amount(value: ChargeAmount | str | None, label: str) -> str | None:
+    if value is None:
+        return None
+    if isinstance(value, bool) or not isinstance(value, int | float | Decimal | str):
+        raise TypeError(f"meter precheck {label} must be a finite number or numeric string")
+    try:
+        amount = Decimal(str(value))
+    except InvalidOperation as exc:
+        raise ValueError(f"meter precheck {label} must be numeric") from exc
+    if not amount.is_finite():
+        raise ValueError(f"meter precheck {label} must be finite")
+    return str(amount)
 
 
 class Meter(Protocol):
@@ -299,7 +389,7 @@ def _int_usage(usage: dict[str, Any], *keys: str) -> int:
 
 
 def __getattr__(name: str) -> Any:
-    if name == "TokenmasterMeter":
+    if name in {"TokenmasterCostMeter", "TokenmasterMeter"}:
         module = import_module("pollard.meters.tokenmaster")
         value = getattr(module, name)
         globals()[name] = value

@@ -25,7 +25,8 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install
-        run: python -m pip install -e ".[dev,estimate-openai]"
+        run: |
+          python -m pip install -e ".[dev,estimate-openai]"
 
       - name: Ruff
         run: python -m ruff check src tests examples docs/recipes
@@ -61,7 +62,8 @@ jobs:
           python-version: "3.14"
 
       - name: Install
-        run: python -m pip install -e ".[dev,langchain,pydantic-ai]"
+        run: |
+          python -m pip install -e ".[dev,langchain,pydantic-ai]"
 
       - name: Recipe checks
         run: >-
@@ -112,7 +114,8 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install
-        run: python -m pip install -e ".[dev]"
+        run: |
+          python -m pip install -e ".[dev]"
 
       - name: Supported release acceptance
         run: >-
@@ -142,7 +145,8 @@ jobs:
           python-version: "3.13"
 
       - name: Install
-        run: python -m pip install -e ".[dev]"
+        run: |
+          python -m pip install -e ".[dev]"
 
       - name: Start disposable services
         run: |

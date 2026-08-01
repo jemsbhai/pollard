@@ -250,6 +250,8 @@ Built-in meters from `pollard.meters`:
 | `WallClockMeter()` | Completed callable duration | No duration prediction |
 | `TokenMeter(estimator=None, reserved_output_tokens=0)` | Normalized input plus output usage | None without estimator; estimated input plus output reservation with estimator |
 | `CostMeter(prices)` | Token usage multiplied by caller-supplied per-million prices | No dollar prediction |
+| `TokenmasterMeter(...)` | Normalized token usage plus tokenmaster state and advice | Optional prompt estimate and opt-in per-request profile checks |
+| `TokenmasterCostMeter(...)` | Tier-aware tokenmaster request price | Conservative request estimate; only `Budget(usd=...)` creates a dollar limit |
 | `WindowMeter(name, limit, window_seconds, meter=None)` | Wrapped meter charge in a shared sliding window | Uses wrapped meter estimate |
 
 `CostMeter` price rows require `input_per_1m` and `output_per_1m`. Pricing is
@@ -257,14 +259,71 @@ caller data and must be updated when a provider price changes. A settled
 dollar charge is not a provider-account hard limit.
 
 Optional meters include `EnergyMeter` in `pollard.meters.energy` and
-`TokenmasterMeter` in `pollard.meters`. The OpenAI prompt estimator is
-`pollard.estimators.openai.OpenAITokenEstimator`.
+`TokenmasterMeter` plus `TokenmasterCostMeter` in `pollard.meters`. The OpenAI
+prompt estimator is `pollard.estimators.openai.OpenAITokenEstimator`.
+When an installed `tiktoken` does not recognize a GPT-5-family identifier,
+including an `openai:`-prefixed alias, that estimator uses `o200k_base`;
+other recognized modern OpenAI family prefixes do the same, while genuinely
+unknown families retain the general `cl100k_base` fallback.
 
 `TokenmasterMeter(model=None, *, meter=None, estimator=None,
-reserved_output=0, expected_remaining_turns=None, task=None, policy=None)`
-accepts the same estimator protocol as `TokenMeter`. When configured, its
-precheck is the estimated input plus `reserved_output`; actual tokenmaster
-state and the settled charge still come from provider usage.
+reserved_output=0, expected_remaining_turns=None, task=None, policy=None,
+enforce_profile_limits=False, profile_capacity="nominal")` accepts the same
+estimator protocol as `TokenMeter`. When configured, its token precheck is the
+estimated input plus `reserved_output`; actual tokenmaster state and the
+settled charge still come from provider usage.
+
+`enforce_profile_limits=True` additionally checks each request against the
+selected tokenmaster profile and requires an estimator. Input and context
+checks use estimated input and the greater of `reserved_output` and an explicit
+request output limit; the profile's output cap is enforced only for an explicit
+`max_output_tokens`, `max_completion_tokens`, or `max_tokens` request. These
+are per-request checks. They do not set or replace cumulative
+`Budget(tokens=...)`. `profile_capacity` selects tokenmaster's nominal or
+effective profile capacity. A refusal is recorded before dispatch when a check
+can prove the request is too large. Settled overages are retained as diagnostics
+on the completed node and do not undo an external call.
+
+`TokenmasterCostMeter(model=None, *, meter=None, estimator,
+reserved_output=0, name="usd")` selects tokenmaster 0.2 pricing for the request
+profile, including long-context tiers. The estimator is required. Its preflight
+estimate uses the highest applicable input-category rate plus reserved output,
+so it is intentionally conservative; settlement uses the provider's exclusive
+input, cache-read, cache-write, output, and reasoning usage categories. It
+participates in USD arbitration under its default `name="usd"` only when the
+run has an explicit `Budget(usd=...)`. A custom name uses the matching
+`Budget(extra={...})` entry instead. The resulting charge is an application-side
+ledger value, not a provider-account limit or invoice. Without the matching
+budget, Pollard records the charge but does not enforce a dollar ceiling.
+
+Both profile prechecks and USD prechecks depend on caller-supplied prompt
+estimates. Profile enforcement requires an estimator, and
+`TokenmasterCostMeter` always requires one. Images, tools, provider-added
+instructions, and wire-format changes can make that local estimate differ from
+settled usage. USD estimation deliberately favors a conservative upper bound.
+Exact settlement derives exclusive ordinary-input, cache-read, cache-write,
+output, and reasoning categories from retained `provider_usage` when available,
+then falls back to normalized exclusive usage. It avoids double counting an
+inclusive aggregate.
+
+The constructor accepts either `model` or `meter`, not both; that explicit
+model or supplied meter profile always wins. When both bindings are absent,
+settlement resolves a compatible direct-provider profile from `result.model`,
+then `usage.model_id`, then the request's `model`. Set `model` explicitly for
+Azure deployment names, model-gateway routes, or provider aliases that do not
+identify the underlying tokenmaster profile; neither inference nor a
+provider-returned model overrides an explicit binding. Missing, non-USD, or
+incomplete request pricing fails closed. Gemini token-hour cache-storage pricing
+is therefore rejected rather than silently approximated from request token
+counts.
+
+Bundled registry lookup is offline, and its data is not automatically replaced
+at runtime. Pollard performs no model-catalog or pricing network access at
+import, preflight, or settlement. Tokenmaster maintainers explicitly run
+`tokenmaster-models check`, `propose`, `discover`, or `apply`; the scheduled
+weekly workflow reports drift and uploads a report but does not mutate the
+registry, commit, or publish. Applications receive reviewed data by upgrading
+their installed tokenmaster release.
 
 ## Registry and policies
 

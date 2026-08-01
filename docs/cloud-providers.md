@@ -48,6 +48,37 @@ The direct adapters preserve provider-native request fields. LiteLLM is the
 portability path when one normalized chat interface is more useful than direct
 access to a cloud API.
 
+## Tokenmaster profile and price binding
+
+`TokenmasterMeter(enforce_profile_limits=True)` can apply a registered model's
+input, context, and explicit output limits to each request.
+`TokenmasterCostMeter` can estimate and settle that profile's tiered USD request
+price. Profile limits are per-request constraints, not cumulative
+`Budget(tokens=...)` limits. Dollar arbitration is active only when the run has
+an explicit `Budget(usd=...)`; it is an application-side control, while the
+provider's billing system remains authoritative.
+
+Direct provider model identifiers can be inferred when they identify a
+tokenmaster profile. Azure deployment names, internal gateway routes, and
+other aliases usually do not. For those paths, pass the underlying canonical
+profile explicitly to each tokenmaster meter, for example
+`model="openai:gpt-5.6-sol"`. Pollard preserves an explicit binding instead of
+replacing it with a model name returned after completion.
+
+Prompt and USD preflight estimates are conservative. Provider usage settles
+the completed call, and any post-response profile-limit diagnostic records the
+overage without pretending the external work did not happen. Unsupported
+pricing fails closed. In particular, Gemini cache storage priced per token-hour
+cannot be derived from one request's usage and is not approximated by
+`TokenmasterCostMeter`; account for that storage separately at the provider
+boundary.
+
+These meters perform no catalog or pricing network request. Tokenmaster model
+data changes only after a maintainer runs its explicit `tokenmaster-models`
+refresh commands, reviews the proposal, and ships a release. The scheduled
+refresh workflow reports drift; it does not silently update a running Pollard
+application.
+
 ## OpenAI API
 
 The direct OpenAI adapter supports Responses, Responses streaming, Chat

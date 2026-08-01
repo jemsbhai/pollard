@@ -6,6 +6,32 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-07-31
+
+### Added
+
+- Add opt-in per-request tokenmaster profile-limit checks to
+  `TokenmasterMeter`, including GPT-5.6 Sol, Terra, and Luna context and output
+  limits. Profile checks are independent of cumulative `Budget(tokens=...)`
+  accounting and record post-response diagnostics without undoing a completed
+  provider call.
+- Add `TokenmasterCostMeter` for tier-aware USD estimates and settlement from
+  tokenmaster 0.2 pricing. Dollar enforcement is enabled only by an explicit
+  `Budget(usd=...)`; provider billing remains authoritative.
+
+### Changed
+
+- Require `tokenmaster>=0.2.0,<0.3` for the optional tokenmaster integration.
+- Resolve inferred model profiles from completed provider results while
+  preserving explicit bindings for Azure deployments and model gateways.
+  Token-hour cache-storage prices, including Gemini cache storage, fail closed
+  because Pollard cannot derive them from per-request usage.
+- Use the GPT-5-family `o200k_base` tokenizer fallback when an installed
+  `tiktoken` release does not yet recognize a GPT-5.6 model identifier.
+- Keep registry and pricing lookup offline at Pollard import and runtime;
+  tokenmaster refresh remains an explicit, reviewed maintainer operation, and
+  its scheduled workflow reports drift without mutating or publishing data.
+
 ## [1.4.0] - 2026-07-30
 
 ### Added
