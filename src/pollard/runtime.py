@@ -610,6 +610,7 @@ class Run:
                 "shared reservation lease was lost while the call was running",
                 reservation.reservation_id or "",
                 node.id,
+                detail=lease_lost,
             )
         return node
 

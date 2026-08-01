@@ -7,10 +7,13 @@ from tokenmaster import CalibrationRecord, Meter, ModelProfile, Pricing
 
 from pollard import AsyncRuntime, Budget, BudgetExceeded, MemoryStore, Runtime
 from pollard.meters import (
+    DepthMeter,
     MeterPrecheckRefusal,
     StepMeter,
     TokenmasterCostMeter,
     TokenmasterMeter,
+    WallClockMeter,
+    tokenmaster_governance_meters,
 )
 
 
@@ -22,6 +25,31 @@ def _tokenmaster_meter() -> Meter:
             window_nominal=1_000,
         )
     )
+
+
+def test_tokenmaster_governance_factory_preserves_standard_runtime_accounting() -> None:
+    meters = tokenmaster_governance_meters(
+        "gpt-5.6",
+        estimator=ConstantEstimator(10),
+        reserved_output=2,
+        expected_remaining_turns=3,
+        enforce_profile_limits=True,
+    )
+
+    assert [type(meter) for meter in meters] == [
+        StepMeter,
+        DepthMeter,
+        WallClockMeter,
+        TokenmasterMeter,
+        TokenmasterCostMeter,
+    ]
+    assert [meter.name for meter in meters] == [
+        "steps",
+        "depth",
+        "seconds",
+        "tokens",
+        "usd",
+    ]
 
 
 def test_tokenmaster_meter_charges_usage_and_writes_meta() -> None:

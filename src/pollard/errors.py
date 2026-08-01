@@ -98,10 +98,18 @@ class CallCleanupError(PollardError):
 class ReservationLeaseLost(PollardError):
     """Raised after a completed call whose shared reservation lease was lost."""
 
-    def __init__(self, message: str, reservation_id: str, node_id: str) -> None:
+    def __init__(
+        self,
+        message: str,
+        reservation_id: str,
+        node_id: str,
+        *,
+        detail: str | None = None,
+    ) -> None:
         super().__init__(message)
         self.reservation_id = reservation_id
         self.node_id = node_id
+        self.detail = detail
 
 
 class ReservationUncertain(PollardError):

@@ -6,6 +6,27 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 
 ## [Unreleased]
 
+## [1.5.1] - 2026-08-01
+
+### Added
+
+- Add `tokenmaster_governance_meters(...)`, an explicit factory that preserves
+  Pollard's standard step, depth, and wall-clock meters while replacing the
+  built-in token meter with Tokenmaster token and USD governance. Runtime
+  defaults and existing serialized charge formats remain unchanged.
+- Expose the lease-loss diagnostic as `ReservationLeaseLost.detail` in
+  addition to the diagnostic already recorded on the completed node.
+
+### Changed
+
+- Wait for newly created Kafka test topics to become visible in broker metadata
+  before constructing a store, avoiding setup races on slower brokers.
+- Make lease-loss tests synchronize on the renewal attempt instead of relying
+  on a fixed callable delay.
+- Consolidate the documented safety, provider, backend, and ergonomic limits
+  into a classified limitations reference without weakening fail-closed
+  behavior.
+
 ## [1.5.0] - 2026-07-31
 
 ### Added

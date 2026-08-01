@@ -17,6 +17,7 @@ failure boundaries, and complete commands needed to operate or review Pollard.
 | Inspect, verify, report, seal, or export a run | [Observability](https://github.com/jemsbhai/pollard/blob/main/docs/observability.md) |
 | Compare a recording with a deliberate live provider observation | [Replay and live revalidation](https://github.com/jemsbhai/pollard/blob/main/docs/revalidation.md) |
 | Diagnose refusals, replay misses, integrity, providers, or stores | [Troubleshooting](https://github.com/jemsbhai/pollard/blob/main/docs/troubleshooting.md) |
+| Review every documented limitation and its classification | [Documented limitations](https://github.com/jemsbhai/pollard/blob/main/docs/limitations.md) |
 | Classify, redact, retain, or delete recorded data | [Data governance](https://github.com/jemsbhai/pollard/blob/main/docs/data-governance.md) |
 | Share budgets across processes or hosts | [Scale-out stores](https://github.com/jemsbhai/pollard/blob/main/docs/scale-out.md) |
 | Run a configured PostgreSQL, Redis, MongoDB, Neo4j, or Kafka example | [Distributed-store walkthrough](https://github.com/jemsbhai/pollard/blob/main/examples/README.md#configured-distributed-store-walkthrough) |

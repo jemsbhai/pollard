@@ -17,6 +17,9 @@ if TYPE_CHECKING:
     from .tokenmaster import (
         TokenmasterMeter as TokenmasterMeter,
     )
+    from .tokenmaster import (
+        tokenmaster_governance_meters as tokenmaster_governance_meters,
+    )
 
 ChargeAmount: TypeAlias = int | float | Decimal
 
@@ -389,7 +392,11 @@ def _int_usage(usage: dict[str, Any], *keys: str) -> int:
 
 
 def __getattr__(name: str) -> Any:
-    if name in {"TokenmasterCostMeter", "TokenmasterMeter"}:
+    if name in {
+        "TokenmasterCostMeter",
+        "TokenmasterMeter",
+        "tokenmaster_governance_meters",
+    }:
         module = import_module("pollard.meters.tokenmaster")
         value = getattr(module, name)
         globals()[name] = value

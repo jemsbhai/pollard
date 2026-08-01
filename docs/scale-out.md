@@ -101,6 +101,11 @@ after attempting settlement and recording the completed call. Schema migration,
 backup, restore, reconnect, and incident procedures are in
 [PostgreSQL operations](https://github.com/jemsbhai/pollard/blob/main/docs/postgres-operations.md).
 
+The raised `ReservationLeaseLost` carries `reservation_id`, `node_id`, and a
+non-sensitive `detail` matching the completed node's
+`meta["reservation_lease"]["detail"]`. Use the node as the durable diagnostic
+record; exception attributes are immediate operational context.
+
 With concurrent writers sharing one arbiter, total settled spend is bounded by
 the budget plus the sum of actual-minus-estimate overshoot for calls that passed
 precheck. Meters with exact prechecks, including steps and request windows, do

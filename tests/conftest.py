@@ -1,4 +1,5 @@
 import os
+import time
 from collections.abc import Iterator
 from uuid import uuid4
 
@@ -17,6 +18,23 @@ from pollard import (
 from pollard.store import Store
 
 pytest_plugins = ["pytester"]
+
+
+def _wait_for_kafka_topic(admin: object, topic: str, *, timeout: float = 10) -> None:
+    """Wait until broker metadata exposes a newly acknowledged topic."""
+
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        metadata = admin.list_topics(timeout=min(2, timeout))  # type: ignore[attr-defined]
+        topic_metadata = metadata.topics.get(topic)
+        if (
+            topic_metadata is not None
+            and topic_metadata.error is None
+            and topic_metadata.partitions
+        ):
+            return
+        time.sleep(0.05)
+    raise RuntimeError(f"Kafka topic metadata did not become visible for {topic}")
 
 
 _STORE_PARAMS = ["memory", "sqlite-interned", "sqlite-plain", "hashrope"]
@@ -99,6 +117,7 @@ def store(request: pytest.FixtureRequest, tmp_path) -> Iterator[Store]:  # type:
                 )
             ]
         )[topic].result(timeout=10)
+        _wait_for_kafka_topic(admin, topic)
         try:
             with KafkaStore(
                 {"bootstrap.servers": bootstrap}, topic=topic
