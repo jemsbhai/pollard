@@ -62,7 +62,7 @@ jobs:
           python-version: "3.14"
 
       - name: Install test tooling
-        run: python -m pip install -e . build hatchling pytest
+        run: python -m pip install -e . build hatchling "hashrope>=0.2.2" pytest
 
       - name: Run the installed-wheel first-run smoke test
         run: >-
