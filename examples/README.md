@@ -221,6 +221,7 @@ another hosted model provider.
 | `exp_006_code_fix.py` | Pinned llama.cpp server and local model | Loopback llama.cpp only | Code-fix recording, outcome, seal, fixed file, and HTML tree |
 | `exp_006_mcp_household.py` | Pinned llama.cpp server, local model, and `pollard[mcp]` | Loopback llama.cpp plus local stdio MCP | Household recording, outcome, seal, and HTML tree |
 | `exp_006_verify.py` | Python and the repository checkout | None | Verification report; optional combined manifest rewrite |
+| `exp_007_overhead.py` | Local clock, memory, filesystem, SQLite, and final candidate wheel | None | Provenance-bound JSON result after release integration |
 
 ### EXP-001 local inference
 
@@ -295,6 +296,53 @@ and [EXP-006 case-study index](https://github.com/jemsbhai/pollard/blob/main/evi
 before replacing a committed result. The research synthesis is model-generated.
 The code-fix and household candidate controllers are deterministic with model
 review; those artifacts do not prove autonomous candidate invention.
+
+### EXP-007 local per-step overhead
+
+Run a small structural check without creating a release artifact:
+
+```powershell
+$env:PYTHONPATH = (Resolve-Path src)
+python examples\exp_007_overhead.py --steps 4 --samples 3 --warmups 0
+```
+
+For the final measurement, build the integrated candidate wheel into a location
+outside the repository, install that exact wheel into a clean virtual
+environment, and run with `--package-wheel`. For example, on POSIX or macOS:
+
+```sh
+artifact_dir="$(mktemp -d)"
+python3 -m build --wheel --no-isolation --outdir "$artifact_dir"
+wheel="$(find "$artifact_dir" -maxdepth 1 -name '*.whl' -print -quit)"
+python3 -m venv "$artifact_dir/venv"
+"$artifact_dir/venv/bin/python" -m pip install --upgrade "pip>=25"
+"$artifact_dir/venv/bin/python" -m pip install --no-index --no-deps "$wheel"
+"$artifact_dir/venv/bin/python" -I examples/exp_007_overhead.py \
+  --package-wheel "$wheel" --require-publishable-provenance \
+  --output "$artifact_dir/result.json"
+```
+
+On Windows PowerShell:
+
+```powershell
+$artifactDir = Join-Path $env:TEMP ("pollard-exp007-" + [guid]::NewGuid())
+New-Item -ItemType Directory -Path $artifactDir | Out-Null
+python -m build --wheel --no-isolation --outdir $artifactDir
+$wheel = (Get-ChildItem $artifactDir -Filter *.whl -File).FullName
+python -m venv (Join-Path $artifactDir venv)
+& "$artifactDir\venv\Scripts\python.exe" -m pip install --upgrade "pip>=25"
+& "$artifactDir\venv\Scripts\python.exe" -m pip install --no-index --no-deps $wheel
+& "$artifactDir\venv\Scripts\python.exe" -I examples\exp_007_overhead.py `
+  --package-wheel $wheel --require-publishable-provenance `
+  --output (Join-Path $artifactDir result.json)
+```
+
+The result must identify a known clean repository commit, confirm that isolated
+Python loaded Pollard from the recorded wheel distribution, and report
+`publishable: true` before it is copied to `evidence/EXP-007/result.json` and
+summarized in the README, logbook, or findings. Timing values never determine
+whether the experiment passes. Pip 25 or newer is required so the PEP 610
+install record includes the wheel's archive hash.
 
 ## Provider and framework recipes
 

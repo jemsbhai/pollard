@@ -6,6 +6,34 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 
 ## [Unreleased]
 
+## [1.6.0] - 2026-09-01
+
+### Added
+
+- Add the opt-in `Runtime(..., refuse_duplicate_recordings=True)` safety guard
+  and public `DuplicateRecording` exception. The guard rejects an existing
+  model or tool identity before budget reservation, live policy evaluation, or
+  dispatch; caller-managed `attempt` values remain the supported way to record
+  distinct retries. The default remains `False`, preserving 1.5 record-mode
+  redispatch and result-conflict behavior.
+- Register the credential-free EXP-007 local per-step overhead protocol for
+  MemoryStore and SQLite record, hybrid-hit, and strict replay-hit paths. Its
+  runner can bind a future result to an exact wheel, the interpreter's PEP 610
+  wheel-install record, loaded source digest, matching clean-checkout source
+  digest, repository commit, and clean-tree state, with a machine-readable
+  publishability gate; this release makes no quantitative performance claim.
+- Add a bounded macOS/Python 3.14 CI job that builds and installs the wheel,
+  runs the exact credential-free first-use program outside the checkout, and
+  verifies its cross-platform node identities.
+
+### Fixed
+
+- Replace the wheel-incompatible offline README example with a self-contained
+  90-second first run and separate POSIX/macOS and Windows PowerShell virtual
+  environment commands.
+- Make `dir(pollard)` include every lazy public export without importing those
+  exports or hiding existing module metadata.
+
 ## [1.5.1] - 2026-08-01
 
 ### Added

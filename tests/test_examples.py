@@ -41,6 +41,7 @@ def test_example_script_runs_offline(script: str) -> None:
         "examples/exp_001_local_model.py",
         "examples/exp_004_storage.py",
         "examples/exp_005_contention.py",
+        "examples/exp_007_overhead.py",
     ],
 )
 def test_formal_experiment_runner_help_is_offline(script: str) -> None:

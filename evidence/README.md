@@ -95,6 +95,36 @@ deterministic candidate controllers with model review, so they do not support a
 claim that the model autonomously invented the recorded candidates. Full
 recording prerequisites and claim limits are in the case-study index.
 
+## EXP-007: local per-step overhead protocol
+
+- [Runner](https://github.com/jemsbhai/pollard/blob/main/examples/exp_007_overhead.py)
+
+The offline runner compares a fixed direct Python callable with Pollard batches
+over MemoryStore and SQLite in fresh-chain record, hybrid-hit, and strict
+replay-hit modes. Fresh stores and recorded hit fixtures are prepared outside
+each timed region. The protocol retains every measured batch mean and reports
+p50 and p95 summaries; pass status covers workload and structural invariants,
+never a timing threshold.
+
+A publishable result must be produced by an isolated interpreter that has the
+final candidate wheel installed. `--package-wheel` makes the runner verify that
+the wheel version and normalized Python-source digest match the loaded package.
+`--require-publishable-provenance` additionally rejects editable installs,
+requires the interpreter's PEP 610 archive SHA-256 to equal that wheel, and
+requires isolated imports, the loaded package root to belong to that installed
+distribution, and the clean checkout's package-source digest to match both. The
+result records the wheel SHA-256, installed-archive SHA-256, checkout and
+loaded-package digests, runner digest, repository commit, repository dirty
+state, confirmation that Git's top level is the runner checkout, and
+`publishable: true`. Do not add a raw result or numeric claim from an older,
+editable, dirty, source-shadowed, or unbound implementation.
+
+The committed protocol describes local Pollard hashing, metering, store work,
+and replay verification around a near-zero-latency mock. It excludes providers,
+adapters, networks, tokenization, concurrency, and remote stores. Any eventual
+result is descriptive evidence for its recorded environment, not a latency
+guarantee or service-level objective.
+
 ## Verification and claim boundary
 
 The test suite validates result IDs and pass states, expected condition counts,
@@ -105,4 +135,5 @@ Interpretation lives in the
 
 EXP-006 is the 1.0 launch evidence. Its manifest pins every shipped case input
 and artifact, while the verifier proves strict offline replay without executing
-a model function or tool handler.
+a model function or tool handler. EXP-007 remains a registered protocol until a
+final integrated wheel produces a provenance-checked raw result.

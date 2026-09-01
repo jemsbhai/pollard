@@ -189,6 +189,7 @@ class Runtime:
         policies: list[Policy] | None = None,
         dry_run: bool = False,
         mode: str | ReplayMode = ReplayMode.RECORD,
+        refuse_duplicate_recordings: bool = False,
         on_node: NodeCallback | None = None,
         reservation_lease_seconds: int | float = 60,
     ) -> None:
@@ -198,12 +199,15 @@ class Runtime:
             or reservation_lease_seconds <= 0
         ):
             raise ValueError("reservation_lease_seconds must be positive")
+        if not isinstance(refuse_duplicate_recordings, bool):
+            raise TypeError("refuse_duplicate_recordings must be a bool")
         self.mode = normalize_mode(mode)
         self.store: Store = _coerce_store(store, mode=self.mode)
         self.meters = meters or [StepMeter(), DepthMeter(), WallClockMeter(), TokenMeter()]
         self.registry = registry
         self.policies = policies or []
         self.dry_run = dry_run
+        self.refuse_duplicate_recordings = refuse_duplicate_recordings
         self.on_node = on_node
         self.reservation_lease_seconds = float(reservation_lease_seconds)
 
@@ -884,6 +888,12 @@ class Run:
             recorded = self._recorded_node(NodeKind.TOOL_CALL, payload, attempt)
             assert recorded is not None
             return recorded
+        if (
+            self._runtime.mode == ReplayMode.RECORD
+            and self._runtime.refuse_duplicate_recordings
+        ):
+            recorded = self._recorded_node(NodeKind.TOOL_CALL, payload, attempt)
+            assert recorded is None
         for policy in self._runtime.policies:
             decision = policy.decide(
                 PolicyContext(
@@ -1004,6 +1014,7 @@ class Run:
             parent_id=self.cursor_id,
             payload=payload,
             attempt=attempt,
+            refuse_duplicate_recordings=self._runtime.refuse_duplicate_recordings,
         )
         if node is None:
             return None

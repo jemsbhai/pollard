@@ -8,13 +8,16 @@ import pytest
 from pollard import (
     ActionSpec,
     Budget,
+    Decision,
     IntegrityError,
     MemoryStore,
     MissingRecording,
+    PolicyContext,
     Registry,
     Runtime,
     SQLiteStore,
 )
+from pollard.errors import DuplicateRecording
 from pollard.stores.hashrope import HashRopeStore
 
 PAYLOAD = {"model": "mock-1", "messages": [{"role": "user", "content": "hello"}]}
@@ -38,6 +41,214 @@ def test_record_mode_executes_and_records_result_conflicts() -> None:
         "text": "changed",
         "usage": {"input_tokens": 1, "output_tokens": 1},
     }
+
+
+@pytest.mark.parametrize(
+    "duplicate_result",
+    [
+        RESULT,
+        {"text": "changed", "usage": {"input_tokens": 1, "output_tokens": 1}},
+    ],
+    ids=["identical-result", "conflicting-result"],
+)
+def test_opt_in_duplicate_refusal_stops_model_before_budget_and_dispatch(
+    duplicate_result: dict[str, Any],
+) -> None:
+    store = MemoryStore()
+    run = Runtime(
+        store,
+        mode="record",
+        refuse_duplicate_recordings=True,
+    ).run("strict-conflict", budget=Budget(steps=1))
+    dispatched: list[str] = []
+
+    def first_call(_payload: dict[str, object]) -> dict[str, Any]:
+        dispatched.append("first")
+        return RESULT
+
+    def duplicate_call(_payload: dict[str, object]) -> dict[str, Any]:
+        dispatched.append("duplicate")
+        return duplicate_result
+
+    first = run.model_call(PAYLOAD, fn=first_call)
+    stored_before = store.get(first.id)
+    report_before = run.report()
+    run.rollback(run.root_id)
+
+    with pytest.raises(DuplicateRecording) as exc_info:
+        run.model_call(PAYLOAD, fn=duplicate_call)
+
+    assert dispatched == ["first"]
+    assert exc_info.value.node_id == first.id
+    assert exc_info.value.attempt == 0
+    assert "model=mock-1" in exc_info.value.payload_summary
+    message = str(exc_info.value)
+    assert "new attempt" in message
+    assert "mode='hybrid'" in message
+    assert "revalidation API" in message
+    assert store.get(first.id) == stored_before
+    assert run.report() == report_before
+
+
+def test_opt_in_duplicate_refusal_survives_sqlite_reopen(tmp_path: Path) -> None:
+    database = tmp_path / "runs.db"
+    dispatched: list[str] = []
+
+    with SQLiteStore(database) as store:
+        first_run = Runtime(
+            store,
+            mode="record",
+            refuse_duplicate_recordings=True,
+        ).run("persistent-strict-duplicate")
+        first = first_run.model_call(
+            PAYLOAD,
+            fn=lambda _payload: dispatched.append("first") or RESULT,
+        )
+        report_before = first_run.report()
+
+    with SQLiteStore(database) as store:
+        repeated_run = Runtime(
+            store,
+            mode="record",
+            refuse_duplicate_recordings=True,
+        ).run("persistent-strict-duplicate")
+        with pytest.raises(DuplicateRecording) as exc_info:
+            repeated_run.model_call(
+                PAYLOAD,
+                fn=lambda _payload: dispatched.append("duplicate") or RESULT,
+            )
+
+        assert dispatched == ["first"]
+        assert exc_info.value.node_id == first.id
+        assert repeated_run.report() == report_before
+        assert repeated_run.report()["avoided"] == {}
+        assert len(list(store.walk(repeated_run.root_id))) == 2
+
+
+def test_opt_in_duplicate_refusal_allows_explicit_retry_attempt() -> None:
+    store = MemoryStore()
+    run = Runtime(
+        store,
+        mode="record",
+        refuse_duplicate_recordings=True,
+    ).run("strict-attempt-retry")
+    dispatched: list[int] = []
+    first = run.model_call(
+        PAYLOAD,
+        fn=lambda _payload: dispatched.append(0) or RESULT,
+    )
+    run.rollback(run.root_id)
+    retry_result = {
+        "text": "retried",
+        "usage": {"input_tokens": 1, "output_tokens": 1},
+    }
+    retry = run.model_call(
+        PAYLOAD,
+        attempt=1,
+        fn=lambda _payload: dispatched.append(1) or retry_result,
+    )
+
+    assert dispatched == [0, 1]
+    assert retry.id != first.id
+    assert retry.parent == first.parent == run.root_id
+    assert retry.attempt == 1
+    assert retry.result == retry_result
+    assert run.report()["spent"]["steps"] == 2.0
+
+
+def test_opt_in_duplicate_refusal_stops_unregistered_tool_before_dispatch() -> None:
+    store = MemoryStore()
+    run = Runtime(
+        store,
+        mode="record",
+        refuse_duplicate_recordings=True,
+    ).run("strict-tool-duplicate")
+    dispatched: list[str] = []
+
+    def call(_payload: dict[str, object]) -> dict[str, Any]:
+        dispatched.append("tool")
+        return {
+            "ok": True,
+            "usage": {"input_tokens": 0, "output_tokens": 0},
+        }
+
+    first = run.tool_call("lookup", {"key": "one"}, fn=call)
+    run.rollback(run.root_id)
+
+    with pytest.raises(DuplicateRecording) as exc_info:
+        run.tool_call("lookup", {"key": "one"}, fn=call)
+
+    assert dispatched == ["tool"]
+    assert exc_info.value.node_id == first.id
+    assert "tool=lookup" in exc_info.value.payload_summary
+    assert "revalidation" not in str(exc_info.value)
+
+
+@pytest.mark.parametrize("mode", ["hybrid", "replay"])
+def test_duplicate_refusal_option_is_record_mode_only(mode: str) -> None:
+    store = MemoryStore()
+    recorded = Runtime(store, mode="record").run("strict-option-mode-boundary")
+    first = recorded.model_call(PAYLOAD, fn=lambda _payload: RESULT)
+
+    run = Runtime(
+        store,
+        mode=mode,
+        refuse_duplicate_recordings=True,
+    ).run("strict-option-mode-boundary")
+    replayed = run.model_call(
+        PAYLOAD,
+        fn=lambda _payload: pytest.fail(f"{mode} hit must not dispatch"),
+    )
+
+    assert replayed.id == first.id
+    assert replayed.result == RESULT
+
+
+def test_opt_in_registered_duplicate_refuses_before_policy_re_evaluation() -> None:
+    class AllowThenDenyPolicy:
+        def __init__(self) -> None:
+            self.calls = 0
+
+        def decide(self, _context: PolicyContext) -> Decision:
+            self.calls += 1
+            return Decision.ALLOW if self.calls == 1 else Decision.DENY
+
+    registry = Registry(
+        [
+            ActionSpec(
+                "echo",
+                "1",
+                "Echo text.",
+                {
+                    "type": "object",
+                    "properties": {"text": {"type": "string"}},
+                    "required": ["text"],
+                    "additionalProperties": False,
+                },
+                False,
+                lambda args: {
+                    "text": args["text"],
+                    "usage": {"input_tokens": 0, "output_tokens": 0},
+                },
+            )
+        ]
+    )
+    policy = AllowThenDenyPolicy()
+    run = Runtime(
+        MemoryStore(),
+        registry=registry,
+        policies=[policy],
+        mode="record",
+        refuse_duplicate_recordings=True,
+    ).run("strict-registered-duplicate-policy")
+    first = run.tool_call("echo", {"text": "hello"})
+    run.rollback(run.root_id)
+
+    with pytest.raises(DuplicateRecording) as exc_info:
+        run.tool_call("echo", {"text": "hello"})
+
+    assert exc_info.value.node_id == first.id
+    assert policy.calls == 1
 
 
 def test_hybrid_hit_serves_recording_and_accounts_avoided_charges() -> None:
@@ -138,6 +349,11 @@ def test_replay_tool_miss_summary_includes_version_without_calling_fn() -> None:
 def test_runtime_rejects_unknown_replay_mode() -> None:
     with pytest.raises(ValueError, match="record, hybrid, replay"):
         Runtime(mode="unknown")
+
+
+def test_runtime_rejects_non_boolean_duplicate_refusal_option() -> None:
+    with pytest.raises(TypeError, match="refuse_duplicate_recordings must be a bool"):
+        Runtime(refuse_duplicate_recordings="yes")  # type: ignore[arg-type]
 
 
 def test_replay_missing_run_does_not_create_root_or_emit_node() -> None:

@@ -66,6 +66,7 @@ class AsyncRuntime(Runtime):
         policies: list[Policy] | None = None,
         dry_run: bool = False,
         mode: str | ReplayMode = ReplayMode.RECORD,
+        refuse_duplicate_recordings: bool = False,
         on_node: NodeCallback | None = None,
         reservation_lease_seconds: int | float = 60,
     ) -> None:
@@ -76,6 +77,7 @@ class AsyncRuntime(Runtime):
             policies=policies,
             dry_run=dry_run,
             mode=mode,
+            refuse_duplicate_recordings=refuse_duplicate_recordings,
             on_node=on_node,
             reservation_lease_seconds=reservation_lease_seconds,
         )
@@ -441,6 +443,12 @@ class AsyncRun(Run):
             recorded = self._recorded_node(NodeKind.TOOL_CALL, payload, attempt)
             assert recorded is not None
             return recorded
+        if (
+            self._runtime.mode == ReplayMode.RECORD
+            and self._runtime.refuse_duplicate_recordings
+        ):
+            recorded = self._recorded_node(NodeKind.TOOL_CALL, payload, attempt)
+            assert recorded is None
         for policy in self._runtime.policies:
             decision = policy.decide(
                 PolicyContext(

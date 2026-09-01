@@ -42,6 +42,22 @@ class MissingRecording(PollardError):
         self.payload_summary = payload_summary
 
 
+class DuplicateRecording(PollardError):
+    """Raised when record mode would dispatch an already-recorded call identity."""
+
+    def __init__(
+        self,
+        message: str,
+        node_id: str,
+        payload_summary: str,
+        attempt: int,
+    ) -> None:
+        super().__init__(message)
+        self.node_id = node_id
+        self.payload_summary = payload_summary
+        self.attempt = attempt
+
+
 class UnsupportedSchema(PollardError):
     """Raised when a registry schema uses unsupported JSON Schema features."""
 
