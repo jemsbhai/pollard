@@ -81,6 +81,15 @@ SQLite inspection:
 pip install pollard
 ```
 
+On macOS, pip is usually not on PATH and Homebrew's Python refuses direct
+installs. Use a virtual environment:
+
+```powershell
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install pollard
+```
+
 Install only the integrations used by the application:
 
 | Need | Install | Boundary |
@@ -124,11 +133,15 @@ without a provider account:
 
 ```python
 from pollard import Budget, Runtime
-from examples.mock_model import call_model
+
+def mock_model(payload):
+    return {"text": "hello from a mock model",
+            "usage": {"input_tokens": 8, "output_tokens": 4}}
 
 with Runtime().run("offline", budget=Budget(tokens=100)) as run:
-    node = run.model_call({"model": "mock-1", "messages": []}, fn=call_model)
+    node = run.model_call({"model": "mock-1", "input": "hi"}, fn=mock_model)
     print(node.result["text"])
+    print(run.report())
 ```
 
 ## Streaming And Estimates
