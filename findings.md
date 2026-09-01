@@ -108,3 +108,18 @@ Interpretation boundary:
 - Offline replay establishes integrity and availability of the committed
   semantic results. It does not establish deterministic regeneration by the
   local model.
+
+## 2026-09-01 EXP-007 Protocol Status
+
+Source: `LOGBOOK.md`, entry `2026-09-01 EXP-007 Local Per-Step Overhead
+Protocol`.
+
+No quantitative finding is registered yet. The final run must load the exact
+candidate wheel, prove that its normalized Python sources match the loaded
+package and clean checkout, record the wheel and runner SHA-256 digests, identify
+a clean repository commit, and report `publishable: true`. Timing values do not
+determine pass or fail.
+
+Any later result is descriptive for its recorded local environment. It cannot
+establish a provider, network, concurrency, remote-store, throughput, service
+level, or performance-guarantee claim.

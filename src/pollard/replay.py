@@ -6,7 +6,7 @@ from enum import Enum
 from typing import Any
 
 from ._canon import IdentityValue
-from .errors import IntegrityError, MissingRecording
+from .errors import DuplicateRecording, IntegrityError, MissingRecording
 from .governor import charge_to_decimal, charge_to_json
 from .hashing import digest_payload
 from .meters import Meter
@@ -39,10 +39,15 @@ def recorded_node_or_missing(
     parent_id: str,
     payload: dict[str, IdentityValue],
     attempt: int,
+    refuse_duplicate_recordings: bool = False,
 ) -> Node | None:
-    if mode == ReplayMode.RECORD:
+    if mode == ReplayMode.RECORD and not refuse_duplicate_recordings:
         return None
     candidate = Node.make(kind=kind, parent=parent_id, payload=payload, attempt=attempt)
+    if mode == ReplayMode.RECORD:
+        if store.exists(candidate.id):
+            _raise_duplicate(candidate, kind.value, payload)
+        return None
     if not store.exists(candidate.id):
         if mode == ReplayMode.REPLAY:
             _raise_missing(candidate, kind.value, payload)
@@ -111,6 +116,26 @@ def _raise_missing(
         f"missing recording for {summary}: {candidate.id}",
         candidate.id,
         summary,
+    )
+
+
+def _raise_duplicate(
+    candidate: Node,
+    kind: str,
+    payload: dict[str, IdentityValue],
+) -> None:
+    summary = payload_summary(kind, payload)
+    guidance = "use a new attempt for a distinct retry or mode='hybrid' to reuse the recording"
+    if kind == NodeKind.MODEL_CALL.value:
+        guidance += ", or use the revalidation API for a deliberate live model observation"
+    raise DuplicateRecording(
+        (
+            f"recording already exists for {summary} at attempt={candidate.attempt}: "
+            f"{candidate.id}; {guidance}"
+        ),
+        candidate.id,
+        summary,
+        candidate.attempt,
     )
 
 

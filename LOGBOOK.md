@@ -878,3 +878,48 @@ Cost, credentials, and publication status:
 - No provider credential was read.
 - At this checkpoint, 1.0.0 has not yet been pushed, merged, tagged, uploaded
   to PyPI, or published as a GitHub release.
+
+## 2026-09-01 EXP-007 Local Per-Step Overhead Protocol
+
+Status: registered; final installed-wheel measurement pending.
+
+Question: what incremental per-step latency does Pollard add to a fixed local
+callable for MemoryStore and SQLite record, hybrid-hit, and strict replay-hit
+paths?
+
+Protocol:
+
+- Run 40 sequential steps per batch, discard two warmup batches, and retain 15
+  measured batches for each backend and mode.
+- Pair every Pollard batch with the same direct Python callable and alternate
+  which timed region runs first. Disable garbage collection only inside each
+  timed region.
+- Start every record sample with an empty store and a fresh growing chain.
+  Prepare matching hybrid and replay chains before timing, with sentinel model
+  callables that fail if a recorded hit dispatches.
+- Exclude runtime construction, fixture recording, store opening, validation,
+  and cleanup from the timed regions. Retain every batch mean and summarize
+  minimum, p50, p95, and maximum with no timing acceptance threshold.
+- Pass only when the fixed workload result, callable counts, six case rows, and
+  41-node tree shape satisfy the declared invariants.
+
+Provenance gate:
+
+- Build the candidate wheel from the final integrated source and install it in
+  an isolated environment before measuring.
+- Pass that exact wheel to `--package-wheel`. The runner refuses to continue if
+  the wheel version or normalized Python-source digest differs from the loaded
+  Pollard package.
+- Also pass `--require-publishable-provenance`. The runner then requires the
+  interpreter's PEP 610 archive SHA-256 to equal the supplied wheel, rejects
+  editable installs, requires isolated imports from that installed
+  distribution, requires the clean checkout's package-source digest to match
+  the wheel and loaded package, and records `publishable: true` only with a
+  known commit, a Git top level equal to the runner checkout, and `dirty: false`.
+- Record the wheel SHA-256, installed-archive SHA-256, checkout and
+  loaded-package digests, runner digest, repository commit, and repository dirty
+  state.
+
+No environment, timing, or performance finding is recorded at this checkpoint.
+The raw result and numeric claims must be added only after the final integrated
+wheel passes this provenance gate. No network or provider credential is needed.

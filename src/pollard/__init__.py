@@ -7,7 +7,7 @@ from importlib import import_module
 from types import ModuleType
 from typing import TYPE_CHECKING, Any
 
-__version__ = "1.5.1"
+__version__ = "1.6.0"
 
 if TYPE_CHECKING:
     from .aio import AsyncRun, AsyncRuntime
@@ -15,6 +15,7 @@ if TYPE_CHECKING:
         BudgetExceeded,
         CallCleanupError,
         ConfirmationRequired,
+        DuplicateRecording,
         IntegrityError,
         MissingRecording,
         PolicyViolation,
@@ -75,6 +76,7 @@ _EXPORTS = {
     "CallCleanupError": ("pollard.errors", "CallCleanupError"),
     "ConfirmationRequired": ("pollard.errors", "ConfirmationRequired"),
     "Decision": ("pollard.policy", "Decision"),
+    "DuplicateRecording": ("pollard.errors", "DuplicateRecording"),
     "IntegrityError": ("pollard.errors", "IntegrityError"),
     "HashRopeStore": ("pollard.stores.hashrope", "HashRopeStore"),
     "KafkaStore": ("pollard.stores.kafka", "KafkaStore"),
@@ -148,6 +150,7 @@ __all__ = [
     "CallCleanupError",
     "ConfirmationRequired",
     "Decision",
+    "DuplicateRecording",
     "ExactResultComparator",
     "ExportReport",
     "GCReport",
@@ -220,6 +223,11 @@ def _load_export(name: str) -> Any:
 
 
 class _PollardModule(ModuleType):
+    def __dir__(self) -> list[str]:
+        namespace = ModuleType.__getattribute__(self, "__dict__")
+        public = namespace.get("__all__", ())
+        return sorted({*ModuleType.__dir__(self), *public})
+
     def __getattribute__(self, name: str) -> Any:
         namespace = ModuleType.__getattribute__(self, "__dict__")
         exports = namespace.get("_EXPORTS", {})

@@ -18,7 +18,11 @@ from pollard import (
     WindowMeter,
 )
 from pollard.arbiter import BudgetReservation, ReservationCheck, WindowReservation
-from pollard.errors import PostDispatchOutcomeUnknown, ReservationUncertain
+from pollard.errors import (
+    DuplicateRecording,
+    PostDispatchOutcomeUnknown,
+    ReservationUncertain,
+)
 from pollard.meters import StepMeter, TokenMeter
 
 
@@ -211,6 +215,145 @@ def test_async_replay_hit_never_awaits_fn() -> None:
 
     asyncio.run(record())
     asyncio.run(replay())
+
+
+def test_async_default_record_mode_preserves_duplicate_redispatch() -> None:
+    store = MemoryStore()
+
+    async def scenario() -> None:
+        run = AsyncRuntime(store, mode="record").run("async-legacy-duplicate")
+        dispatched: list[str] = []
+
+        async def call(
+            _payload: dict[str, object],
+            *,
+            result: str,
+        ) -> dict[str, object]:
+            dispatched.append(result)
+            return {
+                "text": result,
+                "usage": {"input_tokens": 1, "output_tokens": 1},
+            }
+
+        first = await run.amodel_call(
+            {"model": "mock-1"},
+            fn=lambda payload: call(payload, result="first"),
+        )
+        run.rollback(run.root_id)
+        second = await run.amodel_call(
+            {"model": "mock-1"},
+            fn=lambda payload: call(payload, result="changed"),
+        )
+
+        assert dispatched == ["first", "changed"]
+        assert second.id == first.id
+        assert second.result["text"] == "first"
+        assert store.get(first.id).meta["result_conflicts"][0]["result"]["text"] == "changed"
+
+    asyncio.run(scenario())
+
+
+def test_async_opt_in_duplicate_refusal_stops_before_budget_and_dispatch() -> None:
+    store = MemoryStore()
+
+    async def scenario() -> None:
+        run = AsyncRuntime(
+            store,
+            mode="record",
+            refuse_duplicate_recordings=True,
+        ).run("async-strict-duplicate", budget=Budget(steps=1))
+        dispatched: list[int] = []
+
+        async def call(
+            _payload: dict[str, object],
+            *,
+            index: int,
+        ) -> dict[str, object]:
+            dispatched.append(index)
+            return {
+                "text": "first" if index == 0 else "changed",
+                "usage": {"input_tokens": 1, "output_tokens": 1},
+            }
+
+        payload = {"model": "mock-1"}
+        first = await run.amodel_call(payload, fn=lambda value: call(value, index=0))
+        stored_before = store.get(first.id)
+        report_before = run.report()
+        run.rollback(run.root_id)
+
+        with pytest.raises(DuplicateRecording) as exc_info:
+            await run.amodel_call(payload, fn=lambda value: call(value, index=99))
+
+        assert dispatched == [0]
+        assert exc_info.value.node_id == first.id
+        assert exc_info.value.attempt == 0
+        assert "revalidation API" in str(exc_info.value)
+        assert store.get(first.id) == stored_before
+        assert run.report() == report_before
+
+    asyncio.run(scenario())
+
+
+def test_async_opt_in_duplicate_refusal_stops_unregistered_tool_dispatch() -> None:
+    store = MemoryStore()
+
+    async def scenario() -> None:
+        run = AsyncRuntime(
+            store,
+            mode="record",
+            refuse_duplicate_recordings=True,
+        ).run("async-strict-tool-duplicate")
+        dispatched: list[str] = []
+
+        async def call(_payload: dict[str, object]) -> dict[str, object]:
+            dispatched.append("tool")
+            return {
+                "ok": True,
+                "usage": {"input_tokens": 0, "output_tokens": 0},
+            }
+
+        first = await run.atool_call("lookup", {"key": "one"}, fn=call)
+        run.rollback(run.root_id)
+
+        with pytest.raises(DuplicateRecording) as exc_info:
+            await run.atool_call("lookup", {"key": "one"}, fn=call)
+
+        assert dispatched == ["tool"]
+        assert exc_info.value.node_id == first.id
+        assert "tool=lookup" in exc_info.value.payload_summary
+        assert "revalidation" not in str(exc_info.value)
+
+    asyncio.run(scenario())
+
+
+def test_async_opt_in_registered_duplicate_refuses_before_policy() -> None:
+    class AllowThenDenyPolicy:
+        def __init__(self) -> None:
+            self.calls = 0
+
+        def decide(self, _context: object) -> Decision:
+            self.calls += 1
+            return Decision.ALLOW if self.calls == 1 else Decision.DENY
+
+    async def scenario() -> None:
+        policy = AllowThenDenyPolicy()
+        run = AsyncRuntime(
+            MemoryStore(),
+            registry=make_registry(),
+            policies=[policy],  # type: ignore[list-item]
+            mode="record",
+            refuse_duplicate_recordings=True,
+        ).run("async-strict-registered-duplicate-policy")
+        first = await run.atool_call("echo", {"text": "hello"})
+        run.rollback(run.root_id)
+
+        with pytest.raises(DuplicateRecording) as exc_info:
+            await run.atool_call("echo", {"text": "hello"})
+
+        assert exc_info.value.node_id == first.id
+        assert policy.calls == 1
+
+    asyncio.run(scenario())
 
 
 def test_async_replay_structural_nodes_are_read_only() -> None:

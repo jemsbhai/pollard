@@ -50,6 +50,25 @@ jobs:
             exit 1
           }
 
+  macos-wheel-smoke:
+    name: Installed-wheel first run on macOS
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+
+      - name: Install test tooling
+        run: python -m pip install -e . build hatchling pytest
+
+      - name: Run the installed-wheel first-run smoke test
+        run: >-
+          python -m pytest tests/test_documentation.py
+          -k wheel_installed_first_run_works_outside_checkout
+
   framework-recipes:
     name: Framework recipes on Python 3.14
     runs-on: ubuntu-latest

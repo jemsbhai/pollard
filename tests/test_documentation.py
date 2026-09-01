@@ -1,10 +1,13 @@
 import ast
+import os
 import subprocess
 import sys
 import zipfile
 from email.parser import BytesParser
 from email.policy import default
 from pathlib import Path
+
+import pytest
 
 import pollard
 
@@ -23,6 +26,60 @@ EXPECTED_RECIPES = {
     "pydantic_ai_wrap.py",
     "pydantic_refund_workflow.py",
 }
+FIRST_RUN_ROOT_ID = "fb4f2a23cc196e53f0fa800a71c025e0a9b7ac5890b83c4d9d1a0214175d9dd5"
+FIRST_RUN_NODE_ID = "c4882b75addd9867f623049798e2c6cebc3d49daa80bd5a825c102cf0580fd30"
+
+
+def _read_first_run_program() -> str:
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    heading = "## 90-Second Credential-Free Start"
+    assert heading in readme
+    section = readme.split(heading, maxsplit=1)[1].split("\n## ", maxsplit=1)[0]
+    assert FIRST_RUN_ROOT_ID in section
+    assert FIRST_RUN_NODE_ID in section
+    opening = "```python\n"
+    assert opening in section
+    program = section.split(opening, maxsplit=1)[1].split("\n```", maxsplit=1)[0]
+    return f"{program.rstrip()}\n"
+
+
+def test_readme_first_run_separates_posix_and_powershell_commands() -> None:
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    section = readme.split("## 90-Second Credential-Free Start", maxsplit=1)[1].split(
+        "\n## ", maxsplit=1
+    )[0]
+    assert "On POSIX systems, including macOS:" in section
+    assert "```sh\npython3 -m venv .venv\n.venv/bin/python -m pip install pollard" in section
+    assert ".venv/bin/python first_run.py" in section
+    assert "On Windows PowerShell:" in section
+    assert "```powershell\npy -3 -m venv .venv" in section
+    assert r".\.venv\Scripts\python.exe -m pip install pollard" in section
+    assert r".\.venv\Scripts\python.exe first_run.py" in section
+    assert "from examples" not in section
+    assert "from openai" not in section
+
+
+@pytest.fixture(scope="module")
+def built_wheel(tmp_path_factory: pytest.TempPathFactory) -> Path:
+    wheel_dir = tmp_path_factory.mktemp("wheel")
+    subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "build",
+            "--wheel",
+            "--no-isolation",
+            "--outdir",
+            str(wheel_dir),
+        ],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    wheels = list(wheel_dir.glob("*.whl"))
+    assert len(wheels) == 1
+    return wheels[0]
 
 
 def test_github_workflows_cannot_publish() -> None:
@@ -64,24 +121,9 @@ def test_release_runbook_declares_local_only_production_upload() -> None:
 
 
 def test_built_wheel_exposes_consistent_version_and_author_metadata(
-    tmp_path: Path,
+    built_wheel: Path, tmp_path: Path,
 ) -> None:
-    subprocess.run(
-        [
-            sys.executable,
-            "-m",
-            "build",
-            "--wheel",
-            "--no-isolation",
-            "--outdir",
-            str(tmp_path),
-        ],
-        cwd=ROOT,
-        check=True,
-        capture_output=True,
-        text=True,
-    )
-    wheel = next(tmp_path.glob("*.whl"))
+    wheel = built_wheel
     with zipfile.ZipFile(wheel) as archive:
         metadata_path = next(
             name for name in archive.namelist() if name.endswith(".dist-info/METADATA")
@@ -138,6 +180,66 @@ def test_built_wheel_exposes_consistent_version_and_author_metadata(
         capture_output=True,
         text=True,
     )
+
+
+def test_wheel_installed_first_run_works_outside_checkout(
+    built_wheel: Path, tmp_path: Path
+) -> None:
+    venv_dir = tmp_path / "venv"
+    run_dir = tmp_path / "consumer"
+    run_dir.mkdir()
+    script = run_dir / "first_run.py"
+    script.write_text(
+        (
+            f"{_read_first_run_program()}\n"
+            f'assert run.root_id == "{FIRST_RUN_ROOT_ID}"\n'
+            f'assert node.id == "{FIRST_RUN_NODE_ID}"\n'
+        ),
+        encoding="utf-8",
+    )
+
+    subprocess.run(
+        [sys.executable, "-m", "venv", str(venv_dir)],
+        cwd=tmp_path,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    venv_python = venv_dir / (
+        "Scripts/python.exe" if sys.platform == "win32" else "bin/python"
+    )
+    subprocess.run(
+        [
+            str(venv_python),
+            "-m",
+            "pip",
+            "install",
+            "--no-index",
+            "--no-deps",
+            str(built_wheel),
+        ],
+        cwd=run_dir,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    clean_env = os.environ.copy()
+    clean_env.pop("PYTHONPATH", None)
+    result = subprocess.run(
+        [str(venv_python), "-I", script.name],
+        cwd=run_dir,
+        env=clean_env,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.stdout.splitlines() == [
+        "offline reply for hello",
+        "tokens: 6; steps: 1",
+    ]
+    assert result.stderr == ""
 
 
 def test_docs_index_names_every_top_level_document() -> None:

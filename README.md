@@ -2,32 +2,81 @@
 
 Governed execution trees for AI agents: budget it, gate it, replay it.
 
-```powershell
-pip install "pollard[openai]"
+## 90-Second Credential-Free Start
+
+Pollard requires Python 3.10 or newer. The core package has no runtime
+dependencies, and this first run needs no model-provider account or API key.
+
+On POSIX systems, including macOS:
+
+```sh
+python3 -m venv .venv
+.venv/bin/python -m pip install pollard
 ```
+
+On Windows PowerShell:
+
+```powershell
+py -3 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install pollard
+```
+
+Save this as `first_run.py`:
 
 ```python
-from openai import OpenAI
 from pollard import Budget, Runtime
-from pollard.adapters.openai import make_responses_fn
 
-client = OpenAI(max_retries=0)
-with Runtime("runs.db").run("triage", budget=Budget(tokens=20_000)) as run:
+def call_model(payload):
+    return {
+        "text": f"offline reply for {payload['prompt']}",
+        "usage": {"input_tokens": 2, "output_tokens": 4},
+    }
+
+with Runtime().run("first-run", budget=Budget(tokens=10, steps=1)) as run:
     node = run.model_call(
-        {"model": "gpt-5.6", "input": "Summarize: ...", "max_output_tokens": 256},
-        fn=make_responses_fn(client, store=False),
+        {"model": "local-demo", "prompt": "hello"},
+        fn=call_model,
     )
-    print(node.result["text"], run.report())
+    spent = run.report()["spent"]
+    print(node.result["text"])
+    print(f"tokens: {spent['tokens']:.0f}; steps: {spent['steps']:.0f}")
 ```
 
-pollard is a runtime primitive, not an agent framework. It records each step as a node in a content-addressed tree. Node identity is a hash of the step inputs, parent identity, kind, and attempt number, so the tree gives you a control-flow ledger without owning your model client, tools, prompts, or loop.
+Run it on POSIX or macOS:
 
-The client above belongs to your code. Pollard does not read credentials or
-construct provider clients. Anthropic, Amazon Bedrock, and LiteLLM adapters
-follow the same pattern through `pollard[anthropic]`, `pollard[bedrock]`, and
-`pollard[litellm]`. Azure OpenAI uses the OpenAI adapter with an Azure-configured
-client. See [Cloud-hosted model providers](https://github.com/jemsbhai/pollard/blob/main/docs/cloud-providers.md)
-for direct AWS and Azure examples plus Vertex AI and other LiteLLM routes.
+```sh
+.venv/bin/python first_run.py
+```
+
+Or on Windows PowerShell:
+
+```powershell
+.\.venv\Scripts\python.exe first_run.py
+```
+
+Expected output:
+
+```text
+offline reply for hello
+tokens: 6; steps: 1
+```
+
+`Runtime()` uses an in-memory store, so this example creates no database file.
+The deterministic `call_model` callable stands in for any caller-owned model
+client, and its usage fields let Pollard settle the token and step ledger. This
+exact program's root ID is
+`fb4f2a23cc196e53f0fa800a71c025e0a9b7ac5890b83c4d9d1a0214175d9dd5`, and
+its model-call ID is
+`c4882b75addd9867f623049798e2c6cebc3d49daa80bd5a825c102cf0580fd30`.
+The installed-wheel smoke test locks both values so Linux, Windows, and macOS CI
+detect platform-dependent identity drift.
+
+## What Pollard Does
+
+Pollard is a runtime primitive, not an agent framework. It records each step as
+a node in a content-addressed tree. Node identity is a hash of the step inputs,
+parent identity, kind, and attempt number, so the tree gives you a control-flow
+ledger without owning your model client, tools, prompts, or loop.
 
 What you get:
 
@@ -41,6 +90,50 @@ What you get:
 - Scale-out: share atomic budgets and sliding windows across workers through
   SQLite, PostgreSQL, Redis, MongoDB, or Neo4j, and merge disconnected stores
   later. Kafka provides ordered audit and replay storage without shared limits.
+
+## First Live Provider Integration
+
+Install the OpenAI adapter with the same virtual environment when you are ready
+to replace the local callable.
+
+On POSIX or macOS:
+
+```sh
+.venv/bin/python -m pip install "pollard[openai]"
+```
+
+On Windows PowerShell:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install "pollard[openai]"
+```
+
+```python
+from openai import OpenAI
+from pollard import Budget, Runtime
+from pollard.adapters.openai import make_responses_fn
+
+client = OpenAI(max_retries=0)
+runtime = Runtime("runs.db", refuse_duplicate_recordings=True)
+with runtime.run("triage", budget=Budget(tokens=20_000)) as run:
+    node = run.model_call(
+        {"model": "gpt-5.6", "input": "Summarize: ...", "max_output_tokens": 256},
+        fn=make_responses_fn(client, store=False),
+    )
+    print(node.result["text"], run.report())
+```
+
+This path makes a provider request and can incur charges. The client belongs to
+your code: Pollard does not read credentials or construct provider clients.
+The opt-in duplicate guard prevents a sequential rerun of the same recorded
+identity from dispatching again; use an explicit new `attempt` for a genuine
+retry. It is not a distributed lock, so concurrent callers still need provider
+idempotency when exactly-once dispatch matters.
+Anthropic, Amazon Bedrock, and LiteLLM adapters follow the same pattern through
+`pollard[anthropic]`, `pollard[bedrock]`, and `pollard[litellm]`. Azure OpenAI
+uses the OpenAI adapter with an Azure-configured client. See
+[Cloud-hosted model providers](https://github.com/jemsbhai/pollard/blob/main/docs/cloud-providers.md)
+for direct AWS and Azure examples plus Vertex AI and other LiteLLM routes.
 
 Budget semantics are honest about what can be controlled. If a precheck estimate proves a step would exceed budget, pollard records a refusal node and does not call your function. If the actual result charge exceeds budget after the function returns, that node still stands because the spend already happened; later steps are refused. Transactional stores reserve estimated charges before execution and settle actual charges afterward, so exact step and request prechecks stay within one shared limit under concurrent writers.
 
@@ -78,7 +171,7 @@ budgets, replay, seals, merge, governance helpers, and a CLI with offline
 SQLite inspection:
 
 ```powershell
-pip install pollard
+python -m pip install pollard
 ```
 
 Install only the integrations used by the application:
@@ -116,20 +209,6 @@ The LangChain incident-response, LangChain support-policy RAG, Pydantic refund,
 and pydantic-ai claim-triage recipes use deterministic local paths by default.
 Only an explicit `--live` flag on either LangChain recipe or the pydantic-ai
 recipe enables hosted inference.
-
-## Offline Mock Demo
-
-Core Pollard still installs with zero runtime dependencies and can be tried
-without a provider account:
-
-```python
-from pollard import Budget, Runtime
-from examples.mock_model import call_model
-
-with Runtime().run("offline", budget=Budget(tokens=100)) as run:
-    node = run.model_call({"model": "mock-1", "messages": []}, fn=call_model)
-    print(node.result["text"])
-```
 
 ## Streaming And Estimates
 
@@ -514,7 +593,9 @@ How it compares:
 
 `Runtime(mode=...)` accepts three modes:
 
-- `record`: execute the function and store the result.
+- `record`: execute the function and store the result. For compatibility, the
+  default redispatches an existing identity and retains result-conflict
+  metadata, as in Pollard 1.5.
 - `hybrid`: serve a stored result when the computed node id already exists, otherwise execute and store.
 - `replay`: never call a step function, registered handler, or live policy hook.
   A missing run, structural node, or result raises `MissingRecording`.
@@ -524,6 +605,14 @@ create or patch recording state. A SQLite path passed directly to `Runtime` is
 opened in query-only mode. When `hybrid` or `replay` serves a stored result,
 `run.report()["avoided"]` records the charges that were skipped for that run.
 Those pure-replay counters remain process-local.
+
+For cost-sensitive live calls, set
+`Runtime(..., refuse_duplicate_recordings=True)`. A sequential duplicate then
+raises `DuplicateRecording` before budget reservation, registered-tool policy
+evaluation, or dispatch and adds neither spent nor avoided charges. Supply a
+new caller-managed `attempt` for a distinct retry, or use `hybrid` to reuse the
+stored result. The guard is an existence check rather than an atomic
+exactly-once claim; concurrent workers still require provider idempotency.
 
 Live provider comparison is a separate, explicit operation. In `record` mode,
 `run.revalidate_model_call(...)` verifies the golden recording before dispatch,

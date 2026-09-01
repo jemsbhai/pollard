@@ -47,6 +47,7 @@ Runtime(
     policies=None,
     dry_run=False,
     mode="record",
+    refuse_duplicate_recordings=False,
     on_node=None,
     reservation_lease_seconds=60,
 )
@@ -62,6 +63,12 @@ Runtime(
   recorded without executing their handlers.
 - `mode`: `record`, `hybrid`, or `replay`, as a string or `ReplayMode`.
   Path-based SQLite stores are opened query-only in replay mode.
+- `refuse_duplicate_recordings`: opt-in record-mode protection. When `True`,
+  an existing model or tool identity raises `DuplicateRecording` before budget
+  reservation, live policy evaluation, or dispatch. The default is `False` and
+  preserves record-mode redispatch and result-conflict handling from Pollard
+  1.5. A genuine retry uses a distinct caller-managed `attempt`; `hybrid` is the
+  mode for reusing the stored result.
 - `on_node`: optional callback invoked after a new node is safely stored. A
   callback error becomes a warning and does not discard the node.
 - `reservation_lease_seconds`: positive lease used by transactional stores for
@@ -381,7 +388,12 @@ label, and current settled counters.
 
 ## Replay modes
 
-`ReplayMode.RECORD` always executes a step function and stores its result.
+`ReplayMode.RECORD` executes a step function and stores its result by default.
+With `refuse_duplicate_recordings=True`, an identity already present in the
+store instead raises `DuplicateRecording` without adding spent or avoided
+charges. This is a sequential existence guard, not a distributed lock or an
+exactly-once guarantee: concurrent workers can still race between the check and
+write and need provider idempotency when duplicate dispatch must be impossible.
 `ReplayMode.HYBRID` reuses an exact existing result or executes on a miss.
 `ReplayMode.REPLAY` never executes a step function, registered handler, or live
 policy hook and raises `MissingRecording` on a run, structural-node, or result
@@ -713,6 +725,7 @@ All Pollard exceptions derive from `PollardError`:
 | `PolicyViolation` | Registry or policy recorded a refusal | `refusal_id` |
 | `ConfirmationRequired` | Policy requires explicit continuation | `resume_token` |
 | `MissingRecording` | Strict replay found no stored result | `node_id`, `payload_summary` |
+| `DuplicateRecording` | Opt-in record guard found an existing call identity | `node_id`, `payload_summary`, `attempt` |
 | `IntegrityError` | Stored or transferred data failed integrity validation | Exception message |
 | `PostDispatchOutcomeUnknown` | A caller explicitly reports an external call with unknown outcome | `error` |
 | `CallCleanupError` | Secondary cleanup errors chained behind a primary call error | `errors` |
