@@ -118,6 +118,12 @@ def test_release_runbook_declares_local_only_production_upload() -> None:
         "info.author",
     )
     assert all(text in runbook for text in required)
+    public_verification = runbook.split(
+        "## 6. Verify public distribution", maxsplit=1
+    )[1].split("## 7. Close the release", maxsplit=1)[0]
+    assert 'python -m pip install -e ".[dev,estimate-openai]"' in public_verification
+    assert "python -m pytest" in public_verification
+    assert "python examples\\exp_006_verify.py" in public_verification
 
 
 def test_built_wheel_exposes_consistent_version_and_author_metadata(
