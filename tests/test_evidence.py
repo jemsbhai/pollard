@@ -171,8 +171,11 @@ def test_exp007_runner_is_offline_and_binds_the_loaded_wheel(tmp_path: Path) -> 
     assert provenance["package_source_file_count"] > 0
     runner_repository = provenance["runner_repository"]
     assert runner_repository["commit"] is None or len(runner_repository["commit"]) == 40
-    assert runner_repository["root_matches_runner_repository"] is True
+    assert runner_repository["root_matches_runner_repository"] in (True, False, None)
     assert runner_repository["dirty"] in (True, False, None)
+    if runner_repository["root_matches_runner_repository"] is not True:
+        assert runner_repository["commit"] is None
+        assert runner_repository["dirty"] is None
     assert runner_repository["package_source_sha256"] == provenance[
         "package_source_sha256"
     ]
@@ -191,7 +194,12 @@ def test_exp007_runner_is_offline_and_binds_the_loaded_wheel(tmp_path: Path) -> 
     expected_publishable = (
         isinstance(runner_repository["commit"], str)
         and len(runner_repository["commit"]) == 40
+        and runner_repository["root_matches_runner_repository"] is True
         and runner_repository["dirty"] is False
+        and runner_repository["matches_loaded_package_sources"] is True
+        and loaded_distribution["matches_package_wheel"] is True
+        and loaded_distribution["loaded_from_distribution"] is True
+        and loaded_distribution["isolated_imports"] is True
     )
     assert provenance["publishable"] is expected_publishable
     assert provenance["status"] == (

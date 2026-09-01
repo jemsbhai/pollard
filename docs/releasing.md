@@ -249,6 +249,8 @@ dependencies, and run the offline verification path. For 1.0 and later this
 includes the full test suite and EXP-006 verifier:
 
 ```powershell
+python -m pip install -e ".[dev,estimate-openai]"
+python -m pytest
 $env:PYTHONPATH = (Resolve-Path src)
 python examples\exp_006_verify.py
 ```
