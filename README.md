@@ -2,6 +2,13 @@
 
 Governed execution trees for AI agents: budget it, gate it, replay it.
 
+Native Node.js/TypeScript and Rust core packages are being prepared as
+`pollardai` 0.1.0. They preserve Pollard's node identity contract and provide
+in-memory execution, budgets, registry gating, and replay. The Python package
+continues to provide the complete integrations and persistent stores. See
+[native package scope and releases](https://github.com/jemsbhai/pollard/blob/main/docs/native-releases.md)
+for the feature boundary and release status.
+
 ## 90-Second Credential-Free Start
 
 Pollard requires Python 3.10 or newer. The core package has no runtime

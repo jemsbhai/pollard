@@ -1,0 +1,31 @@
+{
+  "name": "pollardai",
+  "version": "0.1.0",
+  "description": "Experimental native TypeScript core for Pollard governed, content-addressed execution trees",
+  "license": "MIT",
+  "author": "Muntaser Syed",
+  "type": "module",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/esm/index.d.ts",
+  "exports": {
+    ".": {
+      "import": { "types": "./dist/esm/index.d.ts", "default": "./dist/esm/index.js" },
+      "require": { "types": "./dist/cjs/index.d.ts", "default": "./dist/cjs/index.js" }
+    }
+  },
+  "files": ["dist", "README.md", "LICENSE"],
+  "engines": { "node": ">=20" },
+  "repository": { "type": "git", "url": "git+https://github.com/jemsbhai/pollard.git", "directory": "packages/npm" },
+  "homepage": "https://github.com/jemsbhai/pollard/tree/main/packages/npm",
+  "bugs": "https://github.com/jemsbhai/pollard/issues",
+  "keywords": ["ai", "agents", "governance", "replay", "pollard"],
+  "publishConfig": { "access": "public" },
+  "scripts": {
+    "build": "tsc -p tsconfig.json && tsc -p tsconfig.cjs.json && node scripts/build.cjs",
+    "test": "npm run build && node --test test/core.test.mjs",
+    "smoke:pack": "node scripts/smoke-pack.cjs",
+    "prepack": "npm run build"
+  },
+  "devDependencies": { "@types/node": "^22.0.0", "typescript": "^5.7.0" }
+}

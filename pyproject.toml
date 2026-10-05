@@ -77,3 +77,6 @@ addopts = "-q -p no:pollard"
 
 [tool.coverage.run]
 source = ["src/pollard"]
+
+[tool.hatch.build.targets.sdist]
+exclude = ["/packages", "/crates", "/interop"]
