@@ -6,17 +6,28 @@ The native packages start at version 0.1.0 and have their own version line.
 
 ## Release status
 
-Both 0.1.0 packages are being prepared. Registry publication is pending local
-validation and authenticated uploads. The install commands below apply after
-the corresponding registry reports version 0.1.0.
+Rust 0.1.0 is published on
+[crates.io](https://crates.io/crates/pollardai/0.1.0). A clean public-registry
+consumer verified the released crate and its archive checksum.
+
+The tested npm archive is available in the
+[pollardai 0.1.0 GitHub release](https://github.com/jemsbhai/pollard/releases/tag/pollardai-v0.1.0).
+The npm registry upload was rejected and requires refreshed maintainer
+authentication. Until that upload succeeds, install the release archive:
 
 ```sh
-npm install pollardai
+npm install https://github.com/jemsbhai/pollard/releases/download/pollardai-v0.1.0/pollardai-0.1.0.tgz
 ```
+
+Rust installs from the public registry:
 
 ```sh
 cargo add pollardai
 ```
+
+After npm registry publication, `npm install pollardai` will install 0.1.0.
+Both package archives, checksums, and the checked source commit are recorded
+in the tagged GitHub release. The native source passed all 49 CI checks.
 
 The npm source is in
 [packages/npm](https://github.com/jemsbhai/pollard/tree/main/packages/npm).
@@ -126,7 +137,7 @@ token in source, command arguments, a recording, or CI secrets.
 5. Fetch fresh public metadata and compare archive hashes. Install npm from
    the public registry into a clean directory and run the offline example.
    Compile and run a clean Rust consumer using the public crates.io release.
-6. Tag the reviewed source `pollardai-v0.1.0`, create a local GitHub release
+6. Tag the reviewed source `pollardai-v0.1.0`, create a GitHub release
    with the package artifacts and hashes, and update this release status.
 
 Package versions are immutable after release. Repair an incorrect release with
