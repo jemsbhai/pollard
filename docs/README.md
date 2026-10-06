@@ -34,6 +34,7 @@ failure boundaries, and complete commands needed to operate or review Pollard.
 | Reproduce a published claim | [Evidence index](https://github.com/jemsbhai/pollard/blob/main/evidence/README.md) |
 | Review historical release messaging and claim limits | [Launch history](https://github.com/jemsbhai/pollard/blob/main/docs/launch.md) |
 | Prepare and publish a release | [Local-only release runbook](https://github.com/jemsbhai/pollard/blob/main/docs/releasing.md) |
+| Use or release the native npm and Rust core packages | [Native packages](https://github.com/jemsbhai/pollard/blob/main/docs/native-releases.md) |
 
 ## Scope and trust boundaries
 

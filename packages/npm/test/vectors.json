@@ -1,0 +1,620 @@
+{
+  "canonical_cases": [
+    {
+      "canonical_text": "null",
+      "name": "null",
+      "value": null
+    },
+    {
+      "canonical_text": "[false,true]",
+      "name": "booleans",
+      "value": [
+        false,
+        true
+      ]
+    },
+    {
+      "canonical_text": "{\"array\":[],\"object\":{},\"string\":\"\"}",
+      "name": "empty_values",
+      "value": {
+        "array": [],
+        "object": {},
+        "string": ""
+      }
+    },
+    {
+      "canonical_text": "[-9007199254740991,-1,0,1,9007199254740991]",
+      "name": "safe_integer_boundaries",
+      "value": [
+        -9007199254740991,
+        -1,
+        0,
+        1,
+        9007199254740991
+      ]
+    },
+    {
+      "canonical_text": "{\"0\":\"zero\",\"02\":\"zero-two\",\"10\":\"ten\",\"2\":\"two\"}",
+      "name": "integer_looking_keys",
+      "value": {
+        "0": "zero",
+        "02": "zero-two",
+        "10": "ten",
+        "2": "two"
+      }
+    },
+    {
+      "canonical_text": "{\"a\":\"ascii\",\"\ue000\":\"private-use\",\"\ud800\udc00\":\"astral\"}",
+      "name": "unicode_scalar_key_order",
+      "value": {
+        "a": "ascii",
+        "\ue000": "private-use",
+        "\ud800\udc00": "astral"
+      }
+    },
+    {
+      "canonical_text": "{\"controls\":\"\\u0000\\u0001\\u0002\\u0003\\u0004\\u0005\\u0006\\u0007\\b\\t\\n\\u000b\\f\\r\\u000e\\u000f\\u0010\\u0011\\u0012\\u0013\\u0014\\u0015\\u0016\\u0017\\u0018\\u0019\\u001a\\u001b\\u001c\\u001d\\u001e\\u001f\",\"special\":\"\\\\\\\"/\u2028\u2029\",\"text\":\"caf\u00e9 \ud83d\ude00\"}",
+      "name": "escaped_controls_and_unicode",
+      "value": {
+        "controls": "\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007\b\t\n\u000b\f\r\u000e\u000f\u0010\u0011\u0012\u0013\u0014\u0015\u0016\u0017\u0018\u0019\u001a\u001b\u001c\u001d\u001e\u001f",
+        "special": "\\\"/\u2028\u2029",
+        "text": "caf\u00e9 \ud83d\ude00"
+      }
+    },
+    {
+      "canonical_text": "{\"a\":{\"a\":true,\"z\":null},\"z\":[{\"a\":1,\"b\":2}]}",
+      "name": "nested_key_order",
+      "value": {
+        "a": {
+          "a": true,
+          "z": null
+        },
+        "z": [
+          {
+            "a": 1,
+            "b": 2
+          }
+        ]
+      }
+    }
+  ],
+  "contract": {
+    "node_domain": "pollard/v1\n",
+    "note": "Generated from local Python source; integer bounds are the native-port subset, not Python bounds.",
+    "redaction_domain": "pollard/v1:redact\n",
+    "result_domain": "pollard/v1:result\n",
+    "safe_integer_max": 9007199254740991,
+    "safe_integer_min": -9007199254740991
+  },
+  "detached_store": {
+    "child": {
+      "attempt": 0,
+      "id": "11eabc5bd6ab93d50e3eb66957f369d2efe573b042dfd309b6d01ab76fdd4d46",
+      "kind": "model_call",
+      "meta": {
+        "charges": {
+          "steps": 1
+        }
+      },
+      "parent": "915dcb19531aab1a15b339cf68cb39d831f396869491ba33e1d588aed46440db",
+      "payload": {
+        "model": "fixture"
+      },
+      "result": {
+        "a": 1,
+        "b": 2.0
+      },
+      "result_digest": "50f7acb1c1e4f78228381860d63044e1faf492bc74fbbd3c4a0ee65f93763d07",
+      "result_text": "{\"a\":1,\"b\":2.0}"
+    },
+    "root_after_mutations": {
+      "attempt": 0,
+      "id": "915dcb19531aab1a15b339cf68cb39d831f396869491ba33e1d588aed46440db",
+      "kind": "root",
+      "meta": {
+        "charges": {
+          "steps": 1
+        },
+        "nested": {
+          "value": "original"
+        }
+      },
+      "parent": null,
+      "payload": {
+        "nested": {
+          "flag": true
+        },
+        "run": "detached"
+      },
+      "result": null,
+      "result_digest": null,
+      "result_text": null
+    },
+    "root_after_shallow_patch": {
+      "attempt": 0,
+      "id": "915dcb19531aab1a15b339cf68cb39d831f396869491ba33e1d588aed46440db",
+      "kind": "root",
+      "meta": {
+        "charges": {
+          "steps": 1
+        },
+        "nested": {
+          "replacement": true
+        }
+      },
+      "parent": null,
+      "payload": {
+        "nested": {
+          "flag": true
+        },
+        "run": "detached"
+      },
+      "result": null,
+      "result_digest": null,
+      "result_text": null
+    },
+    "root_before": {
+      "attempt": 0,
+      "id": "915dcb19531aab1a15b339cf68cb39d831f396869491ba33e1d588aed46440db",
+      "kind": "root",
+      "meta": {
+        "charges": {
+          "steps": 1
+        },
+        "nested": {
+          "value": "original"
+        }
+      },
+      "parent": null,
+      "payload": {
+        "nested": {
+          "flag": true
+        },
+        "run": "detached"
+      },
+      "result": null,
+      "result_digest": null,
+      "result_text": null
+    },
+    "tamper_cases": [
+      {
+        "field": "id",
+        "findings": [
+          "node id does not match identity fields"
+        ],
+        "replacement": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      {
+        "field": "result_text",
+        "findings": [
+          "result digest does not match stored result"
+        ],
+        "replacement": "{\"a\":999}"
+      },
+      {
+        "field": "parent",
+        "findings": [
+          "node id does not match identity fields",
+          "node is missing"
+        ],
+        "replacement": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    ],
+    "verification_ok": true
+  },
+  "format": "pollard-portable-interop-v1",
+  "node_cases": [
+    {
+      "attempt": 0,
+      "canonical_identity_text": "{\"a\":0,\"k\":\"root\",\"p\":\"\",\"pl\":{\"run\":\"golden\"}}",
+      "id": "56022c0c5fabdad4de7f9226bd28d33cc5c0098d7e1569b1a3b6293d833d8e8e",
+      "kind": "root",
+      "name": "golden_root",
+      "parent": null,
+      "payload": {
+        "run": "golden"
+      }
+    },
+    {
+      "attempt": 0,
+      "canonical_identity_text": "{\"a\":0,\"k\":\"model_call\",\"p\":\"56022c0c5fabdad4de7f9226bd28d33cc5c0098d7e1569b1a3b6293d833d8e8e\",\"pl\":{\"messages\":[{\"content\":\"hello\",\"role\":\"user\"}],\"model\":\"mock-1\"}}",
+      "id": "07f65f2688e6b6ee1e8acab69b36e29be8d2c72c3317aa47831121a01a7c724d",
+      "kind": "model_call",
+      "name": "golden_model",
+      "parent": "56022c0c5fabdad4de7f9226bd28d33cc5c0098d7e1569b1a3b6293d833d8e8e",
+      "payload": {
+        "messages": [
+          {
+            "content": "hello",
+            "role": "user"
+          }
+        ],
+        "model": "mock-1"
+      }
+    },
+    {
+      "attempt": 1,
+      "canonical_identity_text": "{\"a\":1,\"k\":\"model_call\",\"p\":\"56022c0c5fabdad4de7f9226bd28d33cc5c0098d7e1569b1a3b6293d833d8e8e\",\"pl\":{\"messages\":[{\"content\":\"hello\",\"role\":\"user\"}],\"model\":\"mock-1\"}}",
+      "id": "e043a7e862a99b31e253c243b0462f259e3d519fa8d6b5b545051f228fba8858",
+      "kind": "model_call",
+      "name": "golden_retry",
+      "parent": "56022c0c5fabdad4de7f9226bd28d33cc5c0098d7e1569b1a3b6293d833d8e8e",
+      "payload": {
+        "messages": [
+          {
+            "content": "hello",
+            "role": "user"
+          }
+        ],
+        "model": "mock-1"
+      }
+    },
+    {
+      "attempt": 0,
+      "canonical_identity_text": "{\"a\":0,\"k\":\"root\",\"p\":\"\",\"pl\":{\"run\":\"first-run\"}}",
+      "id": "fb4f2a23cc196e53f0fa800a71c025e0a9b7ac5890b83c4d9d1a0214175d9dd5",
+      "kind": "root",
+      "name": "first_run_root",
+      "parent": null,
+      "payload": {
+        "run": "first-run"
+      }
+    },
+    {
+      "attempt": 0,
+      "canonical_identity_text": "{\"a\":0,\"k\":\"model_call\",\"p\":\"fb4f2a23cc196e53f0fa800a71c025e0a9b7ac5890b83c4d9d1a0214175d9dd5\",\"pl\":{\"model\":\"local-demo\",\"prompt\":\"hello\"}}",
+      "id": "c4882b75addd9867f623049798e2c6cebc3d49daa80bd5a825c102cf0580fd30",
+      "kind": "model_call",
+      "name": "first_run_model",
+      "parent": "fb4f2a23cc196e53f0fa800a71c025e0a9b7ac5890b83c4d9d1a0214175d9dd5",
+      "payload": {
+        "model": "local-demo",
+        "prompt": "hello"
+      }
+    },
+    {
+      "attempt": 0,
+      "canonical_identity_text": "{\"a\":0,\"k\":\"note\",\"p\":\"56022c0c5fabdad4de7f9226bd28d33cc5c0098d7e1569b1a3b6293d833d8e8e\",\"pl\":{}}",
+      "id": "c22c0c8b1c82b2e8653656070fb2c112e92561557520ba93778b3fcde0cd2ee4",
+      "kind": "note",
+      "name": "empty_note",
+      "parent": "56022c0c5fabdad4de7f9226bd28d33cc5c0098d7e1569b1a3b6293d833d8e8e",
+      "payload": {}
+    },
+    {
+      "attempt": 0,
+      "canonical_identity_text": "{\"a\":0,\"k\":\"note\",\"p\":\"56022c0c5fabdad4de7f9226bd28d33cc5c0098d7e1569b1a3b6293d833d8e8e\",\"pl\":{\"a\":\"ascii\",\"\ue000\":\"private-use\",\"\ud800\udc00\":\"astral\"}}",
+      "id": "a6ccf7b02419a02c114752fdc65ff9cb70aabcaaae5b718c77322ac2d28437a2",
+      "kind": "note",
+      "name": "unicode_note",
+      "parent": "56022c0c5fabdad4de7f9226bd28d33cc5c0098d7e1569b1a3b6293d833d8e8e",
+      "payload": {
+        "a": "ascii",
+        "\ue000": "private-use",
+        "\ud800\udc00": "astral"
+      }
+    },
+    {
+      "attempt": 0,
+      "canonical_identity_text": "{\"a\":0,\"k\":\"note\",\"p\":\"56022c0c5fabdad4de7f9226bd28d33cc5c0098d7e1569b1a3b6293d833d8e8e\",\"pl\":{\"0\":\"zero\",\"02\":\"zero-two\",\"10\":\"ten\",\"2\":\"two\"}}",
+      "id": "99c99ebfbf7a7e067edecf6a50d3459c114c4504236e5f9eb3f9ff5c9641db90",
+      "kind": "note",
+      "name": "integer_key_note",
+      "parent": "56022c0c5fabdad4de7f9226bd28d33cc5c0098d7e1569b1a3b6293d833d8e8e",
+      "payload": {
+        "0": "zero",
+        "02": "zero-two",
+        "10": "ten",
+        "2": "two"
+      }
+    },
+    {
+      "attempt": 0,
+      "canonical_identity_text": "{\"a\":0,\"k\":\"note\",\"p\":\"56022c0c5fabdad4de7f9226bd28d33cc5c0098d7e1569b1a3b6293d833d8e8e\",\"pl\":{\"controls\":\"\\u0000\\u0001\\u0002\\u0003\\u0004\\u0005\\u0006\\u0007\\b\\t\\n\\u000b\\f\\r\\u000e\\u000f\\u0010\\u0011\\u0012\\u0013\\u0014\\u0015\\u0016\\u0017\\u0018\\u0019\\u001a\\u001b\\u001c\\u001d\\u001e\\u001f\",\"special\":\"\\\\\\\"/\u2028\u2029\",\"text\":\"caf\u00e9 \ud83d\ude00\"}}",
+      "id": "6244c81ae8102039bf5620318e32fe3c430dd61bf00d187919d928dd083ee380",
+      "kind": "note",
+      "name": "control_note",
+      "parent": "56022c0c5fabdad4de7f9226bd28d33cc5c0098d7e1569b1a3b6293d833d8e8e",
+      "payload": {
+        "controls": "\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007\b\t\n\u000b\f\r\u000e\u000f\u0010\u0011\u0012\u0013\u0014\u0015\u0016\u0017\u0018\u0019\u001a\u001b\u001c\u001d\u001e\u001f",
+        "special": "\\\"/\u2028\u2029",
+        "text": "caf\u00e9 \ud83d\ude00"
+      }
+    },
+    {
+      "attempt": 0,
+      "canonical_identity_text": "{\"a\":0,\"k\":\"note\",\"p\":\"56022c0c5fabdad4de7f9226bd28d33cc5c0098d7e1569b1a3b6293d833d8e8e\",\"pl\":{\"nil\":null,\"no\":false,\"yes\":true}}",
+      "id": "0a3feb7f8c34d75df990087cc41a3eb7250bc1d2921a98c16d5a9d825b60ae78",
+      "kind": "note",
+      "name": "null_bool_note",
+      "parent": "56022c0c5fabdad4de7f9226bd28d33cc5c0098d7e1569b1a3b6293d833d8e8e",
+      "payload": {
+        "nil": null,
+        "no": false,
+        "yes": true
+      }
+    },
+    {
+      "attempt": 0,
+      "canonical_identity_text": "{\"a\":0,\"k\":\"note\",\"p\":\"56022c0c5fabdad4de7f9226bd28d33cc5c0098d7e1569b1a3b6293d833d8e8e\",\"pl\":{\"max\":9007199254740991,\"min\":-9007199254740991}}",
+      "id": "bee0cc33d4c5c94b0e627538aaf3a6bb2c7be7c0a5a8016f7e83f0a96172043c",
+      "kind": "note",
+      "name": "safe_integer_note",
+      "parent": "56022c0c5fabdad4de7f9226bd28d33cc5c0098d7e1569b1a3b6293d833d8e8e",
+      "payload": {
+        "max": 9007199254740991,
+        "min": -9007199254740991
+      }
+    },
+    {
+      "attempt": 0,
+      "canonical_identity_text": "{\"a\":0,\"k\":\"note\",\"p\":\"56022c0c5fabdad4de7f9226bd28d33cc5c0098d7e1569b1a3b6293d833d8e8e\",\"pl\":{\"branch\":true}}",
+      "id": "416d12192a27dc3814494742af184113ab92ae9a274aaacaf8881ae39374d4ea",
+      "kind": "note",
+      "name": "branch_anchor",
+      "parent": "56022c0c5fabdad4de7f9226bd28d33cc5c0098d7e1569b1a3b6293d833d8e8e",
+      "payload": {
+        "branch": true
+      }
+    }
+  ],
+  "redaction_cases": [
+    {
+      "hint": null,
+      "marker": {
+        "__pollard_redacted": "54a667fe4f76148f8f84401b828a80111e4bbd4c51a5915a211bbd5e5796872f",
+        "hint": null
+      },
+      "value": "fake-api-key-for-fixtures"
+    },
+    {
+      "hint": "fixture",
+      "marker": {
+        "__pollard_redacted": "3358ae6693f9c9b2bd5c1989a0a490b9ff1cc9e6282180cea18a17878b6473b9",
+        "hint": "fixture"
+      },
+      "value": {
+        "private": true
+      }
+    }
+  ],
+  "registry": {
+    "canonical_digest_input": "{\"spec_digests\":[\"2892920a5ee8dd8a14d54e01398b6d6dded19fc14ed9cf874d1f70fdf510e24e\",\"a15c5033d2cce80d4a00cc374987521ea4f18f70de5c46c2ff94b26ecb81d9a7\"]}",
+    "registered_tools": [
+      {
+        "args": {
+          "text": "caf\u00e9 \ud83d\ude00"
+        },
+        "audit_args": {
+          "text": "caf\u00e9 \ud83d\ude00"
+        },
+        "name": "echo",
+        "node": {
+          "attempt": 0,
+          "canonical_identity_text": "{\"a\":0,\"k\":\"tool_call\",\"p\":\"56022c0c5fabdad4de7f9226bd28d33cc5c0098d7e1569b1a3b6293d833d8e8e\",\"pl\":{\"args\":{\"text\":\"caf\u00e9 \ud83d\ude00\"},\"registry_digest\":\"714cd7491aed9259d899c9493ca5ab95ef8920faa5d69b66ed5c465305d0fa70\",\"spec_digest\":\"2892920a5ee8dd8a14d54e01398b6d6dded19fc14ed9cf874d1f70fdf510e24e\",\"tool\":\"echo\",\"version\":\"1.0\"}}",
+          "id": "8152b88a586edf3b560b659fcd66debc23edd985a676cfa676cd27a0df65ae2b",
+          "kind": "tool_call",
+          "name": "registered_echo",
+          "parent": "56022c0c5fabdad4de7f9226bd28d33cc5c0098d7e1569b1a3b6293d833d8e8e",
+          "payload": {
+            "args": {
+              "text": "caf\u00e9 \ud83d\ude00"
+            },
+            "registry_digest": "714cd7491aed9259d899c9493ca5ab95ef8920faa5d69b66ed5c465305d0fa70",
+            "spec_digest": "2892920a5ee8dd8a14d54e01398b6d6dded19fc14ed9cf874d1f70fdf510e24e",
+            "tool": "echo",
+            "version": "1.0"
+          }
+        }
+      },
+      {
+        "args": {
+          "message": "fixture only",
+          "nested": {
+            "token": "fake-token-for-fixtures"
+          },
+          "secret": "fake-api-key-for-fixtures"
+        },
+        "audit_args": {
+          "message": "fixture only",
+          "nested": {
+            "token": {
+              "__pollard_redacted": "5e72bd1ed5ec139702830cd977710f2df4aa0c9689f361de4616a713ced9ebc8",
+              "hint": null
+            }
+          },
+          "secret": {
+            "__pollard_redacted": "54a667fe4f76148f8f84401b828a80111e4bbd4c51a5915a211bbd5e5796872f",
+            "hint": null
+          }
+        },
+        "name": "notify",
+        "node": {
+          "attempt": 0,
+          "canonical_identity_text": "{\"a\":0,\"k\":\"tool_call\",\"p\":\"56022c0c5fabdad4de7f9226bd28d33cc5c0098d7e1569b1a3b6293d833d8e8e\",\"pl\":{\"args\":{\"message\":\"fixture only\",\"nested\":{\"token\":{\"__pollard_redacted\":\"5e72bd1ed5ec139702830cd977710f2df4aa0c9689f361de4616a713ced9ebc8\",\"hint\":null}},\"secret\":{\"__pollard_redacted\":\"54a667fe4f76148f8f84401b828a80111e4bbd4c51a5915a211bbd5e5796872f\",\"hint\":null}},\"registry_digest\":\"714cd7491aed9259d899c9493ca5ab95ef8920faa5d69b66ed5c465305d0fa70\",\"spec_digest\":\"a15c5033d2cce80d4a00cc374987521ea4f18f70de5c46c2ff94b26ecb81d9a7\",\"tool\":\"notify\",\"version\":\"2.0\"}}",
+          "id": "0bd0dcedef389aa6663df98ca6a187a448ea1790fa5267593e44cadb80e28fcb",
+          "kind": "tool_call",
+          "name": "registered_notify",
+          "parent": "56022c0c5fabdad4de7f9226bd28d33cc5c0098d7e1569b1a3b6293d833d8e8e",
+          "payload": {
+            "args": {
+              "message": "fixture only",
+              "nested": {
+                "token": {
+                  "__pollard_redacted": "5e72bd1ed5ec139702830cd977710f2df4aa0c9689f361de4616a713ced9ebc8",
+                  "hint": null
+                }
+              },
+              "secret": {
+                "__pollard_redacted": "54a667fe4f76148f8f84401b828a80111e4bbd4c51a5915a211bbd5e5796872f",
+                "hint": null
+              }
+            },
+            "registry_digest": "714cd7491aed9259d899c9493ca5ab95ef8920faa5d69b66ed5c465305d0fa70",
+            "spec_digest": "a15c5033d2cce80d4a00cc374987521ea4f18f70de5c46c2ff94b26ecb81d9a7",
+            "tool": "notify",
+            "version": "2.0"
+          }
+        }
+      }
+    ],
+    "registry_digest": "714cd7491aed9259d899c9493ca5ab95ef8920faa5d69b66ed5c465305d0fa70",
+    "specs": [
+      {
+        "canonical_text": "{\"description\":\"Return fixture input.\",\"name\":\"echo\",\"schema\":{\"additionalProperties\":false,\"properties\":{\"text\":{\"type\":\"string\"}},\"required\":[\"text\"],\"type\":\"object\"},\"side_effects\":false,\"version\":\"1.0\"}",
+        "identity": {
+          "description": "Return fixture input.",
+          "name": "echo",
+          "schema": {
+            "additionalProperties": false,
+            "properties": {
+              "text": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "text"
+            ],
+            "type": "object"
+          },
+          "side_effects": false,
+          "version": "1.0"
+        },
+        "spec_digest": "2892920a5ee8dd8a14d54e01398b6d6dded19fc14ed9cf874d1f70fdf510e24e"
+      },
+      {
+        "canonical_text": "{\"description\":\"Send a fixture notification.\",\"name\":\"notify\",\"schema\":{\"additionalProperties\":false,\"properties\":{\"message\":{\"type\":\"string\"},\"nested\":{\"additionalProperties\":false,\"properties\":{\"token\":{\"sensitive\":true,\"type\":\"string\"}},\"required\":[\"token\"],\"type\":\"object\"},\"secret\":{\"sensitive\":true,\"type\":\"string\"}},\"required\":[\"message\",\"secret\",\"nested\"],\"type\":\"object\"},\"side_effects\":true,\"version\":\"2.0\"}",
+        "identity": {
+          "description": "Send a fixture notification.",
+          "name": "notify",
+          "schema": {
+            "additionalProperties": false,
+            "properties": {
+              "message": {
+                "type": "string"
+              },
+              "nested": {
+                "additionalProperties": false,
+                "properties": {
+                  "token": {
+                    "sensitive": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "token"
+                ],
+                "type": "object"
+              },
+              "secret": {
+                "sensitive": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "message",
+              "secret",
+              "nested"
+            ],
+            "type": "object"
+          },
+          "side_effects": true,
+          "version": "2.0"
+        },
+        "spec_digest": "a15c5033d2cce80d4a00cc374987521ea4f18f70de5c46c2ff94b26ecb81d9a7"
+      }
+    ]
+  },
+  "rejected_cases": [
+    {
+      "error": "invalid_identity",
+      "name": "fractional_identity",
+      "operation": "canonical_bytes",
+      "value": {
+        "x": 0.5
+      }
+    },
+    {
+      "error": "unsafe_integer",
+      "integer_text": "9007199254740992",
+      "name": "positive_unsafe_integer",
+      "operation": "canonical_bytes"
+    },
+    {
+      "error": "unsafe_integer",
+      "integer_text": "-9007199254740992",
+      "name": "negative_unsafe_integer",
+      "operation": "canonical_bytes"
+    },
+    {
+      "attempt": -1,
+      "error": "invalid_attempt",
+      "name": "negative_attempt",
+      "operation": "node_make"
+    },
+    {
+      "attempt": true,
+      "error": "invalid_attempt",
+      "name": "boolean_attempt",
+      "operation": "node_make"
+    },
+    {
+      "attempt": 0.5,
+      "error": "invalid_attempt",
+      "name": "fractional_attempt",
+      "operation": "node_make"
+    },
+    {
+      "error": "invalid_unicode",
+      "json_text": "\"\\ud800\"",
+      "name": "unpaired_surrogate",
+      "operation": "canonical_bytes"
+    },
+    {
+      "error": "invalid_parent",
+      "kind": "note",
+      "name": "nonroot_missing_parent",
+      "operation": "node_make",
+      "parent": null
+    },
+    {
+      "error": "invalid_parent",
+      "kind": "root",
+      "name": "root_has_parent",
+      "operation": "node_make",
+      "parent": "56022c0c5fabdad4de7f9226bd28d33cc5c0098d7e1569b1a3b6293d833d8e8e"
+    }
+  ],
+  "result_cases": [
+    {
+      "name": "integer_and_integral_float",
+      "result": {
+        "a": 1,
+        "b": 2.0
+      },
+      "result_digest": "50f7acb1c1e4f78228381860d63044e1faf492bc74fbbd3c4a0ee65f93763d07",
+      "result_text": "{\"a\":1,\"b\":2.0}"
+    },
+    {
+      "name": "unicode_and_usage",
+      "result": {
+        "text": "caf\u00e9 \ud83d\ude00",
+        "usage": {
+          "input_tokens": 2,
+          "output_tokens": 4
+        }
+      },
+      "result_digest": "7e0b2ba336a78caac3c7b4e30b68221b39f7c2aa1f4f2640e034b6d9890d7053",
+      "result_text": "{\"text\":\"caf\u00e9 \ud83d\ude00\",\"usage\":{\"input_tokens\":2,\"output_tokens\":4}}"
+    },
+    {
+      "name": "imported_noncanonical_result_text",
+      "result": {
+        "a": 1,
+        "b": 2.0
+      },
+      "result_digest": "dc1449d67a921b74a4f96558ae8b57e6f98fb5ddc2efd0a6cfbb5d29c3ff30d9",
+      "result_text": "{ \"b\": 2.0, \"a\": 1 }"
+    }
+  ]
+}

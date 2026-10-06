@@ -12,6 +12,11 @@ htmlcov/
 .mypy_cache/
 .ruff_cache/
 .benchmarks/
+node_modules/
+target/
+*.tgz
+.release-native/
+.npmrc
 .env
 .env.local
 *.key

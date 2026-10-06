@@ -6,6 +6,16 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 
 ## [Unreleased]
 
+### Added
+
+- Prepare native npm and Rust `pollardai` 0.1.0 core packages with independent
+  versions, in-memory execution, integer budgets, registered tool gating, and
+  strict replay. Shared Python-generated vectors check the frozen node identity
+  and exact stored result digest. These packages do not yet include Python's
+  persistent stores, provider adapters, or full API surface.
+- Add native package validation and a local release runbook. Package publishing
+  remains a maintainer-controlled local action.
+
 ## [1.6.0] - 2026-09-01
 
 ### Added

@@ -6,7 +6,10 @@ def test_readme_markdown_links_use_absolute_urls() -> None:
     readmes = sorted(
         path
         for path in Path(".").glob("**/README.md")
-        if not any(part.startswith(".") for part in path.parts)
+        if not any(
+            part.startswith(".") or part in {"node_modules", "target", "dist", "build"}
+            for part in path.parts
+        )
     )
     assert readmes
     for path in readmes:
