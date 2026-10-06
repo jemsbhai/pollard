@@ -1,9 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import { ActionSpec, BudgetExceeded, canonicalBytes, canonicalText, ConcurrentCallError, ConfirmationRequired, digestPayload, DuplicateRecordingError, IntegrityError, MemoryStore, MissingNodeError, Node, nodeId, PolicyViolation, redact, Registry, resultDigestFromText, Runtime, UnsupportedSchema, UsageError, verify } from '../dist/esm/index.js';
 
 const vectors = JSON.parse(readFileSync(new URL('./vectors.json', import.meta.url), 'utf8'));
+const cjs = createRequire(import.meta.url)('../dist/cjs/index.js');
 const reply = (tokens = 2) => ({ text: 'hello', usage: { input_tokens: tokens, output_tokens: 0 } });
 const spec = (handler = args => ({ text: args.text })) => new ActionSpec({ name: 'echo', version: '1', description: 'Echo', sideEffects: false, schema: { type: 'object', properties: { text: { type: 'string' } }, required: ['text'], additionalProperties: false }, handler });
 const storage = value => { const { result, ...record } = value; return record; };
@@ -296,4 +298,47 @@ test('read-only seven-method stores replay but cannot dispatch live without fina
   const store = { get: id => backing.get(id), put: n => backing.put(n), exists: id => backing.exists(id), children: id => backing.children(id), updateMeta: (id, patch) => backing.updateMeta(id, patch), walk: id => backing.walk(id), roots: () => backing.roots() };
   assert.equal(new Runtime({ store, mode: 'replay' }).run('capability').modelCall({}, () => { throw Error('never'); }).result.text, 'hello');
   assert.throws(() => new Runtime({ store }).run('live').modelCall({}, () => { throw Error('never'); }), /RecordingStore.finalize/);
+});
+
+test('ESM and CommonJS runtimes share dispatch locks in both import directions', () => {
+  for (const [OuterRuntime, InnerRuntime, StoreClass] of [[Runtime, cjs.Runtime, cjs.MemoryStore], [cjs.Runtime, Runtime, MemoryStore]]) {
+    const store = new StoreClass(); let nested; let calls = 0;
+    const runtime = new OuterRuntime({ store, estimateTokens: () => {
+      nested.modelCall({ model: 'same' }, () => { calls++; return reply(); });
+      return 0;
+    } });
+    const outer = runtime.run('dual-lock'); nested = new InnerRuntime({ store }).run('dual-lock');
+    assert.throws(() => outer.modelCall({ model: 'same' }, () => { calls++; return reply(); }), error => error.name === 'ConcurrentCallError');
+    assert.equal(calls, 0);
+    const node = nested.modelCall({ model: 'same' }, () => { calls++; return reply(); });
+    assert.equal(calls, 1);
+    assert.throws(() => outer.modelCall({ model: 'same' }, () => { calls++; return reply(); }), error => error.name === 'DuplicateRecordingError');
+    assert.equal(calls, 1); assert.equal(store.get(node.id).meta.state, 'completed');
+  }
+});
+
+test('a recording inserted by an estimator is refused before the handler executes', () => {
+  const store = new MemoryStore(); let run; let calls = 0;
+  const runtime = new Runtime({ store, estimateTokens: payload => {
+    store.put(Node.make({ kind: 'model_call', parent: run.rootId, payload, result: reply() }));
+    return 0;
+  } });
+  run = runtime.run('estimator-store-race');
+  assert.throws(() => run.modelCall({ model: 'same' }, () => { calls++; return reply(); }), DuplicateRecordingError);
+  assert.equal(calls, 0);
+});
+
+test('registered hybrid calls accept foreign-module Node cache hits in both directions', () => {
+  for (const [ReaderRuntime, ReaderRegistry, ReaderSpec, WriterRuntime, WriterRegistry, WriterSpec, StoreClass] of [
+    [Runtime, Registry, ActionSpec, cjs.Runtime, cjs.Registry, cjs.ActionSpec, cjs.MemoryStore],
+    [cjs.Runtime, cjs.Registry, cjs.ActionSpec, Runtime, Registry, ActionSpec, MemoryStore],
+  ]) {
+    let calls = 0; const store = new StoreClass();
+    const input = { name: 'echo', version: '1', description: 'cross-module', sideEffects: false, schema: { type: 'object' } };
+    const writerRegistry = new WriterRegistry([new WriterSpec({ ...input, handler: () => { calls++; return reply(); } })]);
+    const readerRegistry = new ReaderRegistry([new ReaderSpec({ ...input, handler: () => { calls++; throw Error('must never dispatch cached handler'); } })]);
+    const node = new WriterRuntime({ store, registry: writerRegistry }).run('dual-tool').toolCall('echo', { text: 'x' });
+    const hybrid = new ReaderRuntime({ store, registry: readerRegistry, mode: 'hybrid' }).run('dual-tool');
+    assert.equal(hybrid.toolCall('echo', { text: 'x' }).id, node.id); assert.equal(calls, 1);
+  }
 });

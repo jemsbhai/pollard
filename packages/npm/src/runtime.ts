@@ -20,7 +20,14 @@ export interface RuntimeOptions {
 interface Scope { budget: Budget; anchorId: string; }
 interface Counters { steps: number; tokens: number; }
 interface PendingTool { parentId: string; payload: IdentityPayload; args: IdentityPayload; spec: ActionSpec; options: ToolCallOptions; }
-const busyStores = new WeakSet<Store>();
+// ESM and CommonJS consumers can share one Store, so both module graphs must use
+// the same operation lock within this process realm.
+const lockKey = Symbol.for('pollardai/v1:busy-stores');
+const realm = globalThis as unknown as Record<symbol, unknown>;
+const existingLocks = realm[lockKey];
+if (existingLocks !== undefined && !(existingLocks instanceof WeakSet)) throw new TypeError('invalid Pollard store lock registry');
+const busyStores = (existingLocks as WeakSet<Store> | undefined) ?? new WeakSet<Store>();
+if (existingLocks === undefined) Object.defineProperty(globalThis, lockKey, { value: busyStores });
 
 function budgetCopy(value: Budget): Budget {
   objectPayload(value, 'budget');
@@ -145,7 +152,7 @@ export class Run {
     this.#idle();
     if (!this.#runtime.registry) return this.#callSync('tool_call', { tool: name, args }, fn as StepFn, options);
     const prepared = this.#prepareTool(name, args, options);
-    if (prepared instanceof Node) return prepared;
+    if ('recorded' in prepared) return prepared.recorded;
     if (this.#runtime.dryRun && prepared.spec.sideEffects) return this.#dryRun(prepared.payload, options);
     return this.#callSync('tool_call', prepared.payload, () => prepared.spec.handler!(prepared.args) as JsonObject, options, prepared.spec.handler);
   }
@@ -153,7 +160,7 @@ export class Run {
     this.#idle();
     if (!this.#runtime.registry) return this.#callAsync('tool_call', { tool: name, args }, fn as AsyncStepFn, options);
     const prepared = this.#prepareTool(name, args, options);
-    if (prepared instanceof Node) return prepared;
+    if ('recorded' in prepared) return prepared.recorded;
     if (this.#runtime.dryRun && prepared.spec.sideEffects) return this.#dryRun(prepared.payload, options);
     return this.#callAsync('tool_call', prepared.payload, () => prepared.spec.handler!(prepared.args), options);
   }
@@ -277,7 +284,7 @@ export class Run {
     else { this.store.put(refusal); this.#cursorId = refusal.id; }
     throw new PolicyViolation(detail, refusal.id);
   }
-  #prepareTool(name: string, args: IdentityPayload, options: ToolCallOptions): PendingTool | Node {
+  #prepareTool(name: string, args: IdentityPayload, options: ToolCallOptions): PendingTool | { recorded: Node } {
     options = optionsCopy(options);
     if (typeof name !== 'string' || !name) throw new TypeError('tool name must be nonempty');
     objectPayload(args, 'args');
@@ -291,7 +298,7 @@ export class Run {
     if (finding) this.#refusePolicy(`schema validation failed: ${finding}`, { tool: name, args: auditArgs });
     const payload = deepFreeze({ tool: spec.name, version: spec.version, args: auditArgs, spec_digest: spec.specDigest, registry_digest: registry.registryDigest });
     const recorded = this.#recorded('tool_call', payload, options);
-    if (recorded) return recorded;
+    if (recorded) return { recorded };
     let confirmation = false;
     busyStores.add(this.store);
     try {
@@ -323,11 +330,15 @@ export class Run {
   #dryRun(payload: IdentityPayload, options: CallOptions): Node {
     const recorded = this.#recorded('tool_call', payload, options);
     if (recorded) return recorded;
-    const estimate = this.#tokenEstimate('tool_call', payload, options);
-    this.#precheck('tool_call', payload, estimate);
-    const node = Node.make({ kind: 'tool_call', parent: this.#cursorId, payload, attempt: options.attempt ?? 0, meta: { dry_run: true, charges: { steps: 1, tokens: 0 } } });
-    this.store.put(node); this.#cursorId = node.id;
-    return this.store.get(node.id);
+    busyStores.add(this.store);
+    try {
+      const estimate = this.#tokenEstimate('tool_call', payload, options);
+      this.#precheck('tool_call', payload, estimate);
+      const node = Node.make({ kind: 'tool_call', parent: this.#cursorId, payload, attempt: options.attempt ?? 0, meta: { dry_run: true, charges: { steps: 1, tokens: 0 } } });
+      if (this.store.exists(node.id)) throw new DuplicateRecordingError(`recording appeared before dispatch: ${node.id}`);
+      this.store.put(node); this.#cursorId = node.id;
+      return this.store.get(node.id);
+    } finally { busyStores.delete(this.store); }
   }
   #begin(kind: NodeKind, payload: IdentityPayload, options: CallOptions): { pending: Node; estimate: number; recording: RecordingStore } {
     const store = this.store as RecordingStore;
@@ -336,6 +347,9 @@ export class Run {
     this.#precheck(kind, payload, estimate);
     const pending = Node.make({ kind, parent: this.#cursorId, payload, attempt: options.attempt ?? 0,
       meta: { state: 'pending', accounting_unknown: true, charges: { steps: 1, tokens: estimate } } });
+    // Callbacks may have changed trusted store state after the first lookup.
+    // Never rely on an idempotent put as proof this dispatch owns the identity.
+    if (store.exists(pending.id)) throw new DuplicateRecordingError(`recording appeared before dispatch: ${pending.id}`);
     store.put(pending);
     return { pending, estimate, recording: store };
   }
