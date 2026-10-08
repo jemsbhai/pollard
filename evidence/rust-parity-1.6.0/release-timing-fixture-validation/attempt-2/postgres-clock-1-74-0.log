@@ -1,0 +1,20 @@
+   Compiling windows-sys v0.61.2
+   Compiling rand v0.8.8
+   Compiling futures-util v0.3.34
+   Compiling futures-executor v0.3.34
+   Compiling futures v0.3.34
+   Compiling socket2 v0.6.5
+   Compiling mio v1.2.4
+   Compiling tokio v1.53.2
+   Compiling tokio-util v0.7.19
+   Compiling tokio-postgres v0.7.12
+   Compiling postgres v0.19.9
+   Compiling pollardai v0.2.1 (C:\Users\User\.codex\worktrees\rust-pypi-parity\pollard\crates\pollardai)
+    Finished test [unoptimized + debuginfo] target(s) in 26.32s
+     Running tests\postgres_parity.rs (target\debug\deps\postgres_parity-dbd5ecba1c924305.exe)
+
+running 1 test
+test reservation_clock_is_sampled_after_row_lock_wait ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 10 filtered out; finished in 0.75s
+

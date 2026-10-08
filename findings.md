@@ -211,5 +211,28 @@ kernels have no budgets; budget-cache benefits have read-count tests instead.
 No provider, remote-throughput, energy, cost-saving or complete-agent speedup
 claim follows. This remains separate from EXP-007. Python 1.6.0 MongoDB mixed
 leases/windows require `tz_aware=True`; the source UTC fix is not a PyPI upload.
-See the [tagged release](https://github.com/jemsbhai/pollard/releases/tag/pollardai-rust-v0.2.0) for final CI, source, archive and registry
+See the [tagged release](https://github.com/jemsbhai/pollard/releases/tag/pollardai-rust-v0.2.1) for final CI, source, archive and registry
 receipts and publication status.
+
+## 2026-10-08 Rust 0.2.1 Kafka Test-Fixture Follow-up
+
+Rust 0.2.0 passed final pull-request CI and was published on crates.io; fresh
+public-registry consumers and the installed CLI passed verification. After the
+merge, main-branch CI exposed a 5 ms replay deadline shared by ordinary Kafka
+mock tests. The Kafka change is confined to `cfg(test)`: ordinary mocks use
+`KafkaOptions::new("audit")` and its existing 30-second default, while explicit
+missing-record tests retain a 5 ms deadline. New regressions cover delayed
+two-record replay and timeout rejection before producer creation. PostgreSQL
+compares lease expiry with server time sampled immediately before releasing its
+blocking transaction, preserving the 200 ms lease and detection of pre-lock
+clock sampling. SQLite's renewal fixture starts with 60 seconds instead of one
+second; its 1,000-second renewal and consistency assertions are unchanged.
+
+Production timeouts, runtime code and benchmark programs are unchanged. The
+0.2.0 measurements and their `be9e565` provenance remain historical evidence;
+no new timing or optimization claim follows from this patch. Patch validation
+and publication are separate from the completed 0.2.0 checks. See the
+[Rust 0.2.1 release status and receipts](https://github.com/jemsbhai/pollard/releases/tag/pollardai-rust-v0.2.1)
+for final CI, source, archive and registry verification. npm 0.2.0 and the PyPI
+1.6.0 release remain independent; the Python MongoDB source fix is not a new
+PyPI upload.

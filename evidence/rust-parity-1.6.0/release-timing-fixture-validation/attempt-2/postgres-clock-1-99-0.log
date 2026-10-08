@@ -1,0 +1,59 @@
+   Compiling windows-link v0.2.1
+   Compiling subtle v2.6.1
+   Compiling futures-sink v0.3.34
+   Compiling futures-core v0.3.34
+   Compiling getrandom v0.2.17
+   Compiling unicode-properties v0.1.4
+   Compiling unicode-bidi v0.3.18
+   Compiling siphasher v1.0.4
+   Compiling windows-sys v0.61.2
+   Compiling unicode-normalization v0.1.25
+   Compiling scopeguard v1.2.0
+   Compiling fallible-iterator v0.2.0
+   Compiling base64 v0.22.1
+   Compiling byteorder v1.5.0
+   Compiling getrandom v0.3.4
+   Compiling windows_x86_64_msvc v0.52.6
+   Compiling parking_lot_core v0.9.12
+   Compiling whoami v1.6.1
+   Compiling ppv-lite86 v0.2.21
+   Compiling digest v0.10.7
+   Compiling serde v1.0.229
+   Compiling rand_core v0.6.4
+   Compiling futures-channel v0.3.34
+   Compiling lock_api v0.4.14
+   Compiling windows-targets v0.52.6
+   Compiling phf_shared v0.11.3
+   Compiling rand_core v0.9.5
+   Compiling hmac v0.12.1
+   Compiling md-5 v0.10.6
+   Compiling sha2 v0.10.9
+   Compiling windows-sys v0.52.0
+   Compiling futures-util v0.3.34
+   Compiling phf v0.11.3
+   Compiling parking_lot v0.12.5
+   Compiling rand_chacha v0.9.0
+   Compiling rand_chacha v0.3.1
+   Compiling stringprep v0.1.5
+   Compiling rand v0.9.5
+   Compiling rand v0.8.8
+   Compiling socket2 v0.5.10
+   Compiling mio v1.2.4
+   Compiling socket2 v0.6.5
+   Compiling postgres-protocol v0.6.8
+   Compiling futures-executor v0.3.34
+   Compiling futures v0.3.34
+   Compiling postgres-types v0.2.8
+   Compiling tokio v1.53.2
+   Compiling tokio-util v0.7.19
+   Compiling tokio-postgres v0.7.12
+   Compiling postgres v0.19.9
+   Compiling pollardai v0.2.1 (C:\Users\User\.codex\worktrees\rust-pypi-parity\pollard\crates\pollardai)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 22.45s
+     Running tests\postgres_parity.rs (target\debug\deps\postgres_parity-e15b37ba919c615a.exe)
+
+running 1 test
+test reservation_clock_is_sampled_after_row_lock_wait ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 10 filtered out; finished in 0.73s
+

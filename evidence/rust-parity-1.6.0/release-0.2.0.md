@@ -1,6 +1,28 @@
 # Rust pollardai 0.2.0
 
-The final local validation matrix passes for the Rust 0.2.0 release candidate at
+## Follow-up: Rust 0.2.1 test-fixture correction
+
+Rust 0.2.0 passed its final pull-request CI and was published on crates.io;
+fresh public-registry consumers and the installed CLI passed verification.
+A later main-branch CI run exposed an overly short 5 ms replay deadline shared
+by ordinary Kafka mock tests. The Kafka correction is confined to `cfg(test)`:
+ordinary mocks use `KafkaOptions::new("audit")` and its existing 30-second
+default, while explicit missing-record cases retain a 5 ms deadline. New
+regressions exercise delayed two-record replay and rejection of missing records
+before producer creation. Two integration fixtures also avoid scheduler-sensitive
+assumptions: PostgreSQL compares stored expiry against server time captured
+immediately before releasing its blocking transaction, retaining the 200 ms
+lease and detection of pre-lock clock sampling; SQLite's renewal fixture starts
+with 60 seconds instead of one second and retains its 1,000-second renewal and
+consistency assertions. These changes do not alter production timeouts, runtime
+behavior or benchmark code. Patch validation and publication remain separate
+from the completed 0.2.0 results below. See the
+[Rust 0.2.1 release status and receipts](https://github.com/jemsbhai/pollard/releases/tag/pollardai-rust-v0.2.1)
+for final CI, source, archive and registry verification.
+
+## Rust 0.2.0 evidence and provenance
+
+The completed local validation matrix for Rust 0.2.0 used
 source `be9e565`: 212 default tests and 232 optional-feature tests pass on both
 stable Rust 1.94 and Rust 1.74, and all 212 default tests pass in the optimized
 build. Formatting, warnings-denied Clippy, package verification, SQLite
@@ -11,7 +33,7 @@ forces eight threads to allocate 1,024 paths at an identical clock tick.
 Migration tests pass in debug and release builds on Rust 1.74 and 1.99,
 including 20 repeated runs per compiler/profile. These subsequent changes affect
 test fixtures only; the production and benchmark sources remain unchanged.
-See the [tagged release](https://github.com/jemsbhai/pollard/releases/tag/pollardai-rust-v0.2.0)
+See the [tagged release](https://github.com/jemsbhai/pollard/releases/tag/pollardai-rust-v0.2.1)
 for final CI, source, archive and registry receipts and publication status.
 Publication scope is the Rust crate; the Python release oracle remains 1.6.0.
 
@@ -145,9 +167,9 @@ uses identical timestamps across threads; both compilers pass all four tests
 in debug and release, plus 80 repeated test-binary runs overall
 ([Rust 1.74](release-fixture-validation/migration-stress-rust174.json),
 [Rust 1.99](release-fixture-validation/migration-stress-rust199.json)). The final
-suite includes this one additional test beyond the local matrix above. Final
-publication requires successful CI on the exact release source; see the tagged
-release for that CI receipt.
+suite included this one additional test beyond the local matrix above. The
+subsequent 0.2.0 pull-request CI and registry checks passed; the separate Kafka
+test-fixture issue found after merging is described in the follow-up above.
 
 MongoDB needs an explicit distinction between the release oracle and the source
 fix. The unchanged Python 1.6.0 wheel must use **`tz_aware=True`** for mixed
@@ -283,4 +305,4 @@ remote-throughput, energy-saving, provider-cost or complete-agent speedup claim.
 They are separate from EXP-007's Python-callable overhead protocol. Earlier
 checkpoint measurements remain historical and are superseded for this release.
 
-See the [tagged release](https://github.com/jemsbhai/pollard/releases/tag/pollardai-rust-v0.2.0) for final CI, source, archive and registry receipts and publication status.
+See the [tagged release](https://github.com/jemsbhai/pollard/releases/tag/pollardai-rust-v0.2.1) for final CI, source, archive and registry receipts and publication status.

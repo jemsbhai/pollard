@@ -1,0 +1,452 @@
+{
+  "schema": 1,
+  "started_at_utc": "2026-10-08T17:41:42.391988+00:00",
+  "git_head": "4a29d6404bf2cde32be301fedb5a0a4a2f3c76b7",
+  "source_sha256": {
+    "crates/pollardai/tests/postgres_parity.rs": "418caebcf0fbcd95daef35db00d2bd406ede561d7ea3b949245507f1642174d0",
+    "crates/pollardai/tests/sqlite_arbitration.rs": "43d4b09adce7ac86a656916b0071090fd462191aaaa54fa6f4441dc83ed828a7"
+  },
+  "commands": [
+    {
+      "label": "postgres-start",
+      "command": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "pollard-timing-0feae6d3f809-postgres",
+        "--label",
+        "pollard.parity.run=0feae6d3f80942ff87453288a9782fdf",
+        "--label",
+        "pollard.parity.task=rust-ci-deadlines",
+        "--label",
+        "pollard.parity.service=postgres-timing-fixtures",
+        "--publish",
+        "127.0.0.1::5432",
+        "-e",
+        "POSTGRES_USER=pollard",
+        "-e",
+        "POSTGRES_PASSWORD=[REDACTED]",
+        "-e",
+        "POSTGRES_DB=pollard_test",
+        "postgres:16-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea"
+      ],
+      "cwd": "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard",
+      "exit_code": 0,
+      "duration_seconds": 0.437,
+      "log": "evidence/rust-parity-1.6.0/release-timing-fixture-validation/attempt-2/postgres-start.log",
+      "log_sha256": "6448d27ffda22ff25c281d8dccb227de00a720dd318345ed13ad83370292318e",
+      "test_summaries": []
+    },
+    {
+      "label": "postgres-version",
+      "command": [
+        "docker",
+        "exec",
+        "-e",
+        "PGPASSWORD=[REDACTED]",
+        "f4ec6154f70503f65958a4ba2db311ccaedc8cca691d8e4d30eea031aa830106",
+        "psql",
+        "-h",
+        "127.0.0.1",
+        "-U",
+        "pollard",
+        "-d",
+        "pollard_test",
+        "-tAc",
+        "SELECT version()"
+      ],
+      "cwd": "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard",
+      "exit_code": 0,
+      "duration_seconds": 0.156,
+      "log": "evidence/rust-parity-1.6.0/release-timing-fixture-validation/attempt-2/postgres-version.log",
+      "log_sha256": "b3b4ad8903743803a6c5f4e5c6bf8aaa6b8c659f16c95d26667aa1316959a6af",
+      "test_summaries": []
+    },
+    {
+      "label": "sqlite-1-74-0",
+      "command": [
+        "cargo",
+        "+1.74.0",
+        "test",
+        "--locked",
+        "--test",
+        "sqlite_arbitration",
+        "--",
+        "--test-threads=8"
+      ],
+      "cwd": "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\crates\\pollardai",
+      "exit_code": 0,
+      "duration_seconds": 12.266,
+      "log": "evidence/rust-parity-1.6.0/release-timing-fixture-validation/attempt-2/sqlite-1-74-0.log",
+      "log_sha256": "56ee5753d3298204ffc8bd607e7bd0876c72190810f4395f6686fc56553b12ad",
+      "test_summaries": [
+        "test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.21s"
+      ]
+    },
+    {
+      "label": "postgres-clock-1-74-0",
+      "command": [
+        "cargo",
+        "+1.74.0",
+        "test",
+        "--locked",
+        "--features",
+        "postgres",
+        "--test",
+        "postgres_parity",
+        "reservation_clock_is_sampled_after_row_lock_wait",
+        "--",
+        "--exact",
+        "--ignored",
+        "--test-threads=1"
+      ],
+      "cwd": "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\crates\\pollardai",
+      "exit_code": 0,
+      "duration_seconds": 31.484,
+      "log": "evidence/rust-parity-1.6.0/release-timing-fixture-validation/attempt-2/postgres-clock-1-74-0.log",
+      "log_sha256": "4e9da85fa9a1d5e05dff891f48c7162b4b4debc9ad7f21c54ffa0b87ac71e1ac",
+      "test_summaries": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 10 filtered out; finished in 0.75s"
+      ]
+    },
+    {
+      "label": "clippy-1-74-0",
+      "command": [
+        "cargo",
+        "+1.74.0",
+        "clippy",
+        "--locked",
+        "--features",
+        "postgres",
+        "--test",
+        "postgres_parity",
+        "--test",
+        "sqlite_arbitration",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "cwd": "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\crates\\pollardai",
+      "exit_code": 0,
+      "duration_seconds": 4.891,
+      "log": "evidence/rust-parity-1.6.0/release-timing-fixture-validation/attempt-2/clippy-1-74-0.log",
+      "log_sha256": "a650f593033b03fcaf43a635d22f45cf9a43234af377bba2944201c179ed112c",
+      "test_summaries": []
+    },
+    {
+      "label": "sqlite-1-99-0",
+      "command": [
+        "cargo",
+        "+1.99.0",
+        "test",
+        "--locked",
+        "--test",
+        "sqlite_arbitration",
+        "--",
+        "--test-threads=8"
+      ],
+      "cwd": "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\crates\\pollardai",
+      "exit_code": 0,
+      "duration_seconds": 12.828,
+      "log": "evidence/rust-parity-1.6.0/release-timing-fixture-validation/attempt-2/sqlite-1-99-0.log",
+      "log_sha256": "c2838c58d9648258e51797105c7479a5e4416d4554c548aebeef0053cf118620",
+      "test_summaries": [
+        "test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.30s"
+      ]
+    },
+    {
+      "label": "postgres-clock-1-99-0",
+      "command": [
+        "cargo",
+        "+1.99.0",
+        "test",
+        "--locked",
+        "--features",
+        "postgres",
+        "--test",
+        "postgres_parity",
+        "reservation_clock_is_sampled_after_row_lock_wait",
+        "--",
+        "--exact",
+        "--ignored",
+        "--test-threads=1"
+      ],
+      "cwd": "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\crates\\pollardai",
+      "exit_code": 0,
+      "duration_seconds": 27.609,
+      "log": "evidence/rust-parity-1.6.0/release-timing-fixture-validation/attempt-2/postgres-clock-1-99-0.log",
+      "log_sha256": "44abaa9f54b05c1d12cfad7ca3a01d8acdb0925986b33820895ed78cd27bad8b",
+      "test_summaries": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 10 filtered out; finished in 0.73s"
+      ]
+    },
+    {
+      "label": "clippy-1-99-0",
+      "command": [
+        "cargo",
+        "+1.99.0",
+        "clippy",
+        "--locked",
+        "--features",
+        "postgres",
+        "--test",
+        "postgres_parity",
+        "--test",
+        "sqlite_arbitration",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "cwd": "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\crates\\pollardai",
+      "exit_code": 0,
+      "duration_seconds": 7.672,
+      "log": "evidence/rust-parity-1.6.0/release-timing-fixture-validation/attempt-2/clippy-1-99-0.log",
+      "log_sha256": "3f54ea44763e424b5967e412292bc621f4f075a942dd9ed302bb61edb5b1c205",
+      "test_summaries": []
+    },
+    {
+      "label": "format",
+      "command": [
+        "rustfmt",
+        "--edition",
+        "2021",
+        "--check",
+        "crates/pollardai/tests/postgres_parity.rs",
+        "crates/pollardai/tests/sqlite_arbitration.rs"
+      ],
+      "cwd": "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard",
+      "exit_code": 0,
+      "duration_seconds": 0.14,
+      "log": "evidence/rust-parity-1.6.0/release-timing-fixture-validation/attempt-2/format.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test_summaries": []
+    },
+    {
+      "label": "postgres-server-log",
+      "command": [
+        "docker",
+        "logs",
+        "f4ec6154f70503f65958a4ba2db311ccaedc8cca691d8e4d30eea031aa830106"
+      ],
+      "cwd": "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard",
+      "exit_code": 0,
+      "duration_seconds": 0.125,
+      "log": "evidence/rust-parity-1.6.0/release-timing-fixture-validation/attempt-2/postgres-server-log.log",
+      "log_sha256": "4887c9f5c5961e17c9e63d2d875d4a46652c4419a4bead3d5546da2be3b1d59e",
+      "test_summaries": []
+    },
+    {
+      "label": "postgres-cleanup",
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "f4ec6154f70503f65958a4ba2db311ccaedc8cca691d8e4d30eea031aa830106"
+      ],
+      "cwd": "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard",
+      "exit_code": 0,
+      "duration_seconds": 0.766,
+      "log": "evidence/rust-parity-1.6.0/release-timing-fixture-validation/attempt-2/postgres-cleanup.log",
+      "log_sha256": "6448d27ffda22ff25c281d8dccb227de00a720dd318345ed13ad83370292318e",
+      "test_summaries": []
+    }
+  ],
+  "stress": [
+    {
+      "toolchain": "1.74.0",
+      "command": [
+        "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\crates\\pollardai\\target\\debug\\deps\\postgres_parity-dbd5ecba1c924305.exe",
+        "reservation_clock_is_sampled_after_row_lock_wait",
+        "--exact",
+        "--ignored",
+        "--test-threads=1"
+      ],
+      "binary_sha256": "3947c3095c747959bf0094b605a0db2526187010653b1ce7dbf860891793efbb",
+      "iterations": [
+        {
+          "iteration": 1,
+          "exit_code": 0,
+          "duration_seconds": 0.719
+        },
+        {
+          "iteration": 2,
+          "exit_code": 0,
+          "duration_seconds": 0.687
+        },
+        {
+          "iteration": 3,
+          "exit_code": 0,
+          "duration_seconds": 0.953
+        },
+        {
+          "iteration": 4,
+          "exit_code": 0,
+          "duration_seconds": 0.703
+        },
+        {
+          "iteration": 5,
+          "exit_code": 0,
+          "duration_seconds": 0.704
+        },
+        {
+          "iteration": 6,
+          "exit_code": 0,
+          "duration_seconds": 0.687
+        },
+        {
+          "iteration": 7,
+          "exit_code": 0,
+          "duration_seconds": 0.75
+        },
+        {
+          "iteration": 8,
+          "exit_code": 0,
+          "duration_seconds": 0.703
+        },
+        {
+          "iteration": 9,
+          "exit_code": 0,
+          "duration_seconds": 0.719
+        },
+        {
+          "iteration": 10,
+          "exit_code": 0,
+          "duration_seconds": 0.719
+        }
+      ],
+      "log": "evidence/rust-parity-1.6.0/release-timing-fixture-validation/attempt-2/postgres-clock-stress-1-74-0.log",
+      "log_sha256": "8893c367f7e7047a5fcba853297683afa942738bc316def41660382907dbcee6"
+    },
+    {
+      "toolchain": "1.99.0",
+      "command": [
+        "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\crates\\pollardai\\target\\debug\\deps\\postgres_parity-e15b37ba919c615a.exe",
+        "reservation_clock_is_sampled_after_row_lock_wait",
+        "--exact",
+        "--ignored",
+        "--test-threads=1"
+      ],
+      "binary_sha256": "00818deb6056caf787d4ecc9a2e432fd71d310c3986dd72d1d12533310be42f0",
+      "iterations": [
+        {
+          "iteration": 1,
+          "exit_code": 0,
+          "duration_seconds": 0.813
+        },
+        {
+          "iteration": 2,
+          "exit_code": 0,
+          "duration_seconds": 0.812
+        },
+        {
+          "iteration": 3,
+          "exit_code": 0,
+          "duration_seconds": 0.813
+        },
+        {
+          "iteration": 4,
+          "exit_code": 0,
+          "duration_seconds": 0.734
+        },
+        {
+          "iteration": 5,
+          "exit_code": 0,
+          "duration_seconds": 0.734
+        },
+        {
+          "iteration": 6,
+          "exit_code": 0,
+          "duration_seconds": 0.735
+        },
+        {
+          "iteration": 7,
+          "exit_code": 0,
+          "duration_seconds": 0.937
+        },
+        {
+          "iteration": 8,
+          "exit_code": 0,
+          "duration_seconds": 0.828
+        },
+        {
+          "iteration": 9,
+          "exit_code": 0,
+          "duration_seconds": 0.86
+        },
+        {
+          "iteration": 10,
+          "exit_code": 0,
+          "duration_seconds": 0.718
+        }
+      ],
+      "log": "evidence/rust-parity-1.6.0/release-timing-fixture-validation/attempt-2/postgres-clock-stress-1-99-0.log",
+      "log_sha256": "24c5f9f07b3d10d19bf94957e5ca2b91554b4e872306525792aa30b9f217d773"
+    }
+  ],
+  "container": {
+    "id": "f4ec6154f70503f65958a4ba2db311ccaedc8cca691d8e4d30eea031aa830106",
+    "name": "pollard-timing-0feae6d3f809-postgres",
+    "ownership_label": {
+      "pollard.parity.run": "0feae6d3f80942ff87453288a9782fdf"
+    },
+    "image": "postgres:16-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea",
+    "image_id": "sha256:81bd698b4594e751a3269e4dcd3e03a4a0ec0daf7b72e7aa1abd43cce9887542",
+    "loopback_host_port": "52241"
+  },
+  "cleanup": {
+    "id": "f4ec6154f70503f65958a4ba2db311ccaedc8cca691d8e4d30eea031aa830106",
+    "ownership_verified": true,
+    "removed": true
+  },
+  "success": true,
+  "prior_attempt": "../validation.json",
+  "readiness": "TCP readiness avoids the official image socket-only bootstrap server",
+  "readiness_probes": {
+    "command": [
+      "docker",
+      "exec",
+      "f4ec6154f70503f65958a4ba2db311ccaedc8cca691d8e4d30eea031aa830106",
+      "pg_isready",
+      "-h",
+      "127.0.0.1",
+      "-U",
+      "pollard",
+      "-d",
+      "pollard_test"
+    ],
+    "results": [
+      {
+        "exit_code": 2,
+        "output": "127.0.0.1:5432 - no response\n"
+      },
+      {
+        "exit_code": 2,
+        "output": "127.0.0.1:5432 - no response\n"
+      },
+      {
+        "exit_code": 2,
+        "output": "127.0.0.1:5432 - no response\n"
+      },
+      {
+        "exit_code": 2,
+        "output": "127.0.0.1:5432 - no response\n"
+      },
+      {
+        "exit_code": 0,
+        "output": "127.0.0.1:5432 - accepting connections\n"
+      }
+    ]
+  },
+  "test_environment": {
+    "POLLARD_TEST_POSTGRES_DSN": "host=127.0.0.1 port=52241 user=pollard password=[REDACTED] dbname=pollard_test"
+  },
+  "tool_versions": {
+    "cargo +1.74.0 --version": "cargo 1.74.0 (ecb9851af 2023-10-18)",
+    "rustc +1.74.0 --version": "rustc 1.74.0 (79e9716c9 2023-11-13)",
+    "cargo +1.99.0 --version": "cargo 1.99.0 (5f94df478 2026-08-27)",
+    "rustc +1.99.0 --version": "rustc 1.99.0 (b940084d7 2026-09-28)"
+  },
+  "sources_unchanged_during_validation": true,
+  "completed_at_utc": "2026-10-08T17:43:38.639533+00:00"
+}

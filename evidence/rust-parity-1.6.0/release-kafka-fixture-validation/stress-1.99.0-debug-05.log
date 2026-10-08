@@ -1,0 +1,17 @@
+
+running 12 tests
+test kafka::tests::kafka_requires_full_history_topic_config_and_existing_before_producer ... ok
+test kafka::tests::kafka_envelopes_reject_noncanonical_tampered_or_unscoped_messages ... ok
+test kafka::tests::kafka_logical_missing_parent_outcome_does_not_poison_later_valid_records ... ok
+test kafka::tests::kafka_detects_truncated_watermarks_offset_gaps_and_wrong_partition ... ok
+test kafka::tests::kafka_uncertain_ack_recovers_and_unobserved_commands_fail_explicitly ... ok
+test kafka::tests::kafka_staging_publishes_only_settlement_and_only_transient_nodes_can_drop ... ok
+test kafka::tests::kafka_readonly_freezes_snapshot_and_reconnect_is_atomic_with_prefix_check ... ok
+test kafka::tests::kafka_wire_bytes_match_pypi_160_oracle ... ok
+test kafka::tests::kafka_roundtrip_idempotency_conflicts_and_ordered_metadata ... ok
+test kafka::tests::kafka_missing_record_times_out_before_enabling_producer ... ok
+test kafka::tests::kafka_acknowledged_replay_failure_reconnects_before_success ... ok
+test kafka::tests::kafka_functional_replay_tolerates_poll_delays_beyond_old_fixture_deadline ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.04s
+

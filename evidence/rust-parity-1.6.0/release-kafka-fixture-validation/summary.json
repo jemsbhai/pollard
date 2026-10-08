@@ -1,0 +1,793 @@
+{
+  "status": "passed",
+  "started_at_utc": "2026-10-08T17:34:58.184396+00:00",
+  "base_commit": "4a29d6404bf2cde32be301fedb5a0a4a2f3c76b7",
+  "kafka_source_sha256": "c6651aca568046d2b69ca186e3cd8149943099d85a92e84bce6023f7e77d42b4",
+  "production_prefix_sha256": "c195e5272277458dbf5feddc4e5a5e74cc99c589c460abd2ae8db2865c2d40b8",
+  "production_source_unchanged": true,
+  "ordinary_fixture_timeout_seconds": 30,
+  "missing_record_fault_timeout_ms": 5,
+  "regression_poll_delay_ms": 20,
+  "parallel_stress_processes": 4,
+  "test_threads_per_process": 8,
+  "commands": [
+    {
+      "command": [
+        "rustc",
+        "+1.99.0",
+        "--version"
+      ],
+      "log": "rustc-1.99.0.log",
+      "exit_code": 0,
+      "elapsed_seconds": 0.109
+    },
+    {
+      "command": [
+        "cargo",
+        "+1.99.0",
+        "fmt",
+        "--manifest-path",
+        "crates/pollardai/Cargo.toml",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "log": "fmt-1.99.0.log",
+      "exit_code": 0,
+      "elapsed_seconds": 0.735
+    },
+    {
+      "command": [
+        "cargo",
+        "+1.99.0",
+        "test",
+        "--manifest-path",
+        "crates/pollardai/Cargo.toml",
+        "--locked",
+        "--features",
+        "kafka",
+        "--lib",
+        "kafka::tests",
+        "--message-format=json"
+      ],
+      "log": "test-1.99.0-debug.log",
+      "exit_code": 0,
+      "elapsed_seconds": 0.406
+    },
+    {
+      "command": [
+        "cargo",
+        "+1.99.0",
+        "test",
+        "--manifest-path",
+        "crates/pollardai/Cargo.toml",
+        "--locked",
+        "--features",
+        "kafka",
+        "--lib",
+        "kafka::tests",
+        "--message-format=json",
+        "--release"
+      ],
+      "log": "test-1.99.0-release.log",
+      "exit_code": 0,
+      "elapsed_seconds": 64.75
+    },
+    {
+      "command": [
+        "cargo",
+        "+1.99.0",
+        "clippy",
+        "--manifest-path",
+        "crates/pollardai/Cargo.toml",
+        "--locked",
+        "--features",
+        "kafka",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "log": "clippy-1.99.0.log",
+      "exit_code": 0,
+      "elapsed_seconds": 5.968
+    },
+    {
+      "command": [
+        "rustc",
+        "+1.74.0",
+        "--version"
+      ],
+      "log": "rustc-1.74.0.log",
+      "exit_code": 0,
+      "elapsed_seconds": 0.125
+    },
+    {
+      "command": [
+        "cargo",
+        "+1.74.0",
+        "fmt",
+        "--manifest-path",
+        "crates/pollardai/Cargo.toml",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "log": "fmt-1.74.0.log",
+      "exit_code": 0,
+      "elapsed_seconds": 0.438
+    },
+    {
+      "command": [
+        "cargo",
+        "+1.74.0",
+        "test",
+        "--manifest-path",
+        "crates/pollardai/Cargo.toml",
+        "--locked",
+        "--features",
+        "kafka",
+        "--lib",
+        "kafka::tests",
+        "--message-format=json"
+      ],
+      "log": "test-1.74.0-debug.log",
+      "exit_code": 0,
+      "elapsed_seconds": 20.594
+    },
+    {
+      "command": [
+        "cargo",
+        "+1.74.0",
+        "test",
+        "--manifest-path",
+        "crates/pollardai/Cargo.toml",
+        "--locked",
+        "--features",
+        "kafka",
+        "--lib",
+        "kafka::tests",
+        "--message-format=json",
+        "--release"
+      ],
+      "log": "test-1.74.0-release.log",
+      "exit_code": 0,
+      "elapsed_seconds": 58.25
+    },
+    {
+      "command": [
+        "cargo",
+        "+1.74.0",
+        "clippy",
+        "--manifest-path",
+        "crates/pollardai/Cargo.toml",
+        "--locked",
+        "--features",
+        "kafka",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "log": "clippy-1.74.0.log",
+      "exit_code": 0,
+      "elapsed_seconds": 7.547
+    }
+  ],
+  "stress": [
+    {
+      "toolchain": "1.99.0",
+      "profile": "debug",
+      "binary_sha256": "c7e218b736e1b617104fa1be31469e684dad4b91212219a3f2e765f3fe0ffaa4",
+      "command_arguments": [
+        "kafka::tests",
+        "--test-threads=8"
+      ],
+      "iterations": [
+        {
+          "iteration": 1,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 4.094,
+          "log": "stress-1.99.0-debug-01.log"
+        },
+        {
+          "iteration": 2,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 4.094,
+          "log": "stress-1.99.0-debug-02.log"
+        },
+        {
+          "iteration": 3,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 4.11,
+          "log": "stress-1.99.0-debug-03.log"
+        },
+        {
+          "iteration": 4,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 4.11,
+          "log": "stress-1.99.0-debug-04.log"
+        },
+        {
+          "iteration": 5,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.078,
+          "log": "stress-1.99.0-debug-05.log"
+        },
+        {
+          "iteration": 6,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.063,
+          "log": "stress-1.99.0-debug-06.log"
+        },
+        {
+          "iteration": 7,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.062,
+          "log": "stress-1.99.0-debug-07.log"
+        },
+        {
+          "iteration": 8,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.062,
+          "log": "stress-1.99.0-debug-08.log"
+        },
+        {
+          "iteration": 9,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.078,
+          "log": "stress-1.99.0-debug-09.log"
+        },
+        {
+          "iteration": 10,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.063,
+          "log": "stress-1.99.0-debug-10.log"
+        },
+        {
+          "iteration": 11,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.063,
+          "log": "stress-1.99.0-debug-11.log"
+        },
+        {
+          "iteration": 12,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.063,
+          "log": "stress-1.99.0-debug-12.log"
+        },
+        {
+          "iteration": 13,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.062,
+          "log": "stress-1.99.0-debug-13.log"
+        },
+        {
+          "iteration": 14,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.062,
+          "log": "stress-1.99.0-debug-14.log"
+        },
+        {
+          "iteration": 15,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.062,
+          "log": "stress-1.99.0-debug-15.log"
+        },
+        {
+          "iteration": 16,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.062,
+          "log": "stress-1.99.0-debug-16.log"
+        },
+        {
+          "iteration": 17,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.063,
+          "log": "stress-1.99.0-debug-17.log"
+        },
+        {
+          "iteration": 18,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.063,
+          "log": "stress-1.99.0-debug-18.log"
+        },
+        {
+          "iteration": 19,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.063,
+          "log": "stress-1.99.0-debug-19.log"
+        },
+        {
+          "iteration": 20,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.063,
+          "log": "stress-1.99.0-debug-20.log"
+        }
+      ]
+    },
+    {
+      "toolchain": "1.99.0",
+      "profile": "release",
+      "binary_sha256": "674413c0a034ec0634b8474b5d39fd8bc128714c5a219d2f98c30307f0d7b6b3",
+      "command_arguments": [
+        "kafka::tests",
+        "--test-threads=8"
+      ],
+      "iterations": [
+        {
+          "iteration": 1,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 1.532,
+          "log": "stress-1.99.0-release-01.log"
+        },
+        {
+          "iteration": 2,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 1.532,
+          "log": "stress-1.99.0-release-02.log"
+        },
+        {
+          "iteration": 3,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 1.532,
+          "log": "stress-1.99.0-release-03.log"
+        },
+        {
+          "iteration": 4,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 1.532,
+          "log": "stress-1.99.0-release-04.log"
+        },
+        {
+          "iteration": 5,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.062,
+          "log": "stress-1.99.0-release-05.log"
+        },
+        {
+          "iteration": 6,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.062,
+          "log": "stress-1.99.0-release-06.log"
+        },
+        {
+          "iteration": 7,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.062,
+          "log": "stress-1.99.0-release-07.log"
+        },
+        {
+          "iteration": 8,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.062,
+          "log": "stress-1.99.0-release-08.log"
+        },
+        {
+          "iteration": 9,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.063,
+          "log": "stress-1.99.0-release-09.log"
+        },
+        {
+          "iteration": 10,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.063,
+          "log": "stress-1.99.0-release-10.log"
+        },
+        {
+          "iteration": 11,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.063,
+          "log": "stress-1.99.0-release-11.log"
+        },
+        {
+          "iteration": 12,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.063,
+          "log": "stress-1.99.0-release-12.log"
+        },
+        {
+          "iteration": 13,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.062,
+          "log": "stress-1.99.0-release-13.log"
+        },
+        {
+          "iteration": 14,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.062,
+          "log": "stress-1.99.0-release-14.log"
+        },
+        {
+          "iteration": 15,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.062,
+          "log": "stress-1.99.0-release-15.log"
+        },
+        {
+          "iteration": 16,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.062,
+          "log": "stress-1.99.0-release-16.log"
+        },
+        {
+          "iteration": 17,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.063,
+          "log": "stress-1.99.0-release-17.log"
+        },
+        {
+          "iteration": 18,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.063,
+          "log": "stress-1.99.0-release-18.log"
+        },
+        {
+          "iteration": 19,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.063,
+          "log": "stress-1.99.0-release-19.log"
+        },
+        {
+          "iteration": 20,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.063,
+          "log": "stress-1.99.0-release-20.log"
+        }
+      ]
+    },
+    {
+      "toolchain": "1.74.0",
+      "profile": "debug",
+      "binary_sha256": "0926ddb03ce9dc2ec14ba509afd977a6939955ea126629a8012561d0eac4b85b",
+      "command_arguments": [
+        "kafka::tests",
+        "--test-threads=8"
+      ],
+      "iterations": [
+        {
+          "iteration": 1,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 3.75,
+          "log": "stress-1.74.0-debug-01.log"
+        },
+        {
+          "iteration": 2,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 3.75,
+          "log": "stress-1.74.0-debug-02.log"
+        },
+        {
+          "iteration": 3,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 3.75,
+          "log": "stress-1.74.0-debug-03.log"
+        },
+        {
+          "iteration": 4,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 3.75,
+          "log": "stress-1.74.0-debug-04.log"
+        },
+        {
+          "iteration": 5,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.11,
+          "log": "stress-1.74.0-debug-05.log"
+        },
+        {
+          "iteration": 6,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.11,
+          "log": "stress-1.74.0-debug-06.log"
+        },
+        {
+          "iteration": 7,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.11,
+          "log": "stress-1.74.0-debug-07.log"
+        },
+        {
+          "iteration": 8,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.078,
+          "log": "stress-1.74.0-debug-08.log"
+        },
+        {
+          "iteration": 9,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.078,
+          "log": "stress-1.74.0-debug-09.log"
+        },
+        {
+          "iteration": 10,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.078,
+          "log": "stress-1.74.0-debug-10.log"
+        },
+        {
+          "iteration": 11,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.078,
+          "log": "stress-1.74.0-debug-11.log"
+        },
+        {
+          "iteration": 12,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.078,
+          "log": "stress-1.74.0-debug-12.log"
+        },
+        {
+          "iteration": 13,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.079,
+          "log": "stress-1.74.0-debug-13.log"
+        },
+        {
+          "iteration": 14,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.078,
+          "log": "stress-1.74.0-debug-14.log"
+        },
+        {
+          "iteration": 15,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.093,
+          "log": "stress-1.74.0-debug-15.log"
+        },
+        {
+          "iteration": 16,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.093,
+          "log": "stress-1.74.0-debug-16.log"
+        },
+        {
+          "iteration": 17,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.078,
+          "log": "stress-1.74.0-debug-17.log"
+        },
+        {
+          "iteration": 18,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.078,
+          "log": "stress-1.74.0-debug-18.log"
+        },
+        {
+          "iteration": 19,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.079,
+          "log": "stress-1.74.0-debug-19.log"
+        },
+        {
+          "iteration": 20,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.079,
+          "log": "stress-1.74.0-debug-20.log"
+        }
+      ]
+    },
+    {
+      "toolchain": "1.74.0",
+      "profile": "release",
+      "binary_sha256": "334b42702113f469c7dc75e7d40def4beb02b2aae5d3632dee55057cca505101",
+      "command_arguments": [
+        "kafka::tests",
+        "--test-threads=8"
+      ],
+      "iterations": [
+        {
+          "iteration": 1,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 2.594,
+          "log": "stress-1.74.0-release-01.log"
+        },
+        {
+          "iteration": 2,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 2.594,
+          "log": "stress-1.74.0-release-02.log"
+        },
+        {
+          "iteration": 3,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 2.609,
+          "log": "stress-1.74.0-release-03.log"
+        },
+        {
+          "iteration": 4,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 2.594,
+          "log": "stress-1.74.0-release-04.log"
+        },
+        {
+          "iteration": 5,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.078,
+          "log": "stress-1.74.0-release-05.log"
+        },
+        {
+          "iteration": 6,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.078,
+          "log": "stress-1.74.0-release-06.log"
+        },
+        {
+          "iteration": 7,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.078,
+          "log": "stress-1.74.0-release-07.log"
+        },
+        {
+          "iteration": 8,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.078,
+          "log": "stress-1.74.0-release-08.log"
+        },
+        {
+          "iteration": 9,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.078,
+          "log": "stress-1.74.0-release-09.log"
+        },
+        {
+          "iteration": 10,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.078,
+          "log": "stress-1.74.0-release-10.log"
+        },
+        {
+          "iteration": 11,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.078,
+          "log": "stress-1.74.0-release-11.log"
+        },
+        {
+          "iteration": 12,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.078,
+          "log": "stress-1.74.0-release-12.log"
+        },
+        {
+          "iteration": 13,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.078,
+          "log": "stress-1.74.0-release-13.log"
+        },
+        {
+          "iteration": 14,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.078,
+          "log": "stress-1.74.0-release-14.log"
+        },
+        {
+          "iteration": 15,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.078,
+          "log": "stress-1.74.0-release-15.log"
+        },
+        {
+          "iteration": 16,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.094,
+          "log": "stress-1.74.0-release-16.log"
+        },
+        {
+          "iteration": 17,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.078,
+          "log": "stress-1.74.0-release-17.log"
+        },
+        {
+          "iteration": 18,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.078,
+          "log": "stress-1.74.0-release-18.log"
+        },
+        {
+          "iteration": 19,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.078,
+          "log": "stress-1.74.0-release-19.log"
+        },
+        {
+          "iteration": 20,
+          "exit_code": 0,
+          "passed": 12,
+          "elapsed_seconds": 0.078,
+          "log": "stress-1.74.0-release-20.log"
+        }
+      ]
+    }
+  ],
+  "completed_at_utc": "2026-10-08T17:37:55.710237+00:00",
+  "targeted_test_cases": 48,
+  "stress_test_cases": 960,
+  "source_unchanged_during_run": true,
+  "package_version": "0.2.1",
+  "validation_metadata_sha256": {
+    "crates/pollardai/Cargo.toml": "f0a3130176439ed54debc6b6e54a8bcfd3bf6c9d02c252e062e2969e6444de3b",
+    "crates/pollardai/Cargo.lock": "b76b4b598e4fc16299c1a37c68460702801aaaf713bf5f26595144c3ce46437f"
+  },
+  "scope_note": "Changes are confined to the Kafka cfg(test) module. No production Kafka source, runtime deadline, wire format, or benchmark workload changed. The 80 stress runs use four concurrent processes, each with eight test threads."
+}

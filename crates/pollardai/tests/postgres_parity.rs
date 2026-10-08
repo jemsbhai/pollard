@@ -670,9 +670,21 @@ fn reservation_clock_is_sampled_after_row_lock_wait() {
     let dsn = db.dsn.clone();
     let started = Arc::new(Barrier::new(2));
     let signal = started.clone();
+    let pid = Arc::new(AtomicU64::new(0));
+    let backend_pid = pid.clone();
     let task = std::thread::spawn(move || {
-        let s = PostgresStore::connect_with_options(
-            dsn,
+        let s = PostgresStore::connect_with_factory(
+            move || {
+                let mut client = Client::connect(&dsn, NoTls).unwrap();
+                backend_pid.store(
+                    client
+                        .query_one("SELECT pg_backend_pid()", &[])
+                        .unwrap()
+                        .get::<_, i32>(0) as u64,
+                    Ordering::SeqCst,
+                );
+                Ok(client)
+            },
             PostgresOptions {
                 store_id: "clock".into(),
                 ..Default::default()
@@ -683,12 +695,49 @@ fn reservation_clock_is_sampled_after_row_lock_wait() {
         s.reserve("waited", &[budget("root", 2)], &[], 0.2).unwrap()
     });
     started.wait();
+    let mut observer = db.client();
+    let deadline = std::time::Instant::now() + Duration::from_secs(30);
+    loop {
+        let waiting: bool = observer
+            .query_one(
+                "SELECT EXISTS(SELECT 1 FROM pg_stat_activity WHERE pid=$1 AND wait_event_type='Lock')",
+                &[&(pid.load(Ordering::SeqCst) as i32)],
+            )
+            .unwrap()
+            .get(0);
+        if waiting {
+            break;
+        }
+        assert!(
+            std::time::Instant::now() < deadline,
+            "reservation worker never reached the held row lock"
+        );
+        std::thread::sleep(Duration::from_millis(10));
+    }
+    // Start the hold interval only after the worker is actually waiting, so a
+    // clock sampled before lock acquisition necessarily predates the marker.
     std::thread::sleep(Duration::from_millis(300));
+    // Compare server timestamps at the lock boundary, so thread joining and a
+    // later connection/query cannot consume the successful reservation's lease.
+    let releasing_at: f64 = tx
+        .query_one(
+            "SELECT EXTRACT(EPOCH FROM clock_timestamp())::double precision",
+            &[],
+        )
+        .unwrap()
+        .get(0);
     tx.commit().unwrap();
     assert!(task.join().unwrap().ok);
-    let remaining:f64=db.client().query_one("SELECT expires_at-EXTRACT(EPOCH FROM clock_timestamp())::double precision FROM pollard_reservation_state WHERE store_id='clock' AND reservation_id='waited'",&[]).unwrap().get(0);
+    let expires_at: f64 = db
+        .client()
+        .query_one(
+            "SELECT expires_at FROM pollard_reservation_state WHERE store_id='clock' AND reservation_id='waited'",
+            &[],
+        )
+        .unwrap()
+        .get(0);
     assert!(
-        remaining > 0.1,
-        "lease was consumed waiting for lock: {remaining}"
+        expires_at >= releasing_at + 0.2,
+        "lease was sampled before lock release: expires_at={expires_at}, releasing_at={releasing_at}"
     );
 }

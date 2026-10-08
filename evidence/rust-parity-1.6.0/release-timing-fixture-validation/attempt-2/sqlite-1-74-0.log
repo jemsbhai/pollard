@@ -1,0 +1,21 @@
+   Compiling pollardai v0.2.1 (C:\Users\User\.codex\worktrees\rust-pypi-parity\pollard\crates\pollardai)
+    Finished test [unoptimized + debuginfo] target(s) in 9.00s
+     Running tests\sqlite_arbitration.rs (target\debug\deps\sqlite_arbitration-ab4b713d127cef5b.exe)
+
+running 13 tests
+test corrupt_settlement_rolls_back_all_rows_and_keeps_reservation ... ok
+test cumulative_baseline_never_decreases_and_decimals_are_exact ... ok
+test heartbeat_never_recreates_deleted_database_or_repairs_changed_schema ... ok
+test decimal_text_preserves_python_ledger_spelling_and_rejects_rounded_settlement ... ok
+test expired_reservation_stops_blocking_but_late_settlement_keeps_actual_spend ... ok
+test release_returns_capacity_and_repeated_settlement_does_not_double_charge ... ok
+test malformed_lease_duplicate_id_and_negative_settlement_fail_without_changes ... ok
+test lease_renewal_extends_all_live_rows_and_missing_is_false ... ok
+test heartbeat_uses_an_independent_thread_safe_connection ... ok
+test windows_include_pending_and_settled_usage_across_connections ... ok
+test scope_failure_does_not_leave_partial_reservations ... ok
+test imported_sqlite_ledger_rejects_precision_loss_without_mutating_state ... ok
+test independent_connections_reserve_exact_shared_budget_under_race ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.21s
+

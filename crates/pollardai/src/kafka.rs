@@ -850,6 +850,7 @@ mod tests {
         high_override: Option<i64>,
         watermarks_fail: usize,
         polls_fail: usize,
+        poll_delay: Duration,
         fresh_fail: bool,
         produce_fail: usize,
         commit_on_error: bool,
@@ -883,6 +884,7 @@ mod tests {
             let record = broker.records.get(self.cursor).cloned();
             if record.is_some() {
                 self.cursor += 1;
+                std::thread::sleep(broker.poll_delay);
             }
             Ok(record)
         }
@@ -927,9 +929,12 @@ mod tests {
         }
     }
     fn options() -> KafkaOptions {
+        KafkaOptions::new("audit")
+    }
+    fn missing_record_options() -> KafkaOptions {
         KafkaOptions {
             timeout: Duration::from_millis(5),
-            ..KafkaOptions::new("audit")
+            ..options()
         }
     }
     fn open(broker: &Rc<RefCell<Broker>>, options: KafkaOptions) -> Result<KafkaStore> {
@@ -1074,7 +1079,7 @@ mod tests {
         store.put(root()).unwrap();
         assert_eq!(broker.borrow().producers_opened, 2);
         let broker = Rc::new(RefCell::new(Broker::default()));
-        let mut store = open(&broker, options()).unwrap();
+        let mut store = open(&broker, missing_record_options()).unwrap();
         broker.borrow_mut().acknowledge_without_append = true;
         assert!(store
             .put(root())
@@ -1226,6 +1231,51 @@ mod tests {
         assert!(!store.try_exists(&orphan.id).unwrap());
         assert!(matches!(store.put(orphan), Err(Error::NotFound(_))));
         assert_eq!(store.roots().unwrap(), [root().id]);
+    }
+    #[test]
+    fn kafka_functional_replay_tolerates_poll_delays_beyond_old_fixture_deadline() {
+        let broker = Rc::new(RefCell::new(Broker {
+            // A delay between two available records deterministically crosses
+            // the old 5 ms fixture deadline without timing the assertion.
+            poll_delay: Duration::from_millis(20),
+            ..Broker::default()
+        }));
+        let child = Node::make(
+            crate::NodeKind::Note,
+            Some(&root().id),
+            0,
+            json!({"delayed": true}),
+            None,
+            json!({}),
+        )
+        .unwrap();
+        for node in [root(), child.clone()] {
+            append_raw(
+                &broker,
+                "default",
+                event("default", "put", node_record(&node).unwrap())
+                    .unwrap()
+                    .0,
+            );
+        }
+        assert_eq!(options().timeout, Duration::from_secs(30));
+        let store = open(&broker, options()).unwrap();
+        assert_eq!(store.get(&child.id).unwrap(), child);
+        assert_eq!(store.roots().unwrap(), [root().id]);
+    }
+    #[test]
+    fn kafka_missing_record_times_out_before_enabling_producer() {
+        let broker = Rc::new(RefCell::new(Broker {
+            high_override: Some(1),
+            ..Broker::default()
+        }));
+        let error = match open(&broker, missing_record_options()) {
+            Ok(_) => panic!("missing offset must fail closed"),
+            Err(error) => error,
+        };
+        assert_eq!(error, invalid("Kafka replay timed out before offset 0"));
+        assert_eq!(broker.borrow().producers_opened, 0);
+        assert_eq!(broker.borrow().produces, 0);
     }
     #[test]
     fn kafka_staging_publishes_only_settlement_and_only_transient_nodes_can_drop() {

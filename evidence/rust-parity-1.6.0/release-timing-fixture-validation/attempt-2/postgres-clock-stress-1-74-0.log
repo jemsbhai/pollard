@@ -1,0 +1,70 @@
+ITERATION 1
+
+running 1 test
+test reservation_clock_is_sampled_after_row_lock_wait ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 10 filtered out; finished in 0.70s
+
+ITERATION 2
+
+running 1 test
+test reservation_clock_is_sampled_after_row_lock_wait ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 10 filtered out; finished in 0.67s
+
+ITERATION 3
+
+running 1 test
+test reservation_clock_is_sampled_after_row_lock_wait ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 10 filtered out; finished in 0.93s
+
+ITERATION 4
+
+running 1 test
+test reservation_clock_is_sampled_after_row_lock_wait ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 10 filtered out; finished in 0.69s
+
+ITERATION 5
+
+running 1 test
+test reservation_clock_is_sampled_after_row_lock_wait ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 10 filtered out; finished in 0.68s
+
+ITERATION 6
+
+running 1 test
+test reservation_clock_is_sampled_after_row_lock_wait ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 10 filtered out; finished in 0.68s
+
+ITERATION 7
+
+running 1 test
+test reservation_clock_is_sampled_after_row_lock_wait ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 10 filtered out; finished in 0.70s
+
+ITERATION 8
+
+running 1 test
+test reservation_clock_is_sampled_after_row_lock_wait ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 10 filtered out; finished in 0.67s
+
+ITERATION 9
+
+running 1 test
+test reservation_clock_is_sampled_after_row_lock_wait ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 10 filtered out; finished in 0.71s
+
+ITERATION 10
+
+running 1 test
+test reservation_clock_is_sampled_after_row_lock_wait ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 10 filtered out; finished in 0.71s
+

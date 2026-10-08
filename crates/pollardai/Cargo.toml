@@ -1,6 +1,6 @@
 [package]
 name = "pollardai"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2021"
 rust-version = "1.74"
 description = "Native Rust runtime for Pollard governed execution trees, shared budgets, and verified replay"

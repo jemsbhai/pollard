@@ -1,6 +1,12 @@
 # pollardai (Rust)
 
-Native Rust runtime for Pollard governed execution trees. Version 0.2.0 targets the behavior and storage formats of **PyPI `pollard==1.6.0`**, verified against its SHA-pinned wheel. It needs no Python installation at runtime. The runtime, audit workflows, provider normalization and all eight storage backends have native implementations. Language and integration boundaries are described below. Rust 0.1.0 has a smaller API; use 0.2.0 for these capabilities.
+Native Rust runtime for Pollard governed execution trees. Version 0.2.1 retains the behavior and storage formats added in 0.2.0 for **PyPI `pollard==1.6.0`**, verified against its SHA-pinned wheel. It needs no Python installation at runtime. The runtime, audit workflows, provider normalization and all eight storage backends have native implementations. Language and integration boundaries are described below. Rust 0.1.0 has a smaller API.
+
+Version 0.2.1 corrects test-fixture timing without changing production behavior; see the [release status and verification receipts](https://github.com/jemsbhai/pollard/releases/tag/pollardai-rust-v0.2.1).
+
+```sh
+cargo add pollardai@0.2.1
+```
 
 ```rust
 use pollardai::{json, Budget, CallOptions, ReplayMode, Result, Runtime};

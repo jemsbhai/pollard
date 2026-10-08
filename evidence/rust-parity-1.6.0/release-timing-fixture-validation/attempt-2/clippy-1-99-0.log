@@ -1,0 +1,13 @@
+    Checking windows-sys v0.61.2
+    Checking rand v0.8.8
+    Checking futures-util v0.3.34
+    Checking mio v1.2.4
+    Checking socket2 v0.6.5
+    Checking futures-executor v0.3.34
+    Checking futures v0.3.34
+    Checking tokio v1.53.2
+    Checking tokio-util v0.7.19
+    Checking tokio-postgres v0.7.12
+    Checking postgres v0.19.9
+    Checking pollardai v0.2.1 (C:\Users\User\.codex\worktrees\rust-pypi-parity\pollard\crates\pollardai)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 7.12s

@@ -1,0 +1,10 @@
+    Checking futures-channel v0.3.34
+   Compiling num_enum_derive v0.7.6
+    Checking futures-util v0.3.34
+    Checking num_enum v0.7.6
+    Checking rdkafka-sys v4.10.0+2.12.1
+    Checking futures-executor v0.3.34
+    Checking rdkafka v0.39.0
+    Checking futures v0.3.34
+    Checking pollardai v0.2.1 (C:\Users\User\.codex\worktrees\rust-pypi-parity\pollard\crates\pollardai)
+    Finished dev [unoptimized + debuginfo] target(s) in 7.25s

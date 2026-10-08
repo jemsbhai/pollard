@@ -33,6 +33,24 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
   independent main/manual checks and all platform coverage, and validate
   workflow configuration with pinned actionlint.
 
+## [Rust 0.2.1] - 2026-10-08
+
+### Fixed
+
+- Correct Kafka mock-test deadlines after successful 0.2.0 pull-request CI and
+  publication were followed by a main-branch failure under scheduler contention.
+  Ordinary mocks now use the existing 30-second default; only explicit
+  missing-record tests use a 5 ms deadline. Add delayed-replay and timeout
+  regressions. Kafka changes are confined to `cfg(test)`.
+- Remove scheduler-sensitive assumptions from two lease tests. PostgreSQL compares
+  stored expiry with server time immediately before lock release, preserving
+  detection of sampling the lease clock before acquiring the lock. SQLite's
+  successful renewal test starts with a 60-second lease instead of one second;
+  renewal-to-1,000-seconds and row consistency assertions are unchanged.
+  Production timeouts and measured runtime code are unchanged. See the
+  [release status and receipts](https://github.com/jemsbhai/pollard/releases/tag/pollardai-rust-v0.2.1)
+  for final CI, source, archive and registry verification.
+
 ## [Rust 0.2.0] - 2026-10-08
 
 ### Added

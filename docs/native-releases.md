@@ -6,14 +6,25 @@ The native packages have independent version lines.
 
 ## Release status
 
-Rust 0.2.0 targets compatibility with PyPI `pollard==1.6.0`.
-It adds native persistent stores, shared arbitration, async streaming, measurement
+Rust 0.2.1 retains compatibility work from 0.2.0 against PyPI `pollard==1.6.0`.
+Version 0.2.0 added native persistent stores, shared arbitration, async streaming, measurement
 and Tokenmaster meters, provider normalization, revalidation, audit interchange
 and the CLI. The [release evidence](../evidence/rust-parity-1.6.0/release-0.2.0.md)
 records compatibility tests and measured performance. See the
-[Rust 0.2.0 GitHub release](https://github.com/jemsbhai/pollard/releases/tag/pollardai-rust-v0.2.0)
-for publication status, the source commit, successful CI receipt, archive checksum
+[Rust 0.2.1 release status](https://github.com/jemsbhai/pollard/releases/tag/pollardai-rust-v0.2.1)
+for publication status, the source commit, final CI receipt, archive checksum
 and clean public-registry consumer verification.
+
+Rust 0.2.0 is already published on crates.io. Its pull-request CI, public-registry
+consumers and installed CLI passed verification. After merging, a main-branch
+run exposed a 5 ms deadline shared by ordinary Kafka mock tests. The Kafka
+correction is confined to `cfg(test)`: normal mocks use the existing 30-second
+default, while explicit missing-record tests retain a 5 ms deadline. Delayed
+replay and timeout regressions cover the distinction. PostgreSQL's lease-clock
+test now compares expiry against server time sampled immediately before releasing
+its lock, instead of time remaining after another connection opens. SQLite's
+renewal test starts with a 60-second lease; its renewal and consistency checks
+are unchanged. Production timeout behavior and benchmark code are unchanged.
 
 [npm 0.2.0](https://www.npmjs.com/package/pollardai/v/0.2.0) is published with
 the `latest` dist-tag. Native package versions are independent of Python.
@@ -23,7 +34,7 @@ npm install pollardai@0.2.0
 ```
 
 ```sh
-cargo add pollardai@0.2.0
+cargo add pollardai@0.2.1
 ```
 
 The npm release expands the port against Python Pollard 1.6.0. Validation

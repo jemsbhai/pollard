@@ -283,7 +283,7 @@ fn lease_renewal_extends_all_live_rows_and_missing_is_false() {
     assert!(!store.renew("missing", 10.0).unwrap());
     assert!(
         store
-            .reserve("live", &[budget(10, 1)], &[window(10)], 1.0)
+            .reserve("live", &[budget(10, 1)], &[window(10)], 60.0)
             .unwrap()
             .ok
     );

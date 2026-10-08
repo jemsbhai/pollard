@@ -1,6 +1,7 @@
 # Rust parity with PyPI Pollard 1.6.0
 
-Rust `pollardai` 0.2.0 targets the SHA-pinned Python `pollard==1.6.0` release.
+Rust `pollardai` 0.2.0 targets the SHA-pinned Python `pollard==1.6.0` release;
+0.2.1 corrects Kafka and lease test fixtures without changing production behavior.
 The completed `be9e565` matrix passes **212 default tests** on stable/MSRV/release
 and **232 optional-feature tests** on stable/MSRV, plus packaging, SQLite
 interchange and NVML sampling. The current
@@ -11,10 +12,18 @@ interchanges, corrected-source MongoDB and all five CLI selectors. Fresh
 and [all-feature consumers](https://github.com/jemsbhai/pollard/blob/main/evidence/rust-parity-1.6.0/release-ci-validation/consumer-all/summary.json)
 resolved and ran on exactly Rust 1.74.0 without borrowing the library lockfile.
 The [release report](https://github.com/jemsbhai/pollard/blob/main/evidence/rust-parity-1.6.0/release-0.2.0.md) preserves the exact scope and source
-provenance. CI passed its first 29 executed jobs. After macOS capacity retries,
-debug passed but two optimized SQLite migration tests exposed colliding temporary
-paths. The fixture correction and final CI confirmation remain in progress.
-See the [tagged release](https://github.com/jemsbhai/pollard/releases/tag/pollardai-rust-v0.2.0) for final CI, source, archive and registry
+provenance. Version 0.2.0 subsequently passed its final pull-request CI and was
+published on crates.io; fresh public-registry consumers and the installed CLI
+passed verification. Main-branch CI then exposed a 5 ms deadline shared by
+ordinary Kafka mocks. The Kafka correction is confined to `cfg(test)`: normal
+mocks use the existing 30-second default and explicit missing-record tests keep
+their 5 ms deadline, with delayed-replay and timeout regressions. PostgreSQL's
+lease-clock test compares expiry with server time immediately before lock
+release; SQLite's renewal fixture starts with 60 seconds while retaining its
+renewal and consistency assertions. Production timeouts and benchmark code are
+unchanged. Patch validation and publication are
+separate from the historical measurements below.
+See the [tagged release](https://github.com/jemsbhai/pollard/releases/tag/pollardai-rust-v0.2.1) for final CI, source, archive and registry
 receipts and publication status.
 
 The original Python 1.6.0 MongoDB store still requires **`tz_aware=True`** for
@@ -362,4 +371,3 @@ Python SQLite is 3.43.1; native bundled SQLite is 3.45.0.
 MemoryStore's child index replaces repeated full-map scans during traversal. The runtime verifies an immutable ancestry prefix once and extends it as calls advance; custom or externally mutable stores retain full verification unless they explicitly guarantee revision/identity invariants. Incremental charge totals invalidate on revision changes and account for sibling work; read-count and mutation regressions validate this separately from latency benchmarks.
 
 Unretained stream chunks are released after merging, whereas the Python 1.6.0 consumer temporarily retains its chunk list. Total process peak also includes the interpreter, allocators and loaded libraries, so the entire cross-language memory difference cannot be attributed to that change. SQLite, remote database costs and provider latency remain separate from MemoryStore gains.
-
