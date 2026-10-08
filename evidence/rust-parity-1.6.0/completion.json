@@ -1,0 +1,22 @@
+{
+  "status": "complete",
+  "generated_at": "2026-10-08T10:53:24.595447+00:00",
+  "pypi_release": "1.6.0",
+  "branch": "codex/rust-pypi-parity",
+  "unpublished": true,
+  "all_current_source_hashes_match": true,
+  "default_tests": 185,
+  "optional_tests": 205,
+  "live_backend_tests": 31,
+  "nvml_hardware_tests": 1,
+  "source_bound_evidence_sha256": {
+    "final-validation/validation.json": "0f0422cff17c0ac520655872ff35b176c385a60a8bfe1d5f347df91066a8e561",
+    "remote-validation/summary.json": "03ffdd0ad95b7960a4ba488acf22956d50b1092613eb2e624a65f29ec24b7040",
+    "performance.json": "fcfeb3d7321b217ebffdbdc617ba94afe1e302a7c3ac5248c98dde0aac9959d9",
+    "storage-performance.json": "7d4837a65ed59277981442275a4cbd477001a770d94ad3b85c31bcdc3f84c9d6",
+    "stream-memory.json": "4f5a0da95693bddf6cbd852a992376a4c952c47120c9d38bc20419d448cfd392"
+  },
+  "report_sha256": "8250f59b7be21fc57b49d1751716d0552b4987f591e4740c8790f7fb7c80b398",
+  "package_sha256": "e3221df354e7b15f9f36a5cb0004e4e147a185b9b0241aad723582a20272525f",
+  "limitations": "See README compatibility boundary, regressions, single-host performance protocol, Mongo timezone condition, finite Decimal arithmetic and untested live TLS/cluster failover."
+}

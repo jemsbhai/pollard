@@ -1,0 +1,209 @@
+   Compiling pollardai v0.2.0 (C:\Users\User\.codex\worktrees\rust-pypi-parity\pollard\crates\pollardai)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 11.18s
+     Running unittests src\lib.rs (crates\pollardai\target\debug\deps\pollardai-655509fa19be3a61.exe)
+
+running 1 test
+test decimal::tests::checked_accounting_rejects_rounding_but_keeps_representable_results ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\bin\pollard.rs (crates\pollardai\target\debug\deps\pollard-3ca0a4342a7d6b9a.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\adapters_parity.rs (crates\pollardai\target\debug\deps\adapters_parity-6588e80c93cf48c2.exe)
+
+running 6 tests
+test adapter_stream_is_lazy_and_stops_reading_after_error ... ok
+test request_merge_preserves_defaults_and_strips_private_identity_metadata ... ok
+test incremental_normalizer_supports_async_producers_without_buffering ... ok
+test provider_failure_after_dispatch_retains_conservative_accounting ... ok
+test exact_pypi160_provider_streams_fragments_usage_and_terminal_errors ... ok
+test exact_pypi160_provider_responses_and_invalid_usage ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests\async_stream.rs (crates\pollardai\target\debug\deps\async_stream-cd97883976f9148d.exe)
+
+running 6 tests
+test async_tools_cannot_bypass_registry ... ok
+test cancelled_async_dispatch_settles_unknown_record_and_releases_guard ... ok
+test async_stream_replays_retained_chunks ... ok
+test async_calls_gate_dispatch_and_replay_without_polling_provider ... ok
+test tool_streams_use_tool_identity_and_cannot_bypass_registry ... ok
+test synchronous_stream_records_replays_and_settles_failures ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests\cli.rs (crates\pollardai\target\debug\deps\cli-547b0f12d05cf912.exe)
+
+running 5 tests
+test cli_report_refuses_an_unrepresentable_exact_charge_total ... ok
+test cli_fails_without_repairing_or_creating_input_stores ... ok
+test cli_tree_json_and_text_match_the_published_python_contract ... ok
+test native_cli_renders_escaped_html_ascii_and_decimal_totals ... ok
+test native_cli_inspects_exports_imports_and_merges_sqlite ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.02s
+
+     Running tests\core.rs (crates\pollardai\target\debug\deps\core-53e62662341a3e20.exe)
+
+running 18 tests
+test identity_rejects_floats_and_invalid_node_shapes ... ok
+test mutable_metadata_cannot_reopen_finalization ... ok
+test tampered_replay_is_rejected ... ok
+test schema_subset_is_fail_closed_and_caller_values_do_not_panic ... ok
+test reentrant_runtimes_on_shared_store_are_locked ... ok
+test unknown_usage_recorded_result_can_be_strictly_replayed ... ok
+test panic_leaves_pending_work_charged_and_cannot_redispatch ... ok
+test branches_share_charges_and_rollback_does_not_refund ... ok
+test imported_results_preserve_exact_text_and_store_is_detached ... ok
+test confirmation_is_single_use_and_rechecks_budget_at_dispatch ... ok
+test budgets_refuse_before_side_effect_and_charge_actual_overshoot ... ok
+test strict_and_hybrid_replay_never_execute_handlers_and_missing_is_closed ... ok
+test model_and_tool_callback_mutation_cannot_change_identity ... ok
+test optional_duplicate_refusal_and_known_callback_failure_release ... ok
+test registry_schema_policy_and_redaction_gate_dispatch ... ok
+test ordered_confirmation_and_hybrid_policy_checks_match_python ... ok
+test shared_python_golden_vectors ... ok
+test malformed_usage_falls_back_to_estimate_without_stopping_completed_call ... ok
+
+test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests\decimal_exact.rs (crates\pollardai\target\debug\deps\decimal_exact-77fc8fa2f90ea001.exe)
+
+running 7 tests
+test exact_parser_rejects_significant_rounding_and_bounds_exponent_allocation ... ok
+test public_exact_addition_and_subtraction_never_discard_low_digits ... ok
+test profile_prices_check_original_number_before_float_deserialization ... ok
+test nonzero_costs_cannot_silently_underflow_to_zero ... ok
+test imported_recording_charge_does_not_underflow_before_validation ... ok
+test prices_windows_and_governance_budgets_reject_unrepresentable_inputs ... ok
+test exact_costs_match_wide_python_decimal_reference_or_reject_without_rounding ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\display_parity.rs (crates\pollardai\target\debug\deps\display_parity-357c9fb2544338d7.exe)
+
+running 1 test
+test unusual_json_labels_and_span_names_match_python_repr ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests\estimators.rs (crates\pollardai\target\debug\deps\estimators-1efb8c6cd82d95d6.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\hashrope.rs (crates\pollardai\target\debug\deps\hashrope-5ce8aa4226a76468.exe)
+
+running 7 tests
+test hashrope_stages_pending_but_publishes_only_final_record ... ok
+test hashrope_batches_and_orphan_drops_are_atomic ... ok
+test hashrope_known_errors_release_identity_but_unknown_errors_are_persisted ... ok
+test hashrope_imports_blank_lines_and_rejects_malformed_operations ... ok
+test hashrope_runtime_records_reopens_and_replays_final_results ... ok
+test exact_python_hashrope_log_bytes_and_hash ... ok
+test hashrope_preserves_imported_bytes_and_separates_unterminated_records_on_append ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests\identity_parity.rs (crates\pollardai\target\debug\deps\identity_parity-c83e34e1dbd6b4f3.exe)
+
+running 11 tests
+test borrowed_identity_envelope_retains_first_invalid_leaf_error_path ... ok
+test identity_rejects_floating_spellings_without_rounding_large_integers ... ok
+test result_serialization_is_recursive_sorted_and_preserves_imported_text ... ok
+test node_attempts_cover_the_full_native_unsigned_range ... ok
+test nonfinite_exponent_metadata_and_imported_results_are_rejected ... ok
+test float_result_integrity_still_rejects_changed_values_types_and_signed_zero ... ok
+test native_float_results_remain_valid_nodes_after_python_text_normalization ... ok
+test exact_pypi_160_integer_unicode_hashing_and_redaction_vectors ... ok
+test exact_pypi_160_redaction_marker_recognition ... ok
+test exact_pypi_160_native_result_float_text_and_digests ... ok
+test memory_and_reopened_sqlite_nodes_compare_equal_without_weakening_text_integrity ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests\integrations.rs (crates\pollardai\target\debug\deps\integrations-7eef59ff3b1dc2d5.exe)
+
+running 4 tests
+test mcp_discovery_matches_python_registry_digests_and_failures ... ok
+test telemetry_attributes_match_python_without_payload_or_result_content ... ok
+test telemetry_parents_and_cleanup_match_tree_even_on_export_failure ... ok
+test governed_mcp_dispatch_redacts_identity_and_replays_without_transport ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\kafka_live.rs (crates\pollardai\target\debug\deps\kafka_live-e443c73855614fe6.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\kv_parity.rs (crates\pollardai\target\debug\deps\kv_parity-11d161d7f03f3502.exe)
+
+running 8 tests
+test readonly_and_corrupt_clock_never_mutate_and_batches_roll_back ... ok
+test overflowing_expiry_rejects_without_corrupting_ledger_or_tombstone ... ok
+test exact_ledger_rounding_failure_rolls_back_reserve_and_settlement ... ok
+test imported_budget_decimals_never_round_silently ... ok
+test lost_commit_ack_retries_once_and_tombstones_prevent_double_charges ... ok
+test frozen_wire_codecs_preserve_decimal_scale_unicode_and_raw_result ... ok
+test frozen_transactional_ledger_trace_matches_every_committed_bucket ... ok
+test decimal_text_fingerprints_and_retry_tombstones_match_frozen_python ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests\measurement_lifecycle.rs (crates\pollardai\target\debug\deps\measurement_lifecycle-75ea74af5a440ab1.exe)
+
+running 17 tests
+test energy_invalid_intervals_and_start_samples_fail_before_dispatch ... ok
+test factory_panic_unwinds_already_started_contexts_without_a_pending_charge ... ok
+test provider_error_remains_primary_when_every_cleanup_fails ... ok
+test fallible_store_existence_and_pending_hooks_fail_before_provider_dispatch ... ok
+test lifecycle_is_ordered_and_metadata_is_available_before_mutable_charge ... ok
+test asynchronous_cancellation_and_handler_panic_stop_once ... ok
+test custom_fallback_applies_with_valid_provider_usage_and_window_forwards_hooks ... ok
+test window_meter_forwards_measurement_context_and_validates_energy_budget ... ok
+test replay_and_budget_refusal_never_start_measurements ... ok
+test meter_and_serialization_errors_after_results_preserve_unknown_classification ... ok
+test post_result_cleanup_and_readings_failures_keep_conservative_charges ... ok
+test staging_failure_releases_shared_reservation_exactly_once ... ok
+test settlement_failure_after_callback_is_unknown_and_drop_retries_conservatively ... ok
+test energy_finish_failure_is_unknown_and_direct_context_drop_stops_worker ... ok
+test setup_failures_stop_prior_contexts_and_release_sqlite_reservation ... ok
+test energy_counter_unavailability_and_reset_fall_back_to_sampled_power ... ok
+test energy_prefers_counter_and_stops_sampling_after_call ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests\meters_stream.rs (crates\pollardai\target\debug\deps\meters_stream-f997134a1f186394.exe)
+
+running 5 tests
+test energy_integration_is_checked ... ok
+test meter_contracts_and_decimal_cost_match_python ... FAILED
+test windows_validate_and_delegate ... ok
+test stream_contract_merges_and_retains_snapshots ... ok
+test window_ledger_keys_match_pypi_decimal_spelling ... ok
+
+failures:
+
+---- meter_contracts_and_decimal_cost_match_python stdout ----
+
+thread 'meter_contracts_and_decimal_cost_match_python' (6904) panicked at tests\meters_stream.rs:39:5:
+assertion `left == right` failed
+  left: "5"
+ right: "5.00"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    meter_contracts_and_decimal_cost_match_python
+
+test result: FAILED. 4 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--test meters_stream`

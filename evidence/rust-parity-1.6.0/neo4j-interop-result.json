@@ -1,0 +1,77 @@
+{
+  "status": "passed",
+  "backend": "neo4j",
+  "wheel_sha256": "569fb5f130a82c9be327b8dcbd285e3be063200bd9773ca15c5d6bb62edd627f",
+  "binary_sha256": "ec2903319e5ba40a0725887af19b37c94a5ef7f13583ea4d28349afd869cd0f1",
+  "sources_sha256": {
+    "src/adapters.rs": "3b2c206a81c099a11ecd64a538d32bd65f8ee3f84c10185b54773b391887ad2f",
+    "src/aio.rs": "7e6b6860201dcdcd1a3a7fdcdd3f19d93a3786d53482ae5b9ad309324296d5c2",
+    "src/energy.rs": "1b5b61cf22847612de47c27a5904573a295f1563b79db456a5bcada66f510a7e",
+    "src/estimators.rs": "4dab7fcf285f7ef74906d636c9e65df76687f9e43cb0a7fd3995cdbbc8781f6b",
+    "src/hashrope.rs": "5628efeb4c730120d5105762b8fcb264b0fc0fa19446b44dbf2087b4eada4939",
+    "src/identity.rs": "4c6153b6ba9146b9bdff1ca4fb8e7760b6764cf81af844a0fb5279f359a36443",
+    "src/kafka.rs": "7f5e2fb3519f98f24fd783760d7d038231f35156273705cde084ab78e6129b5d",
+    "src/kv.rs": "0cf71a122331fd2742512a5b909e03caf76ddf4291769940b9b6a573e277839f",
+    "src/lib.rs": "32eac83e063fb0cad186781a3b30180b91532663f2f75859060fdb747896ee28",
+    "src/mcp.rs": "c7d7fc84f6a7ffbcd04e58e93e72401dc88bea795c48702df17e1fb36ca8faa0",
+    "src/merge.rs": "8d079769df2bbc3c211d0cd019bb39cad1fbe30f28ac6b05150613bd635bca06",
+    "src/meters.rs": "9223591f3265ee384dec460af470c6511954cb1a80e9e2e16a65f41259aa6a76",
+    "src/mongodb.rs": "019481633006c6b1b302bdf5b484e655d75115982ff2722a9778b2d5a48f1044",
+    "src/neo4j.rs": "f727bf8c0d1e0cc47518daf767a3c48d649a9d4f9d863fa908bb4d7993a26c75",
+    "src/nvml.rs": "d725e42160d733b8bbbf4496754d507baf499042480adbc6b2550ac4db592592",
+    "src/otel.rs": "6875bc3f32dcd23b677118de14a6eb7c9ee05f766c4ceb46bd543a6f59b6ce0d",
+    "src/postgres.rs": "91c2a6d69251a67f01067a17a2cee8bd3d34c7c9bb71d725767e231a789cb053",
+    "src/redis.rs": "582356890612faaf726ce9077b2a7bb3d8543b4a1af0d00a7d4591ca0c4b8979",
+    "src/registry.rs": "0561acb64d9b18a1fef4dfaa0bbd6123b77fe8f19dc4d6ec0bc1f143b7d9dc7d",
+    "src/remote_worker.rs": "ca9263c5e2e2fc3749e6c7a5310d1c4cec65fc7cdcc67dc9102b6edb1041b984",
+    "src/render.rs": "01e824be1a08eaddea045b3197f9b432e1325f4964a49f20bc5a72831be52fee",
+    "src/revalidation.rs": "37e23119bf4c6a53be97e359be1ada1381c15fabf983fac38ac767eb89f168fd",
+    "src/runtime.rs": "20616128eb6a47346a831507d1a295f3194a7b9d90a34823ce46cccbdfeba165",
+    "src/seal.rs": "b13196e1018a1039704ebcc12b3d4c1de07bd54809d2fcb9e734bccabdb1c284",
+    "src/seal_custody.rs": "f21e3cf7688c82a4e4512b8dbc5b0dfcc58510836b394ec3072eb5d8dca78693",
+    "src/sqlite.rs": "489871899311c4efb7b0b174bdcaab0728ce153ac36ba8507f765d44304f8ad7",
+    "src/store.rs": "539f07a44f6ee873a3a20ccea63639efb4888693cde79f9e53e88d1eb91ecd19",
+    "src/store_spec.rs": "cd586b11367d7960016a492b6149d1614128e9d7a1655821a1cee760ab9b93d4",
+    "src/stream.rs": "958bf4b7fd1de1b0272fd2247ed753821d252009312c691db2486b1619514d3b",
+    "src/tokenmaster.rs": "33f9a3356721d4d8ba314894af164c509cf92b2cb1f5a0978404b31ffc6e5878",
+    "Cargo.toml": "30594fa0c9487d790b57f2addf11c32d216a5136d33a6c1603f9ec63c3950143",
+    "Cargo.lock": "acfb766765bd74f06cddfde5314682047b3bb7d3ce788271290cc51ca178ce7a",
+    "examples/document_interop.rs": "083f7a889f23517b5f729c068528fd63313871142f6f848e0095a7a8392d898c"
+  },
+  "python": "3.12.2 (tags/v3.12.2:6abddd9, Feb  6 2024, 21:26:36) [MSC v.1937 64 bit (AMD64)]",
+  "python_driver": "6.2.0",
+  "rust_driver": "0.2.0",
+  "cases": {
+    "exact_records": {
+      "python_seal": "0d7c238deb57ebf69a79e11873846dc8a3974cfdc7da01f228d49b59a28c3693",
+      "rust_node": "a4f12589eb419723c4697914074519fa715a5b9364b984dfb496732566dfe48f"
+    },
+    "budget": {
+      "live_python_reservation_refused": true,
+      "observed": [
+        {
+          "status": "refused",
+          "dispatched": false,
+          "root_id": "f73098a04dd24bcea64c5e39cb3cd4efec247ee5c26f7d945e022e177be4c93f",
+          "node_id": "098d7fdbbc48c1c7a20164579a0fef261fba95c55485e87ec20284bb1bcb9d8e"
+        }
+      ]
+    },
+    "window": {
+      "live_python_reservation_refused": true,
+      "observed": [
+        {
+          "status": "refused",
+          "dispatched": false,
+          "root_id": "39fd197e85fb9e934ada1dafca9745138ed103dac0ec7bb425c5d7f21ee36043",
+          "node_id": "24677417090296d8c8256ecc92a28a55cc8f64ad5ba3360cdaec438d3e52987f"
+        }
+      ]
+    },
+    "reverse_window": true,
+    "mixed_idempotent_settlement": true,
+    "scientific_decimal_wire_digest": true
+  },
+  "namespace_cleaned": true,
+  "cluster_failover_tested": false
+}

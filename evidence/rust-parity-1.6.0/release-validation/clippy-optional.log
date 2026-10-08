@@ -1,0 +1,4 @@
+    Checking rdkafka-sys v4.10.0+2.12.1
+    Checking rdkafka v0.39.0
+    Checking pollardai v0.2.0 (C:\Users\User\.codex\worktrees\rust-pypi-parity\pollard\crates\pollardai)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 19.10s

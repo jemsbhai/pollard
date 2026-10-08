@@ -1,0 +1,59 @@
+{
+  "provenance": {
+    "pollard_version": "1.6.0",
+    "pollard_wheel_sha256": "569fb5f130a82c9be327b8dcbd285e3be063200bd9773ca15c5d6bb62edd627f"
+  },
+  "events": [
+    {
+      "store_id": "default",
+      "operation": "put",
+      "body": {
+        "id": "656bf11084253f74f6c483570d82c2441bec18e7e27f9306d337a9e423e6087b",
+        "parent": null,
+        "kind": "root",
+        "attempt": 0,
+        "payload": "{\"run\":\"Kafka 雪\"}",
+        "result": null,
+        "result_digest": null,
+        "meta": "{\"budget\":{\"usd\":0.125}}"
+      },
+      "operation_id": "44649a7815091f3162390278cc0b163f09b01c49479e0844a1152c9add02a4d4",
+      "event_utf8": "{\"body\":{\"attempt\":0,\"id\":\"656bf11084253f74f6c483570d82c2441bec18e7e27f9306d337a9e423e6087b\",\"kind\":\"root\",\"meta\":\"{\\\"budget\\\":{\\\"usd\\\":0.125}}\",\"parent\":null,\"payload\":\"{\\\"run\\\":\\\"Kafka 雪\\\"}\",\"result\":null,\"result_digest\":null},\"operation\":\"put\",\"operation_id\":\"44649a7815091f3162390278cc0b163f09b01c49479e0844a1152c9add02a4d4\",\"request_digest\":\"01ff57aecabffab990ff6282f6a24a0775196eaa38e2f78a2d58985a8198cb1b\",\"store_id\":\"default\",\"version\":1}",
+      "record_digest": "4cf9eddb1d408a14dd4182dbbf143fe5cc5cb953f19afac59038bf351cb2d3c1"
+    },
+    {
+      "store_id": "store 雪",
+      "operation": "put",
+      "body": {
+        "id": "fefc60dab4b43c37cc8fde31dbc883ee68e83bb7f62452782ced5501178ed5eb",
+        "parent": "656bf11084253f74f6c483570d82c2441bec18e7e27f9306d337a9e423e6087b",
+        "kind": "model_call",
+        "attempt": 0,
+        "payload": "{\"big\":10000000000000000000000000000,\"model\":\"mock\"}",
+        "result": "{\"negative_zero\":-0.0,\"temperature\":1.25,\"text\":\"héllo 雪\",\"usage\":{\"input_tokens\":12,\"output_tokens\":3}}",
+        "result_digest": "2bc78de09f2b74b5841757de238d19b09557a712567f5a45810bf4b23500f123",
+        "meta": "{\"charges\":{\"tokens\":15,\"usd\":0.000125},\"state\":\"completed\"}"
+      },
+      "operation_id": "2c00e77e41aa451823288142138eca3b45c0b94d00fe78daa6593f88ffc1c366",
+      "event_utf8": "{\"body\":{\"attempt\":0,\"id\":\"fefc60dab4b43c37cc8fde31dbc883ee68e83bb7f62452782ced5501178ed5eb\",\"kind\":\"model_call\",\"meta\":\"{\\\"charges\\\":{\\\"tokens\\\":15,\\\"usd\\\":0.000125},\\\"state\\\":\\\"completed\\\"}\",\"parent\":\"656bf11084253f74f6c483570d82c2441bec18e7e27f9306d337a9e423e6087b\",\"payload\":\"{\\\"big\\\":10000000000000000000000000000,\\\"model\\\":\\\"mock\\\"}\",\"result\":\"{\\\"negative_zero\\\":-0.0,\\\"temperature\\\":1.25,\\\"text\\\":\\\"héllo 雪\\\",\\\"usage\\\":{\\\"input_tokens\\\":12,\\\"output_tokens\\\":3}}\",\"result_digest\":\"2bc78de09f2b74b5841757de238d19b09557a712567f5a45810bf4b23500f123\"},\"operation\":\"put\",\"operation_id\":\"2c00e77e41aa451823288142138eca3b45c0b94d00fe78daa6593f88ffc1c366\",\"request_digest\":\"413a26c596dbef1097cca89902318c02d83a496f9b150cabf52a4db2b2f9ce74\",\"store_id\":\"store 雪\",\"version\":1}",
+      "record_digest": "3407715b2e379bcd7e4eaea1bf6fe77202f3677015c723e65faac33eeedf6a86"
+    },
+    {
+      "store_id": "default",
+      "operation": "meta",
+      "body": {
+        "id": "fefc60dab4b43c37cc8fde31dbc883ee68e83bb7f62452782ced5501178ed5eb",
+        "patch": {
+          "nested": {
+            "b": true,
+            "a": null
+          },
+          "tiny": 1e-07
+        }
+      },
+      "operation_id": "ac1d32d893a086ec8469f730a3dfaf4cf62425e680cf28c22bf306f6a221b093",
+      "event_utf8": "{\"body\":{\"id\":\"fefc60dab4b43c37cc8fde31dbc883ee68e83bb7f62452782ced5501178ed5eb\",\"patch\":{\"nested\":{\"a\":null,\"b\":true},\"tiny\":1e-07}},\"operation\":\"meta\",\"operation_id\":\"ac1d32d893a086ec8469f730a3dfaf4cf62425e680cf28c22bf306f6a221b093\",\"request_digest\":\"139c36bf6d6c8a2ac5000d25deaf5dc92b10074895f7cb1565920f4d6fd9b8f8\",\"store_id\":\"default\",\"version\":1}",
+      "record_digest": "4098e9c1dc827504825cca67cf3dd5bf34f77adb6c6b3078fefa308eaf071f42"
+    }
+  ]
+}

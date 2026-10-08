@@ -137,3 +137,11 @@ EXP-006 is the 1.0 launch evidence. Its manifest pins every shipped case input
 and artifact, while the verifier proves strict offline replay without executing
 a model function or tool handler. EXP-007 remains a registered protocol until a
 final integrated wheel produces a provenance-checked raw result.
+
+## Rust parity with PyPI 1.6.0
+
+The [native parity report](rust-parity-1.6.0/README.md) records the compatibility
+matrix, live backend checks, Rust1.74 support, exact release oracle and
+reproducible timing/memory experiments. This is separate from EXP-007. Raw
+samples and source/executable hashes accompany measured ratios and regressions;
+local-runtime gains do not establish provider, remote-service or energy savings.

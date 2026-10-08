@@ -1,0 +1,52 @@
+{
+  "checkpoint": "before final Rust source freeze",
+  "note": "Clean consumer resolution uses a newly generated lockfile; source fingerprints identify each checkpoint.",
+  "consumer_default": {
+    "platform": "windows",
+    "result": "default-rust174-windows/summary.json",
+    "toolchain": "1.74.0"
+  },
+  "mongodb_python": {
+    "windows": {
+      "skipped": 2,
+      "passed": 159,
+      "tests": [
+        "tests/test_mongodb_clock.py",
+        "tests/test_store_backend_failures.py",
+        "tests/test_documentation.py::test_github_workflows_cannot_publish"
+      ]
+    },
+    "linux": {
+      "skipped": 0,
+      "passed": 20,
+      "controlled_timezones": [
+        "UTC0",
+        "MST7MDT",
+        "IST-5:30"
+      ],
+      "log": "mongodb-clock-linux.log"
+    },
+    "ruff": "passed",
+    "mypy": "passed",
+    "source_sha256": {
+      "tests/test_mongodb_clock.py": "184d6a7f70eaba97305a52c3875a69421662096b499b203b4bda96ed789dcdeb",
+      "src/pollard/stores/mongodb.py": "90d957d4f1bad80985a15f3dc61263d0d17ef6cccfd827c0f9f4135af3d79e6b"
+    }
+  },
+  "status": "passed",
+  "consumer_all": {
+    "platform": "linux",
+    "prerequisite_packages": [
+      "cmake",
+      "pkg-config",
+      "perl",
+      "libssl-dev",
+      "python3"
+    ],
+    "result": "all-rust174-linux/summary.json",
+    "container_removed": true,
+    "image": "rust:1.74-bookworm@sha256:fd45a543ed41160eae2ce9e749e5b3c972625b0778104e8962e9bfb113535301",
+    "toolchain": "1.74.1",
+    "note": "Library Cargo.lock was intentionally absent from isolated source copy; Cargo1.74 resolved all features from scratch."
+  }
+}

@@ -68,4 +68,127 @@ jobs:
       - run: cargo fmt --check
       - run: cargo clippy --all-targets --locked -- -D warnings
       - run: cargo test --locked
+      - run: cargo test --release --locked
       - run: cargo package --locked
+
+  rust-python-interop:
+    name: Rust and Python release 1.6.0 interchange on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - uses: dtolnay/rust-toolchain@89b12181fb390509a0842a86cc55eeb8eb928c1d
+        with:
+          toolchain: stable
+      - name: Download pinned release oracle
+        run: >-
+          python -m pip download --no-deps --only-binary=:all:
+          pollard==1.6.0 --dest .benchmarks/python-oracle
+      - name: Verify SQLite and seal interchange
+        run: >-
+          python evidence/rust-parity-1.6.0/sqlite_interop.py
+          --wheel .benchmarks/python-oracle/pollard-1.6.0-py3-none-any.whl
+          --crate crates/pollardai --output-dir .benchmarks/sqlite-interop
+      - name: Verify shared reservation interchange
+        run: >-
+          python evidence/rust-parity-1.6.0/arbitration_interop.py
+          --wheel .benchmarks/python-oracle/pollard-1.6.0-py3-none-any.whl
+          --crate crates/pollardai --output-dir .benchmarks/arbitration-interop
+      - name: Verify mixed runtime enforcement
+        run: >-
+          python evidence/rust-parity-1.6.0/runtime_interop.py
+          --wheel .benchmarks/python-oracle/pollard-1.6.0-py3-none-any.whl
+          --crate crates/pollardai --output-dir .benchmarks/runtime-interop
+
+  rust-optional-features:
+    name: Optional native backends and TLS on Rust ${{ matrix.toolchain }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        toolchain: [stable, "1.74"]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@89b12181fb390509a0842a86cc55eeb8eb928c1d
+        with:
+          toolchain: ${{ matrix.toolchain }}
+          components: clippy
+      - name: Native TLS and Kafka build prerequisites
+        run: sudo apt-get update && sudo apt-get install -y cmake pkg-config libssl-dev perl
+      - name: Strict optional-feature lint
+        run: cargo clippy --manifest-path crates/pollardai/Cargo.toml --locked --all-features --all-targets -- -D warnings
+      - name: Optional-feature unit and fault tests
+        run: cargo test --manifest-path crates/pollardai/Cargo.toml --locked --all-features --all-targets
+
+  rust-fresh-consumer:
+    name: Fresh Rust 1.74 consumer (${{ matrix.features }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        features: [default, all]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - uses: dtolnay/rust-toolchain@89b12181fb390509a0842a86cc55eeb8eb928c1d
+        with:
+          toolchain: "1.74.0"
+      - name: Native build prerequisites
+        if: matrix.features == 'all'
+        run: sudo apt-get update && sudo apt-get install -y cmake pkg-config libssl-dev perl
+      - name: Resolve and run a new downstream application
+        run: >-
+          python evidence/rust-parity-1.6.0/validate_consumer.py
+          --toolchain 1.74.0 --output-dir .benchmarks/fresh-consumer
+          ${{ matrix.features == 'all' && '--all-features' || '' }}
+      - name: Preserve fresh resolution evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: native-fresh-consumer-${{ matrix.features }}
+          include-hidden-files: true
+          path: |
+            .benchmarks/fresh-consumer/summary.json
+            .benchmarks/fresh-consumer/*.log
+            .benchmarks/fresh-consumer/Cargo.toml
+            .benchmarks/fresh-consumer/Cargo.lock
+
+  rust-live-remotes:
+    name: Live native backends and Python release 1.6.0 interoperability
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - uses: dtolnay/rust-toolchain@89b12181fb390509a0842a86cc55eeb8eb928c1d
+        with:
+          toolchain: stable
+      - name: Native build prerequisites
+        run: sudo apt-get update && sudo apt-get install -y cmake pkg-config libssl-dev perl
+      - name: Disposable-service ownership and failure guards
+        run: python -m unittest discover -s evidence/rust-parity-1.6.0 -p test_validate_remote.py -v
+      - name: Validate isolated PostgreSQL, Redis, Kafka, MongoDB and Neo4j
+        run: python evidence/rust-parity-1.6.0/validate_remote.py --output-dir .benchmarks/remote-validation --python-source src
+      - name: Preserve live validation evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: native-live-remote-validation
+          include-hidden-files: true
+          path: |
+            .benchmarks/remote-validation/summary.json
+            .benchmarks/remote-validation/python-environment.json
+            .benchmarks/remote-validation/logs/*.log
+            .benchmarks/remote-validation/results/*.json

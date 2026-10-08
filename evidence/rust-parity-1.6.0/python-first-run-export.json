@@ -1,0 +1,51 @@
+{
+  "format": "pollard/subtree/v1",
+  "nodes": [
+    {
+      "attempt": 0,
+      "id": "fb4f2a23cc196e53f0fa800a71c025e0a9b7ac5890b83c4d9d1a0214175d9dd5",
+      "kind": "root",
+      "meta": "{}",
+      "parent": null,
+      "payload": "{\"run\":\"first-run\"}",
+      "result": null,
+      "result_digest": null
+    },
+    {
+      "attempt": 0,
+      "id": "c4882b75addd9867f623049798e2c6cebc3d49daa80bd5a825c102cf0580fd30",
+      "kind": "model_call",
+      "meta": "{\"charges\":{\"steps\":1,\"tokens\":6},\"created_at\":\"2026-10-08T07:57:46.946036Z\",\"duration_s\":3.89997148886323e-06,\"usage\":{\"input_tokens\":2,\"output_tokens\":4}}",
+      "parent": "fb4f2a23cc196e53f0fa800a71c025e0a9b7ac5890b83c4d9d1a0214175d9dd5",
+      "payload": "{\"model\":\"local-demo\",\"prompt\":\"hello\"}",
+      "result": "{\"text\":\"offline reply for hello\",\"usage\":{\"input_tokens\":2,\"output_tokens\":4}}",
+      "result_digest": "c2191d10ae61e0576759845ae6d9e78946cf0bfc34d93685d30e1dba6dc66551"
+    }
+  ],
+  "root_id": "fb4f2a23cc196e53f0fa800a71c025e0a9b7ac5890b83c4d9d1a0214175d9dd5",
+  "seal": {
+    "algorithm": "sha256:pollard/v1:seal",
+    "digest": "33bd9249f8166ca470553dfada515f44a9f0ce24b7c615dad48e0a89a5936ee3",
+    "entries": [
+      {
+        "index": 0,
+        "kind": "root",
+        "node_id": "fb4f2a23cc196e53f0fa800a71c025e0a9b7ac5890b83c4d9d1a0214175d9dd5",
+        "parent_id": null,
+        "previous": null,
+        "result_digest": null,
+        "seal": "97bf4d3d9cde3aeb5705f68f4b4f1d92dd04937c9dd659ddf076902ed4b12037"
+      },
+      {
+        "index": 1,
+        "kind": "model_call",
+        "node_id": "c4882b75addd9867f623049798e2c6cebc3d49daa80bd5a825c102cf0580fd30",
+        "parent_id": "fb4f2a23cc196e53f0fa800a71c025e0a9b7ac5890b83c4d9d1a0214175d9dd5",
+        "previous": "97bf4d3d9cde3aeb5705f68f4b4f1d92dd04937c9dd659ddf076902ed4b12037",
+        "result_digest": "c2191d10ae61e0576759845ae6d9e78946cf0bfc34d93685d30e1dba6dc66551",
+        "seal": "33bd9249f8166ca470553dfada515f44a9f0ce24b7c615dad48e0a89a5936ee3"
+      }
+    ],
+    "root_id": "fb4f2a23cc196e53f0fa800a71c025e0a9b7ac5890b83c4d9d1a0214175d9dd5"
+  }
+}

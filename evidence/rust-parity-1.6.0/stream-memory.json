@@ -1,0 +1,296 @@
+{
+  "generated_at": "2026-10-08T10:47:09.861354+00:00",
+  "git_base": "51e3a245641044fc8b3d6a90fc49f3cbfcbf107d",
+  "git_dirty": true,
+  "rustc": "rustc 1.94.0 (4a4ef493e 2026-03-02)",
+  "source_sha256": {
+    "crates/pollardai/Cargo.lock": "acfb766765bd74f06cddfde5314682047b3bb7d3ce788271290cc51ca178ce7a",
+    "crates/pollardai/Cargo.toml": "30594fa0c9487d790b57f2addf11c32d216a5136d33a6c1603f9ec63c3950143",
+    "crates/pollardai/examples/arbitration_interop.rs": "6063a93db0122b8003a7a449a06112f64c42bcc6083d67ec3e5c8a6d2d77e582",
+    "crates/pollardai/examples/document_interop.rs": "8e8b40faa2f983071cb50b83cfd3cb378df78047ac3213ed48d6e563d2bf6435",
+    "crates/pollardai/examples/governed_call.rs": "aae354f657cb6e8518fd104b6959aa011bb87f1bdd6661e713e7731fd3cb334e",
+    "crates/pollardai/examples/kafka_interop.rs": "aed7448b12578540872d1d10a5e13925d0d229bd22c53d9239318828e33659d4",
+    "crates/pollardai/examples/performance.rs": "37034a5d125e1afdb305718d3ab9b18babef37057c26c3f2f947a3a904b8e793",
+    "crates/pollardai/examples/postgres_interop.rs": "41e197bb304aafd0085ad415db61d41156515ccc246bc6eb6fd279083e1ef727",
+    "crates/pollardai/examples/redis_interop.rs": "56a50bdd0e3dfd9af29998a81b093fb401c90a940a26e6c09df95d369a13167f",
+    "crates/pollardai/examples/runtime_interop.rs": "7fdbf2b6118ceb61aee625031bb7fbc8c0728ba24e7d1af21e683ac92b68270f",
+    "crates/pollardai/examples/storage_interop.rs": "d312b6a667c4050fc953f0e2ebbce7d02de92ca29822c2151300a02dd785cd6a",
+    "crates/pollardai/examples/storage_performance.rs": "3d3a80fdf1ff993f49f5d8992854c7c9c1c4b7998dcbee50f0cebd7c92ef4f3e",
+    "crates/pollardai/examples/stream_memory.rs": "c90e50fe3f0c24f15ac0e6524228e2fcc20b7a9f650623eeaa8763ebb9d0e208",
+    "crates/pollardai/src/adapters.rs": "3b2c206a81c099a11ecd64a538d32bd65f8ee3f84c10185b54773b391887ad2f",
+    "crates/pollardai/src/aio.rs": "bac10d6c7ecc45c06a4fbe80256baea10e401df5c0f81bfdf8dc98f3c05be431",
+    "crates/pollardai/src/bin/pollard.rs": "3ac3db78d90b20eaf0b00555b303b522cf8f408b810c9b247c3acc4314dc6dc5",
+    "crates/pollardai/src/decimal.rs": "e16747a3669b6f5235507bfe23f18d5b7821e9e7ec7564efa497d0c3b3380fd9",
+    "crates/pollardai/src/energy.rs": "1b5b61cf22847612de47c27a5904573a295f1563b79db456a5bcada66f510a7e",
+    "crates/pollardai/src/estimators.rs": "4dab7fcf285f7ef74906d636c9e65df76687f9e43cb0a7fd3995cdbbc8781f6b",
+    "crates/pollardai/src/hashrope.rs": "5628efeb4c730120d5105762b8fcb264b0fc0fa19446b44dbf2087b4eada4939",
+    "crates/pollardai/src/identity.rs": "4c6153b6ba9146b9bdff1ca4fb8e7760b6764cf81af844a0fb5279f359a36443",
+    "crates/pollardai/src/kafka.rs": "e1eeada88b09bb11a294b6df622d7285e963c72d23fa4bb1a43706a68402ae3b",
+    "crates/pollardai/src/kv.rs": "f2420c883ac7593e824f72a9cd2197077e9eefdd4550924cc7d639358afbb549",
+    "crates/pollardai/src/lib.rs": "3a57d149217449a726c72a74b94ce430d03cd21835b95aed914031901c90e672",
+    "crates/pollardai/src/mcp.rs": "c7d7fc84f6a7ffbcd04e58e93e72401dc88bea795c48702df17e1fb36ca8faa0",
+    "crates/pollardai/src/merge.rs": "8d079769df2bbc3c211d0cd019bb39cad1fbe30f28ac6b05150613bd635bca06",
+    "crates/pollardai/src/meters.rs": "a91f91db6296f258493b438a37327f55a97633aba40c5c74b57cf4a9572ab1b1",
+    "crates/pollardai/src/mongodb.rs": "284d6207f9a1375e442265a031f1bd0704d997e6ec141aa44e66b71c23503d76",
+    "crates/pollardai/src/neo4j.rs": "29236cd8daffca6a2327c478886c46480ceb1dbf20a2a1dd7d451aef5b1af371",
+    "crates/pollardai/src/nvml.rs": "0148be0d09fa2021ffa4e018cc04bec4468916eecb57c8cb7a38d474e8c4e186",
+    "crates/pollardai/src/otel.rs": "37d0858e013b34f52a15623e618f6abd73aa4eaefb622fcb6d665064d5c1147f",
+    "crates/pollardai/src/postgres.rs": "ae842582a93a0e218e73c4ef0e7a3b73beafd3320def47934c33cf33ed14aabf",
+    "crates/pollardai/src/python_display.rs": "859d9cb89b458a807a08fad965a0528056b6c9c03bb2ac81b166d832b2b18997",
+    "crates/pollardai/src/python_printable.rs": "5428029c831ca02b5b97c3ab49a34a276840a0a2bcc4dce40bf4bb670cc11080",
+    "crates/pollardai/src/redis.rs": "582356890612faaf726ce9077b2a7bb3d8543b4a1af0d00a7d4591ca0c4b8979",
+    "crates/pollardai/src/registry.rs": "0561acb64d9b18a1fef4dfaa0bbd6123b77fe8f19dc4d6ec0bc1f143b7d9dc7d",
+    "crates/pollardai/src/remote_worker.rs": "40acd856b12137a2a7c0464f496187b2956094ee5bc01f63f579ce3fa912217a",
+    "crates/pollardai/src/render.rs": "f1b452a6c1ae5a1c96bd932b702320dfb41f68a87088a6505460baa1f35474a2",
+    "crates/pollardai/src/revalidation.rs": "37e23119bf4c6a53be97e359be1ada1381c15fabf983fac38ac767eb89f168fd",
+    "crates/pollardai/src/runtime.rs": "bde122e488a29e784d1b0e646ee6c710ad229c56b44968dde662609367991cfe",
+    "crates/pollardai/src/seal.rs": "b13196e1018a1039704ebcc12b3d4c1de07bd54809d2fcb9e734bccabdb1c284",
+    "crates/pollardai/src/seal_custody.rs": "f21e3cf7688c82a4e4512b8dbc5b0dfcc58510836b394ec3072eb5d8dca78693",
+    "crates/pollardai/src/sqlite.rs": "870d42f1af7c938f145bb795af7b963710250ca0cf2b446f1c941d643587202f",
+    "crates/pollardai/src/store.rs": "d2adf703f157b7c95a461d8b530aa701f31ae454c0aa743494902ee2f65f88f5",
+    "crates/pollardai/src/store_spec.rs": "c11cf7479dd14ccdc9eada0d724e7329f94ee8b8b67bd138a63f620dd6fda838",
+    "crates/pollardai/src/stream.rs": "9543e17ace248cfac9e67f725b79f4d3ff24f04e146e847b240f701d9e626852",
+    "crates/pollardai/src/tokenmaster.rs": "3af24f0115fd3259842c201fcb05e848787c8cd003f5672ece2913c85debb851",
+    "evidence/rust-parity-1.6.0/arbitration_interop.py": "5cdbd3e257831025442ca3cf8b3b1132d7ec98c4ce30aef62eec84ece0806da2",
+    "evidence/rust-parity-1.6.0/audit_release.py": "a40564522181656f7f6fdff8a160576944138d990879f2d68a02be2ff8b83783",
+    "evidence/rust-parity-1.6.0/benchmark.py": "79fe5e8540222df2f21c3a7af36e30b5d16d80be56fb75b38c77be75f2e2b81b",
+    "evidence/rust-parity-1.6.0/benchmark_python.py": "8eff0b2edda65fb5fa02eca65a2bc37f76b7d576af6eddab4ac99cce3fa93429",
+    "evidence/rust-parity-1.6.0/document_interop.py": "3312ffc2f5afd31c61bcb49bc97d44ae63e7ddb842e9b1b0d2da1bb58186ffb1",
+    "evidence/rust-parity-1.6.0/kafka_interop.py": "7bd3fe29cec7fd1ebede437f362849857547e33c1a6983ea459e6405cf5ffe8a",
+    "evidence/rust-parity-1.6.0/postgres_interop.py": "99688cc46585cc631e4116da27042419af0eaa1914ce84cf57f0aa64ae41fbbb",
+    "evidence/rust-parity-1.6.0/prepare_baseline.py": "36e21ed3cbec72a029187db17c6db3a4269166ea7966a95c27c6e60199ad13a1",
+    "evidence/rust-parity-1.6.0/redis_interop.py": "5f2c285d0a2004084afe83ec8c706ce592453fbd123ee12b0c03ec0bfda4ef23",
+    "evidence/rust-parity-1.6.0/remote_cli_smoke.py": "c45b7962cef7acdb508f3bf5bd14c55e7b35ab242ff5e5caa9d9f5ec2d232ceb",
+    "evidence/rust-parity-1.6.0/runtime_interop.py": "b7451e0da550214598d3a2879f6c384dab50530e598da79a679e1dc82b0571b1",
+    "evidence/rust-parity-1.6.0/sqlite_interop.py": "1d5092ae71e2a44a121bd2ee5752a6ce4ff30419513c6bbb3492ed269ad25971",
+    "evidence/rust-parity-1.6.0/storage_performance.py": "007db8faa5701b24896f2663c77fc2d05d18a20bb000f6d7666fddbc894e9555",
+    "evidence/rust-parity-1.6.0/storage_performance_python.py": "89f73c305c6e69dbbddfd758b9b39b44edbfd3aa34f20490645da9c5516e0537",
+    "evidence/rust-parity-1.6.0/stream_memory.py": "f25f6cca207a37a44b644d3dca371c851b09657ffbecedf60f5da17e2ff179b8",
+    "evidence/rust-parity-1.6.0/stream_memory_python.py": "59d94dbdcce94ecc2abc3cf90aeb5e00c4aa488295b0115253e2d0549c528c86",
+    "evidence/rust-parity-1.6.0/test_validate_remote.py": "479afad63b5b0e4231cb4b2c48c1ad9e54708fe4f2319eeb59e8d20146e15b8e",
+    "evidence/rust-parity-1.6.0/validate_native.py": "b2a9b81f26857e0c1745c46fef3855268e1334cf966359961fa68f34bbc2ec70",
+    "evidence/rust-parity-1.6.0/validate_remote.py": "40432c21b8619922fb8b364673e19105a7939d840e09e4d12e9e72dd9e175468"
+  },
+  "binary_sha256": {
+    "crates/pollardai/target/release/examples/stream_memory.exe": "00fcdecc1d8ae5ad766818b9848f9677710f7c8022e926f8440da1357062e4b8"
+  },
+  "python_package_sha256": {
+    "pollard/__init__.py": "a82f5889efb14a4e9a29fd0846d62bf43196c7c590826d263ef86046f357abda",
+    "pollard/_canon.py": "fadd7d70ec8819d065c7e159f0c399b364c4c656fa6348c6ee7fae6dec38a300",
+    "pollard/adapters/__init__.py": "43a30271d85e3b2dabaa037295969b76c9b679d9cbc4300a0e20d5cda519c98e",
+    "pollard/adapters/_common.py": "4c9384f77575c71505d7b0eb2f70b3b322eb65bed5204c9a8ec49b3373d261eb",
+    "pollard/adapters/anthropic.py": "1cfa4226f26f105cbc7b79c8494b162bee1de126e7eb4753a62ea4d4bd4fb61c",
+    "pollard/adapters/bedrock.py": "9e2ac2cb833a2d6bbef02c92cc4c8134d8a206cec5f188c1e247fc801ac724e2",
+    "pollard/adapters/litellm.py": "977f216458cdf17f8a6a3e981ec032a5577ea5152cee96a02883b95f49adafe3",
+    "pollard/adapters/openai.py": "0ff0bf4dcfc82c90b1aff04115d9e8ea5271726f48492bd273a483c9fbfec86f",
+    "pollard/aio.py": "2876413e54042f6536a5f6697cc33de8f853e61458f693557d3ac439563c6e19",
+    "pollard/arbiter.py": "8cc87c89152b57bdb99eb9d93c574d8bef422b5709e805a73b92e45f10bfc04f",
+    "pollard/cli.py": "e6b96aee5fd66c3147c884b01dd0256f5e8ff597185e5742eddc586e702194e9",
+    "pollard/errors.py": "0f22b517f4179c5c9e05336bc7772899d247b7491e863875549e518c120aae51",
+    "pollard/estimators/__init__.py": "1c6f521cc2cc6431f1423818ab51ac6de5dc814b4bedc5bcc4d05ea8e683fef7",
+    "pollard/estimators/openai.py": "47e9aac46e95ed8cc736ccaca9c94312fead804c81c844ad00da7b48e601bf7f",
+    "pollard/governance.py": "4cfecf417e1224e86241bf1309a70e306e893f70a2dd376328f9368262dce153",
+    "pollard/governor.py": "fdb168f7a8a5c460434c3456a45922aa22a994159a60fff246f19a738809a5b5",
+    "pollard/hashing.py": "1123fb66160559cd86bb1d0acd3b5900e1f8a9170dc65f0c101b5be53c789eb1",
+    "pollard/mcp.py": "081e40b9b44043650e6c1f729d94b97333e5cdf73134d6114f70dbfa85bfba41",
+    "pollard/merge.py": "c955dfb9b6879429da4c2f5e54b50d234aa332523e3915d4dff4c0346ad3722a",
+    "pollard/meters/__init__.py": "eeef4320cac5e0dd2af335229c978a99f408dc53b7292c3598d988db834565b6",
+    "pollard/meters/energy.py": "2e981c967f9a540b7e5df09fb1a0c29e8810a16785b68170772ac48301284d98",
+    "pollard/meters/tokenmaster.py": "53ce51761b2a60da03e6ce0059aa3c2b1906e2a433b5c18142afe869ca1121d3",
+    "pollard/otel.py": "41fb2d679431e16689440e50c7f595cbc9b6756fc3851a3acfe2cd6f02a14d9b",
+    "pollard/policy.py": "3b37754d0298688dcd5522302b91efbd7c4f8bddd0d83ceaf7c129ccc79d3ed5",
+    "pollard/pytest_plugin.py": "870c589a0d55c5fe2c6401c3473235fc6dbd4a3e6c8357faf3131935cd47e181",
+    "pollard/redaction.py": "14ec01931361845516be47a4554cf01d4449a2c00379c9b264f44508941a4c11",
+    "pollard/registry.py": "75bd2cea8f95bc7400398a80e642bed4720ac4253461ff280643389b6632dfa9",
+    "pollard/replay.py": "faf77b92265e1ccc0c30e7f30e7be66f845ab65ccfe9f9670293a9634a576d62",
+    "pollard/revalidation.py": "4c979f3dc2b461b81e6971b281fa0ed1f46ceffbf93fc2c2fccc110fbfd7aed3",
+    "pollard/runtime.py": "5ecca0a7d96f71a2167cfff231b820cf9fc72738a98b9b5246eca08ba0492a4c",
+    "pollard/schema.py": "66eaf0de370c4f6fabf52f69279bd2719422d37fa65c877924f9a4841842ce17",
+    "pollard/seal.py": "1068f209f9e3feb19efc1fe2ac6f085f5aefcef9340eabf118ed006433c279f1",
+    "pollard/seal_custody.py": "a0a4997ee1adb7967319743c02948c1c7574ad82475ce3db5b109d0020ffe55a",
+    "pollard/store.py": "fc51a6aceec9ce916f2560c261c0e05f6cd2f5e3b9f9e41f02a4df28be9e30a3",
+    "pollard/stores/__init__.py": "64bb539461ffedea5d23b94e6e83773a1df970b70cdbb567999219ae56c6a2cd",
+    "pollard/stores/_transactional.py": "027872266ce78616763f31a21b3bee463c2258c410ac6dfadac970c46d37b5fd",
+    "pollard/stores/hashrope.py": "647017c81a9ce042c7840f2a2394d221f0253369d2b609daec2b904a741b84a9",
+    "pollard/stores/kafka.py": "b6be5143f3d6e3073a821de7c6c5973407964e9d3a5ee66306922b2a68b1a8b8",
+    "pollard/stores/mongodb.py": "a9fc80872615582859f7296480547be755695b13673f551c1d9072685d53c473",
+    "pollard/stores/neo4j.py": "21d004a5f51f7a7a4924c719a771908fb5318bbe30d6200794bc4044a606d3ed",
+    "pollard/stores/postgres.py": "b7e6436df558ecd97aaab96060e9acb8122eef47b7f4afcc834fb811722058ff",
+    "pollard/stores/redis.py": "697ed7dacd0240eb2cfa4fba694d13dcb226eba1fdb4f68e3457972bb25bf31a",
+    "pollard/stores/sqlite.py": "84fb468d01a726e8431ef99af376710beb9f84acf0131409315dc10ec3d8ea25",
+    "pollard/tree.py": "d67f5efd36103c217f2ce49d4a1f600212212f047a254397ba07d0c38755126a",
+    "pollard/verify.py": "a8b24798dc2bbd88d02639a17d445e933c10c50d871d1b7947183f6fb0d9fe58"
+  },
+  "python_package_root": "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\.benchmarks\\rust-python160\\package",
+  "source_unchanged_during_run": true,
+  "platform": "Windows-11-10.0.26300-SP0",
+  "python": "3.12.2 (tags/v3.12.2:6abddd9, Feb  6 2024, 21:26:36) [MSC v.1937 64 bit (AMD64)]",
+  "wheel_sha256": "569fb5f130a82c9be327b8dcbd285e3be063200bd9773ca15c5d6bb62edd627f",
+  "keep_chunks": false,
+  "constant_final_result": true,
+  "memory_includes_startup": true,
+  "poll_interval_seconds": 0.005,
+  "samples_per_case": 3,
+  "engine_order_seed": 160,
+  "memory_method_note": "Total process peak includes startup and runtime. Windows peak working set is OS-reported; non-Windows RSS is sampled every 5 ms and may miss transient peaks. The 100 ms final sleep is outside operation timing.",
+  "results": [
+    {
+      "chunks": 10000,
+      "engines": {
+        "rust-updated": {
+          "samples": [
+            {
+              "chunks": 10000,
+              "seconds": 0.0032981,
+              "node_id": "9803f94a63f460873dd7b62b457b0cb282589b6b9ef63690348b6f589335e12a",
+              "result_digest": "495ef6f41829bc923ad696574addc42c3742026a91bfc423543de53dd43c7d1a",
+              "callbacks": 10000,
+              "peak_memory_bytes": 5885952,
+              "memory_metric": "peak_working_set"
+            },
+            {
+              "chunks": 10000,
+              "seconds": 0.0032773,
+              "node_id": "9803f94a63f460873dd7b62b457b0cb282589b6b9ef63690348b6f589335e12a",
+              "result_digest": "495ef6f41829bc923ad696574addc42c3742026a91bfc423543de53dd43c7d1a",
+              "callbacks": 10000,
+              "peak_memory_bytes": 5885952,
+              "memory_metric": "peak_working_set"
+            },
+            {
+              "chunks": 10000,
+              "seconds": 0.0033816,
+              "node_id": "9803f94a63f460873dd7b62b457b0cb282589b6b9ef63690348b6f589335e12a",
+              "result_digest": "495ef6f41829bc923ad696574addc42c3742026a91bfc423543de53dd43c7d1a",
+              "callbacks": 10000,
+              "peak_memory_bytes": 5877760,
+              "memory_metric": "peak_working_set"
+            }
+          ],
+          "median_seconds": 0.0032981,
+          "median_peak_bytes": 5885952
+        },
+        "python-1.6.0": {
+          "samples": [
+            {
+              "chunks": 10000,
+              "seconds": 0.0037897999864071608,
+              "node_id": "9803f94a63f460873dd7b62b457b0cb282589b6b9ef63690348b6f589335e12a",
+              "result_digest": "495ef6f41829bc923ad696574addc42c3742026a91bfc423543de53dd43c7d1a",
+              "callbacks": 10000,
+              "pollard_version": "1.6.0",
+              "pollard_file": "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\.benchmarks\\rust-python160\\package\\pollard\\__init__.py",
+              "peak_memory_bytes": 27824128,
+              "memory_metric": "peak_working_set"
+            },
+            {
+              "chunks": 10000,
+              "seconds": 0.004305900016333908,
+              "node_id": "9803f94a63f460873dd7b62b457b0cb282589b6b9ef63690348b6f589335e12a",
+              "result_digest": "495ef6f41829bc923ad696574addc42c3742026a91bfc423543de53dd43c7d1a",
+              "callbacks": 10000,
+              "pollard_version": "1.6.0",
+              "pollard_file": "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\.benchmarks\\rust-python160\\package\\pollard\\__init__.py",
+              "peak_memory_bytes": 26796032,
+              "memory_metric": "peak_working_set"
+            },
+            {
+              "chunks": 10000,
+              "seconds": 0.004050499992445111,
+              "node_id": "9803f94a63f460873dd7b62b457b0cb282589b6b9ef63690348b6f589335e12a",
+              "result_digest": "495ef6f41829bc923ad696574addc42c3742026a91bfc423543de53dd43c7d1a",
+              "callbacks": 10000,
+              "pollard_version": "1.6.0",
+              "pollard_file": "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\.benchmarks\\rust-python160\\package\\pollard\\__init__.py",
+              "peak_memory_bytes": 26624000,
+              "memory_metric": "peak_working_set"
+            }
+          ],
+          "median_seconds": 0.004050499992445111,
+          "median_peak_bytes": 26796032
+        }
+      },
+      "peak_memory_reduction_percent": 78.03424029348824,
+      "speedup": 1.2281313460614025
+    },
+    {
+      "chunks": 200000,
+      "engines": {
+        "python-1.6.0": {
+          "samples": [
+            {
+              "chunks": 200000,
+              "seconds": 0.1122421000036411,
+              "node_id": "9803f94a63f460873dd7b62b457b0cb282589b6b9ef63690348b6f589335e12a",
+              "result_digest": "495ef6f41829bc923ad696574addc42c3742026a91bfc423543de53dd43c7d1a",
+              "callbacks": 200000,
+              "pollard_version": "1.6.0",
+              "pollard_file": "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\.benchmarks\\rust-python160\\package\\pollard\\__init__.py",
+              "peak_memory_bytes": 101638144,
+              "memory_metric": "peak_working_set"
+            },
+            {
+              "chunks": 200000,
+              "seconds": 0.10806989995762706,
+              "node_id": "9803f94a63f460873dd7b62b457b0cb282589b6b9ef63690348b6f589335e12a",
+              "result_digest": "495ef6f41829bc923ad696574addc42c3742026a91bfc423543de53dd43c7d1a",
+              "callbacks": 200000,
+              "pollard_version": "1.6.0",
+              "pollard_file": "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\.benchmarks\\rust-python160\\package\\pollard\\__init__.py",
+              "peak_memory_bytes": 101617664,
+              "memory_metric": "peak_working_set"
+            },
+            {
+              "chunks": 200000,
+              "seconds": 0.11252620001323521,
+              "node_id": "9803f94a63f460873dd7b62b457b0cb282589b6b9ef63690348b6f589335e12a",
+              "result_digest": "495ef6f41829bc923ad696574addc42c3742026a91bfc423543de53dd43c7d1a",
+              "callbacks": 200000,
+              "pollard_version": "1.6.0",
+              "pollard_file": "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\.benchmarks\\rust-python160\\package\\pollard\\__init__.py",
+              "peak_memory_bytes": 102334464,
+              "memory_metric": "peak_working_set"
+            }
+          ],
+          "median_seconds": 0.1122421000036411,
+          "median_peak_bytes": 101638144
+        },
+        "rust-updated": {
+          "samples": [
+            {
+              "chunks": 200000,
+              "seconds": 0.0635954,
+              "node_id": "9803f94a63f460873dd7b62b457b0cb282589b6b9ef63690348b6f589335e12a",
+              "result_digest": "495ef6f41829bc923ad696574addc42c3742026a91bfc423543de53dd43c7d1a",
+              "callbacks": 200000,
+              "peak_memory_bytes": 5873664,
+              "memory_metric": "peak_working_set"
+            },
+            {
+              "chunks": 200000,
+              "seconds": 0.0651448,
+              "node_id": "9803f94a63f460873dd7b62b457b0cb282589b6b9ef63690348b6f589335e12a",
+              "result_digest": "495ef6f41829bc923ad696574addc42c3742026a91bfc423543de53dd43c7d1a",
+              "callbacks": 200000,
+              "peak_memory_bytes": 5447680,
+              "memory_metric": "peak_working_set"
+            },
+            {
+              "chunks": 200000,
+              "seconds": 0.0632275,
+              "node_id": "9803f94a63f460873dd7b62b457b0cb282589b6b9ef63690348b6f589335e12a",
+              "result_digest": "495ef6f41829bc923ad696574addc42c3742026a91bfc423543de53dd43c7d1a",
+              "callbacks": 200000,
+              "peak_memory_bytes": 5451776,
+              "memory_metric": "peak_working_set"
+            }
+          ],
+          "median_seconds": 0.0635954,
+          "median_peak_bytes": 5451776
+        }
+      },
+      "peak_memory_reduction_percent": 94.63609252841138,
+      "speedup": 1.7649405460715886
+    }
+  ]
+}

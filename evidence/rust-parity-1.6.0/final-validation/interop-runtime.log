@@ -1,0 +1,10 @@
+{
+  "status": "passed",
+  "cases": [
+    "window",
+    "budget",
+    "branch",
+    "window_reverse"
+  ],
+  "output": "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\.benchmarks\\final-runtime-interop-a82964ac1576\\runtime-interop-result.json"
+}

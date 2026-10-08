@@ -1,0 +1,53 @@
+{
+  "review_date": "2026-10-08",
+  "reviewer": "independent release_audit subagent",
+  "status": "Final source-bound release measurements completed; see performance.json, storage-performance.json and stream-memory.json.",
+  "scope": [
+    "benchmark.py",
+    "benchmark_python.py",
+    "stream_memory.py",
+    "stream_memory_python.py",
+    "examples/performance.rs",
+    "examples/stream_memory.rs",
+    "storage_performance.py",
+    "storage_performance_python.py",
+    "examples/storage_performance.rs"
+  ],
+  "baseline": {
+    "commit": "51e3a245641044fc8b3d6a90fc49f3cbfcbf107d",
+    "version": "Rust 0.1.0 repository core",
+    "core_verified": "Harness checks every baseline src/*.rs file and Cargo.toml against git show of the fixed commit before timing; Cargo.lock is fingerprinted.",
+    "harness_equivalence": "The same performance.rs file is copied into both crates and checked byte-for-byte before timing. Record and replay each use MemoryStore, no budgets, identical run name, payloads, actual token usage, and an explicit Rust token estimate of 5. Python has no explicit estimate; the complete supplied usage makes actual charges equal and no token budget is configured."
+  },
+  "fixes": [
+    "Capture hashes for current Rust sources, examples, manifests/lockfile, all harnesses, executable binaries, extracted Python package modules, and baseline sources. Record compiler/platform and loaded Python file.",
+    "Verify wheel SHA256, extracted Python module inventory and contents, and actual imported pollard path. Reject stale release binaries by source/harness/manifest timestamps.",
+    "Reject source or executable mutations during measurements; all performance samples now carry checksums instead of validating only the final sample.",
+    "Validate record/replay steps and token totals outside timing; replay providers remain forbidden. Walk checks node count, uniqueness, parents, and hashes the full ordered traversal outside timing.",
+    "Give Python the same counted per-chunk callback as Rust. Validate callback count, final result, one-step accounting, node ID and result digest, and reject a zero-memory sample.",
+    "Use a deterministic shuffled engine order for both harnesses and include stream memory provenance."
+  ],
+  "timing_method": {
+    "performance": "Two untimed warmups followed by requested samples in one worker process per engine/case. Setup, final validation, process launch and compilation are outside time.perf_counter/Instant intervals. Engine order is seeded and shuffled per case; samples within an engine are sequential rather than interleaved.",
+    "streaming": "Three independent worker processes per engine/size, cold process memory included. Timing includes stream execution and callback delivery only. A 100 ms final sleep permits memory observation and is outside timed work.",
+    "memory": "Windows reports OS historical peak working set; other platforms sample RSS every 5 ms and can miss transient peaks. This is total process memory including Python interpreter, libraries and allocator retention, not a direct retained-chunk allocation metric.",
+    "reported_statistic": "Median plus raw samples and min/max for performance; median plus raw samples for stream timings and process memory. Ratios are Python/updated Rust and original Rust/updated Rust."
+  },
+  "attribution_and_limits": [
+    "Identity kernels have matched canonical payloads. Cross-language hashes establish equal outputs; ratios include language/runtime and serializer differences, not solely one optimization.",
+    "Wide traversal exposes the original Rust repeated full-map child scan versus the updated children index. Python already has a children index. Full ordered traversal digest equivalence is required.",
+    "Long record/replay chains exercise ancestor verification and traversal caching. No budgets are enabled, so these results do not isolate or quantify budget-total caching; separate read-count regression tests provide algorithmic evidence.",
+    "Original Rust 0.1.0 lacks the default wall-clock meter and many 1.6.0 validation/policy/streaming features. Updated Rust has stricter and additional semantics. These are before/after application timings of equivalent successful inputs, not equivalent feature-completeness proofs or a controlled per-optimization ablation.",
+    "Replay is a cache-hit workload with provider invocation prohibited. Hybrid hits are now measured separately at100 and1000 steps.",
+    "Streaming compares Python 1.6.0 and updated Rust only because original Rust lacks streaming. Both use keep_chunks=false and constant final result; Python's internal transient chunk retention and Rust's incremental processing differ. Total-process memory savings also include baseline interpreter/runtime overhead.",
+    "The harness is local, offline and deterministic; the MemoryStore harness excludes real provider latency, SQLite I/O, remote backends, concurrent load and cold startup latency. A separate SQLite40-step harness measures local database record/replay/hybrid latency. Single-machine results are not universal guarantees.",
+    "Binary hashes plus source hashes and freshness checks identify the measured state. Timestamps are a stale-build guard, not cryptographic proof that an executable was compiled from those sources; reproduction requires the documented Cargo release builds."
+  ],
+  "validation": "Python files passed py_compile. Example formatting completed. Final compilation, correctness smoke runs and full timing are delegated to root after freezing all runtime sources. No long benchmark was run during this independent review.",
+  "additional_review": {
+    "reviewer": "independent registry_identity subagent",
+    "scope": "SQLite harness and final identity/stream code",
+    "findings": "No material SQLite timing mismatch; Rust supplies estimate5 while Python uses actual complete usage and no budgets. Worker smoke test exposed and fixed expected_id property invocation before any final measurements."
+  },
+  "final_semantic_caveat": "Python1.6 hybrid hit lookup does not invoke the explicit ancestor verification used by strict replay; native hybrid verifies ancestry. Native SQLite hybrid is slower in this measured workload. Successful output parity is not equal verification cost."
+}

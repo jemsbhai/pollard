@@ -1,0 +1,2903 @@
+{
+  "version": "1.6.0",
+  "wheel_sha256": "569fb5f130a82c9be327b8dcbd285e3be063200bd9773ca15c5d6bb62edd627f",
+  "loaded_from": "C:\\Users\\User\\AppData\\Local\\Temp\\pollard-release-audit-20261008\\pollard-1.6.0-py3-none-any.whl\\pollard\\__init__.py",
+  "public_exports": [
+    "ActionSpec",
+    "AsyncRun",
+    "AsyncRuntime",
+    "Budget",
+    "BudgetExceeded",
+    "CallCleanupError",
+    "ConfirmationRequired",
+    "Decision",
+    "DuplicateRecording",
+    "ExactResultComparator",
+    "ExportReport",
+    "GCReport",
+    "HashRopeStore",
+    "ImportReport",
+    "IntegrityError",
+    "KafkaStore",
+    "MemoryStore",
+    "MergeReport",
+    "MissingRecording",
+    "MongoStore",
+    "Neo4jStore",
+    "Node",
+    "NodeKind",
+    "NormalizedModelComparator",
+    "Policy",
+    "PolicyContext",
+    "PolicyViolation",
+    "PollardError",
+    "PostDispatchOutcomeUnknown",
+    "PostgresStore",
+    "RedisStore",
+    "Registry",
+    "ReplayContract",
+    "ReplayMode",
+    "ReservationLeaseLost",
+    "ReservationUncertain",
+    "RevalidationComparator",
+    "RevalidationComparison",
+    "RevalidationReport",
+    "Run",
+    "Runtime",
+    "SQLiteSealSink",
+    "SQLiteStore",
+    "SealCustodyRecord",
+    "SealEntry",
+    "SealReport",
+    "SettlementUncertain",
+    "Store",
+    "UnsupportedSchema",
+    "VerifyFinding",
+    "VerifyReport",
+    "WindowMeter",
+    "__version__",
+    "export_subtree",
+    "gc",
+    "import_subtree",
+    "is_post_dispatch_outcome_unknown",
+    "mark_post_dispatch_outcome_unknown",
+    "merge",
+    "recompute_charges",
+    "redact",
+    "seal",
+    "verify"
+  ],
+  "source_api": {
+    "src/pollard/__init__.py": [],
+    "src/pollard/_canon.py": [
+      {
+        "kind": "function",
+        "name": "canonical_bytes",
+        "line": 13,
+        "signature": "obj: IdentityValue"
+      }
+    ],
+    "src/pollard/adapters/__init__.py": [],
+    "src/pollard/adapters/_common.py": [
+      {
+        "kind": "function",
+        "name": "as_dict",
+        "line": 13,
+        "signature": "value: Any"
+      },
+      {
+        "kind": "function",
+        "name": "int_field",
+        "line": 27,
+        "signature": "value: Any, *names: str"
+      },
+      {
+        "kind": "function",
+        "name": "has_nonnegative_int_field",
+        "line": 36,
+        "signature": "value: Any, *names: str"
+      },
+      {
+        "kind": "function",
+        "name": "set_normalized_usage",
+        "line": 42,
+        "signature": "result: dict[str, Any], normalized: dict[str, int], *, required_fields: tuple[tuple[str, ...], ...], optional_fields: tuple[str, ...]=()"
+      },
+      {
+        "kind": "function",
+        "name": "merge_request",
+        "line": 75,
+        "signature": "defaults: dict[str, Any], payload: dict[str, Any]"
+      },
+      {
+        "kind": "function",
+        "name": "post_dispatch_boundary",
+        "line": 82,
+        "signature": ""
+      }
+    ],
+    "src/pollard/adapters/anthropic.py": [
+      {
+        "kind": "class",
+        "name": "AnthropicStreamError",
+        "line": 37,
+        "methods": [
+          {
+            "name": "__init__",
+            "line": 40,
+            "signature": "self, raw_event: dict[str, Any]",
+            "async": false
+          }
+        ]
+      },
+      {
+        "kind": "function",
+        "name": "make_messages_fn",
+        "line": 56,
+        "signature": "client: Any, *, stream: bool=False, **defaults: Any"
+      },
+      {
+        "kind": "function",
+        "name": "make_async_messages_fn",
+        "line": 67,
+        "signature": "client: Any, *, stream: bool=False, **defaults: Any"
+      },
+      {
+        "kind": "class",
+        "name": "AnthropicMessagesFn",
+        "line": 91,
+        "methods": [
+          {
+            "name": "estimate_input_tokens",
+            "line": 115,
+            "signature": "self, payload: dict[str, Any]",
+            "async": false
+          }
+        ]
+      },
+      {
+        "kind": "function",
+        "name": "normalize_message",
+        "line": 128,
+        "signature": "response: Any"
+      },
+      {
+        "kind": "function",
+        "name": "anthropic_usage",
+        "line": 166,
+        "signature": "response: dict[str, Any]"
+      }
+    ],
+    "src/pollard/adapters/bedrock.py": [
+      {
+        "kind": "class",
+        "name": "BedrockStreamError",
+        "line": 21,
+        "methods": [
+          {
+            "name": "__init__",
+            "line": 24,
+            "signature": "self, event_name: str, raw_event: dict[str, Any]",
+            "async": false
+          }
+        ]
+      },
+      {
+        "kind": "function",
+        "name": "make_converse_fn",
+        "line": 32,
+        "signature": "client: Any, *, stream: bool=False, count_tokens: bool=False, **defaults: Any"
+      },
+      {
+        "kind": "class",
+        "name": "BedrockConverseFn",
+        "line": 55,
+        "methods": [
+          {
+            "name": "estimate_input_tokens",
+            "line": 73,
+            "signature": "self, payload: dict[str, Any]",
+            "async": false
+          }
+        ]
+      },
+      {
+        "kind": "function",
+        "name": "normalize_converse",
+        "line": 99,
+        "signature": "response: Any"
+      },
+      {
+        "kind": "function",
+        "name": "bedrock_usage",
+        "line": 127,
+        "signature": "value: Any"
+      }
+    ],
+    "src/pollard/adapters/litellm.py": [
+      {
+        "kind": "function",
+        "name": "make_completion_fn",
+        "line": 11,
+        "signature": "completion: Any, *, stream: bool=False, **defaults: Any"
+      },
+      {
+        "kind": "function",
+        "name": "make_async_completion_fn",
+        "line": 35,
+        "signature": "acompletion: Any, *, stream: bool=False, **defaults: Any"
+      }
+    ],
+    "src/pollard/adapters/openai.py": [
+      {
+        "kind": "class",
+        "name": "OpenAIResponseError",
+        "line": 19,
+        "methods": [
+          {
+            "name": "__init__",
+            "line": 22,
+            "signature": "self, raw_event: dict[str, Any]",
+            "async": false
+          }
+        ]
+      },
+      {
+        "kind": "function",
+        "name": "make_responses_fn",
+        "line": 44,
+        "signature": "client: Any, *, stream: bool=False, **defaults: Any"
+      },
+      {
+        "kind": "function",
+        "name": "make_async_responses_fn",
+        "line": 67,
+        "signature": "client: Any, *, stream: bool=False, **defaults: Any"
+      },
+      {
+        "kind": "function",
+        "name": "make_chat_completions_fn",
+        "line": 90,
+        "signature": "client: Any, *, stream: bool=False, **defaults: Any"
+      },
+      {
+        "kind": "function",
+        "name": "make_async_chat_completions_fn",
+        "line": 114,
+        "signature": "client: Any, *, stream: bool=False, **defaults: Any"
+      },
+      {
+        "kind": "function",
+        "name": "normalize_chat_completion",
+        "line": 138,
+        "signature": "response: Any"
+      },
+      {
+        "kind": "function",
+        "name": "openai_usage",
+        "line": 165,
+        "signature": "response: dict[str, Any]"
+      }
+    ],
+    "src/pollard/aio.py": [
+      {
+        "kind": "class",
+        "name": "AsyncRuntime",
+        "line": 59,
+        "methods": [
+          {
+            "name": "__init__",
+            "line": 60,
+            "signature": "self, store: str | Path | Store | None=None, *, meters: list[Meter] | None=None, registry: Registry | None=None, policies: list[Policy] | None=None, dry_run: bool=False, mode: str | ReplayMode=ReplayMode.RECORD, refuse_duplicate_recordings: bool=False, on_node: NodeCallback | None=None, reservation_lease_seconds: int | float=60",
+            "async": false
+          },
+          {
+            "name": "run",
+            "line": 85,
+            "signature": "self, label: str, *, budget: Budget | None=None, attempt: int=0",
+            "async": false
+          },
+          {
+            "name": "resume",
+            "line": 101,
+            "signature": "self, label: str, *, budget: Budget | None=None, attempt: int=0",
+            "async": false
+          }
+        ]
+      },
+      {
+        "kind": "class",
+        "name": "AsyncRun",
+        "line": 119,
+        "methods": [
+          {
+            "name": "amodel_call",
+            "line": 129,
+            "signature": "self, payload: dict[str, IdentityValue], *, fn: AsyncStepFn, attempt: int=0, on_delta: AsyncDeltaCallback | None=None, keep_chunks: bool=False",
+            "async": true
+          },
+          {
+            "name": "arevalidate_model_call",
+            "line": 147,
+            "signature": "self, payload: dict[str, IdentityValue], *, fn: AsyncStepFn, contract: ReplayContract, comparator: RevalidationComparator | None=None, live_payload: dict[str, IdentityValue] | None=None, attempt: int=0, observation_id: str | None=None, on_delta: AsyncDeltaCallback | None=None, keep_chunks: bool=False",
+            "async": true
+          },
+          {
+            "name": "atool_call",
+            "line": 187,
+            "signature": "self, name: str, args: dict[str, IdentityValue], *, fn: AsyncStepFn | None=None, version: str | None=None, attempt: int=0",
+            "async": true
+          },
+          {
+            "name": "aconfirm",
+            "line": 203,
+            "signature": "self, token: str",
+            "async": true
+          },
+          {
+            "name": "branch",
+            "line": 216,
+            "signature": "self, *, attempt: int=0, budget: Budget | None=None",
+            "async": false
+          }
+        ]
+      },
+      {
+        "kind": "class",
+        "name": "AsyncRunBranch",
+        "line": 513,
+        "methods": []
+      }
+    ],
+    "src/pollard/arbiter.py": [
+      {
+        "kind": "class",
+        "name": "BudgetReservation",
+        "line": 11,
+        "methods": []
+      },
+      {
+        "kind": "class",
+        "name": "WindowReservation",
+        "line": 19,
+        "methods": []
+      },
+      {
+        "kind": "class",
+        "name": "ReservationCheck",
+        "line": 28,
+        "methods": []
+      },
+      {
+        "kind": "class",
+        "name": "TransactionalArbiter",
+        "line": 38,
+        "methods": []
+      },
+      {
+        "kind": "class",
+        "name": "RenewableArbiter",
+        "line": 57,
+        "methods": []
+      }
+    ],
+    "src/pollard/cli.py": [
+      {
+        "kind": "function",
+        "name": "main",
+        "line": 82,
+        "signature": "argv: Sequence[str] | None=None"
+      },
+      {
+        "kind": "function",
+        "name": "tree_document",
+        "line": 488,
+        "signature": "store: Store, root_id: str, *, include_payloads: bool=False"
+      },
+      {
+        "kind": "function",
+        "name": "render_ascii",
+        "line": 516,
+        "signature": "store: Store, root_id: str, *, unicode: bool=False, include_payloads: bool=False"
+      },
+      {
+        "kind": "function",
+        "name": "render_html",
+        "line": 547,
+        "signature": "store: Store, root_id: str, *, include_payloads: bool=False"
+      }
+    ],
+    "src/pollard/errors.py": [
+      {
+        "kind": "class",
+        "name": "PollardError",
+        "line": 4,
+        "methods": []
+      },
+      {
+        "kind": "class",
+        "name": "IntegrityError",
+        "line": 8,
+        "methods": []
+      },
+      {
+        "kind": "class",
+        "name": "BudgetExceeded",
+        "line": 12,
+        "methods": [
+          {
+            "name": "__init__",
+            "line": 15,
+            "signature": "self, message: str, refusal_id: str",
+            "async": false
+          }
+        ]
+      },
+      {
+        "kind": "class",
+        "name": "PolicyViolation",
+        "line": 20,
+        "methods": [
+          {
+            "name": "__init__",
+            "line": 23,
+            "signature": "self, message: str, refusal_id: str",
+            "async": false
+          }
+        ]
+      },
+      {
+        "kind": "class",
+        "name": "ConfirmationRequired",
+        "line": 28,
+        "methods": [
+          {
+            "name": "__init__",
+            "line": 31,
+            "signature": "self, message: str, resume_token: str",
+            "async": false
+          }
+        ]
+      },
+      {
+        "kind": "class",
+        "name": "MissingRecording",
+        "line": 36,
+        "methods": [
+          {
+            "name": "__init__",
+            "line": 39,
+            "signature": "self, message: str, node_id: str, payload_summary: str",
+            "async": false
+          }
+        ]
+      },
+      {
+        "kind": "class",
+        "name": "DuplicateRecording",
+        "line": 45,
+        "methods": [
+          {
+            "name": "__init__",
+            "line": 48,
+            "signature": "self, message: str, node_id: str, payload_summary: str, attempt: int",
+            "async": false
+          }
+        ]
+      },
+      {
+        "kind": "class",
+        "name": "UnsupportedSchema",
+        "line": 61,
+        "methods": []
+      },
+      {
+        "kind": "class",
+        "name": "PostDispatchOutcomeUnknown",
+        "line": 65,
+        "methods": [
+          {
+            "name": "__init__",
+            "line": 73,
+            "signature": "self, error: BaseException",
+            "async": false
+          }
+        ]
+      },
+      {
+        "kind": "function",
+        "name": "mark_post_dispatch_outcome_unknown",
+        "line": 80,
+        "signature": "error: BaseException"
+      },
+      {
+        "kind": "function",
+        "name": "is_post_dispatch_outcome_unknown",
+        "line": 95,
+        "signature": "error: BaseException"
+      },
+      {
+        "kind": "class",
+        "name": "CallCleanupError",
+        "line": 103,
+        "methods": [
+          {
+            "name": "__init__",
+            "line": 106,
+            "signature": "self, errors: list[BaseException]",
+            "async": false
+          }
+        ]
+      },
+      {
+        "kind": "class",
+        "name": "ReservationLeaseLost",
+        "line": 114,
+        "methods": [
+          {
+            "name": "__init__",
+            "line": 117,
+            "signature": "self, message: str, reservation_id: str, node_id: str, *, detail: str | None=None",
+            "async": false
+          }
+        ]
+      },
+      {
+        "kind": "class",
+        "name": "ReservationUncertain",
+        "line": 131,
+        "methods": [
+          {
+            "name": "__init__",
+            "line": 134,
+            "signature": "self, message: str, reservation_id: str",
+            "async": false
+          }
+        ]
+      },
+      {
+        "kind": "class",
+        "name": "SettlementUncertain",
+        "line": 139,
+        "methods": [
+          {
+            "name": "__init__",
+            "line": 142,
+            "signature": "self, message: str, reservation_id: str",
+            "async": false
+          }
+        ]
+      }
+    ],
+    "src/pollard/estimators/__init__.py": [],
+    "src/pollard/estimators/openai.py": [
+      {
+        "kind": "class",
+        "name": "OpenAITokenEstimator",
+        "line": 9,
+        "methods": [
+          {
+            "name": "__init__",
+            "line": 16,
+            "signature": "self, model: str | None=None, *, tokens_per_message: int=3",
+            "async": false
+          },
+          {
+            "name": "estimate_input_tokens",
+            "line": 22,
+            "signature": "self, payload: dict[str, Any]",
+            "async": false
+          }
+        ]
+      }
+    ],
+    "src/pollard/governance.py": [
+      {
+        "kind": "class",
+        "name": "GCReport",
+        "line": 22,
+        "methods": [
+          {
+            "name": "to_dict",
+            "line": 28,
+            "signature": "self",
+            "async": false
+          }
+        ]
+      },
+      {
+        "kind": "class",
+        "name": "ExportReport",
+        "line": 39,
+        "methods": [
+          {
+            "name": "to_dict",
+            "line": 45,
+            "signature": "self",
+            "async": false
+          }
+        ]
+      },
+      {
+        "kind": "class",
+        "name": "ImportReport",
+        "line": 55,
+        "methods": [
+          {
+            "name": "to_dict",
+            "line": 62,
+            "signature": "self",
+            "async": false
+          }
+        ]
+      },
+      {
+        "kind": "function",
+        "name": "gc",
+        "line": 79,
+        "signature": "store: Store, *, mode: GCMode='drop-pruned'"
+      },
+      {
+        "kind": "function",
+        "name": "export_subtree",
+        "line": 106,
+        "signature": "store: Store, root_id: str, path: str | Path"
+      },
+      {
+        "kind": "function",
+        "name": "import_subtree",
+        "line": 127,
+        "signature": "path: str | Path, store: Store"
+      }
+    ],
+    "src/pollard/governor.py": [
+      {
+        "kind": "class",
+        "name": "Budget",
+        "line": 13,
+        "methods": [
+          {
+            "name": "limits",
+            "line": 21,
+            "signature": "self",
+            "async": false
+          }
+        ]
+      },
+      {
+        "kind": "class",
+        "name": "BudgetCheck",
+        "line": 35,
+        "methods": []
+      },
+      {
+        "kind": "function",
+        "name": "charge_to_decimal",
+        "line": 42,
+        "signature": "value: ChargeAmount"
+      },
+      {
+        "kind": "function",
+        "name": "charge_to_json",
+        "line": 50,
+        "signature": "value: Decimal"
+      },
+      {
+        "kind": "function",
+        "name": "recompute_charges",
+        "line": 56,
+        "signature": "store: Store, root_id: str"
+      },
+      {
+        "kind": "function",
+        "name": "spent_decimal",
+        "line": 68,
+        "signature": "store: Store, anchor_id: str"
+      },
+      {
+        "kind": "function",
+        "name": "check_budget",
+        "line": 75,
+        "signature": "*, budget: Budget | None, spent: dict[str, Decimal], estimates: dict[str, Decimal], exhausted: set[str]"
+      },
+      {
+        "kind": "function",
+        "name": "exhausted_after_settle",
+        "line": 106,
+        "signature": "*, budget: Budget | None, spent: dict[str, Decimal]"
+      }
+    ],
+    "src/pollard/hashing.py": [
+      {
+        "kind": "function",
+        "name": "node_id",
+        "line": 15,
+        "signature": "kind: str, parent_id: str | None, attempt: int, payload: IdentityValue"
+      },
+      {
+        "kind": "function",
+        "name": "digest_payload",
+        "line": 27,
+        "signature": "payload: IdentityValue"
+      },
+      {
+        "kind": "function",
+        "name": "result_to_text",
+        "line": 33,
+        "signature": "result: Any"
+      },
+      {
+        "kind": "function",
+        "name": "result_digest_from_text",
+        "line": 45,
+        "signature": "result_text: str"
+      },
+      {
+        "kind": "function",
+        "name": "result_text_and_digest",
+        "line": 51,
+        "signature": "result: Any"
+      }
+    ],
+    "src/pollard/mcp.py": [
+      {
+        "kind": "function",
+        "name": "registry_from_mcp",
+        "line": 12,
+        "signature": "session: Any, *, exclude: set[str] | None=None"
+      }
+    ],
+    "src/pollard/merge.py": [
+      {
+        "kind": "class",
+        "name": "MergeReport",
+        "line": 35,
+        "methods": [
+          {
+            "name": "to_dict",
+            "line": 43,
+            "signature": "self",
+            "async": false
+          }
+        ]
+      },
+      {
+        "kind": "function",
+        "name": "merge",
+        "line": 260,
+        "signature": "dst: Store, src: Store, *, replay: bool=False"
+      }
+    ],
+    "src/pollard/meters/__init__.py": [
+      {
+        "kind": "class",
+        "name": "MeterPrecheckRefusal",
+        "line": 41,
+        "methods": [
+          {
+            "name": "__init__",
+            "line": 50,
+            "signature": "self, reason: str, detail: str | None=None, *, audit_meta: Mapping[str, Any] | None=None, requested: ChargeAmount | str | None=None, remaining: ChargeAmount | str | None=None",
+            "async": false
+          },
+          {
+            "name": "validated_audit_meta",
+            "line": 71,
+            "signature": "self",
+            "async": false
+          }
+        ]
+      },
+      {
+        "kind": "class",
+        "name": "Meter",
+        "line": 111,
+        "methods": [
+          {
+            "name": "charge",
+            "line": 114,
+            "signature": "self, node_kind: str, payload: dict[str, Any], result: Any, meta: dict[str, Any]",
+            "async": false
+          },
+          {
+            "name": "precheck_estimate",
+            "line": 122,
+            "signature": "self, node_kind: str, payload: dict[str, Any]",
+            "async": false
+          }
+        ]
+      },
+      {
+        "kind": "class",
+        "name": "Estimator",
+        "line": 125,
+        "methods": [
+          {
+            "name": "estimate_input_tokens",
+            "line": 128,
+            "signature": "self, payload: dict[str, Any]",
+            "async": false
+          }
+        ]
+      },
+      {
+        "kind": "class",
+        "name": "StepMeter",
+        "line": 131,
+        "methods": [
+          {
+            "name": "charge",
+            "line": 134,
+            "signature": "self, node_kind: str, payload: dict[str, Any], result: Any, meta: dict[str, Any]",
+            "async": false
+          },
+          {
+            "name": "precheck_estimate",
+            "line": 144,
+            "signature": "self, node_kind: str, payload: dict[str, Any]",
+            "async": false
+          }
+        ]
+      },
+      {
+        "kind": "class",
+        "name": "DepthMeter",
+        "line": 149,
+        "methods": [
+          {
+            "name": "charge",
+            "line": 152,
+            "signature": "self, node_kind: str, payload: dict[str, Any], result: Any, meta: dict[str, Any]",
+            "async": false
+          },
+          {
+            "name": "precheck_estimate",
+            "line": 162,
+            "signature": "self, node_kind: str, payload: dict[str, Any]",
+            "async": false
+          }
+        ]
+      },
+      {
+        "kind": "class",
+        "name": "WallClockMeter",
+        "line": 167,
+        "methods": [
+          {
+            "name": "charge",
+            "line": 170,
+            "signature": "self, node_kind: str, payload: dict[str, Any], result: Any, meta: dict[str, Any]",
+            "async": false
+          },
+          {
+            "name": "precheck_estimate",
+            "line": 181,
+            "signature": "self, node_kind: str, payload: dict[str, Any]",
+            "async": false
+          }
+        ]
+      },
+      {
+        "kind": "class",
+        "name": "TokenMeter",
+        "line": 186,
+        "methods": [
+          {
+            "name": "__init__",
+            "line": 189,
+            "signature": "self, estimator: Estimator | None=None, *, reserved_output_tokens: int=0",
+            "async": false
+          },
+          {
+            "name": "charge",
+            "line": 202,
+            "signature": "self, node_kind: str, payload: dict[str, Any], result: Any, meta: dict[str, Any]",
+            "async": false
+          },
+          {
+            "name": "precheck_estimate",
+            "line": 232,
+            "signature": "self, node_kind: str, payload: dict[str, Any]",
+            "async": false
+          }
+        ]
+      },
+      {
+        "kind": "class",
+        "name": "CostMeter",
+        "line": 249,
+        "methods": [
+          {
+            "name": "__init__",
+            "line": 252,
+            "signature": "self, prices: dict[str, dict[str, ChargeAmount]]",
+            "async": false
+          },
+          {
+            "name": "charge",
+            "line": 261,
+            "signature": "self, node_kind: str, payload: dict[str, Any], result: Any, meta: dict[str, Any]",
+            "async": false
+          },
+          {
+            "name": "precheck_estimate",
+            "line": 295,
+            "signature": "self, node_kind: str, payload: dict[str, Any]",
+            "async": false
+          }
+        ]
+      },
+      {
+        "kind": "class",
+        "name": "WindowMeter",
+        "line": 300,
+        "methods": [
+          {
+            "name": "__init__",
+            "line": 303,
+            "signature": "self, name: str, limit: ChargeAmount, window_seconds: int | float, *, meter: Meter | None=None",
+            "async": false
+          },
+          {
+            "name": "charge",
+            "line": 334,
+            "signature": "self, node_kind: str, payload: dict[str, Any], result: Any, meta: dict[str, Any]",
+            "async": false
+          },
+          {
+            "name": "precheck_estimate",
+            "line": 343,
+            "signature": "self, node_kind: str, payload: dict[str, Any]",
+            "async": false
+          },
+          {
+            "name": "ledger_key",
+            "line": 348,
+            "signature": "self, root_id: str",
+            "async": false
+          }
+        ]
+      },
+      {
+        "kind": "function",
+        "name": "usage_from_openai",
+        "line": 362,
+        "signature": "resp: dict[str, Any]"
+      },
+      {
+        "kind": "function",
+        "name": "usage_from_anthropic",
+        "line": 372,
+        "signature": "resp: dict[str, Any]"
+      }
+    ],
+    "src/pollard/meters/energy.py": [
+      {
+        "kind": "class",
+        "name": "EnergyMeter",
+        "line": 31,
+        "methods": [
+          {
+            "name": "__init__",
+            "line": 34,
+            "signature": "self, *, index: int=0, interval_s: float=0.05, nvml: _NvmlModule | None=None",
+            "async": false
+          },
+          {
+            "name": "measure",
+            "line": 55,
+            "signature": "self",
+            "async": false
+          },
+          {
+            "name": "charge",
+            "line": 58,
+            "signature": "self, node_kind: str, payload: dict[str, Any], result: Any, meta: dict[str, Any]",
+            "async": false
+          },
+          {
+            "name": "precheck_estimate",
+            "line": 69,
+            "signature": "self, node_kind: str, payload: dict[str, Any]",
+            "async": false
+          }
+        ]
+      },
+      {
+        "kind": "class",
+        "name": "EnergyMeasurement",
+        "line": 74,
+        "methods": [
+          {
+            "name": "__init__",
+            "line": 75,
+            "signature": "self, nvml: _NvmlModule, handle: object, interval_s: float",
+            "async": false
+          },
+          {
+            "name": "readings",
+            "line": 107,
+            "signature": "self",
+            "async": false
+          }
+        ]
+      }
+    ],
+    "src/pollard/meters/tokenmaster.py": [
+      {
+        "kind": "class",
+        "name": "TokenmasterMeter",
+        "line": 18,
+        "methods": [
+          {
+            "name": "__init__",
+            "line": 34,
+            "signature": "self, model: str | None=None, *, meter: Any | None=None, estimator: Estimator | None=None, reserved_output: int=0, expected_remaining_turns: int | None=None, task: Any | None=None, policy: Any | None=None, enforce_profile_limits: bool=False, profile_capacity: str='nominal'",
+            "async": false
+          },
+          {
+            "name": "charge",
+            "line": 74,
+            "signature": "self, node_kind: str, payload: dict[str, Any], result: Any, meta: dict[str, Any]",
+            "async": false
+          },
+          {
+            "name": "precheck_estimate",
+            "line": 136,
+            "signature": "self, node_kind: str, payload: dict[str, Any]",
+            "async": false
+          }
+        ]
+      },
+      {
+        "kind": "class",
+        "name": "TokenmasterCostMeter",
+        "line": 340,
+        "methods": [
+          {
+            "name": "__init__",
+            "line": 349,
+            "signature": "self, model: str | None=None, *, meter: Any | None=None, estimator: Estimator, reserved_output: int=0, name: str='usd'",
+            "async": false
+          },
+          {
+            "name": "precheck_estimate",
+            "line": 371,
+            "signature": "self, node_kind: str, payload: dict[str, Any]",
+            "async": false
+          },
+          {
+            "name": "charge",
+            "line": 428,
+            "signature": "self, node_kind: str, payload: dict[str, Any], result: Any, meta: dict[str, Any]",
+            "async": false
+          },
+          {
+            "name": "precheck_fallback_reason",
+            "line": 476,
+            "signature": "self, node_kind: str, payload: dict[str, Any], result: Any, meta: dict[str, Any]",
+            "async": false
+          }
+        ]
+      },
+      {
+        "kind": "function",
+        "name": "tokenmaster_governance_meters",
+        "line": 557,
+        "signature": "model: str | None=None, *, estimator: Estimator, reserved_output: int=0, expected_remaining_turns: int | None=None, task: Any | None=None, policy: Any | None=None, enforce_profile_limits: bool=False, profile_capacity: str='nominal', cost_name: str='usd'"
+      }
+    ],
+    "src/pollard/otel.py": [
+      {
+        "kind": "function",
+        "name": "export_spans",
+        "line": 13,
+        "signature": "store: Store, root_id: str, tracer: Any"
+      },
+      {
+        "kind": "function",
+        "name": "live_span_hook",
+        "line": 46,
+        "signature": "tracer: Any"
+      },
+      {
+        "kind": "function",
+        "name": "span_attributes",
+        "line": 64,
+        "signature": "node: Node"
+      }
+    ],
+    "src/pollard/policy.py": [
+      {
+        "kind": "class",
+        "name": "Decision",
+        "line": 13,
+        "methods": []
+      },
+      {
+        "kind": "class",
+        "name": "PolicyContext",
+        "line": 20,
+        "methods": []
+      },
+      {
+        "kind": "class",
+        "name": "Policy",
+        "line": 28,
+        "methods": [
+          {
+            "name": "decide",
+            "line": 29,
+            "signature": "self, ctx: PolicyContext",
+            "async": false
+          }
+        ]
+      }
+    ],
+    "src/pollard/pytest_plugin.py": [
+      {
+        "kind": "function",
+        "name": "pytest_addoption",
+        "line": 20,
+        "signature": "parser: Parser"
+      },
+      {
+        "kind": "function",
+        "name": "pollard_run",
+        "line": 42,
+        "signature": "request: FixtureRequest"
+      }
+    ],
+    "src/pollard/redaction.py": [
+      {
+        "kind": "function",
+        "name": "redact",
+        "line": 13,
+        "signature": "value: IdentityValue, hint: str | None=None"
+      },
+      {
+        "kind": "function",
+        "name": "is_redacted",
+        "line": 20,
+        "signature": "value: object"
+      },
+      {
+        "kind": "function",
+        "name": "contains_redaction",
+        "line": 35,
+        "signature": "value: object"
+      }
+    ],
+    "src/pollard/registry.py": [
+      {
+        "kind": "class",
+        "name": "ActionSpec",
+        "line": 43,
+        "methods": [
+          {
+            "name": "validate_args",
+            "line": 62,
+            "signature": "self, args: dict[str, IdentityValue]",
+            "async": false
+          },
+          {
+            "name": "redact_args",
+            "line": 69,
+            "signature": "self, args: dict[str, IdentityValue]",
+            "async": false
+          }
+        ]
+      },
+      {
+        "kind": "class",
+        "name": "Registry",
+        "line": 81,
+        "methods": [
+          {
+            "name": "__init__",
+            "line": 84,
+            "signature": "self, specs: list[ActionSpec] | tuple[ActionSpec, ...]",
+            "async": false
+          },
+          {
+            "name": "get",
+            "line": 97,
+            "signature": "self, name: str, version: str | None=None",
+            "async": false
+          }
+        ]
+      }
+    ],
+    "src/pollard/replay.py": [
+      {
+        "kind": "class",
+        "name": "ReplayMode",
+        "line": 18,
+        "methods": []
+      },
+      {
+        "kind": "function",
+        "name": "normalize_mode",
+        "line": 24,
+        "signature": "mode: str | ReplayMode"
+      },
+      {
+        "kind": "function",
+        "name": "recorded_node_or_missing",
+        "line": 34,
+        "signature": "*, mode: ReplayMode, store: Store, kind: NodeKind, parent_id: str, payload: dict[str, IdentityValue], attempt: int, refuse_duplicate_recordings: bool=False"
+      },
+      {
+        "kind": "function",
+        "name": "replay_node_or_missing",
+        "line": 65,
+        "signature": "store: Store, candidate: Node"
+      },
+      {
+        "kind": "function",
+        "name": "avoided_charges",
+        "line": 75,
+        "signature": "*, meters: list[Meter], kind: str, payload: dict[str, IdentityValue], node: Node"
+      },
+      {
+        "kind": "function",
+        "name": "record_avoided_charges",
+        "line": 91,
+        "signature": "store: Store, node_id: str, charges: dict[str, int | float]"
+      },
+      {
+        "kind": "function",
+        "name": "payload_summary",
+        "line": 142,
+        "signature": "kind: str, payload: dict[str, IdentityValue]"
+      }
+    ],
+    "src/pollard/revalidation.py": [
+      {
+        "kind": "class",
+        "name": "ReplayContract",
+        "line": 18,
+        "methods": [
+          {
+            "name": "to_dict",
+            "line": 50,
+            "signature": "self",
+            "async": false
+          },
+          {
+            "name": "bind",
+            "line": 71,
+            "signature": "self, payload: dict[str, IdentityValue]",
+            "async": false
+          }
+        ]
+      },
+      {
+        "kind": "class",
+        "name": "RevalidationComparison",
+        "line": 93,
+        "methods": [
+          {
+            "name": "to_dict",
+            "line": 119,
+            "signature": "self",
+            "async": false
+          }
+        ]
+      },
+      {
+        "kind": "class",
+        "name": "RevalidationComparator",
+        "line": 127,
+        "methods": [
+          {
+            "name": "compare",
+            "line": 132,
+            "signature": "self, recorded: dict[str, Any], live: dict[str, Any]",
+            "async": false
+          }
+        ]
+      },
+      {
+        "kind": "class",
+        "name": "ExactResultComparator",
+        "line": 139,
+        "methods": [
+          {
+            "name": "compare",
+            "line": 144,
+            "signature": "self, recorded: dict[str, Any], live: dict[str, Any]",
+            "async": false
+          }
+        ]
+      },
+      {
+        "kind": "class",
+        "name": "NormalizedModelComparator",
+        "line": 157,
+        "methods": [
+          {
+            "name": "compare",
+            "line": 162,
+            "signature": "self, recorded: dict[str, Any], live: dict[str, Any]",
+            "async": false
+          }
+        ]
+      },
+      {
+        "kind": "class",
+        "name": "RevalidationReport",
+        "line": 178,
+        "methods": [
+          {
+            "name": "to_dict",
+            "line": 196,
+            "signature": "self",
+            "async": false
+          }
+        ]
+      },
+      {
+        "kind": "function",
+        "name": "make_revalidation_payload",
+        "line": 215,
+        "signature": "payload: dict[str, IdentityValue], *, observation_id: str, recorded_node_id: str, recorded_result_digest: str, contract: ReplayContract, comparator_name: str"
+      },
+      {
+        "kind": "function",
+        "name": "make_revalidation_evidence",
+        "line": 251,
+        "signature": "*, observation_id: str, recorded_node_id: str, live_node_id: str, recorded_result_digest: str, live_result_digest: str, comparator_name: str, comparison: RevalidationComparison, exact_match: bool, recorded_contract: dict[str, IdentityValue] | None, live_contract: dict[str, IdentityValue]"
+      },
+      {
+        "kind": "function",
+        "name": "make_revalidation_failure_evidence",
+        "line": 285,
+        "signature": "*, observation_id: str, recorded_node_id: str, live_node_id: str, recorded_result_digest: str, live_result_digest: str, comparator_name: str, error: BaseException"
+      },
+      {
+        "kind": "function",
+        "name": "extract_replay_contract",
+        "line": 312,
+        "signature": "payload: dict[str, IdentityValue]"
+      }
+    ],
+    "src/pollard/runtime.py": [
+      {
+        "kind": "class",
+        "name": "Runtime",
+        "line": 182,
+        "methods": [
+          {
+            "name": "__init__",
+            "line": 183,
+            "signature": "self, store: str | Path | Store | None=None, *, meters: list[Meter] | None=None, registry: Registry | None=None, policies: list[Policy] | None=None, dry_run: bool=False, mode: str | ReplayMode=ReplayMode.RECORD, refuse_duplicate_recordings: bool=False, on_node: NodeCallback | None=None, reservation_lease_seconds: int | float=60",
+            "async": false
+          },
+          {
+            "name": "run",
+            "line": 231,
+            "signature": "self, label: str, *, budget: Budget | None=None, attempt: int=0",
+            "async": false
+          },
+          {
+            "name": "resume",
+            "line": 247,
+            "signature": "self, label: str, *, budget: Budget | None=None, attempt: int=0",
+            "async": false
+          }
+        ]
+      },
+      {
+        "kind": "class",
+        "name": "Run",
+        "line": 277,
+        "methods": [
+          {
+            "name": "__init__",
+            "line": 278,
+            "signature": "self, *, runtime: Runtime, root_id: str, cursor_id: str, label: str, budget_scopes: list[_BudgetScope]",
+            "async": false
+          },
+          {
+            "name": "store",
+            "line": 296,
+            "signature": "self",
+            "async": false
+          },
+          {
+            "name": "cursor",
+            "line": 300,
+            "signature": "self",
+            "async": false
+          },
+          {
+            "name": "model_call",
+            "line": 309,
+            "signature": "self, payload: dict[str, IdentityValue], *, fn: StepFn, attempt: int=0, on_delta: DeltaCallback | None=None, keep_chunks: bool=False",
+            "async": false
+          },
+          {
+            "name": "revalidate_model_call",
+            "line": 327,
+            "signature": "self, payload: dict[str, IdentityValue], *, fn: StepFn, contract: ReplayContract, comparator: RevalidationComparator | None=None, live_payload: dict[str, IdentityValue] | None=None, attempt: int=0, observation_id: str | None=None, on_delta: DeltaCallback | None=None, keep_chunks: bool=False",
+            "async": false
+          },
+          {
+            "name": "tool_call",
+            "line": 365,
+            "signature": "self, name: str, args: dict[str, IdentityValue], *, fn: StepFn | None=None, version: str | None=None, attempt: int=0",
+            "async": false
+          },
+          {
+            "name": "confirm",
+            "line": 381,
+            "signature": "self, token: str",
+            "async": false
+          },
+          {
+            "name": "note",
+            "line": 394,
+            "signature": "self, payload: dict[str, IdentityValue], *, attempt: int=0",
+            "async": false
+          },
+          {
+            "name": "branch",
+            "line": 408,
+            "signature": "self, *, attempt: int=0, budget: Budget | None=None",
+            "async": false
+          },
+          {
+            "name": "rollback",
+            "line": 432,
+            "signature": "self, node_id: str | None=None, *, steps: int=1",
+            "async": false
+          },
+          {
+            "name": "prune",
+            "line": 445,
+            "signature": "self",
+            "async": false
+          },
+          {
+            "name": "report",
+            "line": 450,
+            "signature": "self",
+            "async": false
+          }
+        ]
+      },
+      {
+        "kind": "class",
+        "name": "RunBranch",
+        "line": 1282,
+        "methods": []
+      }
+    ],
+    "src/pollard/schema.py": [
+      {
+        "kind": "function",
+        "name": "resolve_local_refs",
+        "line": 11,
+        "signature": "schema: dict[str, Any]"
+      },
+      {
+        "kind": "function",
+        "name": "schema_has_local_refs",
+        "line": 86,
+        "signature": "schema: dict[str, Any]"
+      }
+    ],
+    "src/pollard/seal.py": [
+      {
+        "kind": "class",
+        "name": "SealEntry",
+        "line": 20,
+        "methods": [
+          {
+            "name": "to_dict",
+            "line": 29,
+            "signature": "self",
+            "async": false
+          }
+        ]
+      },
+      {
+        "kind": "class",
+        "name": "SealReport",
+        "line": 42,
+        "methods": [
+          {
+            "name": "to_dict",
+            "line": 48,
+            "signature": "self",
+            "async": false
+          }
+        ]
+      },
+      {
+        "kind": "function",
+        "name": "seal",
+        "line": 57,
+        "signature": "store: Store, root_id: str"
+      }
+    ],
+    "src/pollard/seal_custody.py": [
+      {
+        "kind": "class",
+        "name": "SealCustodyRecord",
+        "line": 14,
+        "methods": [
+          {
+            "name": "to_dict",
+            "line": 25,
+            "signature": "self",
+            "async": false
+          }
+        ]
+      },
+      {
+        "kind": "class",
+        "name": "SQLiteSealSink",
+        "line": 37,
+        "methods": [
+          {
+            "name": "__init__",
+            "line": 40,
+            "signature": "self, path: str | Path",
+            "async": false
+          },
+          {
+            "name": "publish",
+            "line": 81,
+            "signature": "self, report: SealReport, *, store_id: str, signer_identity: str, sealed_at: str | None=None",
+            "async": false
+          },
+          {
+            "name": "records",
+            "line": 127,
+            "signature": "self",
+            "async": false
+          }
+        ]
+      }
+    ],
+    "src/pollard/store.py": [
+      {
+        "kind": "class",
+        "name": "Store",
+        "line": 15,
+        "methods": [
+          {
+            "name": "put",
+            "line": 16,
+            "signature": "self, node: Node",
+            "async": false
+          },
+          {
+            "name": "get",
+            "line": 18,
+            "signature": "self, node_id: str",
+            "async": false
+          },
+          {
+            "name": "exists",
+            "line": 20,
+            "signature": "self, node_id: str",
+            "async": false
+          },
+          {
+            "name": "children",
+            "line": 22,
+            "signature": "self, node_id: str",
+            "async": false
+          },
+          {
+            "name": "update_meta",
+            "line": 24,
+            "signature": "self, node_id: str, patch: dict[str, object]",
+            "async": false
+          },
+          {
+            "name": "walk",
+            "line": 26,
+            "signature": "self, root_id: str",
+            "async": false
+          },
+          {
+            "name": "roots",
+            "line": 28,
+            "signature": "self",
+            "async": false
+          }
+        ]
+      },
+      {
+        "kind": "class",
+        "name": "MemoryStore",
+        "line": 31,
+        "methods": [
+          {
+            "name": "__init__",
+            "line": 34,
+            "signature": "self",
+            "async": false
+          },
+          {
+            "name": "put",
+            "line": 38,
+            "signature": "self, node: Node",
+            "async": false
+          },
+          {
+            "name": "get",
+            "line": 50,
+            "signature": "self, node_id: str",
+            "async": false
+          },
+          {
+            "name": "exists",
+            "line": 53,
+            "signature": "self, node_id: str",
+            "async": false
+          },
+          {
+            "name": "children",
+            "line": 56,
+            "signature": "self, node_id: str",
+            "async": false
+          },
+          {
+            "name": "update_meta",
+            "line": 62,
+            "signature": "self, node_id: str, patch: dict[str, object]",
+            "async": false
+          },
+          {
+            "name": "walk",
+            "line": 69,
+            "signature": "self, root_id: str",
+            "async": false
+          },
+          {
+            "name": "roots",
+            "line": 76,
+            "signature": "self",
+            "async": false
+          }
+        ]
+      }
+    ],
+    "src/pollard/stores/__init__.py": [],
+    "src/pollard/stores/_transactional.py": [
+      {
+        "kind": "class",
+        "name": "KVTransaction",
+        "line": 28,
+        "methods": [
+          {
+            "name": "get",
+            "line": 31,
+            "signature": "self, bucket: str, key: str",
+            "async": false
+          },
+          {
+            "name": "items",
+            "line": 33,
+            "signature": "self, bucket: str",
+            "async": false
+          },
+          {
+            "name": "put",
+            "line": 35,
+            "signature": "self, bucket: str, key: str, value: str",
+            "async": false
+          },
+          {
+            "name": "delete",
+            "line": 37,
+            "signature": "self, bucket: str, key: str",
+            "async": false
+          },
+          {
+            "name": "now",
+            "line": 39,
+            "signature": "self",
+            "async": false
+          }
+        ]
+      },
+      {
+        "kind": "class",
+        "name": "TransactionalKVStore",
+        "line": 42,
+        "methods": [
+          {
+            "name": "reconnect",
+            "line": 85,
+            "signature": "self",
+            "async": false
+          },
+          {
+            "name": "put",
+            "line": 87,
+            "signature": "self, node: Node",
+            "async": false
+          },
+          {
+            "name": "get",
+            "line": 128,
+            "signature": "self, node_id: str",
+            "async": false
+          },
+          {
+            "name": "exists",
+            "line": 137,
+            "signature": "self, node_id: str",
+            "async": false
+          },
+          {
+            "name": "children",
+            "line": 142,
+            "signature": "self, node_id: str",
+            "async": false
+          },
+          {
+            "name": "update_meta",
+            "line": 153,
+            "signature": "self, node_id: str, patch: dict[str, object]",
+            "async": false
+          },
+          {
+            "name": "walk",
+            "line": 178,
+            "signature": "self, root_id: str",
+            "async": false
+          },
+          {
+            "name": "roots",
+            "line": 204,
+            "signature": "self",
+            "async": false
+          }
+        ]
+      }
+    ],
+    "src/pollard/stores/hashrope.py": [
+      {
+        "kind": "class",
+        "name": "HashRopeStore",
+        "line": 26,
+        "methods": [
+          {
+            "name": "__init__",
+            "line": 29,
+            "signature": "self, data: bytes=b''",
+            "async": false
+          },
+          {
+            "name": "put",
+            "line": 36,
+            "signature": "self, node: Node",
+            "async": false
+          },
+          {
+            "name": "get",
+            "line": 40,
+            "signature": "self, node_id: str",
+            "async": false
+          },
+          {
+            "name": "exists",
+            "line": 43,
+            "signature": "self, node_id: str",
+            "async": false
+          },
+          {
+            "name": "children",
+            "line": 46,
+            "signature": "self, node_id: str",
+            "async": false
+          },
+          {
+            "name": "update_meta",
+            "line": 52,
+            "signature": "self, node_id: str, patch: dict[str, object]",
+            "async": false
+          },
+          {
+            "name": "walk",
+            "line": 56,
+            "signature": "self, root_id: str",
+            "async": false
+          },
+          {
+            "name": "roots",
+            "line": 63,
+            "signature": "self",
+            "async": false
+          },
+          {
+            "name": "to_bytes",
+            "line": 69,
+            "signature": "self",
+            "async": false
+          },
+          {
+            "name": "content_hash",
+            "line": 74,
+            "signature": "self",
+            "async": false
+          },
+          {
+            "name": "validate_log",
+            "line": 79,
+            "signature": "self",
+            "async": false
+          }
+        ]
+      }
+    ],
+    "src/pollard/stores/kafka.py": [
+      {
+        "kind": "class",
+        "name": "KafkaStore",
+        "line": 62,
+        "methods": [
+          {
+            "name": "__init__",
+            "line": 77,
+            "signature": "self, client_config: Mapping[str, object], *, topic: str, store_id: str='default', read_only: bool=False, require_existing: bool=False, timeout: int | float=30",
+            "async": false
+          },
+          {
+            "name": "close",
+            "line": 157,
+            "signature": "self",
+            "async": false
+          },
+          {
+            "name": "reconnect",
+            "line": 166,
+            "signature": "self",
+            "async": false
+          },
+          {
+            "name": "put",
+            "line": 211,
+            "signature": "self, node: Node",
+            "async": false
+          },
+          {
+            "name": "get",
+            "line": 229,
+            "signature": "self, node_id: str",
+            "async": false
+          },
+          {
+            "name": "exists",
+            "line": 235,
+            "signature": "self, node_id: str",
+            "async": false
+          },
+          {
+            "name": "children",
+            "line": 241,
+            "signature": "self, node_id: str",
+            "async": false
+          },
+          {
+            "name": "update_meta",
+            "line": 250,
+            "signature": "self, node_id: str, patch: dict[str, object]",
+            "async": false
+          },
+          {
+            "name": "walk",
+            "line": 268,
+            "signature": "self, root_id: str",
+            "async": false
+          },
+          {
+            "name": "roots",
+            "line": 284,
+            "signature": "self",
+            "async": false
+          }
+        ]
+      }
+    ],
+    "src/pollard/stores/mongodb.py": [
+      {
+        "kind": "class",
+        "name": "MongoStore",
+        "line": 26,
+        "methods": [
+          {
+            "name": "__init__",
+            "line": 37,
+            "signature": "self, uri: str, *, database: str='pollard', store_id: str='default', collection_prefix: str='pollard', create: bool=True, **client_options: object",
+            "async": false
+          },
+          {
+            "name": "close",
+            "line": 96,
+            "signature": "self",
+            "async": false
+          },
+          {
+            "name": "reconnect",
+            "line": 100,
+            "signature": "self",
+            "async": false
+          }
+        ]
+      }
+    ],
+    "src/pollard/stores/neo4j.py": [
+      {
+        "kind": "class",
+        "name": "Neo4jStore",
+        "line": 48,
+        "methods": [
+          {
+            "name": "__init__",
+            "line": 61,
+            "signature": "self, uri: str, auth: object, *, database: str='neo4j', store_id: str='default', create: bool=True, **driver_config: Any",
+            "async": false
+          },
+          {
+            "name": "close",
+            "line": 109,
+            "signature": "self",
+            "async": false
+          },
+          {
+            "name": "reconnect",
+            "line": 114,
+            "signature": "self",
+            "async": false
+          }
+        ]
+      }
+    ],
+    "src/pollard/stores/postgres.py": [
+      {
+        "kind": "class",
+        "name": "PostgresStore",
+        "line": 172,
+        "methods": [
+          {
+            "name": "__init__",
+            "line": 175,
+            "signature": "self, conninfo: str, *, store_id: str='default', intern_payloads: bool=True, intern_threshold: int=1024",
+            "async": false
+          },
+          {
+            "name": "migrate",
+            "line": 206,
+            "signature": "cls, conninfo: str",
+            "async": false
+          },
+          {
+            "name": "close",
+            "line": 278,
+            "signature": "self",
+            "async": false
+          },
+          {
+            "name": "reconnect",
+            "line": 281,
+            "signature": "self",
+            "async": false
+          },
+          {
+            "name": "put",
+            "line": 298,
+            "signature": "self, node: Node",
+            "async": false
+          },
+          {
+            "name": "get",
+            "line": 370,
+            "signature": "self, node_id: str",
+            "async": false
+          },
+          {
+            "name": "exists",
+            "line": 376,
+            "signature": "self, node_id: str",
+            "async": false
+          },
+          {
+            "name": "children",
+            "line": 383,
+            "signature": "self, node_id: str",
+            "async": false
+          },
+          {
+            "name": "update_meta",
+            "line": 394,
+            "signature": "self, node_id: str, patch: dict[str, object]",
+            "async": false
+          },
+          {
+            "name": "walk",
+            "line": 415,
+            "signature": "self, root_id: str",
+            "async": false
+          },
+          {
+            "name": "roots",
+            "line": 422,
+            "signature": "self",
+            "async": false
+          }
+        ]
+      }
+    ],
+    "src/pollard/stores/redis.py": [
+      {
+        "kind": "class",
+        "name": "RedisStore",
+        "line": 30,
+        "methods": [
+          {
+            "name": "__init__",
+            "line": 43,
+            "signature": "self, url: str | None=None, *, client_factory: Callable[[], Any] | None=None, store_id: str='default', prefix: str='pollard', create: bool=True, watch_retries: int=64",
+            "async": false
+          },
+          {
+            "name": "close",
+            "line": 116,
+            "signature": "self",
+            "async": false
+          },
+          {
+            "name": "reconnect",
+            "line": 124,
+            "signature": "self",
+            "async": false
+          }
+        ]
+      }
+    ],
+    "src/pollard/stores/sqlite.py": [
+      {
+        "kind": "class",
+        "name": "SQLiteStore",
+        "line": 24,
+        "methods": [
+          {
+            "name": "__init__",
+            "line": 27,
+            "signature": "self, path: str | Path, *, intern_payloads: bool=True, intern_threshold: int=1024, read_only: bool=False",
+            "async": false
+          },
+          {
+            "name": "close",
+            "line": 121,
+            "signature": "self",
+            "async": false
+          },
+          {
+            "name": "put",
+            "line": 124,
+            "signature": "self, node: Node",
+            "async": false
+          },
+          {
+            "name": "get",
+            "line": 179,
+            "signature": "self, node_id: str",
+            "async": false
+          },
+          {
+            "name": "exists",
+            "line": 185,
+            "signature": "self, node_id: str",
+            "async": false
+          },
+          {
+            "name": "children",
+            "line": 189,
+            "signature": "self, node_id: str",
+            "async": false
+          },
+          {
+            "name": "update_meta",
+            "line": 196,
+            "signature": "self, node_id: str, patch: dict[str, object]",
+            "async": false
+          },
+          {
+            "name": "walk",
+            "line": 214,
+            "signature": "self, root_id: str",
+            "async": false
+          },
+          {
+            "name": "roots",
+            "line": 221,
+            "signature": "self",
+            "async": false
+          }
+        ]
+      }
+    ],
+    "src/pollard/tree.py": [
+      {
+        "kind": "class",
+        "name": "NodeKind",
+        "line": 17,
+        "methods": []
+      },
+      {
+        "kind": "class",
+        "name": "Node",
+        "line": 26,
+        "methods": [
+          {
+            "name": "make",
+            "line": 38,
+            "signature": "cls, *, kind: str | NodeKind, parent: str | None, payload: dict[str, IdentityValue], attempt: int=0, result: Any=None, meta: dict[str, Any] | None=None",
+            "async": false
+          },
+          {
+            "name": "from_storage",
+            "line": 66,
+            "signature": "cls, *, id: str, parent: str | None, kind: str, attempt: int, payload_text: str, result_text: str | None, result_digest: str | None, meta_text: str",
+            "async": false
+          },
+          {
+            "name": "expected_id",
+            "line": 128,
+            "signature": "self",
+            "async": false
+          },
+          {
+            "name": "result_text",
+            "line": 132,
+            "signature": "self",
+            "async": false
+          },
+          {
+            "name": "identity_tuple",
+            "line": 135,
+            "signature": "self",
+            "async": false
+          }
+        ]
+      }
+    ],
+    "src/pollard/verify.py": [
+      {
+        "kind": "class",
+        "name": "VerifyFinding",
+        "line": 12,
+        "methods": []
+      },
+      {
+        "kind": "class",
+        "name": "VerifyReport",
+        "line": 18,
+        "methods": []
+      },
+      {
+        "kind": "function",
+        "name": "verify",
+        "line": 23,
+        "signature": "store: Store, node_id: str"
+      }
+    ]
+  },
+  "test_functions": {
+    "tests/test_adapters.py": [
+      "test_openai_responses_adapter_normalizes_text_and_usage",
+      "test_openai_responses_adapter_surfaces_failed_response",
+      "test_adapter_retains_but_does_not_normalize_invalid_provider_usage",
+      "test_adapter_preserves_native_error_and_marks_unknown_outcome",
+      "test_adapter_marks_operator_interrupt_after_dispatch",
+      "test_openai_chat_and_tool_call_fixtures",
+      "test_openai_stream_fixture_runs_through_pollard",
+      "test_openai_responses_stream_and_tool_output",
+      "test_openai_responses_stream_preserves_incomplete_usage",
+      "test_openai_responses_stream_surfaces_failed_event_details",
+      "test_openai_responses_stream_requires_terminal_event",
+      "test_openai_chat_stream_assembles_tool_fragments",
+      "test_anthropic_message_tool_stream_and_count_fixtures",
+      "test_anthropic_usage_includes_cached_input_tokens",
+      "test_anthropic_stream_surfaces_error_event_details",
+      "test_anthropic_stream_requires_message_stop",
+      "test_anthropic_count_tokens_uses_a_positive_request_projection",
+      "test_litellm_non_stream_and_stream_fixtures",
+      "test_bedrock_converse_normalizes_tools_usage_and_count_tokens",
+      "test_bedrock_usage_includes_cached_input_tokens",
+      "test_bedrock_converse_stream_runs_through_pollard",
+      "test_bedrock_stream_surfaces_provider_errors",
+      "test_bedrock_stream_requires_message_stop",
+      "test_async_openai_and_litellm_stream_factories"
+    ],
+    "tests/test_aio.py": [
+      "test_async_running_call_renews_sqlite_reservation",
+      "test_async_in_memory_sqlite_keeps_reservation_until_completion",
+      "test_async_model_call_matches_sync_identity",
+      "test_async_replay_hit_never_awaits_fn",
+      "test_async_default_record_mode_preserves_duplicate_redispatch",
+      "test_async_opt_in_duplicate_refusal_stops_before_budget_and_dispatch",
+      "test_async_opt_in_duplicate_refusal_stops_unregistered_tool_dispatch",
+      "test_async_opt_in_registered_duplicate_refuses_before_policy",
+      "test_async_replay_structural_nodes_are_read_only",
+      "test_async_registered_replay_skips_live_handler_and_policy",
+      "test_async_registered_tool_awaits_handler",
+      "test_async_unfenced_tool_call_and_required_fn",
+      "test_async_registry_refuses_bad_args",
+      "test_async_branch_and_resume",
+      "test_async_policy_confirm_resumes_once",
+      "test_async_dry_run_suppresses_side_effect_handler",
+      "test_sync_runtime_rejects_async_registered_handler",
+      "test_async_stream_forwards_and_replays_chunks",
+      "test_async_window_reservation_settles_in_sqlite",
+      "test_async_callable_mutation_cannot_change_recorded_payload",
+      "test_async_stream_callback_failure_after_chunk_settles_estimate",
+      "test_async_stream_cancellation_after_chunk_settles_estimate",
+      "test_async_missing_usage_settles_conservative_precheck_estimate",
+      "test_async_release_uncertainty_does_not_mask_callable_error",
+      "test_async_meter_exit_failure_after_result_settles_estimate",
+      "test_async_post_dispatch_unknown_settles_estimates_and_records_note"
+    ],
+    "tests/test_canon.py": [
+      "test_canonical_bytes_sorts_keys_and_uses_compact_json",
+      "test_canonical_bytes_preserves_unicode_utf8",
+      "test_canonical_bytes_rejects_unsupported_identity_values",
+      "test_canonical_bytes_are_deterministic"
+    ],
+    "tests/test_cli.py": [
+      "test_show_is_ascii_and_content_free_by_default",
+      "test_runs_json_works_directly_and_in_a_subprocess",
+      "test_cli_machine_outputs_html_and_error_paths",
+      "test_human_readable_report_runs_verify_and_seal",
+      "test_report_includes_persisted_replay_avoidance",
+      "test_verify_exit_code_and_seal_output",
+      "test_html_export_matches_golden_and_omits_content",
+      "test_html_export_of_one_thousand_nodes_has_a_size_guard",
+      "test_redaction_markers_and_governance_commands",
+      "test_cli_import_reports_tampered_manifest_without_writing",
+      "test_cli_sqlite_only_commands_reject_remote_targets_without_touching_files",
+      "test_cli_runs_accepts_multiple_stores_and_merge_unions_them",
+      "test_cli_merge_spools_multiple_large_sources_to_private_disk_and_cleans_up",
+      "test_cli_merge_finishes_every_source_before_destination_access",
+      "test_cli_merge_refuses_corrupt_finalized_spool_before_destination_access",
+      "test_cli_merge_cleanup_failure_is_credential_safe_and_fails_command",
+      "test_cli_merge_preserves_primary_attribution_when_cleanup_also_fails",
+      "test_cli_merge_cleans_private_spools_on_preparation_and_destination_failures",
+      "test_cli_merge_partial_destination_failure_converges_on_exact_rerun",
+      "test_cli_pg_env_requires_configured_variable",
+      "test_cli_read_commands_accept_pg_env_without_leaking_credentials",
+      "test_cli_pg_env_psycopg_failure_is_credential_safe",
+      "test_cli_redis_env_requires_configured_variable",
+      "test_cli_redis_missing_variable_name_cannot_split_error_output",
+      "test_cli_redis_env_defaults_prefix_and_store_id",
+      "test_cli_read_commands_accept_redis_env_without_leaking_credentials",
+      "test_cli_runs_and_merge_accept_redis_env_as_source",
+      "test_cli_direct_redis_url_strips_fragment_and_sanitizes_label",
+      "test_cli_routes_uppercase_redis_schemes",
+      "test_cli_sanitizes_redis_urls_with_credential_adjacent_invalid_ports",
+      "test_cli_redis_labels_encode_or_reject_control_values",
+      "test_cli_rejects_invalid_redis_env_prefix_queries",
+      "test_cli_redis_module_failure_is_credential_safe",
+      "test_cli_merge_accepts_redis_env_destination_and_is_idempotent",
+      "test_cli_merge_into_existing_redis_destination_records_conflicts_once",
+      "test_cli_rejects_direct_redis_url_as_merge_destination_without_connecting",
+      "test_cli_redis_destination_requires_explicit_namespace_before_access",
+      "test_cli_redis_destination_rejects_ambiguous_namespace_before_access",
+      "test_cli_initialize_if_missing_requires_supported_env_destination",
+      "test_cli_preflights_sources_before_creating_redis_destination",
+      "test_cli_redis_source_read_failure_is_attributed_before_destination_opens",
+      "test_cli_redis_destination_connection_failure_is_credential_safe",
+      "test_cli_redis_destination_rejects_text_overrides_credential_safely",
+      "test_cli_mongo_env_requires_configured_variable_without_line_injection",
+      "test_cli_mongo_env_defaults_database_prefix_and_store_id",
+      "test_cli_observation_commands_accept_mongo_env_without_leaking_credentials",
+      "test_cli_runs_and_merge_accept_mongo_env_as_source_with_canonical_label",
+      "test_cli_rejects_invalid_mongo_env_namespace_queries",
+      "test_cli_rejects_control_characters_in_mongo_namespaces",
+      "test_cli_mongo_constructor_failure_is_credential_safe",
+      "test_cli_pymongo_body_failure_is_credential_safe",
+      "test_cli_mongo_constructor_warning_is_credential_safe",
+      "test_cli_mongo_destination_missing_environment_after_source_preflight",
+      "test_cli_merge_accepts_mongo_env_destination_and_is_idempotent",
+      "test_cli_merge_into_existing_mongo_destination_records_conflicts_once",
+      "test_cli_rejects_direct_mongo_uri_as_merge_destination_without_connecting",
+      "test_cli_mongo_destination_requires_explicit_namespace_before_access",
+      "test_cli_mongo_destination_rejects_ambiguous_namespace_before_access",
+      "test_cli_preflights_sources_before_creating_mongo_destination",
+      "test_cli_mongo_source_failure_prevents_mongo_destination_access",
+      "test_cli_mongo_destination_constructor_failure_is_credential_safe",
+      "test_cli_mongo_destination_warning_closes_store_credential_safely",
+      "test_cli_mongo_destination_driver_write_failure_is_credential_safe",
+      "test_cli_rejects_direct_mongo_uri_without_sqlite_fallback",
+      "test_cli_neo4j_env_requires_configured_variables_without_leaking_values",
+      "test_cli_neo4j_env_defaults_database_and_store_id",
+      "test_cli_observation_commands_accept_neo4j_env_without_leaking_credentials",
+      "test_cli_runs_and_merge_accept_neo4j_env_as_source_with_canonical_label",
+      "test_cli_merge_into_existing_neo4j_destination_records_conflicts_once",
+      "test_cli_neo4j_source_failure_prevents_neo4j_destination_access",
+      "test_cli_neo4j_source_walk_failure_prevents_destination_access",
+      "test_cli_neo4j_destination_constructor_failure_is_credential_safe",
+      "test_cli_neo4j_destination_constructor_warning_is_credential_safe",
+      "test_cli_neo4j_destination_body_warning_is_credential_safe",
+      "test_cli_neo4j_destination_driver_write_failure_is_credential_safe",
+      "test_cli_rejects_invalid_neo4j_env_queries",
+      "test_cli_rejects_control_characters_in_neo4j_namespaces",
+      "test_cli_neo4j_constructor_failure_is_credential_safe",
+      "test_cli_neo4j_body_failure_is_credential_safe",
+      "test_cli_neo4j_constructor_warning_is_credential_safe",
+      "test_cli_neo4j_destination_missing_environment_after_source_preflight",
+      "test_cli_merge_accepts_neo4j_env_destination_and_is_idempotent",
+      "test_cli_rejects_direct_neo4j_uri_as_merge_destination_without_connecting",
+      "test_cli_neo4j_destination_requires_explicit_namespace_before_access",
+      "test_cli_neo4j_destination_requires_explicit_connection_references",
+      "test_cli_neo4j_destination_rejects_ambiguous_selector_before_access",
+      "test_cli_preflights_sources_before_creating_neo4j_destination",
+      "test_cli_rejects_direct_neo4j_uri_without_sqlite_fallback",
+      "test_cli_rejects_obfuscated_neo4j_uri_before_output_or_filesystem_access",
+      "test_cli_kafka_env_defaults_and_sanitizes_client_config",
+      "test_cli_source_commands_and_merge_accept_reordered_kafka_env_spec",
+      "test_cli_rejects_invalid_kafka_env_queries",
+      "test_cli_rejects_malformed_or_unsafe_kafka_client_config",
+      "test_cli_kafka_constructor_warning_is_credential_safe",
+      "test_cli_kafka_cimpl_body_failure_is_credential_safe",
+      "test_cli_merge_accepts_existing_kafka_destination_and_is_idempotent",
+      "test_cli_merge_into_existing_kafka_destination_records_conflicts_once",
+      "test_cli_kafka_destination_requires_explicit_selector_before_access",
+      "test_cli_kafka_destination_missing_environment_after_source_preflight",
+      "test_cli_rejects_direct_kafka_uri_as_merge_destination_without_connecting",
+      "test_cli_kafka_source_failure_prevents_destination_access",
+      "test_cli_kafka_destination_warning_is_credential_safe",
+      "test_cli_kafka_destination_constructor_failure_is_credential_safe",
+      "test_cli_kafka_destination_body_warning_is_credential_safe",
+      "test_cli_kafka_destination_driver_failure_is_credential_safe",
+      "test_cli_rejects_kafka_write_targets_before_environment_lookup",
+      "test_cli_preflights_kafka_sources_before_creating_merge_destination",
+      "test_cli_rejects_direct_kafka_uri_without_environment_or_sqlite_fallback",
+      "test_cli_rejects_obfuscated_kafka_spec_before_environment_or_filesystem_access",
+      "test_cli_read_commands_do_not_create_missing_sqlite_database",
+      "test_cli_read_commands_accept_configured_postgres_and_export_to_sqlite",
+      "test_cli_read_commands_accept_configured_redis_and_export_to_sqlite",
+      "test_cli_merges_into_configured_redis_destination_without_preflight_writes",
+      "test_cli_merges_into_configured_mongodb_destination_safely",
+      "test_cli_accepts_configured_mongodb_for_observation_export_and_merge",
+      "test_cli_merges_into_configured_neo4j_destination_safely",
+      "test_cli_accepts_configured_neo4j_for_observation_export_and_merge"
+    ],
+    "tests/test_distributed_store_example.py": [
+      "test_distributed_store_example_maps_environment_to_constructor",
+      "test_distributed_store_example_refuses_missing_environment",
+      "test_distributed_store_example_refuses_unknown_backend",
+      "test_distributed_store_example_explains_persistent_budget_refusal"
+    ],
+    "tests/test_documentation.py": [
+      "test_readme_first_run_separates_posix_and_powershell_commands",
+      "test_github_workflows_cannot_publish",
+      "test_release_runbook_declares_local_only_production_upload",
+      "test_built_wheel_exposes_consistent_version_and_author_metadata",
+      "test_wheel_installed_first_run_works_outside_checkout",
+      "test_docs_index_names_every_top_level_document",
+      "test_api_reference_names_every_root_export",
+      "test_recipe_index_and_offline_help_cover_every_recipe",
+      "test_example_index_names_every_python_file",
+      "test_distributed_store_guide_covers_operational_contract",
+      "test_remote_store_guides_cover_each_production_lifecycle",
+      "test_kafka_retention_boundary_is_consistent_across_guides"
+    ],
+    "tests/test_energy.py": [
+      "test_integrate_samples_uses_trapezoids",
+      "test_energy_meter_charge_reads_joules_meta",
+      "test_energy_measurement_records_positive_joules",
+      "test_energy_measurement_prefers_cumulative_counter",
+      "test_energy_meter_lazy_import_error"
+    ],
+    "tests/test_estimators.py": [
+      "test_openai_estimator_counts_text_leaves_and_message_overhead",
+      "test_openai_estimator_falls_back_for_unknown_model",
+      "test_openai_estimator_uses_modern_fallback_for_gpt_5_6",
+      "test_openai_estimator_validates_overhead"
+    ],
+    "tests/test_evidence.py": [
+      "test_formal_evidence_artifacts_pass_registered_protocols",
+      "test_formal_evidence_contains_no_common_secret_or_local_path_patterns",
+      "test_exp006_case_studies_pass_strict_offline_verification",
+      "test_exp007_runner_is_offline_and_binds_the_loaded_wheel",
+      "test_exp007_handles_missing_git_as_unbound_provenance",
+      "test_readme_numeric_evidence_rows_name_their_experiment"
+    ],
+    "tests/test_examples.py": [
+      "test_example_script_runs_offline",
+      "test_formal_experiment_runner_help_is_offline",
+      "test_distributed_store_example_help_is_offline"
+    ],
+    "tests/test_framework_recipes.py": [
+      "test_langchain_support_rag_rejects_ungrounded_definitive_answers",
+      "test_langchain_incident_response_records_and_strictly_replays",
+      "test_langchain_support_rag_records_and_strictly_replays",
+      "test_pydantic_refund_preview_approval_redaction_and_replay",
+      "test_pydantic_ai_claim_triage_records_and_strictly_replays"
+    ],
+    "tests/test_governance.py": [
+      "test_gc_drops_only_pruned_subtrees_and_seals_survivors",
+      "test_gc_works_for_every_builtin_store",
+      "test_gc_property_never_removes_unmarked_siblings",
+      "test_gc_rejects_tampering_before_deleting_anything",
+      "test_export_import_round_trip_and_idempotence",
+      "test_detached_subtree_requires_parent_then_imports",
+      "test_tampered_manifest_is_rejected_before_target_write",
+      "test_manifest_cycle_is_rejected_before_tree_walk"
+    ],
+    "tests/test_governor.py": [
+      "test_budget_refusal_happens_before_execution",
+      "test_post_settle_exhaustion_blocks_the_next_call",
+      "test_budget_limits_include_extra_and_validate_values",
+      "test_charge_to_decimal_rejects_bool",
+      "test_live_counters_match_recomputed_charges"
+    ],
+    "tests/test_hashing.py": [
+      "test_node_id_golden_vectors",
+      "test_attempt_is_the_identity_salt",
+      "test_ancestry_changes_child_identity",
+      "test_result_digest_uses_stored_text"
+    ],
+    "tests/test_import.py": [
+      "test_version",
+      "test_store_protocol_is_public",
+      "test_duplicate_recording_is_public",
+      "test_dir_adds_lazy_public_api_without_hiding_existing_names"
+    ],
+    "tests/test_mcp.py": [
+      "test_registry_from_mcp_builds_async_handlers",
+      "test_registry_from_fastmcp_accepts_generated_schema_annotations",
+      "test_registry_from_mcp_reports_unsupported_tool_schema",
+      "test_registry_from_mcp_can_exclude_tools",
+      "test_registry_from_mcp_accepts_object_listing_and_model_dump_result",
+      "test_mcp_model_dump_result_is_normalized_recursively"
+    ],
+    "tests/test_merge.py": [
+      "test_merge_copies_missing_nodes_and_is_idempotent",
+      "test_merge_unions_meta_and_records_scalar_and_result_conflicts",
+      "test_replay_merge_rejects_result_conflict_without_mutating",
+      "test_merge_is_commutative_apart_from_kept_scalar_value",
+      "test_merge_property_union_is_idempotent_and_verify_clean",
+      "test_merge_one_thousand_nodes_preserves_rehydrated_payload_bytes",
+      "test_merge_spool_preserves_deterministic_order_and_exact_node_text",
+      "test_merge_spool_is_disk_backed_for_multiple_large_sources",
+      "test_merge_spool_refuses_corrupt_or_truncated_state",
+      "test_merge_spool_validates_node_integrity_and_parent_order_before_replay",
+      "test_merge_spool_manifest_rejects_a_self_consistent_record_rewrite",
+      "test_merge_spool_rejects_forged_result_object_and_text_pair",
+      "test_merge_spool_requires_each_declared_root_to_start_its_walk",
+      "test_merge_spool_closes_connection_when_read_only_setup_fails"
+    ],
+    "tests/test_meter_precheck_refusal.py": [
+      "test_meter_precheck_refusal_is_audited_before_sync_dispatch",
+      "test_meter_precheck_refusal_is_audited_before_async_dispatch",
+      "test_unexpected_meter_precheck_errors_still_propagate",
+      "test_meter_precheck_refusal_rejects_unsafe_audit_metadata",
+      "test_mutated_precheck_metadata_cannot_poison_the_charge_ledger"
+    ],
+    "tests/test_meters.py": [
+      "test_step_meter_charges_model_and_tool_calls_only",
+      "test_wall_clock_meter_reads_duration_meta",
+      "test_token_meter_reads_standard_usage_shape",
+      "test_token_meter_warns_once_for_missing_usage",
+      "test_token_meter_rejects_incomplete_or_invalid_usage",
+      "test_token_meter_uses_input_estimator_and_output_reservation",
+      "test_token_meter_rejects_invalid_estimates",
+      "test_cost_meter_uses_decimal_arithmetic",
+      "test_cost_meter_returns_zero_for_missing_price_or_usage",
+      "test_window_meter_supports_request_and_token_windows",
+      "test_usage_helpers_normalize_provider_shapes"
+    ],
+    "tests/test_otel.py": [
+      "test_offline_span_tree_matches_branched_refused_replayed_tree",
+      "test_live_span_hook_emits_new_nodes_without_payload_content",
+      "test_offline_export_handles_a_tree_deeper_than_python_recursion"
+    ],
+    "tests/test_policy.py": [
+      "test_registered_tool_call_resolves_through_registry",
+      "test_registry_blocks_unknown_tool_and_ignores_supplied_fn",
+      "test_registry_refuses_version_or_schema_mismatch",
+      "test_dry_run_suppresses_side_effectful_handler",
+      "test_dry_run_executes_side_effect_free_handler",
+      "test_unfenced_tool_call_still_uses_supplied_fn",
+      "test_policy_deny_stops_ordered_composition",
+      "test_policy_confirm_resumes_exactly_once",
+      "test_root_rejects_different_registry_for_same_label"
+    ],
+    "tests/test_pytest_plugin.py": [
+      "test_pytest_plugin_records_then_replays"
+    ],
+    "tests/test_readme_links.py": [
+      "test_readme_markdown_links_use_absolute_urls"
+    ],
+    "tests/test_recipes.py": [
+      "test_recipe_scripts_compile",
+      "test_mcp_demo_server_compiles",
+      "test_mcp_recipe_runs_end_to_end_without_network"
+    ],
+    "tests/test_redaction.py": [
+      "test_redact_is_deterministic_and_canonical",
+      "test_sensitive_schema_keyword_is_fail_closed",
+      "test_sensitive_schema_redacts_nested_objects_and_arrays",
+      "test_sensitive_tool_value_reaches_handler_but_not_store",
+      "test_sensitive_value_is_redacted_on_refusal_and_dry_run",
+      "test_async_sensitive_handler_receives_original_only_at_execution",
+      "test_redaction_digest_uses_domain_separation"
+    ],
+    "tests/test_registry.py": [
+      "test_action_spec_and_registry_digest_golden_vectors",
+      "test_registry_rejects_duplicate_names",
+      "test_registry_get_enforces_version",
+      "test_unsupported_schema_is_rejected_at_registration",
+      "test_schema_rejects_invalid_enum_shapes",
+      "test_schema_rejects_malformed_any_of",
+      "test_schema_rejects_non_integer_constraint_values",
+      "test_schema_rejects_negative_length_constraints",
+      "test_constraint_keywords_require_their_declared_type",
+      "test_schema_validator_accepts_supported_values",
+      "test_schema_any_of_registers_and_validates_each_branch",
+      "test_inclusive_integer_bounds_accept_endpoints",
+      "test_exclusive_integer_bounds_reject_endpoints",
+      "test_string_length_counts_unicode_code_points",
+      "test_array_cardinality_and_item_schema_both_apply",
+      "test_zero_length_constraints_accept_empty_values",
+      "test_any_of_constraints_are_branch_local_and_booleans_are_not_integers",
+      "test_contradictory_constraints_register_but_accept_no_boundary_value",
+      "test_additional_properties_alone_closes_an_object_schema",
+      "test_enum_uses_json_type_equality",
+      "test_schema_resolves_local_defs_and_escaped_json_pointers",
+      "test_schema_resolves_legacy_definitions",
+      "test_schema_resolves_local_refs_inside_any_of_branches",
+      "test_reference_like_annotation_values_remain_literal",
+      "test_schema_rejects_unresolved_or_recursive_refs",
+      "test_schema_accepts_non_validation_annotations",
+      "test_schema_rejects_non_string_text_annotations",
+      "test_sensitive_redaction_follows_only_matching_any_of_branch",
+      "test_pydantic_nullable_sensitive_string_schema_registers",
+      "test_pydantic_generated_integer_and_length_constraints_register",
+      "test_schema_validator_reports_first_finding",
+      "test_array_null_boolean_and_enum_subset"
+    ],
+    "tests/test_replay.py": [
+      "test_record_mode_executes_and_records_result_conflicts",
+      "test_opt_in_duplicate_refusal_stops_model_before_budget_and_dispatch",
+      "test_opt_in_duplicate_refusal_survives_sqlite_reopen",
+      "test_opt_in_duplicate_refusal_allows_explicit_retry_attempt",
+      "test_opt_in_duplicate_refusal_stops_unregistered_tool_before_dispatch",
+      "test_duplicate_refusal_option_is_record_mode_only",
+      "test_opt_in_registered_duplicate_refuses_before_policy_re_evaluation",
+      "test_hybrid_hit_serves_recording_and_accounts_avoided_charges",
+      "test_hybrid_miss_executes_and_stores",
+      "test_replay_hit_never_calls_fn_even_when_budget_would_refuse",
+      "test_replay_miss_raises_missing_recording_without_calling_fn",
+      "test_replay_tool_miss_summary_includes_version_without_calling_fn",
+      "test_runtime_rejects_unknown_replay_mode",
+      "test_runtime_rejects_non_boolean_duplicate_refusal_option",
+      "test_replay_missing_run_does_not_create_root_or_emit_node",
+      "test_replay_reuses_structural_nodes_without_budget_checks_or_writes",
+      "test_replay_missing_structural_node_fails_without_writing",
+      "test_replay_does_not_retrofit_registry_binding",
+      "test_registered_tool_replay_skips_live_handler_and_policy",
+      "test_strict_replay_does_not_serve_resultless_dry_run_node",
+      "test_in_process_replay_results_are_detached_from_stored_state",
+      "test_sqlite_path_replay_is_physically_read_only",
+      "test_sqlite_path_replay_does_not_create_missing_database",
+      "test_replay_verifies_recording_integrity",
+      "test_replay_reports_missing_or_changed_ancestor_as_integrity_error"
+    ],
+    "tests/test_replay_ci.py": [
+      "test_replay_ci_example_uses_recording_with_sockets_guarded"
+    ],
+    "tests/test_revalidation.py": [
+      "test_replay_contract_binds_copy_and_preserves_reserved_metadata",
+      "test_replay_contract_rejects_invalid_identity",
+      "test_replay_contract_rejects_nonobject_or_conflicting_reserved_metadata",
+      "test_comparators_report_value_free_json_pointer_differences",
+      "test_exact_comparator_bounds_difference_paths",
+      "test_normalized_comparator_ignores_transport_and_tool_call_ids",
+      "test_normalized_comparator_falls_back_to_nonaccounting_result_fields",
+      "test_normalized_comparator_handles_provider_tool_variants_and_invalid_shapes",
+      "test_exact_comparator_reports_extra_list_items",
+      "test_revalidation_payload_validates_reserved_metadata_shapes",
+      "test_live_revalidation_records_separate_budgeted_evidence_and_preserves_golden",
+      "test_revalidation_store_parity",
+      "test_revalidation_supports_legacy_recording_without_bound_contract",
+      "test_revalidation_compares_canonical_stored_json_across_python_container_types",
+      "test_exact_revalidation_reports_drift_paths_without_values",
+      "test_revalidation_can_execute_a_distinct_live_request_and_fingerprint",
+      "test_revalidation_meters_receive_the_dispatched_payload_not_audit_metadata",
+      "test_revalidation_rejects_conflicting_live_payload_contract_before_dispatch",
+      "test_live_revalidation_rejects_nonrecord_modes_before_dispatch",
+      "test_live_revalidation_rejects_dry_run_missing_recording_and_invalid_inputs",
+      "test_duplicate_observation_id_is_refused_before_second_dispatch",
+      "test_reserved_revalidation_marker_and_malformed_recorded_contract_fail_closed",
+      "test_revalidation_rejects_nonobject_recording_and_malformed_live_contract",
+      "test_comparator_failure_records_content_free_failure_and_restores_cursor",
+      "test_invalid_comparator_result_is_a_recorded_comparison_failure",
+      "test_comparator_failure_preserves_primary_error_when_failure_note_cannot_store",
+      "test_revalidation_budget_refusal_happens_before_live_dispatch",
+      "test_revalidation_verifies_golden_integrity_before_live_dispatch",
+      "test_sync_stream_revalidation_forwards_chunks_and_compares_final_result",
+      "test_async_revalidation_has_sync_parity_and_awaits_provider_once",
+      "test_async_revalidation_streams_and_replay_mode_never_dispatches"
+    ],
+    "tests/test_runtime.py": [
+      "test_model_call_records_result_charges_and_moves_cursor",
+      "test_on_node_callback_failure_warns_without_breaking_the_run",
+      "test_runtime_records_measurement_meter_readings",
+      "test_tool_call_wraps_name_and_args_in_payload",
+      "test_branch_has_isolated_cursor",
+      "test_rollback_moves_to_an_ancestor_and_continuation_branches",
+      "test_rollback_rejects_non_ancestor",
+      "test_resume_uses_deepest_non_pruned_leaf",
+      "test_resume_ignores_pruned_tip",
+      "test_same_label_and_attempt_use_same_root",
+      "test_branch_budget_refuses_inside_branch_without_moving_parent",
+      "test_stream_forwards_chunks_settles_once_and_keeps_chunks",
+      "test_stream_callback_failure_after_first_chunk_settles_estimate",
+      "test_stream_operator_interrupt_after_first_chunk_settles_estimate",
+      "test_stream_and_non_stream_calls_have_same_identity",
+      "test_replay_reemits_retained_chunks_without_calling_fn",
+      "test_estimator_refusal_is_marked_and_fn_is_not_called",
+      "test_missing_provider_usage_settles_conservative_precheck_estimate",
+      "test_callable_mutation_cannot_change_recorded_identity_payload",
+      "test_meter_enter_failure_stops_lease_and_releases_reservation",
+      "test_meter_exit_and_release_failures_do_not_mask_callable_error",
+      "test_meter_exit_failure_after_result_settles_conservative_estimate",
+      "test_post_dispatch_unknown_settles_estimates_and_records_safe_note",
+      "test_lease_heartbeat_stop_is_bounded_when_renew_sticks",
+      "test_lease_heartbeat_records_base_exception_from_renewal"
+    ],
+    "tests/test_seal.py": [
+      "test_seal_report_is_deterministic_and_serializable",
+      "test_seal_changes_when_result_changes",
+      "test_seal_rejects_tampered_result_text"
+    ],
+    "tests/test_seal_custody.py": [
+      "test_sqlite_seal_sink_appends_complete_ordered_records",
+      "test_sqlite_seal_sink_requires_custody_identity",
+      "test_sqlite_seal_sink_refuses_pollard_store_database",
+      "test_sqlite_seal_sink_sequences_concurrent_publications"
+    ],
+    "tests/test_store_backend_failures.py": [
+      "test_kafka_constructor_validation",
+      "test_optional_backend_import_errors_are_actionable",
+      "test_remote_constructor_validation",
+      "test_redis_constructor_requires_boolean_create",
+      "test_mongodb_constructor_requires_boolean_create",
+      "test_neo4j_constructor_requires_boolean_create",
+      "test_redis_server_time_fails_closed",
+      "test_redis_client_factory_owns_construction_and_reconnect",
+      "test_redis_client_factory_must_return_fresh_client",
+      "test_redis_create_false_requires_existing_valid_store_without_writes",
+      "test_redis_creation_commits_identity_schema_and_revision_atomically",
+      "test_redis_creation_reuses_valid_namespace_without_mutation",
+      "test_redis_creation_rejects_partial_namespace_without_writes",
+      "test_redis_url_rejects_text_overrides_before_client_creation",
+      "test_redis_corrupt_schema_version_is_safely_rendered",
+      "test_mongodb_create_false_requires_existing_schema_without_writes",
+      "test_mongodb_reconnect_preserves_create_false",
+      "test_mongodb_reconnect_keeps_previous_client_until_schema_is_valid",
+      "test_mongodb_connect_refuses_standalone_and_closes_candidate",
+      "test_mongodb_namespace_states_fail_closed",
+      "test_mongodb_rejects_missing_or_incompatible_record_index",
+      "test_mongodb_fresh_index_creation_is_explicit_and_validated",
+      "test_mongodb_fresh_identity_schema_and_revision_initialize_in_one_transaction",
+      "test_mongodb_existing_create_path_performs_validation_only",
+      "test_mongodb_write_does_not_recreate_missing_coordinator",
+      "test_mongodb_create_failure_closes_client_without_connect_time_writes",
+      "test_mongodb_transaction_fails_closed_on_corrupt_records_and_time",
+      "test_redis_transaction_fails_closed_on_corrupt_values_and_types",
+      "test_neo4j_create_false_requires_existing_schema_without_writes",
+      "test_neo4j_reconnect_preserves_create_false_without_writes",
+      "test_neo4j_reconnect_after_create_mode_is_read_only",
+      "test_neo4j_create_false_reconnect_keeps_previous_driver_on_invalid_schema",
+      "test_neo4j_initial_schema_read_avoids_missing_property_notifications",
+      "test_neo4j_namespace_states_fail_closed",
+      "test_neo4j_create_mode_orders_validation_and_initialization",
+      "test_neo4j_create_mode_stops_before_ddl_for_partial_namespace",
+      "test_neo4j_rejects_missing_or_incompatible_constraints",
+      "test_neo4j_constraint_state_rejects_partial_and_alternate_names",
+      "test_neo4j_constraint_state_rejects_incompatible_backing_index",
+      "test_neo4j_creates_both_constraints_in_one_transaction",
+      "test_neo4j_does_not_repair_partial_constraints",
+      "test_neo4j_write_does_not_recreate_missing_coordinator",
+      "test_neo4j_fresh_schema_and_coordinator_initialize_in_one_transaction",
+      "test_neo4j_create_failure_closes_driver_without_constraint_writes",
+      "test_neo4j_logical_initialization_failure_closes_driver_after_validation",
+      "test_transactional_store_refuses_corrupt_schema_and_nodes",
+      "test_transactional_store_refuses_corrupt_reservation_and_window_state",
+      "test_transactional_store_refuses_corrupt_settlement_details",
+      "test_transactional_release_connection_failure_is_explicitly_uncertain",
+      "test_kafka_codec_and_state_machine_failure_paths",
+      "test_kafka_node_decoder_refuses_invalid_records",
+      "test_kafka_result_conflict_is_deterministic",
+      "test_kafka_invalid_command_does_not_poison_same_offset_retry",
+      "test_store_package_lazy_exports_and_unknown_attribute",
+      "test_kafka_produce_recovery_finds_committed_operation",
+      "test_kafka_produce_recovery_reports_persistent_ambiguity",
+      "test_kafka_watermarks_fail_closed",
+      "test_kafka_watermark_failure_and_forward_sync",
+      "test_kafka_replay_message_failures",
+      "test_kafka_replay_poll_failure",
+      "test_kafka_apply_message_rejects_wrong_key_and_nonbytes",
+      "test_kafka_delivery_callback_validation",
+      "test_kafka_delivery_enqueue_and_missing_message_failures"
+    ],
+    "tests/test_store_hashrope.py": [
+      "test_hashrope_store_replays_snapshot",
+      "test_hashrope_store_rejects_parent_that_does_not_exist",
+      "test_hashrope_store_rejects_bad_identity"
+    ],
+    "tests/test_store_kafka.py": [
+      "test_kafka_rejects_invalid_read_only_and_nonfinite_timeout",
+      "test_kafka_rejects_timeout_too_large_to_normalize",
+      "test_kafka_controls_client_configuration_and_observer_identity",
+      "test_kafka_require_existing_refuses_empty_topic_before_producer_creation",
+      "test_kafka_require_existing_replays_identity_before_creating_producer",
+      "test_kafka_require_existing_rejects_wrong_identity_before_producer_creation",
+      "test_kafka_require_existing_rejects_corrupt_history_before_producer_creation",
+      "test_kafka_require_existing_reconnect_restores_previous_clients_if_emptied",
+      "test_kafka_producer_construction_failure_closes_validated_consumer",
+      "test_kafka_read_only_defends_all_write_paths",
+      "test_kafka_read_only_snapshot_is_frozen_until_reconnect",
+      "test_kafka_reconnect_atomically_replaces_clients",
+      "test_kafka_failed_reconnect_restores_clients_and_view",
+      "test_kafka_reconnect_refuses_changed_history_and_restores_previous_view",
+      "test_kafka_acknowledged_write_repair_failure_restores_and_closes_replacement",
+      "test_kafka_is_non_arbiter_and_rebuilds_concurrent_metadata",
+      "test_kafka_real_broker_walks_deep_tree_iteratively",
+      "test_kafka_failed_preconditions_do_not_poison_later_retry",
+      "test_kafka_real_read_only_snapshot_refreshes_only_on_reconnect",
+      "test_kafka_real_cli_observation_export_import_and_merge_are_read_only",
+      "test_kafka_real_cli_merge_destination_is_existing_and_idempotent",
+      "test_kafka_refuses_incompatible_topic_configuration",
+      "test_kafka_event_codec_is_canonical_and_fails_closed"
+    ],
+    "tests/test_store_memory.py": [
+      "test_memory_store_rejects_parent_that_does_not_exist",
+      "test_memory_store_rejects_bad_identity"
+    ],
+    "tests/test_store_postgres.py": [
+      "test_postgres_store_is_lazy_optional_import",
+      "test_postgres_fresh_schema_records_current_version",
+      "test_postgres_legacy_schema_requires_explicit_forward_migration",
+      "test_postgres_migration_refuses_in_flight_legacy_reservation",
+      "test_postgres_unknown_schema_version_is_refused",
+      "test_postgres_partial_unversioned_schema_is_refused",
+      "test_postgres_changed_current_table_layout_is_refused",
+      "test_postgres_logical_stores_are_isolated_and_intern_payloads",
+      "test_postgres_window_meter_is_atomic_across_two_threads",
+      "test_postgres_running_call_keeps_exact_window_reservation",
+      "test_postgres_reserve_and_settle_retries_are_idempotent",
+      "test_postgres_reservation_lease_starts_after_budget_row_lock_wait",
+      "test_postgres_window_settlement_time_is_after_row_lock_wait",
+      "test_postgres_renewal_lease_starts_after_reservation_row_lock_wait",
+      "test_postgres_reconnects_after_backend_loss",
+      "test_postgres_reserve_commit_with_lost_ack_is_recovered",
+      "test_postgres_settle_commit_with_lost_ack_is_recovered_once",
+      "test_postgres_release_commit_with_lost_ack_is_recovered",
+      "test_completed_provider_call_recovers_settlement_after_connection_loss",
+      "test_persistent_reserve_settle_and_release_failures_are_explicit",
+      "test_postgres_window_settlement_cannot_escape_eight_writer_limit",
+      "test_postgres_concurrent_puts_are_benign_and_meta_patches_are_not_lost",
+      "test_postgres_budget_contention_two_processes_twenty_rounds",
+      "test_postgres_cli_uses_env_spec_without_printing_dsn"
+    ],
+    "tests/test_store_remote.py": [
+      "test_remote_store_reopen_and_exact_concurrent_budget",
+      "test_remote_window_contention_and_retry_tombstones",
+      "test_remote_replay_verify_seal_and_external_custody",
+      "test_redis_requires_noeviction_and_refuses_future_schema",
+      "test_redis_create_false_rejects_missing_namespace_without_writes",
+      "test_redis_caller_owned_client_factory_reconnects",
+      "test_mongodb_refuses_future_schema",
+      "test_mongodb_create_false_missing_namespace_has_no_side_effects",
+      "test_neo4j_refuses_future_schema",
+      "test_neo4j_create_false_missing_namespace_has_no_side_effects"
+    ],
+    "tests/test_store_shared.py": [
+      "test_put_get_and_idempotent_put",
+      "test_children_are_sorted_by_kind_then_id",
+      "test_update_meta_merges_top_level_keys",
+      "test_put_get_and_walk_do_not_expose_mutable_stored_state",
+      "test_walk_is_depth_first_and_deterministic",
+      "test_walk_handles_depth_beyond_python_recursion_limit",
+      "test_roots_are_sorted_by_run_label_then_id",
+      "test_result_conflict_keeps_first_result_and_records_conflict",
+      "test_same_id_with_different_identity_fields_is_integrity_error"
+    ],
+    "tests/test_store_sqlite.py": [
+      "test_sqlite_store_persists_across_reopen",
+      "test_gitignore_excludes_sqlite_wal_sidecars",
+      "test_payload_interning_is_storage_only_and_configurable",
+      "test_repeated_large_strings_share_one_blob",
+      "test_caller_blob_ref_shape_round_trips_without_aliasing",
+      "test_missing_interned_blob_is_integrity_error",
+      "test_schema_one_database_migrates_without_changing_nodes",
+      "test_reopening_schema_three_database_is_read_only",
+      "test_explicit_read_only_store_never_creates_or_migrates",
+      "test_concurrent_sqlite_puts_and_meta_patches_are_serialized"
+    ],
+    "tests/test_store_transactional.py": [
+      "test_transactional_base_implements_store_and_maintenance_contract",
+      "test_transactional_base_preserves_first_result_and_rejects_identity_collision",
+      "test_exact_budget_is_atomic_and_duplicate_settlement_is_idempotent",
+      "test_reservation_retry_release_and_expiry_semantics",
+      "test_window_events_expire_and_settle_at_transaction_time",
+      "test_ambiguous_reserve_and_settle_are_recovered_by_tombstones",
+      "test_persistent_connection_loss_raises_explicit_uncertainty"
+    ],
+    "tests/test_tokenmaster_meter.py": [
+      "test_tokenmaster_governance_factory_preserves_standard_runtime_accounting",
+      "test_tokenmaster_meter_charges_usage_and_writes_meta",
+      "test_tokenmaster_meter_supports_openai_compatible_usage_aliases",
+      "test_tokenmaster_meter_falls_back_to_charge_when_model_is_missing",
+      "test_runtime_can_budget_with_tokenmaster_meter",
+      "test_tokenmaster_meter_estimates_input_and_reserves_output",
+      "test_tokenmaster_meter_rejects_invalid_estimates",
+      "test_tokenmaster_meter_rejects_invalid_output_reservation",
+      "test_tokenmaster_estimator_refuses_before_model_dispatch",
+      "test_tokenmaster_estimate_is_conservative_fallback_without_usage",
+      "test_profile_enforcement_requires_an_estimator_and_known_capacity_kind",
+      "test_legacy_estimator_does_not_parse_provider_output_options",
+      "test_gpt_5_6_alias_accepts_exact_input_and_context_boundaries",
+      "test_gpt_5_6_profile_refusal_is_auditable_before_dispatch",
+      "test_profile_enforcement_understands_requested_output_spellings",
+      "test_profile_enforcement_can_use_effective_capacity",
+      "test_profile_enforcement_refuses_when_estimator_has_no_answer",
+      "test_settlement_records_profile_overage_without_raising",
+      "test_result_model_is_inferred_but_explicit_binding_wins",
+      "test_inferred_model_binding_is_not_sticky_across_calls",
+      "test_openai_nested_details_are_made_exclusive_and_metadata_merges",
+      "test_anthropic_and_bedrock_cache_fields_are_already_exclusive",
+      "test_gpt_5_6_cost_meter_uses_conservative_long_tier_precheck",
+      "test_gpt_5_6_cost_meter_exact_long_tier_is_decimal_safe",
+      "test_cost_meter_refuses_missing_pricing_before_dispatch",
+      "test_cost_meter_refuses_non_usd_pricing_before_dispatch",
+      "test_gemini_cache_storage_is_incomplete_and_fails_closed",
+      "test_cost_meter_refuses_when_estimator_has_no_answer",
+      "test_cost_budget_refuses_before_provider_dispatch",
+      "test_cost_settlement_failure_uses_reserved_precheck_estimate",
+      "test_post_dispatch_dependency_and_pricing_failures_do_not_raise",
+      "test_post_dispatch_diagnostics_do_not_raise_when_warnings_are_errors",
+      "test_tokenmaster_cost_meter_runs_in_sync_and_strict_replay",
+      "test_tokenmaster_cost_meter_runs_in_async_runtime"
+    ],
+    "tests/test_tree.py": [
+      "test_make_root_computes_identity",
+      "test_node_result_digest_is_computed_from_stored_text",
+      "test_parent_invariants",
+      "test_attempt_must_be_non_negative_int",
+      "test_from_storage_allows_identity_mismatch_for_verification"
+    ],
+    "tests/test_verify.py": [
+      "test_verify_clean_tree_passes",
+      "test_verify_detects_tampered_payload",
+      "test_verify_detects_tampered_result_text"
+    ],
+    "tests/test_window_meter.py": [
+      "test_window_meter_is_shared_across_two_sqlite_writers",
+      "test_sqlite_budget_reservations_enforce_exact_step_limit",
+      "test_expired_sqlite_budget_reservation_releases_capacity",
+      "test_sqlite_reservation_lease_starts_after_write_lock_wait",
+      "test_sqlite_window_settlement_time_is_sampled_after_write_lock_wait",
+      "test_running_sqlite_call_renews_reservation_past_initial_lease",
+      "test_lease_heartbeat_cadence_does_not_drift_with_slow_renewal",
+      "test_lease_heartbeat_stop_reports_unconfirmed_deadline",
+      "test_lost_reservation_lease_is_recorded_and_reported",
+      "test_failed_call_releases_window_reservation_immediately",
+      "test_estimated_token_budget_records_bounded_settle_overshoot"
+    ]
+  }
+}

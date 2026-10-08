@@ -2,9 +2,13 @@ use crate::identity::hex64;
 use crate::{
     canonical_bytes, node_id, result_digest_from_text, result_text_and_digest, Error, Result,
 };
+use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::collections::{BTreeMap, BTreeSet};
+use std::sync::Arc;
+
+pub type LeaseRenewer = Arc<dyn Fn(&str, f64) -> Result<bool> + Send + Sync>;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -29,7 +33,7 @@ impl NodeKind {
 }
 
 /// Detached owned record. Result integrity is checked against exact result text.
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Node {
     pub id: String,
     pub parent: Option<String>,
@@ -40,6 +44,24 @@ pub struct Node {
     pub result_text: Option<String>,
     pub result_digest: Option<String>,
     pub meta: Value,
+}
+
+impl PartialEq for Node {
+    fn eq(&self, other: &Self) -> bool {
+        self.id == other.id
+            && self.parent == other.parent
+            && self.kind == other.kind
+            && self.attempt == other.attempt
+            && self.payload == other.payload
+            && self.result_text == other.result_text
+            && self.result_digest == other.result_digest
+            && match (&self.result, &other.result) {
+                (None, None) => true,
+                (Some(left), Some(right)) => crate::identity::result_values_equal(left, right),
+                _ => false,
+            }
+            && crate::identity::result_values_equal(&self.meta, &other.meta)
+    }
 }
 
 impl Node {
@@ -133,7 +155,7 @@ impl Node {
             ));
         }
         canonical_bytes(&self.payload)?;
-        crate::identity::safe_amount(self.attempt, "attempt")?;
+        crate::identity::validate_finite_json(&self.meta)?;
         if self.result_digest.as_deref().is_some_and(|s| !hex64(s)) {
             return Err(Error::Integrity("invalid result digest".into()));
         }
@@ -157,7 +179,7 @@ impl Node {
                 }
                 let parsed: Value =
                     serde_json::from_str(text).map_err(|e| Error::Integrity(e.to_string()))?;
-                if *result != parsed {
+                if !crate::identity::result_values_equal(result, &parsed) {
                     return Err(Error::Integrity(
                         "result differs from stored result text".into(),
                     ));
@@ -173,20 +195,117 @@ impl Node {
     }
 }
 
+/// A store-local cache token distinguishing local writes from independent ones.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct StoreRevision {
+    /// Mutations through this store instance.
+    pub local: u64,
+    /// All independently committed mutations, including identities and blobs.
+    pub external: u64,
+}
+
 /// Optional settlement extension required by live runtimes. Finalization must
 /// atomically replace only a pending, resultless node with the same identity.
 pub trait RecordingStore: Store {
     fn finalize(&mut self, node: Node) -> Result<()>;
+    /// Stage a live call before dispatch. Append-only backends may keep this
+    /// transient and publish a single completed record during finalization.
+    fn stage_pending(&mut self, node: Node) -> Result<()> {
+        self.put(node)
+    }
+    /// Revision covering every store mutation, or None for externally writable stores.
+    fn revision(&self) -> Option<u64> {
+        None
+    }
+    /// Existing settled identity/result bytes cannot change through this backend.
+    fn trusted_immutable_identity(&self) -> bool {
+        false
+    }
+    /// A token valid only on this store instance. Returning Some promises that
+    /// every committed mutation changes a component and that reads observe the
+    /// current token. Local writes preserve settled identity/result bytes; other
+    /// changes, including external SQL and triggers, must change `external`.
+    /// A single-node write must not modify other cached nodes; such side effects
+    /// require changing `external` or returning None instead.
+    /// Runtimes recheck tokens after scans and discard caches on any change.
+    fn cache_revision(&self) -> Option<StoreRevision> {
+        if self.trusted_immutable_identity() {
+            self.revision()
+                .map(|local| StoreRevision { local, external: 0 })
+        } else {
+            None
+        }
+    }
+    fn supports_reservations(&self) -> bool {
+        false
+    }
+    /// None means this backend has no shared-budget arbiter.
+    fn reserve_budget(
+        &mut self,
+        _id: &str,
+        _budgets: &[crate::BudgetReservation],
+        _windows: &[crate::WindowReservation],
+        _lease_seconds: f64,
+    ) -> Result<Option<crate::ReservationCheck>> {
+        Ok(None)
+    }
+    fn settle_budget(&mut self, _id: &str, _charges: &BTreeMap<String, Decimal>) -> Result<()> {
+        Err(Error::Invalid("store has no shared-budget arbiter".into()))
+    }
+    fn release_budget(&mut self, _id: &str) -> Result<()> {
+        Err(Error::Invalid("store has no shared-budget arbiter".into()))
+    }
+    /// An independent connection-safe heartbeat, callable while a handler executes.
+    fn lease_renewer(&self) -> Option<LeaseRenewer> {
+        None
+    }
 }
 
 /// Backends return detached owned records. Mutations occur only via methods.
 pub trait Store {
+    /// Snapshot compatible append-only log bytes, when the backend exposes one.
+    fn operation_log(&self) -> Result<Vec<u8>> {
+        Err(Error::Invalid(
+            "backend does not expose an operation log".into(),
+        ))
+    }
     fn put(&mut self, node: Node) -> Result<()>;
     fn get(&self, id: &str) -> Result<Node>;
     fn exists(&self, id: &str) -> bool;
+    /// Fallible existence query. Runtime dispatch must use this method so a
+    /// remote connection failure cannot be mistaken for a missing recording.
+    fn try_exists(&self, id: &str) -> Result<bool> {
+        Ok(self.exists(id))
+    }
     fn children(&self, id: &str) -> Result<Vec<String>>;
     fn update_meta(&mut self, id: &str, patch: Value) -> Result<()>;
     fn roots(&self) -> Result<Vec<String>>;
+    /// Import collision checks and writes share one transaction on native stores.
+    fn import_nodes(&mut self, nodes: Vec<Node>) -> Result<(usize, usize)> {
+        crate::merge::import_prepared(self, nodes)
+    }
+    /// Merge destination reads and writes share one transaction on SQLite.
+    fn merge_nodes(&mut self, nodes: Vec<Node>, replay: bool) -> Result<crate::MergeReport> {
+        crate::merge::merge_prepared(self, nodes, replay)
+    }
+    /// Apply a prevalidated batch. Backends may override to provide atomicity.
+    fn apply_batch(&mut self, nodes: Vec<Node>, patches: Vec<(String, Value)>) -> Result<()> {
+        for node in nodes {
+            self.put(node)?;
+        }
+        for (id, patch) in patches {
+            self.update_meta(&id, patch)?;
+        }
+        Ok(())
+    }
+    fn drop_nodes(&mut self, _ids: &BTreeSet<String>) -> Result<()> {
+        Err(Error::Invalid(
+            "backend does not support garbage collection".into(),
+        ))
+    }
+    fn compact(&mut self) -> Result<usize> {
+        Err(Error::Invalid("backend does not support compaction".into()))
+    }
     fn walk(&self, root: &str) -> Result<Vec<Node>> {
         let mut pending = vec![root.to_owned()];
         let mut seen = BTreeSet::new();
@@ -208,6 +327,8 @@ pub trait Store {
 pub struct MemoryStore {
     nodes: BTreeMap<String, Node>,
     pending: BTreeSet<String>,
+    children: BTreeMap<String, BTreeSet<(String, String)>>,
+    revision: u64,
 }
 
 impl MemoryStore {
@@ -243,6 +364,7 @@ impl Store for MemoryStore {
                     .as_array_mut()
                     .ok_or_else(|| Error::Integrity("invalid result_conflicts metadata".into()))?
                     .push(json!({"result_digest":node.result_digest,"result":node.result}));
+                self.revision = self.revision.wrapping_add(1);
             }
             return Ok(());
         }
@@ -251,7 +373,14 @@ impl Store for MemoryStore {
         {
             self.pending.insert(node.id.clone());
         }
+        if let Some(parent) = &node.parent {
+            self.children
+                .entry(parent.clone())
+                .or_default()
+                .insert((node.kind.as_str().to_owned(), node.id.clone()));
+        }
         self.nodes.insert(node.id.clone(), node);
+        self.revision = self.revision.wrapping_add(1);
         Ok(())
     }
     fn get(&self, id: &str) -> Result<Node> {
@@ -264,13 +393,13 @@ impl Store for MemoryStore {
         self.nodes.contains_key(id)
     }
     fn children(&self, id: &str) -> Result<Vec<String>> {
-        let mut nodes: Vec<_> = self
-            .nodes
-            .values()
-            .filter(|n| n.parent.as_deref() == Some(id))
-            .collect();
-        nodes.sort_by_key(|n| (n.kind.as_str(), n.id.as_str()));
-        Ok(nodes.into_iter().map(|n| n.id.clone()).collect())
+        Ok(self
+            .children
+            .get(id)
+            .into_iter()
+            .flatten()
+            .map(|(_, id)| id.clone())
+            .collect())
     }
     fn update_meta(&mut self, id: &str, patch: Value) -> Result<()> {
         let patch = patch
@@ -284,6 +413,7 @@ impl Store for MemoryStore {
             .as_object_mut()
             .expect("validated meta")
             .extend(patch.clone());
+        self.revision = self.revision.wrapping_add(1);
         Ok(())
     }
     fn roots(&self) -> Result<Vec<String>> {
@@ -295,6 +425,39 @@ impl Store for MemoryStore {
             )
         });
         Ok(roots.into_iter().map(|n| n.id.clone()).collect())
+    }
+    fn apply_batch(&mut self, nodes: Vec<Node>, patches: Vec<(String, Value)>) -> Result<()> {
+        let mut staged = self.clone();
+        for node in nodes {
+            staged.put(node)?;
+        }
+        for (id, patch) in patches {
+            staged.update_meta(&id, patch)?;
+        }
+        *self = staged;
+        Ok(())
+    }
+    fn drop_nodes(&mut self, ids: &BTreeSet<String>) -> Result<()> {
+        if self
+            .nodes
+            .values()
+            .any(|n| !ids.contains(&n.id) && n.parent.as_ref().is_some_and(|p| ids.contains(p)))
+        {
+            return Err(Error::Integrity(
+                "garbage collection would orphan a child".into(),
+            ));
+        }
+        self.nodes.retain(|id, _| !ids.contains(id));
+        self.pending.retain(|id| !ids.contains(id));
+        self.children.retain(|id, _| !ids.contains(id));
+        for children in self.children.values_mut() {
+            children.retain(|(_, id)| !ids.contains(id));
+        }
+        self.revision = self.revision.wrapping_add(1);
+        Ok(())
+    }
+    fn compact(&mut self) -> Result<usize> {
+        Ok(0)
     }
 }
 
@@ -326,7 +489,14 @@ impl RecordingStore for MemoryStore {
         }
         self.pending.remove(&node.id);
         self.nodes.insert(node.id.clone(), node);
+        self.revision = self.revision.wrapping_add(1);
         Ok(())
+    }
+    fn revision(&self) -> Option<u64> {
+        Some(self.revision)
+    }
+    fn trusted_immutable_identity(&self) -> bool {
+        true
     }
 }
 
@@ -383,4 +553,61 @@ pub fn verify<S: Store + ?Sized>(store: &S, id: &str) -> VerifyReport {
         ok: findings.is_empty(),
         findings,
     }
+}
+
+/// Verify a subtree and its external ancestry, including child-index consistency.
+/// The Python-compatible `verify` function intentionally checks ancestry only.
+pub fn verify_subtree<S: Store + ?Sized>(store: &S, root: &str) -> VerifyReport {
+    let mut report = verify(store, root);
+    let mut pending = vec![(root.to_owned(), None)];
+    let mut seen = BTreeSet::new();
+    while let Some((id, expected_parent)) = pending.pop() {
+        if !seen.insert(id.clone()) {
+            report.findings.push(VerifyFinding {
+                node_id: id,
+                message: "cycle or duplicate in subtree".into(),
+            });
+            continue;
+        }
+        match store.get(&id) {
+            Ok(node) => {
+                if node.id != id
+                    || expected_parent
+                        .as_ref()
+                        .is_some_and(|p| node.parent.as_ref() != Some(p))
+                {
+                    report.findings.push(VerifyFinding {
+                        node_id: id.clone(),
+                        message: "child index disagrees with stored identity".into(),
+                    });
+                }
+                if id != root {
+                    if let Err(e) = node.validate() {
+                        report.findings.push(VerifyFinding {
+                            node_id: id.clone(),
+                            message: e.to_string(),
+                        });
+                    }
+                }
+                match store.children(&id) {
+                    Ok(children) => pending.extend(
+                        children
+                            .into_iter()
+                            .rev()
+                            .map(|child| (child, Some(id.clone()))),
+                    ),
+                    Err(e) => report.findings.push(VerifyFinding {
+                        node_id: id,
+                        message: e.to_string(),
+                    }),
+                }
+            }
+            Err(e) => report.findings.push(VerifyFinding {
+                node_id: id,
+                message: e.to_string(),
+            }),
+        }
+    }
+    report.ok = report.findings.is_empty();
+    report
 }

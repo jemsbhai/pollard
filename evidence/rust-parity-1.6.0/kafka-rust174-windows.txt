@@ -1,0 +1,4 @@
+    Updating crates.io index
+    Blocking waiting for file lock on build directory
+    Checking pollardai v0.1.0 (C:\Users\User\.codex\worktrees\rust-pypi-parity\pollard\crates\pollardai)
+    Finished dev [unoptimized + debuginfo] target(s) in 33.59s

@@ -1,0 +1,6 @@
+   Packaging pollardai v0.1.0 (C:\Users\User\.codex\worktrees\rust-pypi-parity\pollard\crates\pollardai)
+    Updating crates.io index
+    Packaged 105 files, 2.3MiB (330.5KiB compressed)
+   Verifying pollardai v0.1.0 (C:\Users\User\.codex\worktrees\rust-pypi-parity\pollard\crates\pollardai)
+   Compiling pollardai v0.1.0 (C:\Users\User\.codex\worktrees\rust-pypi-parity\pollard\crates\pollardai\target\package\pollardai-0.1.0)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 11.62s

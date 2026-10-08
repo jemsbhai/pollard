@@ -110,14 +110,8 @@ fn shared_python_golden_vectors() {
 }
 
 #[test]
-fn identity_rejects_nonportable_values_and_invalid_node_shapes() {
-    for value in [
-        json!(1.0),
-        json!(-0.0),
-        json!({"n":MAX_SAFE_INTEGER+1}),
-        json!(-(MAX_SAFE_INTEGER as i64) - 1),
-        json!(u64::MAX),
-    ] {
+fn identity_rejects_floats_and_invalid_node_shapes() {
+    for value in [json!(1.0), json!(-0.0)] {
         assert!(canonical_bytes(&value).is_err());
     }
     assert!(serde_json::from_str::<Value>("\"\\ud800\"").is_err());
@@ -139,7 +133,7 @@ fn identity_rejects_nonportable_values_and_invalid_node_shapes() {
         None,
         json!({})
     )
-    .is_err());
+    .is_ok());
     assert!(Budget {
         steps: Some(MAX_SAFE_INTEGER + 1),
         ..Default::default()
@@ -272,7 +266,7 @@ fn budgets_refuse_before_side_effect_and_charge_actual_overshoot() {
 }
 
 #[test]
-fn malformed_usage_fail_closes_after_dispatch_and_keeps_conservative_charge() {
+fn malformed_usage_falls_back_to_estimate_without_stopping_completed_call() {
     for (i, usage) in [
         Value::Null,
         json!({"input_tokens":-10,"output_tokens":0}),
@@ -294,10 +288,13 @@ fn malformed_usage_fail_closes_after_dispatch_and_keeps_conservative_charge() {
                 0,
             )
             .unwrap();
-        assert!(matches!(
-            run.model_call(json!({}), options(3), |_| Ok(json!({"usage":usage}))),
-            Err(Error::UsageError { .. })
-        ));
+        let node = run
+            .model_call(json!({}), options(3), |_| Ok(json!({"usage":usage})))
+            .unwrap();
+        assert_eq!(
+            node.meta["accounting_fallbacks"]["tokens"]["reason"],
+            json!("missing_or_invalid_provider_usage")
+        );
         assert_eq!(
             run.spent().unwrap(),
             Charges {
@@ -305,12 +302,9 @@ fn malformed_usage_fail_closes_after_dispatch_and_keeps_conservative_charge() {
                 tokens: 3
             }
         );
-        assert!(matches!(
-            run.model_call(json!({"next":true}), options(0), |_| panic!(
-                "unknown usage cannot grant credits"
-            )),
-            Err(Error::BudgetExceeded { .. })
-        ));
+        run.model_call(json!({"next":true}), options(0), |_| Ok(result(1)))
+            .unwrap();
+        assert_eq!(run.spent().unwrap().tokens, 4);
     }
     let runtime = Runtime::memory(ReplayMode::Record);
     let mut run = runtime
@@ -323,17 +317,14 @@ fn malformed_usage_fail_closes_after_dispatch_and_keeps_conservative_charge() {
             0,
         )
         .unwrap();
-    assert!(matches!(
-        run.model_call(json!({}), CallOptions::default(), |_| panic!(
-            "estimate required"
-        )),
-        Err(Error::BudgetExceeded { .. })
-    ));
+    run.model_call(json!({}), CallOptions::default(), |_| Ok(result(1)))
+        .unwrap();
+    assert_eq!(run.spent().unwrap().tokens, 1);
 }
 
 #[test]
-fn duplicate_recordings_and_failed_calls_never_redispatch() {
-    let runtime = Runtime::memory(ReplayMode::Record);
+fn optional_duplicate_refusal_and_known_callback_failure_release() {
+    let runtime = Runtime::memory(ReplayMode::Record).with_refuse_duplicate_recordings(true);
     let mut run = runtime.run("duplicate", None, 0).unwrap();
     let root = run.root_id().to_owned();
     let payload = json!({"model":"x"});
@@ -375,17 +366,13 @@ fn duplicate_recordings_and_failed_calls_never_redispatch() {
     assert_eq!(
         fail.spent().unwrap(),
         Charges {
-            steps: 1,
-            tokens: 2
+            steps: 0,
+            tokens: 0
         }
     );
     fail.rollback(&root).unwrap();
-    assert!(matches!(
-        fail.model_call(json!({}), CallOptions::default(), |_| panic!(
-            "failed redispatch"
-        )),
-        Err(Error::DuplicateRecording(_))
-    ));
+    fail.model_call(json!({}), CallOptions::default(), |_| Ok(result(0)))
+        .unwrap();
 }
 
 #[test]
@@ -711,7 +698,7 @@ fn schema_subset_is_fail_closed_and_caller_values_do_not_panic() {
     assert!(constrained
         .validate_args(&json!({"value":null,"text":"😀"}))
         .is_ok());
-    assert!(constrained.redact_args(&json!({"value":u64::MAX})).is_err());
+    assert!(constrained.redact_args(&json!({"value":u64::MAX})).is_ok());
 }
 
 #[test]
@@ -749,12 +736,14 @@ fn mutable_metadata_cannot_reopen_finalization() {
 }
 
 #[test]
-fn denial_dominates_confirmation_and_hybrid_reuse_skips_policies() {
+fn ordered_confirmation_and_hybrid_policy_checks_match_python() {
     let registry = Registry::new(vec![spec(Some(Arc::new(|_| Ok(result(0)))))]).unwrap();
     let denied = Runtime::memory(ReplayMode::Record)
         .with_registry(registry.clone())
         .with_policy(Arc::new(|_| Decision::Confirm))
-        .with_policy(Arc::new(|_| Decision::Deny));
+        .with_policy(Arc::new(|_| {
+            panic!("first confirmation stops policy evaluation")
+        }));
     let mut run = denied.run("deny-after-confirm", None, 0).unwrap();
     assert!(matches!(
         run.registered_tool_call(
@@ -763,7 +752,7 @@ fn denial_dominates_confirmation_and_hybrid_reuse_skips_policies() {
             json!({"secret":"private"}),
             CallOptions::default()
         ),
-        Err(Error::PolicyViolation { .. })
+        Err(Error::ConfirmationRequired { .. })
     ));
     let record = Runtime::memory(ReplayMode::Record).with_registry(registry.clone());
     let mut run = record.run("hybrid-policy", None, 0).unwrap();
@@ -777,7 +766,7 @@ fn denial_dominates_confirmation_and_hybrid_reuse_skips_policies() {
         .unwrap();
     let hybrid = Runtime::from_shared(record.shared_store(), ReplayMode::Hybrid)
         .with_registry(registry)
-        .with_policy(Arc::new(|_| panic!("hybrid hit policy")));
+        .with_policy(Arc::new(|_| Decision::Allow));
     let mut run = hybrid.run("hybrid-policy", None, 0).unwrap();
     assert_eq!(
         run.registered_tool_call(
@@ -804,12 +793,10 @@ fn unknown_usage_recorded_result_can_be_strictly_replayed() {
             0,
         )
         .unwrap();
-    assert!(matches!(
-        run.model_call(json!({"model":"x"}), options(2), |_| Ok(
-            json!({"text":"semantic result"})
-        )),
-        Err(Error::UsageError { .. })
-    ));
+    run.model_call(json!({"model":"x"}), options(2), |_| {
+        Ok(json!({"text":"semantic result"}))
+    })
+    .unwrap();
     let replay = Runtime::from_shared(runtime.shared_store(), ReplayMode::Replay);
     let mut run = replay.run("unknown-replay", None, 0).unwrap();
     assert_eq!(

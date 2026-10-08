@@ -1,0 +1,14 @@
+   Compiling zerocopy v0.8.62
+   Compiling memchr v2.8.3
+   Compiling serde_json v1.0.151
+   Compiling serde_derive v1.0.229
+   Compiling serde v1.0.229
+   Compiling ahash v0.8.12
+   Compiling hashbrown v0.14.5
+   Compiling hashlink v0.9.1
+   Compiling rusqlite v0.31.0
+   Compiling pollardai v0.2.0 (C:\Users\User\.codex\worktrees\rust-pypi-parity\pollard\crates\pollardai)
+   Compiling pollard-fresh-consumer v0.0.0 (C:\Users\User\.codex\worktrees\rust-pypi-parity\pollard\.benchmarks\fresh-consumer-default-020)
+    Finished dev [unoptimized + debuginfo] target(s) in 15.93s
+     Running `crates\pollardai\target\debug\pollard-fresh-consumer.exe`
+recorded_tokens=6 strict_replay=true

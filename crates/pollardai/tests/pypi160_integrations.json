@@ -1,0 +1,1543 @@
+{
+  "provenance": {
+    "wheel_sha256": "569fb5f130a82c9be327b8dcbd285e3be063200bd9773ca15c5d6bb62edd627f"
+  },
+  "mcp": [
+    {
+      "listing": {},
+      "exclude": [],
+      "digest": "e0a2633cb43dd332eb1863d05159cf7aa5d26385d103ebfb8d4d6776ac560afa"
+    },
+    {
+      "listing": {
+        "tools": []
+      },
+      "exclude": [],
+      "digest": "e0a2633cb43dd332eb1863d05159cf7aa5d26385d103ebfb8d4d6776ac560afa"
+    },
+    {
+      "listing": {
+        "tools": [
+          {
+            "name": "echo",
+            "description": "Echo text",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string",
+                  "sensitive": true
+                }
+              },
+              "required": [
+                "text"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ]
+      },
+      "exclude": [],
+      "digest": "2f2ab8fbef4240c6eb1c9849e0d9ed3a610861fc0cab9cc87f58ad4994afc9a3"
+    },
+    {
+      "listing": {
+        "tools": [
+          {
+            "name": "excluded",
+            "inputSchema": null
+          },
+          {
+            "name": "blank",
+            "description": 9
+          }
+        ]
+      },
+      "exclude": [
+        "excluded"
+      ],
+      "digest": "99845c68329feb5cbd330d31fb851376586373abe91693685d3b325827784991"
+    },
+    {
+      "listing": {
+        "tools": [
+          {
+            "name": "refs",
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "n": {
+                  "$ref": "#/$defs/n"
+                }
+              },
+              "$defs": {
+                "n": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "exclude": [],
+      "digest": "f5405dbb4c0a2a80a4cbe534e3bffe27b90f7bfa91a90ab568d15b5bf3848f31"
+    },
+    {
+      "listing": {
+        "tools": null
+      },
+      "exclude": [],
+      "error": "TypeError"
+    },
+    {
+      "listing": {
+        "tools": [
+          {}
+        ]
+      },
+      "exclude": [],
+      "error": "TypeError"
+    },
+    {
+      "listing": {
+        "tools": [
+          {
+            "name": "x",
+            "inputSchema": []
+          }
+        ]
+      },
+      "exclude": [],
+      "error": "TypeError"
+    },
+    {
+      "listing": {
+        "tools": [
+          {
+            "name": "x",
+            "inputSchema": {
+              "allOf": []
+            }
+          }
+        ]
+      },
+      "exclude": [],
+      "error": "UnsupportedSchema"
+    },
+    {
+      "listing": {
+        "tools": [
+          {
+            "name": "x"
+          },
+          {
+            "name": "x"
+          }
+        ]
+      },
+      "exclude": [],
+      "error": "ValueError"
+    }
+  ],
+  "otel": [
+    {
+      "node": {
+        "id": "93f30ba765ce9f56140f9acf546b6ebed3ba9a52e85281c7ab90b8ce831ad183",
+        "parent": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "kind": "model_call",
+        "attempt": 0,
+        "payload": {
+          "model": "openai/gpt-demo",
+          "prompt": "PRIVATE_INPUT"
+        },
+        "result": {
+          "text": "PRIVATE_OUTPUT",
+          "model": "returned",
+          "usage": {
+            "input_tokens": 5,
+            "output_tokens": 8
+          }
+        },
+        "result_digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "meta": {},
+        "result_text": "{\"model\":\"returned\",\"text\":\"PRIVATE_OUTPUT\",\"usage\":{\"input_tokens\":5,\"output_tokens\":8}}"
+      },
+      "attributes": {
+        "pollard.node.id": "93f30ba765ce9f56140f9acf546b6ebed3ba9a52e85281c7ab90b8ce831ad183",
+        "pollard.node.kind": "model_call",
+        "pollard.node.attempt": 0,
+        "pollard.node.pruned": false,
+        "pollard.result.digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "gen_ai.operation.name": "chat",
+        "gen_ai.request.model": "openai/gpt-demo",
+        "gen_ai.provider.name": "openai",
+        "gen_ai.response.model": "returned",
+        "gen_ai.usage.input_tokens": 5,
+        "gen_ai.usage.output_tokens": 8
+      },
+      "name": "chat openai/gpt-demo"
+    },
+    {
+      "node": {
+        "id": "93f30ba765ce9f56140f9acf546b6ebed3ba9a52e85281c7ab90b8ce831ad183",
+        "parent": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "kind": "model_call",
+        "attempt": 0,
+        "payload": {
+          "model": "openai/gpt-demo",
+          "prompt": "PRIVATE_INPUT"
+        },
+        "result": {
+          "text": "PRIVATE_OUTPUT",
+          "model": "returned",
+          "usage": {
+            "input_tokens": 5,
+            "output_tokens": 8
+          }
+        },
+        "result_digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "meta": {
+          "usage": {
+            "input_tokens": true,
+            "output_tokens": 2
+          },
+          "pruned": 1
+        },
+        "result_text": "{\"model\":\"returned\",\"text\":\"PRIVATE_OUTPUT\",\"usage\":{\"input_tokens\":5,\"output_tokens\":8}}"
+      },
+      "attributes": {
+        "pollard.node.id": "93f30ba765ce9f56140f9acf546b6ebed3ba9a52e85281c7ab90b8ce831ad183",
+        "pollard.node.kind": "model_call",
+        "pollard.node.attempt": 0,
+        "pollard.node.pruned": false,
+        "pollard.result.digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "gen_ai.operation.name": "chat",
+        "gen_ai.request.model": "openai/gpt-demo",
+        "gen_ai.provider.name": "openai",
+        "gen_ai.response.model": "returned",
+        "gen_ai.usage.output_tokens": 2
+      },
+      "name": "chat openai/gpt-demo"
+    },
+    {
+      "node": {
+        "id": "93f30ba765ce9f56140f9acf546b6ebed3ba9a52e85281c7ab90b8ce831ad183",
+        "parent": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "kind": "model_call",
+        "attempt": 0,
+        "payload": {
+          "model": "openai/gpt-demo",
+          "prompt": "PRIVATE_INPUT"
+        },
+        "result": {
+          "text": "PRIVATE_OUTPUT",
+          "model": "returned",
+          "usage": {
+            "input_tokens": 5,
+            "output_tokens": 8
+          }
+        },
+        "result_digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "meta": {
+          "registry_digest": "meta",
+          "charges": {
+            "usd": 0.1,
+            "tokens": 3,
+            "bool": true,
+            "string": "private"
+          },
+          "avoided": {
+            "tokens": 4
+          },
+          "pruned": true
+        },
+        "result_text": "{\"model\":\"returned\",\"text\":\"PRIVATE_OUTPUT\",\"usage\":{\"input_tokens\":5,\"output_tokens\":8}}"
+      },
+      "attributes": {
+        "pollard.node.id": "93f30ba765ce9f56140f9acf546b6ebed3ba9a52e85281c7ab90b8ce831ad183",
+        "pollard.node.kind": "model_call",
+        "pollard.node.attempt": 0,
+        "pollard.node.pruned": true,
+        "pollard.result.digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "pollard.registry.digest": "meta",
+        "pollard.charge.usd": 0.1,
+        "pollard.charge.tokens": 3,
+        "pollard.avoided.tokens": 4,
+        "gen_ai.operation.name": "chat",
+        "gen_ai.request.model": "openai/gpt-demo",
+        "gen_ai.provider.name": "openai",
+        "gen_ai.response.model": "returned",
+        "gen_ai.usage.input_tokens": 5,
+        "gen_ai.usage.output_tokens": 8
+      },
+      "name": "chat openai/gpt-demo"
+    },
+    {
+      "node": {
+        "id": "3ae2769b63ca511d6c15c4fe7000748b38733a9f1f6c3518a6515f5883fb91a2",
+        "parent": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "kind": "model_call",
+        "attempt": 0,
+        "payload": {
+          "modelId": "bedrock/model",
+          "prompt": "PRIVATE_INPUT"
+        },
+        "result": {
+          "text": "PRIVATE_OUTPUT",
+          "model": "returned",
+          "usage": {
+            "input_tokens": 5,
+            "output_tokens": 8
+          }
+        },
+        "result_digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "meta": {},
+        "result_text": "{\"model\":\"returned\",\"text\":\"PRIVATE_OUTPUT\",\"usage\":{\"input_tokens\":5,\"output_tokens\":8}}"
+      },
+      "attributes": {
+        "pollard.node.id": "3ae2769b63ca511d6c15c4fe7000748b38733a9f1f6c3518a6515f5883fb91a2",
+        "pollard.node.kind": "model_call",
+        "pollard.node.attempt": 0,
+        "pollard.node.pruned": false,
+        "pollard.result.digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "gen_ai.operation.name": "chat",
+        "gen_ai.request.model": "bedrock/model",
+        "gen_ai.provider.name": "aws.bedrock",
+        "gen_ai.response.model": "returned",
+        "gen_ai.usage.input_tokens": 5,
+        "gen_ai.usage.output_tokens": 8
+      },
+      "name": "chat bedrock/model"
+    },
+    {
+      "node": {
+        "id": "3ae2769b63ca511d6c15c4fe7000748b38733a9f1f6c3518a6515f5883fb91a2",
+        "parent": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "kind": "model_call",
+        "attempt": 0,
+        "payload": {
+          "modelId": "bedrock/model",
+          "prompt": "PRIVATE_INPUT"
+        },
+        "result": {
+          "text": "PRIVATE_OUTPUT",
+          "model": "returned",
+          "usage": {
+            "input_tokens": 5,
+            "output_tokens": 8
+          }
+        },
+        "result_digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "meta": {
+          "usage": {
+            "input_tokens": true,
+            "output_tokens": 2
+          },
+          "pruned": 1
+        },
+        "result_text": "{\"model\":\"returned\",\"text\":\"PRIVATE_OUTPUT\",\"usage\":{\"input_tokens\":5,\"output_tokens\":8}}"
+      },
+      "attributes": {
+        "pollard.node.id": "3ae2769b63ca511d6c15c4fe7000748b38733a9f1f6c3518a6515f5883fb91a2",
+        "pollard.node.kind": "model_call",
+        "pollard.node.attempt": 0,
+        "pollard.node.pruned": false,
+        "pollard.result.digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "gen_ai.operation.name": "chat",
+        "gen_ai.request.model": "bedrock/model",
+        "gen_ai.provider.name": "aws.bedrock",
+        "gen_ai.response.model": "returned",
+        "gen_ai.usage.output_tokens": 2
+      },
+      "name": "chat bedrock/model"
+    },
+    {
+      "node": {
+        "id": "3ae2769b63ca511d6c15c4fe7000748b38733a9f1f6c3518a6515f5883fb91a2",
+        "parent": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "kind": "model_call",
+        "attempt": 0,
+        "payload": {
+          "modelId": "bedrock/model",
+          "prompt": "PRIVATE_INPUT"
+        },
+        "result": {
+          "text": "PRIVATE_OUTPUT",
+          "model": "returned",
+          "usage": {
+            "input_tokens": 5,
+            "output_tokens": 8
+          }
+        },
+        "result_digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "meta": {
+          "registry_digest": "meta",
+          "charges": {
+            "usd": 0.1,
+            "tokens": 3,
+            "bool": true,
+            "string": "private"
+          },
+          "avoided": {
+            "tokens": 4
+          },
+          "pruned": true
+        },
+        "result_text": "{\"model\":\"returned\",\"text\":\"PRIVATE_OUTPUT\",\"usage\":{\"input_tokens\":5,\"output_tokens\":8}}"
+      },
+      "attributes": {
+        "pollard.node.id": "3ae2769b63ca511d6c15c4fe7000748b38733a9f1f6c3518a6515f5883fb91a2",
+        "pollard.node.kind": "model_call",
+        "pollard.node.attempt": 0,
+        "pollard.node.pruned": true,
+        "pollard.result.digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "pollard.registry.digest": "meta",
+        "pollard.charge.usd": 0.1,
+        "pollard.charge.tokens": 3,
+        "pollard.avoided.tokens": 4,
+        "gen_ai.operation.name": "chat",
+        "gen_ai.request.model": "bedrock/model",
+        "gen_ai.provider.name": "aws.bedrock",
+        "gen_ai.response.model": "returned",
+        "gen_ai.usage.input_tokens": 5,
+        "gen_ai.usage.output_tokens": 8
+      },
+      "name": "chat bedrock/model"
+    },
+    {
+      "node": {
+        "id": "55a31e91aee5f0412939b98ac34ab45c8bff5917e4b8afd556161a3caa5cbce4",
+        "parent": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "kind": "model_call",
+        "attempt": 0,
+        "payload": {
+          "model": "azure/a",
+          "prompt": "PRIVATE_INPUT"
+        },
+        "result": {
+          "text": "PRIVATE_OUTPUT",
+          "model": "returned",
+          "usage": {
+            "input_tokens": 5,
+            "output_tokens": 8
+          }
+        },
+        "result_digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "meta": {},
+        "result_text": "{\"model\":\"returned\",\"text\":\"PRIVATE_OUTPUT\",\"usage\":{\"input_tokens\":5,\"output_tokens\":8}}"
+      },
+      "attributes": {
+        "pollard.node.id": "55a31e91aee5f0412939b98ac34ab45c8bff5917e4b8afd556161a3caa5cbce4",
+        "pollard.node.kind": "model_call",
+        "pollard.node.attempt": 0,
+        "pollard.node.pruned": false,
+        "pollard.result.digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "gen_ai.operation.name": "chat",
+        "gen_ai.request.model": "azure/a",
+        "gen_ai.provider.name": "azure.ai.openai",
+        "gen_ai.response.model": "returned",
+        "gen_ai.usage.input_tokens": 5,
+        "gen_ai.usage.output_tokens": 8
+      },
+      "name": "chat azure/a"
+    },
+    {
+      "node": {
+        "id": "55a31e91aee5f0412939b98ac34ab45c8bff5917e4b8afd556161a3caa5cbce4",
+        "parent": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "kind": "model_call",
+        "attempt": 0,
+        "payload": {
+          "model": "azure/a",
+          "prompt": "PRIVATE_INPUT"
+        },
+        "result": {
+          "text": "PRIVATE_OUTPUT",
+          "model": "returned",
+          "usage": {
+            "input_tokens": 5,
+            "output_tokens": 8
+          }
+        },
+        "result_digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "meta": {
+          "usage": {
+            "input_tokens": true,
+            "output_tokens": 2
+          },
+          "pruned": 1
+        },
+        "result_text": "{\"model\":\"returned\",\"text\":\"PRIVATE_OUTPUT\",\"usage\":{\"input_tokens\":5,\"output_tokens\":8}}"
+      },
+      "attributes": {
+        "pollard.node.id": "55a31e91aee5f0412939b98ac34ab45c8bff5917e4b8afd556161a3caa5cbce4",
+        "pollard.node.kind": "model_call",
+        "pollard.node.attempt": 0,
+        "pollard.node.pruned": false,
+        "pollard.result.digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "gen_ai.operation.name": "chat",
+        "gen_ai.request.model": "azure/a",
+        "gen_ai.provider.name": "azure.ai.openai",
+        "gen_ai.response.model": "returned",
+        "gen_ai.usage.output_tokens": 2
+      },
+      "name": "chat azure/a"
+    },
+    {
+      "node": {
+        "id": "55a31e91aee5f0412939b98ac34ab45c8bff5917e4b8afd556161a3caa5cbce4",
+        "parent": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "kind": "model_call",
+        "attempt": 0,
+        "payload": {
+          "model": "azure/a",
+          "prompt": "PRIVATE_INPUT"
+        },
+        "result": {
+          "text": "PRIVATE_OUTPUT",
+          "model": "returned",
+          "usage": {
+            "input_tokens": 5,
+            "output_tokens": 8
+          }
+        },
+        "result_digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "meta": {
+          "registry_digest": "meta",
+          "charges": {
+            "usd": 0.1,
+            "tokens": 3,
+            "bool": true,
+            "string": "private"
+          },
+          "avoided": {
+            "tokens": 4
+          },
+          "pruned": true
+        },
+        "result_text": "{\"model\":\"returned\",\"text\":\"PRIVATE_OUTPUT\",\"usage\":{\"input_tokens\":5,\"output_tokens\":8}}"
+      },
+      "attributes": {
+        "pollard.node.id": "55a31e91aee5f0412939b98ac34ab45c8bff5917e4b8afd556161a3caa5cbce4",
+        "pollard.node.kind": "model_call",
+        "pollard.node.attempt": 0,
+        "pollard.node.pruned": true,
+        "pollard.result.digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "pollard.registry.digest": "meta",
+        "pollard.charge.usd": 0.1,
+        "pollard.charge.tokens": 3,
+        "pollard.avoided.tokens": 4,
+        "gen_ai.operation.name": "chat",
+        "gen_ai.request.model": "azure/a",
+        "gen_ai.provider.name": "azure.ai.openai",
+        "gen_ai.response.model": "returned",
+        "gen_ai.usage.input_tokens": 5,
+        "gen_ai.usage.output_tokens": 8
+      },
+      "name": "chat azure/a"
+    },
+    {
+      "node": {
+        "id": "349cb09a4fa387dbeb683373adde217478e4afed7adb3d64b847c52281cca9ea",
+        "parent": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "kind": "model_call",
+        "attempt": 0,
+        "payload": {
+          "model": "vertex_ai/a",
+          "prompt": "PRIVATE_INPUT"
+        },
+        "result": {
+          "text": "PRIVATE_OUTPUT",
+          "model": "returned",
+          "usage": {
+            "input_tokens": 5,
+            "output_tokens": 8
+          }
+        },
+        "result_digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "meta": {},
+        "result_text": "{\"model\":\"returned\",\"text\":\"PRIVATE_OUTPUT\",\"usage\":{\"input_tokens\":5,\"output_tokens\":8}}"
+      },
+      "attributes": {
+        "pollard.node.id": "349cb09a4fa387dbeb683373adde217478e4afed7adb3d64b847c52281cca9ea",
+        "pollard.node.kind": "model_call",
+        "pollard.node.attempt": 0,
+        "pollard.node.pruned": false,
+        "pollard.result.digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "gen_ai.operation.name": "chat",
+        "gen_ai.request.model": "vertex_ai/a",
+        "gen_ai.provider.name": "gcp.vertex_ai",
+        "gen_ai.response.model": "returned",
+        "gen_ai.usage.input_tokens": 5,
+        "gen_ai.usage.output_tokens": 8
+      },
+      "name": "chat vertex_ai/a"
+    },
+    {
+      "node": {
+        "id": "349cb09a4fa387dbeb683373adde217478e4afed7adb3d64b847c52281cca9ea",
+        "parent": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "kind": "model_call",
+        "attempt": 0,
+        "payload": {
+          "model": "vertex_ai/a",
+          "prompt": "PRIVATE_INPUT"
+        },
+        "result": {
+          "text": "PRIVATE_OUTPUT",
+          "model": "returned",
+          "usage": {
+            "input_tokens": 5,
+            "output_tokens": 8
+          }
+        },
+        "result_digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "meta": {
+          "usage": {
+            "input_tokens": true,
+            "output_tokens": 2
+          },
+          "pruned": 1
+        },
+        "result_text": "{\"model\":\"returned\",\"text\":\"PRIVATE_OUTPUT\",\"usage\":{\"input_tokens\":5,\"output_tokens\":8}}"
+      },
+      "attributes": {
+        "pollard.node.id": "349cb09a4fa387dbeb683373adde217478e4afed7adb3d64b847c52281cca9ea",
+        "pollard.node.kind": "model_call",
+        "pollard.node.attempt": 0,
+        "pollard.node.pruned": false,
+        "pollard.result.digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "gen_ai.operation.name": "chat",
+        "gen_ai.request.model": "vertex_ai/a",
+        "gen_ai.provider.name": "gcp.vertex_ai",
+        "gen_ai.response.model": "returned",
+        "gen_ai.usage.output_tokens": 2
+      },
+      "name": "chat vertex_ai/a"
+    },
+    {
+      "node": {
+        "id": "349cb09a4fa387dbeb683373adde217478e4afed7adb3d64b847c52281cca9ea",
+        "parent": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "kind": "model_call",
+        "attempt": 0,
+        "payload": {
+          "model": "vertex_ai/a",
+          "prompt": "PRIVATE_INPUT"
+        },
+        "result": {
+          "text": "PRIVATE_OUTPUT",
+          "model": "returned",
+          "usage": {
+            "input_tokens": 5,
+            "output_tokens": 8
+          }
+        },
+        "result_digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "meta": {
+          "registry_digest": "meta",
+          "charges": {
+            "usd": 0.1,
+            "tokens": 3,
+            "bool": true,
+            "string": "private"
+          },
+          "avoided": {
+            "tokens": 4
+          },
+          "pruned": true
+        },
+        "result_text": "{\"model\":\"returned\",\"text\":\"PRIVATE_OUTPUT\",\"usage\":{\"input_tokens\":5,\"output_tokens\":8}}"
+      },
+      "attributes": {
+        "pollard.node.id": "349cb09a4fa387dbeb683373adde217478e4afed7adb3d64b847c52281cca9ea",
+        "pollard.node.kind": "model_call",
+        "pollard.node.attempt": 0,
+        "pollard.node.pruned": true,
+        "pollard.result.digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "pollard.registry.digest": "meta",
+        "pollard.charge.usd": 0.1,
+        "pollard.charge.tokens": 3,
+        "pollard.avoided.tokens": 4,
+        "gen_ai.operation.name": "chat",
+        "gen_ai.request.model": "vertex_ai/a",
+        "gen_ai.provider.name": "gcp.vertex_ai",
+        "gen_ai.response.model": "returned",
+        "gen_ai.usage.input_tokens": 5,
+        "gen_ai.usage.output_tokens": 8
+      },
+      "name": "chat vertex_ai/a"
+    },
+    {
+      "node": {
+        "id": "398ab9ce9455d696b6553a10cca0c45872a9ffb92d7a754d71132c85942c85a0",
+        "parent": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "kind": "model_call",
+        "attempt": 0,
+        "payload": {
+          "model": "gemini/a",
+          "prompt": "PRIVATE_INPUT"
+        },
+        "result": {
+          "text": "PRIVATE_OUTPUT",
+          "model": "returned",
+          "usage": {
+            "input_tokens": 5,
+            "output_tokens": 8
+          }
+        },
+        "result_digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "meta": {},
+        "result_text": "{\"model\":\"returned\",\"text\":\"PRIVATE_OUTPUT\",\"usage\":{\"input_tokens\":5,\"output_tokens\":8}}"
+      },
+      "attributes": {
+        "pollard.node.id": "398ab9ce9455d696b6553a10cca0c45872a9ffb92d7a754d71132c85942c85a0",
+        "pollard.node.kind": "model_call",
+        "pollard.node.attempt": 0,
+        "pollard.node.pruned": false,
+        "pollard.result.digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "gen_ai.operation.name": "chat",
+        "gen_ai.request.model": "gemini/a",
+        "gen_ai.provider.name": "gcp.gemini",
+        "gen_ai.response.model": "returned",
+        "gen_ai.usage.input_tokens": 5,
+        "gen_ai.usage.output_tokens": 8
+      },
+      "name": "chat gemini/a"
+    },
+    {
+      "node": {
+        "id": "398ab9ce9455d696b6553a10cca0c45872a9ffb92d7a754d71132c85942c85a0",
+        "parent": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "kind": "model_call",
+        "attempt": 0,
+        "payload": {
+          "model": "gemini/a",
+          "prompt": "PRIVATE_INPUT"
+        },
+        "result": {
+          "text": "PRIVATE_OUTPUT",
+          "model": "returned",
+          "usage": {
+            "input_tokens": 5,
+            "output_tokens": 8
+          }
+        },
+        "result_digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "meta": {
+          "usage": {
+            "input_tokens": true,
+            "output_tokens": 2
+          },
+          "pruned": 1
+        },
+        "result_text": "{\"model\":\"returned\",\"text\":\"PRIVATE_OUTPUT\",\"usage\":{\"input_tokens\":5,\"output_tokens\":8}}"
+      },
+      "attributes": {
+        "pollard.node.id": "398ab9ce9455d696b6553a10cca0c45872a9ffb92d7a754d71132c85942c85a0",
+        "pollard.node.kind": "model_call",
+        "pollard.node.attempt": 0,
+        "pollard.node.pruned": false,
+        "pollard.result.digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "gen_ai.operation.name": "chat",
+        "gen_ai.request.model": "gemini/a",
+        "gen_ai.provider.name": "gcp.gemini",
+        "gen_ai.response.model": "returned",
+        "gen_ai.usage.output_tokens": 2
+      },
+      "name": "chat gemini/a"
+    },
+    {
+      "node": {
+        "id": "398ab9ce9455d696b6553a10cca0c45872a9ffb92d7a754d71132c85942c85a0",
+        "parent": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "kind": "model_call",
+        "attempt": 0,
+        "payload": {
+          "model": "gemini/a",
+          "prompt": "PRIVATE_INPUT"
+        },
+        "result": {
+          "text": "PRIVATE_OUTPUT",
+          "model": "returned",
+          "usage": {
+            "input_tokens": 5,
+            "output_tokens": 8
+          }
+        },
+        "result_digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "meta": {
+          "registry_digest": "meta",
+          "charges": {
+            "usd": 0.1,
+            "tokens": 3,
+            "bool": true,
+            "string": "private"
+          },
+          "avoided": {
+            "tokens": 4
+          },
+          "pruned": true
+        },
+        "result_text": "{\"model\":\"returned\",\"text\":\"PRIVATE_OUTPUT\",\"usage\":{\"input_tokens\":5,\"output_tokens\":8}}"
+      },
+      "attributes": {
+        "pollard.node.id": "398ab9ce9455d696b6553a10cca0c45872a9ffb92d7a754d71132c85942c85a0",
+        "pollard.node.kind": "model_call",
+        "pollard.node.attempt": 0,
+        "pollard.node.pruned": true,
+        "pollard.result.digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "pollard.registry.digest": "meta",
+        "pollard.charge.usd": 0.1,
+        "pollard.charge.tokens": 3,
+        "pollard.avoided.tokens": 4,
+        "gen_ai.operation.name": "chat",
+        "gen_ai.request.model": "gemini/a",
+        "gen_ai.provider.name": "gcp.gemini",
+        "gen_ai.response.model": "returned",
+        "gen_ai.usage.input_tokens": 5,
+        "gen_ai.usage.output_tokens": 8
+      },
+      "name": "chat gemini/a"
+    },
+    {
+      "node": {
+        "id": "ed138b5fb67f8fbde13aed8c696bae9050faa00efdca83df79d751d004769a24",
+        "parent": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "kind": "model_call",
+        "attempt": 0,
+        "payload": {
+          "model": "anthropic/a",
+          "prompt": "PRIVATE_INPUT"
+        },
+        "result": {
+          "text": "PRIVATE_OUTPUT",
+          "model": "returned",
+          "usage": {
+            "input_tokens": 5,
+            "output_tokens": 8
+          }
+        },
+        "result_digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "meta": {},
+        "result_text": "{\"model\":\"returned\",\"text\":\"PRIVATE_OUTPUT\",\"usage\":{\"input_tokens\":5,\"output_tokens\":8}}"
+      },
+      "attributes": {
+        "pollard.node.id": "ed138b5fb67f8fbde13aed8c696bae9050faa00efdca83df79d751d004769a24",
+        "pollard.node.kind": "model_call",
+        "pollard.node.attempt": 0,
+        "pollard.node.pruned": false,
+        "pollard.result.digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "gen_ai.operation.name": "chat",
+        "gen_ai.request.model": "anthropic/a",
+        "gen_ai.provider.name": "anthropic",
+        "gen_ai.response.model": "returned",
+        "gen_ai.usage.input_tokens": 5,
+        "gen_ai.usage.output_tokens": 8
+      },
+      "name": "chat anthropic/a"
+    },
+    {
+      "node": {
+        "id": "ed138b5fb67f8fbde13aed8c696bae9050faa00efdca83df79d751d004769a24",
+        "parent": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "kind": "model_call",
+        "attempt": 0,
+        "payload": {
+          "model": "anthropic/a",
+          "prompt": "PRIVATE_INPUT"
+        },
+        "result": {
+          "text": "PRIVATE_OUTPUT",
+          "model": "returned",
+          "usage": {
+            "input_tokens": 5,
+            "output_tokens": 8
+          }
+        },
+        "result_digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "meta": {
+          "usage": {
+            "input_tokens": true,
+            "output_tokens": 2
+          },
+          "pruned": 1
+        },
+        "result_text": "{\"model\":\"returned\",\"text\":\"PRIVATE_OUTPUT\",\"usage\":{\"input_tokens\":5,\"output_tokens\":8}}"
+      },
+      "attributes": {
+        "pollard.node.id": "ed138b5fb67f8fbde13aed8c696bae9050faa00efdca83df79d751d004769a24",
+        "pollard.node.kind": "model_call",
+        "pollard.node.attempt": 0,
+        "pollard.node.pruned": false,
+        "pollard.result.digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "gen_ai.operation.name": "chat",
+        "gen_ai.request.model": "anthropic/a",
+        "gen_ai.provider.name": "anthropic",
+        "gen_ai.response.model": "returned",
+        "gen_ai.usage.output_tokens": 2
+      },
+      "name": "chat anthropic/a"
+    },
+    {
+      "node": {
+        "id": "ed138b5fb67f8fbde13aed8c696bae9050faa00efdca83df79d751d004769a24",
+        "parent": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "kind": "model_call",
+        "attempt": 0,
+        "payload": {
+          "model": "anthropic/a",
+          "prompt": "PRIVATE_INPUT"
+        },
+        "result": {
+          "text": "PRIVATE_OUTPUT",
+          "model": "returned",
+          "usage": {
+            "input_tokens": 5,
+            "output_tokens": 8
+          }
+        },
+        "result_digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "meta": {
+          "registry_digest": "meta",
+          "charges": {
+            "usd": 0.1,
+            "tokens": 3,
+            "bool": true,
+            "string": "private"
+          },
+          "avoided": {
+            "tokens": 4
+          },
+          "pruned": true
+        },
+        "result_text": "{\"model\":\"returned\",\"text\":\"PRIVATE_OUTPUT\",\"usage\":{\"input_tokens\":5,\"output_tokens\":8}}"
+      },
+      "attributes": {
+        "pollard.node.id": "ed138b5fb67f8fbde13aed8c696bae9050faa00efdca83df79d751d004769a24",
+        "pollard.node.kind": "model_call",
+        "pollard.node.attempt": 0,
+        "pollard.node.pruned": true,
+        "pollard.result.digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "pollard.registry.digest": "meta",
+        "pollard.charge.usd": 0.1,
+        "pollard.charge.tokens": 3,
+        "pollard.avoided.tokens": 4,
+        "gen_ai.operation.name": "chat",
+        "gen_ai.request.model": "anthropic/a",
+        "gen_ai.provider.name": "anthropic",
+        "gen_ai.response.model": "returned",
+        "gen_ai.usage.input_tokens": 5,
+        "gen_ai.usage.output_tokens": 8
+      },
+      "name": "chat anthropic/a"
+    },
+    {
+      "node": {
+        "id": "ca776d4739a5df4405f7f3b26cb6174acb7e80684140e841c028d0e25ba011ba",
+        "parent": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "kind": "model_call",
+        "attempt": 0,
+        "payload": {
+          "model": "unknown",
+          "_pollard": {
+            "provider": "custom"
+          },
+          "prompt": "PRIVATE_INPUT"
+        },
+        "result": {
+          "text": "PRIVATE_OUTPUT",
+          "model": "returned",
+          "usage": {
+            "input_tokens": 5,
+            "output_tokens": 8
+          }
+        },
+        "result_digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "meta": {},
+        "result_text": "{\"model\":\"returned\",\"text\":\"PRIVATE_OUTPUT\",\"usage\":{\"input_tokens\":5,\"output_tokens\":8}}"
+      },
+      "attributes": {
+        "pollard.node.id": "ca776d4739a5df4405f7f3b26cb6174acb7e80684140e841c028d0e25ba011ba",
+        "pollard.node.kind": "model_call",
+        "pollard.node.attempt": 0,
+        "pollard.node.pruned": false,
+        "pollard.result.digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "gen_ai.operation.name": "chat",
+        "gen_ai.request.model": "unknown",
+        "gen_ai.provider.name": "custom",
+        "gen_ai.response.model": "returned",
+        "gen_ai.usage.input_tokens": 5,
+        "gen_ai.usage.output_tokens": 8
+      },
+      "name": "chat unknown"
+    },
+    {
+      "node": {
+        "id": "ca776d4739a5df4405f7f3b26cb6174acb7e80684140e841c028d0e25ba011ba",
+        "parent": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "kind": "model_call",
+        "attempt": 0,
+        "payload": {
+          "model": "unknown",
+          "_pollard": {
+            "provider": "custom"
+          },
+          "prompt": "PRIVATE_INPUT"
+        },
+        "result": {
+          "text": "PRIVATE_OUTPUT",
+          "model": "returned",
+          "usage": {
+            "input_tokens": 5,
+            "output_tokens": 8
+          }
+        },
+        "result_digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "meta": {
+          "usage": {
+            "input_tokens": true,
+            "output_tokens": 2
+          },
+          "pruned": 1
+        },
+        "result_text": "{\"model\":\"returned\",\"text\":\"PRIVATE_OUTPUT\",\"usage\":{\"input_tokens\":5,\"output_tokens\":8}}"
+      },
+      "attributes": {
+        "pollard.node.id": "ca776d4739a5df4405f7f3b26cb6174acb7e80684140e841c028d0e25ba011ba",
+        "pollard.node.kind": "model_call",
+        "pollard.node.attempt": 0,
+        "pollard.node.pruned": false,
+        "pollard.result.digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "gen_ai.operation.name": "chat",
+        "gen_ai.request.model": "unknown",
+        "gen_ai.provider.name": "custom",
+        "gen_ai.response.model": "returned",
+        "gen_ai.usage.output_tokens": 2
+      },
+      "name": "chat unknown"
+    },
+    {
+      "node": {
+        "id": "ca776d4739a5df4405f7f3b26cb6174acb7e80684140e841c028d0e25ba011ba",
+        "parent": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "kind": "model_call",
+        "attempt": 0,
+        "payload": {
+          "model": "unknown",
+          "_pollard": {
+            "provider": "custom"
+          },
+          "prompt": "PRIVATE_INPUT"
+        },
+        "result": {
+          "text": "PRIVATE_OUTPUT",
+          "model": "returned",
+          "usage": {
+            "input_tokens": 5,
+            "output_tokens": 8
+          }
+        },
+        "result_digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "meta": {
+          "registry_digest": "meta",
+          "charges": {
+            "usd": 0.1,
+            "tokens": 3,
+            "bool": true,
+            "string": "private"
+          },
+          "avoided": {
+            "tokens": 4
+          },
+          "pruned": true
+        },
+        "result_text": "{\"model\":\"returned\",\"text\":\"PRIVATE_OUTPUT\",\"usage\":{\"input_tokens\":5,\"output_tokens\":8}}"
+      },
+      "attributes": {
+        "pollard.node.id": "ca776d4739a5df4405f7f3b26cb6174acb7e80684140e841c028d0e25ba011ba",
+        "pollard.node.kind": "model_call",
+        "pollard.node.attempt": 0,
+        "pollard.node.pruned": true,
+        "pollard.result.digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "pollard.registry.digest": "meta",
+        "pollard.charge.usd": 0.1,
+        "pollard.charge.tokens": 3,
+        "pollard.avoided.tokens": 4,
+        "gen_ai.operation.name": "chat",
+        "gen_ai.request.model": "unknown",
+        "gen_ai.provider.name": "custom",
+        "gen_ai.response.model": "returned",
+        "gen_ai.usage.input_tokens": 5,
+        "gen_ai.usage.output_tokens": 8
+      },
+      "name": "chat unknown"
+    },
+    {
+      "node": {
+        "id": "069612f5fdfb477affa1ee5721968b5e014e90f2ac90c69969150eb52854be44",
+        "parent": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "kind": "model_call",
+        "attempt": 0,
+        "payload": {
+          "model": null,
+          "prompt": "PRIVATE_INPUT"
+        },
+        "result": {
+          "text": "PRIVATE_OUTPUT",
+          "model": "returned",
+          "usage": {
+            "input_tokens": 5,
+            "output_tokens": 8
+          }
+        },
+        "result_digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "meta": {},
+        "result_text": "{\"model\":\"returned\",\"text\":\"PRIVATE_OUTPUT\",\"usage\":{\"input_tokens\":5,\"output_tokens\":8}}"
+      },
+      "attributes": {
+        "pollard.node.id": "069612f5fdfb477affa1ee5721968b5e014e90f2ac90c69969150eb52854be44",
+        "pollard.node.kind": "model_call",
+        "pollard.node.attempt": 0,
+        "pollard.node.pruned": false,
+        "pollard.result.digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "gen_ai.operation.name": "chat",
+        "gen_ai.response.model": "returned",
+        "gen_ai.usage.input_tokens": 5,
+        "gen_ai.usage.output_tokens": 8
+      },
+      "name": "chat None"
+    },
+    {
+      "node": {
+        "id": "069612f5fdfb477affa1ee5721968b5e014e90f2ac90c69969150eb52854be44",
+        "parent": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "kind": "model_call",
+        "attempt": 0,
+        "payload": {
+          "model": null,
+          "prompt": "PRIVATE_INPUT"
+        },
+        "result": {
+          "text": "PRIVATE_OUTPUT",
+          "model": "returned",
+          "usage": {
+            "input_tokens": 5,
+            "output_tokens": 8
+          }
+        },
+        "result_digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "meta": {
+          "usage": {
+            "input_tokens": true,
+            "output_tokens": 2
+          },
+          "pruned": 1
+        },
+        "result_text": "{\"model\":\"returned\",\"text\":\"PRIVATE_OUTPUT\",\"usage\":{\"input_tokens\":5,\"output_tokens\":8}}"
+      },
+      "attributes": {
+        "pollard.node.id": "069612f5fdfb477affa1ee5721968b5e014e90f2ac90c69969150eb52854be44",
+        "pollard.node.kind": "model_call",
+        "pollard.node.attempt": 0,
+        "pollard.node.pruned": false,
+        "pollard.result.digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "gen_ai.operation.name": "chat",
+        "gen_ai.response.model": "returned",
+        "gen_ai.usage.output_tokens": 2
+      },
+      "name": "chat None"
+    },
+    {
+      "node": {
+        "id": "069612f5fdfb477affa1ee5721968b5e014e90f2ac90c69969150eb52854be44",
+        "parent": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "kind": "model_call",
+        "attempt": 0,
+        "payload": {
+          "model": null,
+          "prompt": "PRIVATE_INPUT"
+        },
+        "result": {
+          "text": "PRIVATE_OUTPUT",
+          "model": "returned",
+          "usage": {
+            "input_tokens": 5,
+            "output_tokens": 8
+          }
+        },
+        "result_digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "meta": {
+          "registry_digest": "meta",
+          "charges": {
+            "usd": 0.1,
+            "tokens": 3,
+            "bool": true,
+            "string": "private"
+          },
+          "avoided": {
+            "tokens": 4
+          },
+          "pruned": true
+        },
+        "result_text": "{\"model\":\"returned\",\"text\":\"PRIVATE_OUTPUT\",\"usage\":{\"input_tokens\":5,\"output_tokens\":8}}"
+      },
+      "attributes": {
+        "pollard.node.id": "069612f5fdfb477affa1ee5721968b5e014e90f2ac90c69969150eb52854be44",
+        "pollard.node.kind": "model_call",
+        "pollard.node.attempt": 0,
+        "pollard.node.pruned": true,
+        "pollard.result.digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "pollard.registry.digest": "meta",
+        "pollard.charge.usd": 0.1,
+        "pollard.charge.tokens": 3,
+        "pollard.avoided.tokens": 4,
+        "gen_ai.operation.name": "chat",
+        "gen_ai.response.model": "returned",
+        "gen_ai.usage.input_tokens": 5,
+        "gen_ai.usage.output_tokens": 8
+      },
+      "name": "chat None"
+    },
+    {
+      "node": {
+        "id": "57074922d798ba5b7dc6295a5a5012ac74c269b30cbeca949de06b966c3dbc30",
+        "parent": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "kind": "model_call",
+        "attempt": 0,
+        "payload": {
+          "model": false,
+          "prompt": "PRIVATE_INPUT"
+        },
+        "result": {
+          "text": "PRIVATE_OUTPUT",
+          "model": "returned",
+          "usage": {
+            "input_tokens": 5,
+            "output_tokens": 8
+          }
+        },
+        "result_digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "meta": {},
+        "result_text": "{\"model\":\"returned\",\"text\":\"PRIVATE_OUTPUT\",\"usage\":{\"input_tokens\":5,\"output_tokens\":8}}"
+      },
+      "attributes": {
+        "pollard.node.id": "57074922d798ba5b7dc6295a5a5012ac74c269b30cbeca949de06b966c3dbc30",
+        "pollard.node.kind": "model_call",
+        "pollard.node.attempt": 0,
+        "pollard.node.pruned": false,
+        "pollard.result.digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "gen_ai.operation.name": "chat",
+        "gen_ai.response.model": "returned",
+        "gen_ai.usage.input_tokens": 5,
+        "gen_ai.usage.output_tokens": 8
+      },
+      "name": "chat False"
+    },
+    {
+      "node": {
+        "id": "57074922d798ba5b7dc6295a5a5012ac74c269b30cbeca949de06b966c3dbc30",
+        "parent": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "kind": "model_call",
+        "attempt": 0,
+        "payload": {
+          "model": false,
+          "prompt": "PRIVATE_INPUT"
+        },
+        "result": {
+          "text": "PRIVATE_OUTPUT",
+          "model": "returned",
+          "usage": {
+            "input_tokens": 5,
+            "output_tokens": 8
+          }
+        },
+        "result_digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "meta": {
+          "usage": {
+            "input_tokens": true,
+            "output_tokens": 2
+          },
+          "pruned": 1
+        },
+        "result_text": "{\"model\":\"returned\",\"text\":\"PRIVATE_OUTPUT\",\"usage\":{\"input_tokens\":5,\"output_tokens\":8}}"
+      },
+      "attributes": {
+        "pollard.node.id": "57074922d798ba5b7dc6295a5a5012ac74c269b30cbeca949de06b966c3dbc30",
+        "pollard.node.kind": "model_call",
+        "pollard.node.attempt": 0,
+        "pollard.node.pruned": false,
+        "pollard.result.digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "gen_ai.operation.name": "chat",
+        "gen_ai.response.model": "returned",
+        "gen_ai.usage.output_tokens": 2
+      },
+      "name": "chat False"
+    },
+    {
+      "node": {
+        "id": "57074922d798ba5b7dc6295a5a5012ac74c269b30cbeca949de06b966c3dbc30",
+        "parent": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "kind": "model_call",
+        "attempt": 0,
+        "payload": {
+          "model": false,
+          "prompt": "PRIVATE_INPUT"
+        },
+        "result": {
+          "text": "PRIVATE_OUTPUT",
+          "model": "returned",
+          "usage": {
+            "input_tokens": 5,
+            "output_tokens": 8
+          }
+        },
+        "result_digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "meta": {
+          "registry_digest": "meta",
+          "charges": {
+            "usd": 0.1,
+            "tokens": 3,
+            "bool": true,
+            "string": "private"
+          },
+          "avoided": {
+            "tokens": 4
+          },
+          "pruned": true
+        },
+        "result_text": "{\"model\":\"returned\",\"text\":\"PRIVATE_OUTPUT\",\"usage\":{\"input_tokens\":5,\"output_tokens\":8}}"
+      },
+      "attributes": {
+        "pollard.node.id": "57074922d798ba5b7dc6295a5a5012ac74c269b30cbeca949de06b966c3dbc30",
+        "pollard.node.kind": "model_call",
+        "pollard.node.attempt": 0,
+        "pollard.node.pruned": true,
+        "pollard.result.digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "pollard.registry.digest": "meta",
+        "pollard.charge.usd": 0.1,
+        "pollard.charge.tokens": 3,
+        "pollard.avoided.tokens": 4,
+        "gen_ai.operation.name": "chat",
+        "gen_ai.response.model": "returned",
+        "gen_ai.usage.input_tokens": 5,
+        "gen_ai.usage.output_tokens": 8
+      },
+      "name": "chat False"
+    },
+    {
+      "node": {
+        "id": "f5255302af237e3d5d58752adde57c940449c74b8b308d04057cf080850bc648",
+        "parent": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "kind": "model_call",
+        "attempt": 0,
+        "payload": {
+          "prompt": "PRIVATE_INPUT"
+        },
+        "result": {
+          "text": "PRIVATE_OUTPUT",
+          "model": "returned",
+          "usage": {
+            "input_tokens": 5,
+            "output_tokens": 8
+          }
+        },
+        "result_digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "meta": {},
+        "result_text": "{\"model\":\"returned\",\"text\":\"PRIVATE_OUTPUT\",\"usage\":{\"input_tokens\":5,\"output_tokens\":8}}"
+      },
+      "attributes": {
+        "pollard.node.id": "f5255302af237e3d5d58752adde57c940449c74b8b308d04057cf080850bc648",
+        "pollard.node.kind": "model_call",
+        "pollard.node.attempt": 0,
+        "pollard.node.pruned": false,
+        "pollard.result.digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "gen_ai.operation.name": "chat",
+        "gen_ai.response.model": "returned",
+        "gen_ai.usage.input_tokens": 5,
+        "gen_ai.usage.output_tokens": 8
+      },
+      "name": "chat model"
+    },
+    {
+      "node": {
+        "id": "f5255302af237e3d5d58752adde57c940449c74b8b308d04057cf080850bc648",
+        "parent": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "kind": "model_call",
+        "attempt": 0,
+        "payload": {
+          "prompt": "PRIVATE_INPUT"
+        },
+        "result": {
+          "text": "PRIVATE_OUTPUT",
+          "model": "returned",
+          "usage": {
+            "input_tokens": 5,
+            "output_tokens": 8
+          }
+        },
+        "result_digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "meta": {
+          "usage": {
+            "input_tokens": true,
+            "output_tokens": 2
+          },
+          "pruned": 1
+        },
+        "result_text": "{\"model\":\"returned\",\"text\":\"PRIVATE_OUTPUT\",\"usage\":{\"input_tokens\":5,\"output_tokens\":8}}"
+      },
+      "attributes": {
+        "pollard.node.id": "f5255302af237e3d5d58752adde57c940449c74b8b308d04057cf080850bc648",
+        "pollard.node.kind": "model_call",
+        "pollard.node.attempt": 0,
+        "pollard.node.pruned": false,
+        "pollard.result.digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "gen_ai.operation.name": "chat",
+        "gen_ai.response.model": "returned",
+        "gen_ai.usage.output_tokens": 2
+      },
+      "name": "chat model"
+    },
+    {
+      "node": {
+        "id": "f5255302af237e3d5d58752adde57c940449c74b8b308d04057cf080850bc648",
+        "parent": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "kind": "model_call",
+        "attempt": 0,
+        "payload": {
+          "prompt": "PRIVATE_INPUT"
+        },
+        "result": {
+          "text": "PRIVATE_OUTPUT",
+          "model": "returned",
+          "usage": {
+            "input_tokens": 5,
+            "output_tokens": 8
+          }
+        },
+        "result_digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "meta": {
+          "registry_digest": "meta",
+          "charges": {
+            "usd": 0.1,
+            "tokens": 3,
+            "bool": true,
+            "string": "private"
+          },
+          "avoided": {
+            "tokens": 4
+          },
+          "pruned": true
+        },
+        "result_text": "{\"model\":\"returned\",\"text\":\"PRIVATE_OUTPUT\",\"usage\":{\"input_tokens\":5,\"output_tokens\":8}}"
+      },
+      "attributes": {
+        "pollard.node.id": "f5255302af237e3d5d58752adde57c940449c74b8b308d04057cf080850bc648",
+        "pollard.node.kind": "model_call",
+        "pollard.node.attempt": 0,
+        "pollard.node.pruned": true,
+        "pollard.result.digest": "715296769b9442c8e33c226fb6af47add7f551a0ab96fdb4d7f8fd5f72b9567b",
+        "pollard.registry.digest": "meta",
+        "pollard.charge.usd": 0.1,
+        "pollard.charge.tokens": 3,
+        "pollard.avoided.tokens": 4,
+        "gen_ai.operation.name": "chat",
+        "gen_ai.response.model": "returned",
+        "gen_ai.usage.input_tokens": 5,
+        "gen_ai.usage.output_tokens": 8
+      },
+      "name": "chat model"
+    },
+    {
+      "node": {
+        "id": "dbef47d273b7c481f552a8592984e16f93aa480e85c34f1fe1b5f86bcaa92fcb",
+        "parent": null,
+        "kind": "root",
+        "attempt": 0,
+        "payload": {
+          "run": "private run"
+        },
+        "result": null,
+        "result_digest": null,
+        "meta": {},
+        "result_text": null
+      },
+      "attributes": {
+        "pollard.node.id": "dbef47d273b7c481f552a8592984e16f93aa480e85c34f1fe1b5f86bcaa92fcb",
+        "pollard.node.kind": "root",
+        "pollard.node.attempt": 0,
+        "pollard.node.pruned": false
+      },
+      "name": "pollard root"
+    },
+    {
+      "node": {
+        "id": "80822cfe367b5d974ee15fde1969ee54f45cab0d5e862a385824f2d7e481f306",
+        "parent": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "kind": "tool_call",
+        "attempt": 0,
+        "payload": {
+          "tool": "echo",
+          "arguments": {
+            "secret": "private"
+          }
+        },
+        "result": null,
+        "result_digest": null,
+        "meta": {},
+        "result_text": null
+      },
+      "attributes": {
+        "pollard.node.id": "80822cfe367b5d974ee15fde1969ee54f45cab0d5e862a385824f2d7e481f306",
+        "pollard.node.kind": "tool_call",
+        "pollard.node.attempt": 0,
+        "pollard.node.pruned": false
+      },
+      "name": "execute_tool echo"
+    },
+    {
+      "node": {
+        "id": "b552a53bb543701ef2afcd8bdc20addbb468d2954a8afaea6f6b0144ec7c3252",
+        "parent": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "kind": "refusal",
+        "attempt": 0,
+        "payload": {
+          "reason": "budget",
+          "meter": "tokens"
+        },
+        "result": null,
+        "result_digest": null,
+        "meta": {},
+        "result_text": null
+      },
+      "attributes": {
+        "pollard.node.id": "b552a53bb543701ef2afcd8bdc20addbb468d2954a8afaea6f6b0144ec7c3252",
+        "pollard.node.kind": "refusal",
+        "pollard.node.attempt": 0,
+        "pollard.node.pruned": false,
+        "pollard.refusal.reason": "budget"
+      },
+      "name": "pollard refusal"
+    },
+    {
+      "node": {
+        "id": "f35da1b10734a32a7b08d741f224c3c992046d8b6a47e7bc6edc51f9b070dfdc",
+        "parent": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "kind": "note",
+        "attempt": 0,
+        "payload": {},
+        "result": null,
+        "result_digest": null,
+        "meta": {},
+        "result_text": null
+      },
+      "attributes": {
+        "pollard.node.id": "f35da1b10734a32a7b08d741f224c3c992046d8b6a47e7bc6edc51f9b070dfdc",
+        "pollard.node.kind": "note",
+        "pollard.node.attempt": 0,
+        "pollard.node.pruned": false
+      },
+      "name": "pollard note"
+    }
+  ]
+}

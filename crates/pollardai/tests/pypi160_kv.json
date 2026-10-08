@@ -1,0 +1,923 @@
+{
+  "provenance": {
+    "pollard_version": "1.6.0",
+    "wheel_sha256": "569fb5f130a82c9be327b8dcbd285e3be063200bd9773ca15c5d6bb62edd627f",
+    "generator": "generate_kv_parity.py"
+  },
+  "requests": [
+    {
+      "budgets": [
+        {
+          "scope_id": "scope:é",
+          "limits": {
+            "usd": "100000000000000000000"
+          },
+          "baseline": {
+            "usd": "0.00"
+          },
+          "estimates": {
+            "usd": "0"
+          }
+        }
+      ],
+      "windows": [
+        {
+          "ledger_key": "window:☃",
+          "meter": "usd",
+          "limit": "100000000000000000000",
+          "amount": "0",
+          "window_seconds": 10.0
+        }
+      ],
+      "lease": 30.0,
+      "request": "{\"budgets\":[{\"baseline\":{\"usd\":\"0.00\"},\"estimates\":{\"usd\":\"0\"},\"limits\":{\"usd\":\"100000000000000000000\"},\"scope_id\":\"scope:é\"}],\"lease_seconds\":\"30.0\",\"windows\":[{\"amount\":\"0\",\"ledger_key\":\"window:☃\",\"limit\":\"100000000000000000000\",\"meter\":\"usd\",\"window_seconds\":\"10.0\"}]}",
+      "digest": "5697b1944e624344478663f58f8680cea502a87988ed5d9f1d271ec5fb52a024",
+      "charges": {
+        "usd": "0"
+      },
+      "charges_text": "{\"usd\":\"0\"}",
+      "charges_digest": "209765b9b48dc1c823e1b161b3877e202ac722026c9e30f2a55c7da50b5ec4b1"
+    },
+    {
+      "budgets": [
+        {
+          "scope_id": "scope:é",
+          "limits": {
+            "usd": "100000000000000000000"
+          },
+          "baseline": {
+            "usd": "0.00"
+          },
+          "estimates": {
+            "usd": "0.00"
+          }
+        }
+      ],
+      "windows": [
+        {
+          "ledger_key": "window:☃",
+          "meter": "usd",
+          "limit": "100000000000000000000",
+          "amount": "0.00",
+          "window_seconds": 10.0
+        }
+      ],
+      "lease": 30.0,
+      "request": "{\"budgets\":[{\"baseline\":{\"usd\":\"0.00\"},\"estimates\":{\"usd\":\"0.00\"},\"limits\":{\"usd\":\"100000000000000000000\"},\"scope_id\":\"scope:é\"}],\"lease_seconds\":\"30.0\",\"windows\":[{\"amount\":\"0.00\",\"ledger_key\":\"window:☃\",\"limit\":\"100000000000000000000\",\"meter\":\"usd\",\"window_seconds\":\"10.0\"}]}",
+      "digest": "9d514fd5880e367ab4eaa163df861ac141086a8b0ee316294150f590363ff666",
+      "charges": {
+        "usd": "0.00"
+      },
+      "charges_text": "{\"usd\":\"0.00\"}",
+      "charges_digest": "148955913cf5b1002bdc3b9190e0e4ff23ae93a0196ed966bef5d15f03bbb4e6"
+    },
+    {
+      "budgets": [
+        {
+          "scope_id": "scope:é",
+          "limits": {
+            "usd": "100000000000000000000"
+          },
+          "baseline": {
+            "usd": "0.00"
+          },
+          "estimates": {
+            "usd": "0.0000001"
+          }
+        }
+      ],
+      "windows": [
+        {
+          "ledger_key": "window:☃",
+          "meter": "usd",
+          "limit": "100000000000000000000",
+          "amount": "0.0000001",
+          "window_seconds": 10.0
+        }
+      ],
+      "lease": 30.0,
+      "request": "{\"budgets\":[{\"baseline\":{\"usd\":\"0.00\"},\"estimates\":{\"usd\":\"1E-7\"},\"limits\":{\"usd\":\"100000000000000000000\"},\"scope_id\":\"scope:é\"}],\"lease_seconds\":\"30.0\",\"windows\":[{\"amount\":\"1E-7\",\"ledger_key\":\"window:☃\",\"limit\":\"100000000000000000000\",\"meter\":\"usd\",\"window_seconds\":\"10.0\"}]}",
+      "digest": "71af4cdadc6d4191edc70811cf60cb795dea92a7e4914105e8ec5dd614d2d804",
+      "charges": {
+        "usd": "0.0000001"
+      },
+      "charges_text": "{\"usd\":\"1E-7\"}",
+      "charges_digest": "fb880af1d3b98611016c014493269e0497bcfa4cfa5a4b312a039768ea993b10"
+    },
+    {
+      "budgets": [
+        {
+          "scope_id": "scope:é",
+          "limits": {
+            "usd": "100000000000000000000"
+          },
+          "baseline": {
+            "usd": "0.00"
+          },
+          "estimates": {
+            "usd": "0.00000010"
+          }
+        }
+      ],
+      "windows": [
+        {
+          "ledger_key": "window:☃",
+          "meter": "usd",
+          "limit": "100000000000000000000",
+          "amount": "0.00000010",
+          "window_seconds": 10.0
+        }
+      ],
+      "lease": 30.0,
+      "request": "{\"budgets\":[{\"baseline\":{\"usd\":\"0.00\"},\"estimates\":{\"usd\":\"1.0E-7\"},\"limits\":{\"usd\":\"100000000000000000000\"},\"scope_id\":\"scope:é\"}],\"lease_seconds\":\"30.0\",\"windows\":[{\"amount\":\"1.0E-7\",\"ledger_key\":\"window:☃\",\"limit\":\"100000000000000000000\",\"meter\":\"usd\",\"window_seconds\":\"10.0\"}]}",
+      "digest": "ad8a4d366f8a3dbec1db9720e9daeb1b8164a322cbef27fd2236f9588227c2c6",
+      "charges": {
+        "usd": "0.00000010"
+      },
+      "charges_text": "{\"usd\":\"1.0E-7\"}",
+      "charges_digest": "6691bc29cd28ff6a188a3aa2f392447f09843347aab9af5da010e413d70711d8"
+    },
+    {
+      "budgets": [
+        {
+          "scope_id": "scope:é",
+          "limits": {
+            "usd": "100000000000000000000"
+          },
+          "baseline": {
+            "usd": "0.00"
+          },
+          "estimates": {
+            "usd": "1.2300"
+          }
+        }
+      ],
+      "windows": [
+        {
+          "ledger_key": "window:☃",
+          "meter": "usd",
+          "limit": "100000000000000000000",
+          "amount": "1.2300",
+          "window_seconds": 10.0
+        }
+      ],
+      "lease": 30.0,
+      "request": "{\"budgets\":[{\"baseline\":{\"usd\":\"0.00\"},\"estimates\":{\"usd\":\"1.2300\"},\"limits\":{\"usd\":\"100000000000000000000\"},\"scope_id\":\"scope:é\"}],\"lease_seconds\":\"30.0\",\"windows\":[{\"amount\":\"1.2300\",\"ledger_key\":\"window:☃\",\"limit\":\"100000000000000000000\",\"meter\":\"usd\",\"window_seconds\":\"10.0\"}]}",
+      "digest": "a3d106afff1f3f343256e0c8df312a883042b6e59b49f6153d2e030c8c0643f8",
+      "charges": {
+        "usd": "1.2300"
+      },
+      "charges_text": "{\"usd\":\"1.2300\"}",
+      "charges_digest": "68f3bb0dda96adf0b21f421dcf29c6c3ee68de735beaed4d5d6f4da222d41439"
+    },
+    {
+      "budgets": [
+        {
+          "scope_id": "scope:é",
+          "limits": {
+            "usd": "100000000000000000000"
+          },
+          "baseline": {
+            "usd": "0.00"
+          },
+          "estimates": {
+            "usd": "12345678901234567890.000001"
+          }
+        }
+      ],
+      "windows": [
+        {
+          "ledger_key": "window:☃",
+          "meter": "usd",
+          "limit": "100000000000000000000",
+          "amount": "12345678901234567890.000001",
+          "window_seconds": 10.0
+        }
+      ],
+      "lease": 30.0,
+      "request": "{\"budgets\":[{\"baseline\":{\"usd\":\"0.00\"},\"estimates\":{\"usd\":\"12345678901234567890.000001\"},\"limits\":{\"usd\":\"100000000000000000000\"},\"scope_id\":\"scope:é\"}],\"lease_seconds\":\"30.0\",\"windows\":[{\"amount\":\"12345678901234567890.000001\",\"ledger_key\":\"window:☃\",\"limit\":\"100000000000000000000\",\"meter\":\"usd\",\"window_seconds\":\"10.0\"}]}",
+      "digest": "f873f0b350ccd5d18318720d2dc99805b229ef6ae27db3cdfc00d810c4218ced",
+      "charges": {
+        "usd": "12345678901234567890.000001"
+      },
+      "charges_text": "{\"usd\":\"12345678901234567890.000001\"}",
+      "charges_digest": "050fc265c70df0905990dc38034a38edd02cea9b408fe008e6d58f3e7028ec08"
+    }
+  ],
+  "nodes": [
+    {
+      "node_text": "{\"attempt\":0,\"id\":\"a4711154499120ff2b2817766e57019a0a6095b45490977f35f19b166a18b999\",\"kind\":\"root\",\"meta\":\"{\\\"meta\\\":1e-07}\",\"parent\":null,\"payload\":\"{\\\"integer\\\":340282366920938463463374607431768211456,\\\"run\\\":\\\"KV café\\\"}\",\"result\":null,\"result_digest\":null}"
+    },
+    {
+      "node_text": "{\"attempt\":0,\"id\":\"49b520df8702d29246874c2fe62c413f59b958c4e76bb6723b952e4227f9765a\",\"kind\":\"model_call\",\"meta\":\"{}\",\"parent\":\"a4711154499120ff2b2817766e57019a0a6095b45490977f35f19b166a18b999\",\"payload\":\"{\\\"model\\\":\\\"test\\\"}\",\"result\":\"{\\\"float\\\":1e-07,\\\"large\\\":1208925819614629174706176,\\\"text\\\":\\\"é\\\"}\",\"result_digest\":\"a6e5f9e160ae3e67101ac278612b1a61fb19236bce62a7a75ec2637568159efe\"}"
+    }
+  ],
+  "trace": [
+    {
+      "action": {
+        "op": "reserve",
+        "id": "a",
+        "budgets": [
+          {
+            "scope_id": "root",
+            "limits": {
+              "steps": "3",
+              "usd": "0.0000010",
+              "depth": "5"
+            },
+            "baseline": {
+              "steps": "0",
+              "usd": "0.00000000"
+            },
+            "estimates": {
+              "steps": "1",
+              "usd": "0.0000002"
+            }
+          }
+        ],
+        "windows": [
+          {
+            "ledger_key": "root-window",
+            "meter": "steps",
+            "limit": "2",
+            "amount": "1",
+            "window_seconds": 10.0
+          }
+        ],
+        "lease": 30.0
+      },
+      "check": {
+        "ok": true,
+        "reason": "budget",
+        "meter": null,
+        "requested": "0",
+        "remaining": "0",
+        "window_seconds": null
+      },
+      "state": {
+        "schema": {
+          "version": "1"
+        },
+        "budget": {
+          "[\"root\",\"steps\"]": "0",
+          "[\"root\",\"usd\"]": "0"
+        },
+        "reservations": {
+          "a": "{\"charges\":null,\"charges_digest\":null,\"completed_at\":null,\"created_at\":1000.0,\"details\":[{\"amount\":\"1\",\"kind\":\"budget\",\"meter\":\"steps\",\"scope_id\":\"root\"},{\"amount\":\"2E-7\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"root\"},{\"amount\":\"1\",\"kind\":\"window\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"window_seconds\":10.0}],\"expires_at\":1030.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"steps\\\":\\\"0\\\",\\\"usd\\\":\\\"0E-8\\\"},\\\"estimates\\\":{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2E-7\\\"},\\\"limits\\\":{\\\"depth\\\":\\\"5\\\",\\\"steps\\\":\\\"3\\\",\\\"usd\\\":\\\"0.0000010\\\"},\\\"scope_id\\\":\\\"root\\\"}],\\\"lease_seconds\\\":\\\"30.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1\\\",\\\"ledger_key\\\":\\\"root-window\\\",\\\"limit\\\":\\\"2\\\",\\\"meter\\\":\\\"steps\\\",\\\"window_seconds\\\":\\\"10.0\\\"}]}\",\"request_digest\":\"7abe48e073db396b2f6c6b6f6cf7a18a11892cf01a13cc6c1762f7ea1c88399e\",\"state\":\"active\"}"
+        }
+      }
+    },
+    {
+      "action": {
+        "op": "reserve",
+        "id": "a",
+        "budgets": [
+          {
+            "scope_id": "root",
+            "limits": {
+              "steps": "3",
+              "usd": "0.0000010",
+              "depth": "5"
+            },
+            "baseline": {
+              "steps": "0",
+              "usd": "0.00000000"
+            },
+            "estimates": {
+              "steps": "1",
+              "usd": "0.0000002"
+            }
+          }
+        ],
+        "windows": [
+          {
+            "ledger_key": "root-window",
+            "meter": "steps",
+            "limit": "2",
+            "amount": "1",
+            "window_seconds": 10.0
+          }
+        ],
+        "lease": 30.0
+      },
+      "check": {
+        "ok": true,
+        "reason": "budget",
+        "meter": null,
+        "requested": "0",
+        "remaining": "0",
+        "window_seconds": null
+      },
+      "state": {
+        "schema": {
+          "version": "1"
+        },
+        "budget": {
+          "[\"root\",\"steps\"]": "0",
+          "[\"root\",\"usd\"]": "0"
+        },
+        "reservations": {
+          "a": "{\"charges\":null,\"charges_digest\":null,\"completed_at\":null,\"created_at\":1000.0,\"details\":[{\"amount\":\"1\",\"kind\":\"budget\",\"meter\":\"steps\",\"scope_id\":\"root\"},{\"amount\":\"2E-7\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"root\"},{\"amount\":\"1\",\"kind\":\"window\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"window_seconds\":10.0}],\"expires_at\":1030.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"steps\\\":\\\"0\\\",\\\"usd\\\":\\\"0E-8\\\"},\\\"estimates\\\":{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2E-7\\\"},\\\"limits\\\":{\\\"depth\\\":\\\"5\\\",\\\"steps\\\":\\\"3\\\",\\\"usd\\\":\\\"0.0000010\\\"},\\\"scope_id\\\":\\\"root\\\"}],\\\"lease_seconds\\\":\\\"30.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1\\\",\\\"ledger_key\\\":\\\"root-window\\\",\\\"limit\\\":\\\"2\\\",\\\"meter\\\":\\\"steps\\\",\\\"window_seconds\\\":\\\"10.0\\\"}]}\",\"request_digest\":\"7abe48e073db396b2f6c6b6f6cf7a18a11892cf01a13cc6c1762f7ea1c88399e\",\"state\":\"active\"}"
+        }
+      }
+    },
+    {
+      "action": {
+        "op": "reserve",
+        "id": "b",
+        "budgets": [
+          {
+            "scope_id": "root",
+            "limits": {
+              "steps": "3",
+              "usd": "0.0000010",
+              "depth": "5"
+            },
+            "baseline": {
+              "steps": "0",
+              "usd": "0.00000000"
+            },
+            "estimates": {
+              "steps": "1",
+              "usd": "0.0000002"
+            }
+          }
+        ],
+        "windows": [
+          {
+            "ledger_key": "root-window",
+            "meter": "steps",
+            "limit": "2",
+            "amount": "1",
+            "window_seconds": 10.0
+          }
+        ],
+        "lease": 30.0
+      },
+      "check": {
+        "ok": true,
+        "reason": "budget",
+        "meter": null,
+        "requested": "0",
+        "remaining": "0",
+        "window_seconds": null
+      },
+      "state": {
+        "schema": {
+          "version": "1"
+        },
+        "budget": {
+          "[\"root\",\"steps\"]": "0",
+          "[\"root\",\"usd\"]": "0"
+        },
+        "reservations": {
+          "a": "{\"charges\":null,\"charges_digest\":null,\"completed_at\":null,\"created_at\":1000.0,\"details\":[{\"amount\":\"1\",\"kind\":\"budget\",\"meter\":\"steps\",\"scope_id\":\"root\"},{\"amount\":\"2E-7\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"root\"},{\"amount\":\"1\",\"kind\":\"window\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"window_seconds\":10.0}],\"expires_at\":1030.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"steps\\\":\\\"0\\\",\\\"usd\\\":\\\"0E-8\\\"},\\\"estimates\\\":{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2E-7\\\"},\\\"limits\\\":{\\\"depth\\\":\\\"5\\\",\\\"steps\\\":\\\"3\\\",\\\"usd\\\":\\\"0.0000010\\\"},\\\"scope_id\\\":\\\"root\\\"}],\\\"lease_seconds\\\":\\\"30.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1\\\",\\\"ledger_key\\\":\\\"root-window\\\",\\\"limit\\\":\\\"2\\\",\\\"meter\\\":\\\"steps\\\",\\\"window_seconds\\\":\\\"10.0\\\"}]}\",\"request_digest\":\"7abe48e073db396b2f6c6b6f6cf7a18a11892cf01a13cc6c1762f7ea1c88399e\",\"state\":\"active\"}",
+          "b": "{\"charges\":null,\"charges_digest\":null,\"completed_at\":null,\"created_at\":1000.0,\"details\":[{\"amount\":\"1\",\"kind\":\"budget\",\"meter\":\"steps\",\"scope_id\":\"root\"},{\"amount\":\"2E-7\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"root\"},{\"amount\":\"1\",\"kind\":\"window\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"window_seconds\":10.0}],\"expires_at\":1030.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"steps\\\":\\\"0\\\",\\\"usd\\\":\\\"0E-8\\\"},\\\"estimates\\\":{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2E-7\\\"},\\\"limits\\\":{\\\"depth\\\":\\\"5\\\",\\\"steps\\\":\\\"3\\\",\\\"usd\\\":\\\"0.0000010\\\"},\\\"scope_id\\\":\\\"root\\\"}],\\\"lease_seconds\\\":\\\"30.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1\\\",\\\"ledger_key\\\":\\\"root-window\\\",\\\"limit\\\":\\\"2\\\",\\\"meter\\\":\\\"steps\\\",\\\"window_seconds\\\":\\\"10.0\\\"}]}\",\"request_digest\":\"7abe48e073db396b2f6c6b6f6cf7a18a11892cf01a13cc6c1762f7ea1c88399e\",\"state\":\"active\"}"
+        }
+      }
+    },
+    {
+      "action": {
+        "op": "reserve",
+        "id": "blocked",
+        "budgets": [
+          {
+            "scope_id": "root",
+            "limits": {
+              "steps": "3",
+              "usd": "0.0000010",
+              "depth": "5"
+            },
+            "baseline": {
+              "steps": "0",
+              "usd": "0.00000000"
+            },
+            "estimates": {
+              "steps": "1",
+              "usd": "0.0000002"
+            }
+          }
+        ],
+        "windows": [
+          {
+            "ledger_key": "root-window",
+            "meter": "steps",
+            "limit": "2",
+            "amount": "1",
+            "window_seconds": 10.0
+          }
+        ],
+        "lease": 30.0
+      },
+      "check": {
+        "ok": false,
+        "reason": "window",
+        "meter": "steps",
+        "requested": "1",
+        "remaining": "0",
+        "window_seconds": 10.0
+      },
+      "state": {
+        "schema": {
+          "version": "1"
+        },
+        "budget": {
+          "[\"root\",\"steps\"]": "0",
+          "[\"root\",\"usd\"]": "0"
+        },
+        "reservations": {
+          "a": "{\"charges\":null,\"charges_digest\":null,\"completed_at\":null,\"created_at\":1000.0,\"details\":[{\"amount\":\"1\",\"kind\":\"budget\",\"meter\":\"steps\",\"scope_id\":\"root\"},{\"amount\":\"2E-7\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"root\"},{\"amount\":\"1\",\"kind\":\"window\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"window_seconds\":10.0}],\"expires_at\":1030.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"steps\\\":\\\"0\\\",\\\"usd\\\":\\\"0E-8\\\"},\\\"estimates\\\":{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2E-7\\\"},\\\"limits\\\":{\\\"depth\\\":\\\"5\\\",\\\"steps\\\":\\\"3\\\",\\\"usd\\\":\\\"0.0000010\\\"},\\\"scope_id\\\":\\\"root\\\"}],\\\"lease_seconds\\\":\\\"30.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1\\\",\\\"ledger_key\\\":\\\"root-window\\\",\\\"limit\\\":\\\"2\\\",\\\"meter\\\":\\\"steps\\\",\\\"window_seconds\\\":\\\"10.0\\\"}]}\",\"request_digest\":\"7abe48e073db396b2f6c6b6f6cf7a18a11892cf01a13cc6c1762f7ea1c88399e\",\"state\":\"active\"}",
+          "b": "{\"charges\":null,\"charges_digest\":null,\"completed_at\":null,\"created_at\":1000.0,\"details\":[{\"amount\":\"1\",\"kind\":\"budget\",\"meter\":\"steps\",\"scope_id\":\"root\"},{\"amount\":\"2E-7\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"root\"},{\"amount\":\"1\",\"kind\":\"window\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"window_seconds\":10.0}],\"expires_at\":1030.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"steps\\\":\\\"0\\\",\\\"usd\\\":\\\"0E-8\\\"},\\\"estimates\\\":{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2E-7\\\"},\\\"limits\\\":{\\\"depth\\\":\\\"5\\\",\\\"steps\\\":\\\"3\\\",\\\"usd\\\":\\\"0.0000010\\\"},\\\"scope_id\\\":\\\"root\\\"}],\\\"lease_seconds\\\":\\\"30.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1\\\",\\\"ledger_key\\\":\\\"root-window\\\",\\\"limit\\\":\\\"2\\\",\\\"meter\\\":\\\"steps\\\",\\\"window_seconds\\\":\\\"10.0\\\"}]}\",\"request_digest\":\"7abe48e073db396b2f6c6b6f6cf7a18a11892cf01a13cc6c1762f7ea1c88399e\",\"state\":\"active\"}"
+        }
+      }
+    },
+    {
+      "action": {
+        "op": "settle",
+        "id": "a",
+        "charges": {
+          "steps": "1",
+          "usd": "0.00000010"
+        }
+      },
+      "state": {
+        "schema": {
+          "version": "1"
+        },
+        "budget": {
+          "[\"root\",\"steps\"]": "1",
+          "[\"root\",\"usd\"]": "1.0E-7"
+        },
+        "reservations": {
+          "a": "{\"charges\":\"{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"1.0E-7\\\"}\",\"charges_digest\":\"69292abeff2b4b0156d65fb7f8afc3ad12564f5276addbb3ac7d6084fe4eae7e\",\"completed_at\":1000.0,\"created_at\":1000.0,\"details\":[{\"amount\":\"1\",\"kind\":\"budget\",\"meter\":\"steps\",\"scope_id\":\"root\"},{\"amount\":\"2E-7\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"root\"},{\"amount\":\"1\",\"kind\":\"window\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"window_seconds\":10.0}],\"expires_at\":1030.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"steps\\\":\\\"0\\\",\\\"usd\\\":\\\"0E-8\\\"},\\\"estimates\\\":{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2E-7\\\"},\\\"limits\\\":{\\\"depth\\\":\\\"5\\\",\\\"steps\\\":\\\"3\\\",\\\"usd\\\":\\\"0.0000010\\\"},\\\"scope_id\\\":\\\"root\\\"}],\\\"lease_seconds\\\":\\\"30.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1\\\",\\\"ledger_key\\\":\\\"root-window\\\",\\\"limit\\\":\\\"2\\\",\\\"meter\\\":\\\"steps\\\",\\\"window_seconds\\\":\\\"10.0\\\"}]}\",\"request_digest\":\"7abe48e073db396b2f6c6b6f6cf7a18a11892cf01a13cc6c1762f7ea1c88399e\",\"state\":\"settled\"}",
+          "b": "{\"charges\":null,\"charges_digest\":null,\"completed_at\":null,\"created_at\":1000.0,\"details\":[{\"amount\":\"1\",\"kind\":\"budget\",\"meter\":\"steps\",\"scope_id\":\"root\"},{\"amount\":\"2E-7\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"root\"},{\"amount\":\"1\",\"kind\":\"window\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"window_seconds\":10.0}],\"expires_at\":1030.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"steps\\\":\\\"0\\\",\\\"usd\\\":\\\"0E-8\\\"},\\\"estimates\\\":{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2E-7\\\"},\\\"limits\\\":{\\\"depth\\\":\\\"5\\\",\\\"steps\\\":\\\"3\\\",\\\"usd\\\":\\\"0.0000010\\\"},\\\"scope_id\\\":\\\"root\\\"}],\\\"lease_seconds\\\":\\\"30.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1\\\",\\\"ledger_key\\\":\\\"root-window\\\",\\\"limit\\\":\\\"2\\\",\\\"meter\\\":\\\"steps\\\",\\\"window_seconds\\\":\\\"10.0\\\"}]}\",\"request_digest\":\"7abe48e073db396b2f6c6b6f6cf7a18a11892cf01a13cc6c1762f7ea1c88399e\",\"state\":\"active\"}"
+        },
+        "window-events": {
+          "[\"a\",\"2\"]": "{\"amount\":\"1\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"settled_at\":1000.0,\"window_seconds\":10.0}"
+        }
+      }
+    },
+    {
+      "action": {
+        "op": "settle",
+        "id": "a",
+        "charges": {
+          "steps": "1",
+          "usd": "0.00000010"
+        }
+      },
+      "state": {
+        "schema": {
+          "version": "1"
+        },
+        "budget": {
+          "[\"root\",\"steps\"]": "1",
+          "[\"root\",\"usd\"]": "1.0E-7"
+        },
+        "reservations": {
+          "a": "{\"charges\":\"{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"1.0E-7\\\"}\",\"charges_digest\":\"69292abeff2b4b0156d65fb7f8afc3ad12564f5276addbb3ac7d6084fe4eae7e\",\"completed_at\":1000.0,\"created_at\":1000.0,\"details\":[{\"amount\":\"1\",\"kind\":\"budget\",\"meter\":\"steps\",\"scope_id\":\"root\"},{\"amount\":\"2E-7\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"root\"},{\"amount\":\"1\",\"kind\":\"window\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"window_seconds\":10.0}],\"expires_at\":1030.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"steps\\\":\\\"0\\\",\\\"usd\\\":\\\"0E-8\\\"},\\\"estimates\\\":{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2E-7\\\"},\\\"limits\\\":{\\\"depth\\\":\\\"5\\\",\\\"steps\\\":\\\"3\\\",\\\"usd\\\":\\\"0.0000010\\\"},\\\"scope_id\\\":\\\"root\\\"}],\\\"lease_seconds\\\":\\\"30.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1\\\",\\\"ledger_key\\\":\\\"root-window\\\",\\\"limit\\\":\\\"2\\\",\\\"meter\\\":\\\"steps\\\",\\\"window_seconds\\\":\\\"10.0\\\"}]}\",\"request_digest\":\"7abe48e073db396b2f6c6b6f6cf7a18a11892cf01a13cc6c1762f7ea1c88399e\",\"state\":\"settled\"}",
+          "b": "{\"charges\":null,\"charges_digest\":null,\"completed_at\":null,\"created_at\":1000.0,\"details\":[{\"amount\":\"1\",\"kind\":\"budget\",\"meter\":\"steps\",\"scope_id\":\"root\"},{\"amount\":\"2E-7\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"root\"},{\"amount\":\"1\",\"kind\":\"window\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"window_seconds\":10.0}],\"expires_at\":1030.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"steps\\\":\\\"0\\\",\\\"usd\\\":\\\"0E-8\\\"},\\\"estimates\\\":{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2E-7\\\"},\\\"limits\\\":{\\\"depth\\\":\\\"5\\\",\\\"steps\\\":\\\"3\\\",\\\"usd\\\":\\\"0.0000010\\\"},\\\"scope_id\\\":\\\"root\\\"}],\\\"lease_seconds\\\":\\\"30.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1\\\",\\\"ledger_key\\\":\\\"root-window\\\",\\\"limit\\\":\\\"2\\\",\\\"meter\\\":\\\"steps\\\",\\\"window_seconds\\\":\\\"10.0\\\"}]}\",\"request_digest\":\"7abe48e073db396b2f6c6b6f6cf7a18a11892cf01a13cc6c1762f7ea1c88399e\",\"state\":\"active\"}"
+        },
+        "window-events": {
+          "[\"a\",\"2\"]": "{\"amount\":\"1\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"settled_at\":1000.0,\"window_seconds\":10.0}"
+        }
+      }
+    },
+    {
+      "action": {
+        "op": "settle",
+        "id": "a",
+        "charges": {
+          "steps": "2"
+        }
+      },
+      "error": "IntegrityError",
+      "state": {
+        "schema": {
+          "version": "1"
+        },
+        "budget": {
+          "[\"root\",\"steps\"]": "1",
+          "[\"root\",\"usd\"]": "1.0E-7"
+        },
+        "reservations": {
+          "a": "{\"charges\":\"{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"1.0E-7\\\"}\",\"charges_digest\":\"69292abeff2b4b0156d65fb7f8afc3ad12564f5276addbb3ac7d6084fe4eae7e\",\"completed_at\":1000.0,\"created_at\":1000.0,\"details\":[{\"amount\":\"1\",\"kind\":\"budget\",\"meter\":\"steps\",\"scope_id\":\"root\"},{\"amount\":\"2E-7\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"root\"},{\"amount\":\"1\",\"kind\":\"window\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"window_seconds\":10.0}],\"expires_at\":1030.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"steps\\\":\\\"0\\\",\\\"usd\\\":\\\"0E-8\\\"},\\\"estimates\\\":{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2E-7\\\"},\\\"limits\\\":{\\\"depth\\\":\\\"5\\\",\\\"steps\\\":\\\"3\\\",\\\"usd\\\":\\\"0.0000010\\\"},\\\"scope_id\\\":\\\"root\\\"}],\\\"lease_seconds\\\":\\\"30.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1\\\",\\\"ledger_key\\\":\\\"root-window\\\",\\\"limit\\\":\\\"2\\\",\\\"meter\\\":\\\"steps\\\",\\\"window_seconds\\\":\\\"10.0\\\"}]}\",\"request_digest\":\"7abe48e073db396b2f6c6b6f6cf7a18a11892cf01a13cc6c1762f7ea1c88399e\",\"state\":\"settled\"}",
+          "b": "{\"charges\":null,\"charges_digest\":null,\"completed_at\":null,\"created_at\":1000.0,\"details\":[{\"amount\":\"1\",\"kind\":\"budget\",\"meter\":\"steps\",\"scope_id\":\"root\"},{\"amount\":\"2E-7\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"root\"},{\"amount\":\"1\",\"kind\":\"window\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"window_seconds\":10.0}],\"expires_at\":1030.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"steps\\\":\\\"0\\\",\\\"usd\\\":\\\"0E-8\\\"},\\\"estimates\\\":{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2E-7\\\"},\\\"limits\\\":{\\\"depth\\\":\\\"5\\\",\\\"steps\\\":\\\"3\\\",\\\"usd\\\":\\\"0.0000010\\\"},\\\"scope_id\\\":\\\"root\\\"}],\\\"lease_seconds\\\":\\\"30.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1\\\",\\\"ledger_key\\\":\\\"root-window\\\",\\\"limit\\\":\\\"2\\\",\\\"meter\\\":\\\"steps\\\",\\\"window_seconds\\\":\\\"10.0\\\"}]}\",\"request_digest\":\"7abe48e073db396b2f6c6b6f6cf7a18a11892cf01a13cc6c1762f7ea1c88399e\",\"state\":\"active\"}"
+        },
+        "window-events": {
+          "[\"a\",\"2\"]": "{\"amount\":\"1\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"settled_at\":1000.0,\"window_seconds\":10.0}"
+        }
+      }
+    },
+    {
+      "action": {
+        "op": "release",
+        "id": "b"
+      },
+      "state": {
+        "schema": {
+          "version": "1"
+        },
+        "budget": {
+          "[\"root\",\"steps\"]": "1",
+          "[\"root\",\"usd\"]": "1.0E-7"
+        },
+        "reservations": {
+          "a": "{\"charges\":\"{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"1.0E-7\\\"}\",\"charges_digest\":\"69292abeff2b4b0156d65fb7f8afc3ad12564f5276addbb3ac7d6084fe4eae7e\",\"completed_at\":1000.0,\"created_at\":1000.0,\"details\":[{\"amount\":\"1\",\"kind\":\"budget\",\"meter\":\"steps\",\"scope_id\":\"root\"},{\"amount\":\"2E-7\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"root\"},{\"amount\":\"1\",\"kind\":\"window\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"window_seconds\":10.0}],\"expires_at\":1030.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"steps\\\":\\\"0\\\",\\\"usd\\\":\\\"0E-8\\\"},\\\"estimates\\\":{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2E-7\\\"},\\\"limits\\\":{\\\"depth\\\":\\\"5\\\",\\\"steps\\\":\\\"3\\\",\\\"usd\\\":\\\"0.0000010\\\"},\\\"scope_id\\\":\\\"root\\\"}],\\\"lease_seconds\\\":\\\"30.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1\\\",\\\"ledger_key\\\":\\\"root-window\\\",\\\"limit\\\":\\\"2\\\",\\\"meter\\\":\\\"steps\\\",\\\"window_seconds\\\":\\\"10.0\\\"}]}\",\"request_digest\":\"7abe48e073db396b2f6c6b6f6cf7a18a11892cf01a13cc6c1762f7ea1c88399e\",\"state\":\"settled\"}",
+          "b": "{\"charges\":null,\"charges_digest\":null,\"completed_at\":1000.0,\"created_at\":1000.0,\"details\":[{\"amount\":\"1\",\"kind\":\"budget\",\"meter\":\"steps\",\"scope_id\":\"root\"},{\"amount\":\"2E-7\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"root\"},{\"amount\":\"1\",\"kind\":\"window\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"window_seconds\":10.0}],\"expires_at\":1030.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"steps\\\":\\\"0\\\",\\\"usd\\\":\\\"0E-8\\\"},\\\"estimates\\\":{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2E-7\\\"},\\\"limits\\\":{\\\"depth\\\":\\\"5\\\",\\\"steps\\\":\\\"3\\\",\\\"usd\\\":\\\"0.0000010\\\"},\\\"scope_id\\\":\\\"root\\\"}],\\\"lease_seconds\\\":\\\"30.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1\\\",\\\"ledger_key\\\":\\\"root-window\\\",\\\"limit\\\":\\\"2\\\",\\\"meter\\\":\\\"steps\\\",\\\"window_seconds\\\":\\\"10.0\\\"}]}\",\"request_digest\":\"7abe48e073db396b2f6c6b6f6cf7a18a11892cf01a13cc6c1762f7ea1c88399e\",\"state\":\"released\"}"
+        },
+        "window-events": {
+          "[\"a\",\"2\"]": "{\"amount\":\"1\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"settled_at\":1000.0,\"window_seconds\":10.0}"
+        }
+      }
+    },
+    {
+      "action": {
+        "op": "release",
+        "id": "b"
+      },
+      "state": {
+        "schema": {
+          "version": "1"
+        },
+        "budget": {
+          "[\"root\",\"steps\"]": "1",
+          "[\"root\",\"usd\"]": "1.0E-7"
+        },
+        "reservations": {
+          "a": "{\"charges\":\"{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"1.0E-7\\\"}\",\"charges_digest\":\"69292abeff2b4b0156d65fb7f8afc3ad12564f5276addbb3ac7d6084fe4eae7e\",\"completed_at\":1000.0,\"created_at\":1000.0,\"details\":[{\"amount\":\"1\",\"kind\":\"budget\",\"meter\":\"steps\",\"scope_id\":\"root\"},{\"amount\":\"2E-7\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"root\"},{\"amount\":\"1\",\"kind\":\"window\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"window_seconds\":10.0}],\"expires_at\":1030.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"steps\\\":\\\"0\\\",\\\"usd\\\":\\\"0E-8\\\"},\\\"estimates\\\":{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2E-7\\\"},\\\"limits\\\":{\\\"depth\\\":\\\"5\\\",\\\"steps\\\":\\\"3\\\",\\\"usd\\\":\\\"0.0000010\\\"},\\\"scope_id\\\":\\\"root\\\"}],\\\"lease_seconds\\\":\\\"30.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1\\\",\\\"ledger_key\\\":\\\"root-window\\\",\\\"limit\\\":\\\"2\\\",\\\"meter\\\":\\\"steps\\\",\\\"window_seconds\\\":\\\"10.0\\\"}]}\",\"request_digest\":\"7abe48e073db396b2f6c6b6f6cf7a18a11892cf01a13cc6c1762f7ea1c88399e\",\"state\":\"settled\"}",
+          "b": "{\"charges\":null,\"charges_digest\":null,\"completed_at\":1000.0,\"created_at\":1000.0,\"details\":[{\"amount\":\"1\",\"kind\":\"budget\",\"meter\":\"steps\",\"scope_id\":\"root\"},{\"amount\":\"2E-7\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"root\"},{\"amount\":\"1\",\"kind\":\"window\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"window_seconds\":10.0}],\"expires_at\":1030.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"steps\\\":\\\"0\\\",\\\"usd\\\":\\\"0E-8\\\"},\\\"estimates\\\":{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2E-7\\\"},\\\"limits\\\":{\\\"depth\\\":\\\"5\\\",\\\"steps\\\":\\\"3\\\",\\\"usd\\\":\\\"0.0000010\\\"},\\\"scope_id\\\":\\\"root\\\"}],\\\"lease_seconds\\\":\\\"30.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1\\\",\\\"ledger_key\\\":\\\"root-window\\\",\\\"limit\\\":\\\"2\\\",\\\"meter\\\":\\\"steps\\\",\\\"window_seconds\\\":\\\"10.0\\\"}]}\",\"request_digest\":\"7abe48e073db396b2f6c6b6f6cf7a18a11892cf01a13cc6c1762f7ea1c88399e\",\"state\":\"released\"}"
+        },
+        "window-events": {
+          "[\"a\",\"2\"]": "{\"amount\":\"1\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"settled_at\":1000.0,\"window_seconds\":10.0}"
+        }
+      }
+    },
+    {
+      "action": {
+        "op": "reserve",
+        "id": "b",
+        "budgets": [
+          {
+            "scope_id": "root",
+            "limits": {
+              "steps": "3",
+              "usd": "0.0000010",
+              "depth": "5"
+            },
+            "baseline": {
+              "steps": "0",
+              "usd": "0.00000000"
+            },
+            "estimates": {
+              "steps": "1",
+              "usd": "0.0000002"
+            }
+          }
+        ],
+        "windows": [
+          {
+            "ledger_key": "root-window",
+            "meter": "steps",
+            "limit": "2",
+            "amount": "1",
+            "window_seconds": 10.0
+          }
+        ],
+        "lease": 30.0
+      },
+      "error": "IntegrityError",
+      "state": {
+        "schema": {
+          "version": "1"
+        },
+        "budget": {
+          "[\"root\",\"steps\"]": "1",
+          "[\"root\",\"usd\"]": "1.0E-7"
+        },
+        "reservations": {
+          "a": "{\"charges\":\"{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"1.0E-7\\\"}\",\"charges_digest\":\"69292abeff2b4b0156d65fb7f8afc3ad12564f5276addbb3ac7d6084fe4eae7e\",\"completed_at\":1000.0,\"created_at\":1000.0,\"details\":[{\"amount\":\"1\",\"kind\":\"budget\",\"meter\":\"steps\",\"scope_id\":\"root\"},{\"amount\":\"2E-7\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"root\"},{\"amount\":\"1\",\"kind\":\"window\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"window_seconds\":10.0}],\"expires_at\":1030.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"steps\\\":\\\"0\\\",\\\"usd\\\":\\\"0E-8\\\"},\\\"estimates\\\":{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2E-7\\\"},\\\"limits\\\":{\\\"depth\\\":\\\"5\\\",\\\"steps\\\":\\\"3\\\",\\\"usd\\\":\\\"0.0000010\\\"},\\\"scope_id\\\":\\\"root\\\"}],\\\"lease_seconds\\\":\\\"30.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1\\\",\\\"ledger_key\\\":\\\"root-window\\\",\\\"limit\\\":\\\"2\\\",\\\"meter\\\":\\\"steps\\\",\\\"window_seconds\\\":\\\"10.0\\\"}]}\",\"request_digest\":\"7abe48e073db396b2f6c6b6f6cf7a18a11892cf01a13cc6c1762f7ea1c88399e\",\"state\":\"settled\"}",
+          "b": "{\"charges\":null,\"charges_digest\":null,\"completed_at\":1000.0,\"created_at\":1000.0,\"details\":[{\"amount\":\"1\",\"kind\":\"budget\",\"meter\":\"steps\",\"scope_id\":\"root\"},{\"amount\":\"2E-7\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"root\"},{\"amount\":\"1\",\"kind\":\"window\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"window_seconds\":10.0}],\"expires_at\":1030.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"steps\\\":\\\"0\\\",\\\"usd\\\":\\\"0E-8\\\"},\\\"estimates\\\":{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2E-7\\\"},\\\"limits\\\":{\\\"depth\\\":\\\"5\\\",\\\"steps\\\":\\\"3\\\",\\\"usd\\\":\\\"0.0000010\\\"},\\\"scope_id\\\":\\\"root\\\"}],\\\"lease_seconds\\\":\\\"30.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1\\\",\\\"ledger_key\\\":\\\"root-window\\\",\\\"limit\\\":\\\"2\\\",\\\"meter\\\":\\\"steps\\\",\\\"window_seconds\\\":\\\"10.0\\\"}]}\",\"request_digest\":\"7abe48e073db396b2f6c6b6f6cf7a18a11892cf01a13cc6c1762f7ea1c88399e\",\"state\":\"released\"}"
+        },
+        "window-events": {
+          "[\"a\",\"2\"]": "{\"amount\":\"1\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"settled_at\":1000.0,\"window_seconds\":10.0}"
+        }
+      }
+    },
+    {
+      "action": {
+        "op": "reserve",
+        "id": "c",
+        "budgets": [
+          {
+            "scope_id": "root",
+            "limits": {
+              "steps": "3",
+              "usd": "0.0000010",
+              "depth": "5"
+            },
+            "baseline": {
+              "steps": "0",
+              "usd": "0.00000000"
+            },
+            "estimates": {
+              "steps": "1",
+              "usd": "0.0000002"
+            }
+          }
+        ],
+        "windows": [
+          {
+            "ledger_key": "root-window",
+            "meter": "steps",
+            "limit": "2",
+            "amount": "1",
+            "window_seconds": 10.0
+          }
+        ],
+        "lease": 3.0
+      },
+      "check": {
+        "ok": true,
+        "reason": "budget",
+        "meter": null,
+        "requested": "0",
+        "remaining": "0",
+        "window_seconds": null
+      },
+      "state": {
+        "schema": {
+          "version": "1"
+        },
+        "budget": {
+          "[\"root\",\"steps\"]": "1",
+          "[\"root\",\"usd\"]": "1.0E-7"
+        },
+        "reservations": {
+          "a": "{\"charges\":\"{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"1.0E-7\\\"}\",\"charges_digest\":\"69292abeff2b4b0156d65fb7f8afc3ad12564f5276addbb3ac7d6084fe4eae7e\",\"completed_at\":1000.0,\"created_at\":1000.0,\"details\":[{\"amount\":\"1\",\"kind\":\"budget\",\"meter\":\"steps\",\"scope_id\":\"root\"},{\"amount\":\"2E-7\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"root\"},{\"amount\":\"1\",\"kind\":\"window\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"window_seconds\":10.0}],\"expires_at\":1030.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"steps\\\":\\\"0\\\",\\\"usd\\\":\\\"0E-8\\\"},\\\"estimates\\\":{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2E-7\\\"},\\\"limits\\\":{\\\"depth\\\":\\\"5\\\",\\\"steps\\\":\\\"3\\\",\\\"usd\\\":\\\"0.0000010\\\"},\\\"scope_id\\\":\\\"root\\\"}],\\\"lease_seconds\\\":\\\"30.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1\\\",\\\"ledger_key\\\":\\\"root-window\\\",\\\"limit\\\":\\\"2\\\",\\\"meter\\\":\\\"steps\\\",\\\"window_seconds\\\":\\\"10.0\\\"}]}\",\"request_digest\":\"7abe48e073db396b2f6c6b6f6cf7a18a11892cf01a13cc6c1762f7ea1c88399e\",\"state\":\"settled\"}",
+          "b": "{\"charges\":null,\"charges_digest\":null,\"completed_at\":1000.0,\"created_at\":1000.0,\"details\":[{\"amount\":\"1\",\"kind\":\"budget\",\"meter\":\"steps\",\"scope_id\":\"root\"},{\"amount\":\"2E-7\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"root\"},{\"amount\":\"1\",\"kind\":\"window\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"window_seconds\":10.0}],\"expires_at\":1030.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"steps\\\":\\\"0\\\",\\\"usd\\\":\\\"0E-8\\\"},\\\"estimates\\\":{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2E-7\\\"},\\\"limits\\\":{\\\"depth\\\":\\\"5\\\",\\\"steps\\\":\\\"3\\\",\\\"usd\\\":\\\"0.0000010\\\"},\\\"scope_id\\\":\\\"root\\\"}],\\\"lease_seconds\\\":\\\"30.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1\\\",\\\"ledger_key\\\":\\\"root-window\\\",\\\"limit\\\":\\\"2\\\",\\\"meter\\\":\\\"steps\\\",\\\"window_seconds\\\":\\\"10.0\\\"}]}\",\"request_digest\":\"7abe48e073db396b2f6c6b6f6cf7a18a11892cf01a13cc6c1762f7ea1c88399e\",\"state\":\"released\"}",
+          "c": "{\"charges\":null,\"charges_digest\":null,\"completed_at\":null,\"created_at\":1000.0,\"details\":[{\"amount\":\"1\",\"kind\":\"budget\",\"meter\":\"steps\",\"scope_id\":\"root\"},{\"amount\":\"2E-7\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"root\"},{\"amount\":\"1\",\"kind\":\"window\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"window_seconds\":10.0}],\"expires_at\":1003.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"steps\\\":\\\"0\\\",\\\"usd\\\":\\\"0E-8\\\"},\\\"estimates\\\":{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2E-7\\\"},\\\"limits\\\":{\\\"depth\\\":\\\"5\\\",\\\"steps\\\":\\\"3\\\",\\\"usd\\\":\\\"0.0000010\\\"},\\\"scope_id\\\":\\\"root\\\"}],\\\"lease_seconds\\\":\\\"3.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1\\\",\\\"ledger_key\\\":\\\"root-window\\\",\\\"limit\\\":\\\"2\\\",\\\"meter\\\":\\\"steps\\\",\\\"window_seconds\\\":\\\"10.0\\\"}]}\",\"request_digest\":\"41af717df9210425516fe963fe22522364c34d798f5a926a6f06f546fff58bc6\",\"state\":\"active\"}"
+        },
+        "window-events": {
+          "[\"a\",\"2\"]": "{\"amount\":\"1\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"settled_at\":1000.0,\"window_seconds\":10.0}"
+        }
+      }
+    },
+    {
+      "action": {
+        "op": "advance",
+        "seconds": 3.0
+      },
+      "state": {
+        "schema": {
+          "version": "1"
+        },
+        "budget": {
+          "[\"root\",\"steps\"]": "1",
+          "[\"root\",\"usd\"]": "1.0E-7"
+        },
+        "reservations": {
+          "a": "{\"charges\":\"{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"1.0E-7\\\"}\",\"charges_digest\":\"69292abeff2b4b0156d65fb7f8afc3ad12564f5276addbb3ac7d6084fe4eae7e\",\"completed_at\":1000.0,\"created_at\":1000.0,\"details\":[{\"amount\":\"1\",\"kind\":\"budget\",\"meter\":\"steps\",\"scope_id\":\"root\"},{\"amount\":\"2E-7\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"root\"},{\"amount\":\"1\",\"kind\":\"window\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"window_seconds\":10.0}],\"expires_at\":1030.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"steps\\\":\\\"0\\\",\\\"usd\\\":\\\"0E-8\\\"},\\\"estimates\\\":{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2E-7\\\"},\\\"limits\\\":{\\\"depth\\\":\\\"5\\\",\\\"steps\\\":\\\"3\\\",\\\"usd\\\":\\\"0.0000010\\\"},\\\"scope_id\\\":\\\"root\\\"}],\\\"lease_seconds\\\":\\\"30.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1\\\",\\\"ledger_key\\\":\\\"root-window\\\",\\\"limit\\\":\\\"2\\\",\\\"meter\\\":\\\"steps\\\",\\\"window_seconds\\\":\\\"10.0\\\"}]}\",\"request_digest\":\"7abe48e073db396b2f6c6b6f6cf7a18a11892cf01a13cc6c1762f7ea1c88399e\",\"state\":\"settled\"}",
+          "b": "{\"charges\":null,\"charges_digest\":null,\"completed_at\":1000.0,\"created_at\":1000.0,\"details\":[{\"amount\":\"1\",\"kind\":\"budget\",\"meter\":\"steps\",\"scope_id\":\"root\"},{\"amount\":\"2E-7\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"root\"},{\"amount\":\"1\",\"kind\":\"window\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"window_seconds\":10.0}],\"expires_at\":1030.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"steps\\\":\\\"0\\\",\\\"usd\\\":\\\"0E-8\\\"},\\\"estimates\\\":{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2E-7\\\"},\\\"limits\\\":{\\\"depth\\\":\\\"5\\\",\\\"steps\\\":\\\"3\\\",\\\"usd\\\":\\\"0.0000010\\\"},\\\"scope_id\\\":\\\"root\\\"}],\\\"lease_seconds\\\":\\\"30.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1\\\",\\\"ledger_key\\\":\\\"root-window\\\",\\\"limit\\\":\\\"2\\\",\\\"meter\\\":\\\"steps\\\",\\\"window_seconds\\\":\\\"10.0\\\"}]}\",\"request_digest\":\"7abe48e073db396b2f6c6b6f6cf7a18a11892cf01a13cc6c1762f7ea1c88399e\",\"state\":\"released\"}",
+          "c": "{\"charges\":null,\"charges_digest\":null,\"completed_at\":null,\"created_at\":1000.0,\"details\":[{\"amount\":\"1\",\"kind\":\"budget\",\"meter\":\"steps\",\"scope_id\":\"root\"},{\"amount\":\"2E-7\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"root\"},{\"amount\":\"1\",\"kind\":\"window\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"window_seconds\":10.0}],\"expires_at\":1003.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"steps\\\":\\\"0\\\",\\\"usd\\\":\\\"0E-8\\\"},\\\"estimates\\\":{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2E-7\\\"},\\\"limits\\\":{\\\"depth\\\":\\\"5\\\",\\\"steps\\\":\\\"3\\\",\\\"usd\\\":\\\"0.0000010\\\"},\\\"scope_id\\\":\\\"root\\\"}],\\\"lease_seconds\\\":\\\"3.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1\\\",\\\"ledger_key\\\":\\\"root-window\\\",\\\"limit\\\":\\\"2\\\",\\\"meter\\\":\\\"steps\\\",\\\"window_seconds\\\":\\\"10.0\\\"}]}\",\"request_digest\":\"41af717df9210425516fe963fe22522364c34d798f5a926a6f06f546fff58bc6\",\"state\":\"active\"}"
+        },
+        "window-events": {
+          "[\"a\",\"2\"]": "{\"amount\":\"1\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"settled_at\":1000.0,\"window_seconds\":10.0}"
+        }
+      }
+    },
+    {
+      "action": {
+        "op": "renew",
+        "id": "c",
+        "lease": 30.0
+      },
+      "renewed": false,
+      "state": {
+        "schema": {
+          "version": "1"
+        },
+        "budget": {
+          "[\"root\",\"steps\"]": "1",
+          "[\"root\",\"usd\"]": "1.0E-7"
+        },
+        "reservations": {
+          "a": "{\"charges\":\"{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"1.0E-7\\\"}\",\"charges_digest\":\"69292abeff2b4b0156d65fb7f8afc3ad12564f5276addbb3ac7d6084fe4eae7e\",\"completed_at\":1000.0,\"created_at\":1000.0,\"details\":[{\"amount\":\"1\",\"kind\":\"budget\",\"meter\":\"steps\",\"scope_id\":\"root\"},{\"amount\":\"2E-7\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"root\"},{\"amount\":\"1\",\"kind\":\"window\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"window_seconds\":10.0}],\"expires_at\":1030.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"steps\\\":\\\"0\\\",\\\"usd\\\":\\\"0E-8\\\"},\\\"estimates\\\":{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2E-7\\\"},\\\"limits\\\":{\\\"depth\\\":\\\"5\\\",\\\"steps\\\":\\\"3\\\",\\\"usd\\\":\\\"0.0000010\\\"},\\\"scope_id\\\":\\\"root\\\"}],\\\"lease_seconds\\\":\\\"30.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1\\\",\\\"ledger_key\\\":\\\"root-window\\\",\\\"limit\\\":\\\"2\\\",\\\"meter\\\":\\\"steps\\\",\\\"window_seconds\\\":\\\"10.0\\\"}]}\",\"request_digest\":\"7abe48e073db396b2f6c6b6f6cf7a18a11892cf01a13cc6c1762f7ea1c88399e\",\"state\":\"settled\"}",
+          "b": "{\"charges\":null,\"charges_digest\":null,\"completed_at\":1000.0,\"created_at\":1000.0,\"details\":[{\"amount\":\"1\",\"kind\":\"budget\",\"meter\":\"steps\",\"scope_id\":\"root\"},{\"amount\":\"2E-7\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"root\"},{\"amount\":\"1\",\"kind\":\"window\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"window_seconds\":10.0}],\"expires_at\":1030.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"steps\\\":\\\"0\\\",\\\"usd\\\":\\\"0E-8\\\"},\\\"estimates\\\":{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2E-7\\\"},\\\"limits\\\":{\\\"depth\\\":\\\"5\\\",\\\"steps\\\":\\\"3\\\",\\\"usd\\\":\\\"0.0000010\\\"},\\\"scope_id\\\":\\\"root\\\"}],\\\"lease_seconds\\\":\\\"30.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1\\\",\\\"ledger_key\\\":\\\"root-window\\\",\\\"limit\\\":\\\"2\\\",\\\"meter\\\":\\\"steps\\\",\\\"window_seconds\\\":\\\"10.0\\\"}]}\",\"request_digest\":\"7abe48e073db396b2f6c6b6f6cf7a18a11892cf01a13cc6c1762f7ea1c88399e\",\"state\":\"released\"}",
+          "c": "{\"charges\":null,\"charges_digest\":null,\"completed_at\":null,\"created_at\":1000.0,\"details\":[{\"amount\":\"1\",\"kind\":\"budget\",\"meter\":\"steps\",\"scope_id\":\"root\"},{\"amount\":\"2E-7\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"root\"},{\"amount\":\"1\",\"kind\":\"window\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"window_seconds\":10.0}],\"expires_at\":1003.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"steps\\\":\\\"0\\\",\\\"usd\\\":\\\"0E-8\\\"},\\\"estimates\\\":{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2E-7\\\"},\\\"limits\\\":{\\\"depth\\\":\\\"5\\\",\\\"steps\\\":\\\"3\\\",\\\"usd\\\":\\\"0.0000010\\\"},\\\"scope_id\\\":\\\"root\\\"}],\\\"lease_seconds\\\":\\\"3.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1\\\",\\\"ledger_key\\\":\\\"root-window\\\",\\\"limit\\\":\\\"2\\\",\\\"meter\\\":\\\"steps\\\",\\\"window_seconds\\\":\\\"10.0\\\"}]}\",\"request_digest\":\"41af717df9210425516fe963fe22522364c34d798f5a926a6f06f546fff58bc6\",\"state\":\"active\"}"
+        },
+        "window-events": {
+          "[\"a\",\"2\"]": "{\"amount\":\"1\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"settled_at\":1000.0,\"window_seconds\":10.0}"
+        }
+      }
+    },
+    {
+      "action": {
+        "op": "reserve",
+        "id": "c",
+        "budgets": [
+          {
+            "scope_id": "root",
+            "limits": {
+              "steps": "3",
+              "usd": "0.0000010",
+              "depth": "5"
+            },
+            "baseline": {
+              "steps": "0",
+              "usd": "0.00000000"
+            },
+            "estimates": {
+              "steps": "1",
+              "usd": "0.0000002"
+            }
+          }
+        ],
+        "windows": [
+          {
+            "ledger_key": "root-window",
+            "meter": "steps",
+            "limit": "2",
+            "amount": "1",
+            "window_seconds": 10.0
+          }
+        ],
+        "lease": 3.0
+      },
+      "error": "IntegrityError",
+      "state": {
+        "schema": {
+          "version": "1"
+        },
+        "budget": {
+          "[\"root\",\"steps\"]": "1",
+          "[\"root\",\"usd\"]": "1.0E-7"
+        },
+        "reservations": {
+          "a": "{\"charges\":\"{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"1.0E-7\\\"}\",\"charges_digest\":\"69292abeff2b4b0156d65fb7f8afc3ad12564f5276addbb3ac7d6084fe4eae7e\",\"completed_at\":1000.0,\"created_at\":1000.0,\"details\":[{\"amount\":\"1\",\"kind\":\"budget\",\"meter\":\"steps\",\"scope_id\":\"root\"},{\"amount\":\"2E-7\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"root\"},{\"amount\":\"1\",\"kind\":\"window\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"window_seconds\":10.0}],\"expires_at\":1030.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"steps\\\":\\\"0\\\",\\\"usd\\\":\\\"0E-8\\\"},\\\"estimates\\\":{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2E-7\\\"},\\\"limits\\\":{\\\"depth\\\":\\\"5\\\",\\\"steps\\\":\\\"3\\\",\\\"usd\\\":\\\"0.0000010\\\"},\\\"scope_id\\\":\\\"root\\\"}],\\\"lease_seconds\\\":\\\"30.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1\\\",\\\"ledger_key\\\":\\\"root-window\\\",\\\"limit\\\":\\\"2\\\",\\\"meter\\\":\\\"steps\\\",\\\"window_seconds\\\":\\\"10.0\\\"}]}\",\"request_digest\":\"7abe48e073db396b2f6c6b6f6cf7a18a11892cf01a13cc6c1762f7ea1c88399e\",\"state\":\"settled\"}",
+          "b": "{\"charges\":null,\"charges_digest\":null,\"completed_at\":1000.0,\"created_at\":1000.0,\"details\":[{\"amount\":\"1\",\"kind\":\"budget\",\"meter\":\"steps\",\"scope_id\":\"root\"},{\"amount\":\"2E-7\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"root\"},{\"amount\":\"1\",\"kind\":\"window\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"window_seconds\":10.0}],\"expires_at\":1030.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"steps\\\":\\\"0\\\",\\\"usd\\\":\\\"0E-8\\\"},\\\"estimates\\\":{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2E-7\\\"},\\\"limits\\\":{\\\"depth\\\":\\\"5\\\",\\\"steps\\\":\\\"3\\\",\\\"usd\\\":\\\"0.0000010\\\"},\\\"scope_id\\\":\\\"root\\\"}],\\\"lease_seconds\\\":\\\"30.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1\\\",\\\"ledger_key\\\":\\\"root-window\\\",\\\"limit\\\":\\\"2\\\",\\\"meter\\\":\\\"steps\\\",\\\"window_seconds\\\":\\\"10.0\\\"}]}\",\"request_digest\":\"7abe48e073db396b2f6c6b6f6cf7a18a11892cf01a13cc6c1762f7ea1c88399e\",\"state\":\"released\"}",
+          "c": "{\"charges\":null,\"charges_digest\":null,\"completed_at\":null,\"created_at\":1000.0,\"details\":[{\"amount\":\"1\",\"kind\":\"budget\",\"meter\":\"steps\",\"scope_id\":\"root\"},{\"amount\":\"2E-7\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"root\"},{\"amount\":\"1\",\"kind\":\"window\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"window_seconds\":10.0}],\"expires_at\":1003.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"steps\\\":\\\"0\\\",\\\"usd\\\":\\\"0E-8\\\"},\\\"estimates\\\":{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2E-7\\\"},\\\"limits\\\":{\\\"depth\\\":\\\"5\\\",\\\"steps\\\":\\\"3\\\",\\\"usd\\\":\\\"0.0000010\\\"},\\\"scope_id\\\":\\\"root\\\"}],\\\"lease_seconds\\\":\\\"3.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1\\\",\\\"ledger_key\\\":\\\"root-window\\\",\\\"limit\\\":\\\"2\\\",\\\"meter\\\":\\\"steps\\\",\\\"window_seconds\\\":\\\"10.0\\\"}]}\",\"request_digest\":\"41af717df9210425516fe963fe22522364c34d798f5a926a6f06f546fff58bc6\",\"state\":\"active\"}"
+        },
+        "window-events": {
+          "[\"a\",\"2\"]": "{\"amount\":\"1\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"settled_at\":1000.0,\"window_seconds\":10.0}"
+        }
+      }
+    },
+    {
+      "action": {
+        "op": "settle",
+        "id": "c",
+        "charges": {
+          "steps": "1",
+          "usd": "0.00000020"
+        }
+      },
+      "state": {
+        "schema": {
+          "version": "1"
+        },
+        "budget": {
+          "[\"root\",\"steps\"]": "2",
+          "[\"root\",\"usd\"]": "3.0E-7"
+        },
+        "reservations": {
+          "a": "{\"charges\":\"{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"1.0E-7\\\"}\",\"charges_digest\":\"69292abeff2b4b0156d65fb7f8afc3ad12564f5276addbb3ac7d6084fe4eae7e\",\"completed_at\":1000.0,\"created_at\":1000.0,\"details\":[{\"amount\":\"1\",\"kind\":\"budget\",\"meter\":\"steps\",\"scope_id\":\"root\"},{\"amount\":\"2E-7\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"root\"},{\"amount\":\"1\",\"kind\":\"window\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"window_seconds\":10.0}],\"expires_at\":1030.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"steps\\\":\\\"0\\\",\\\"usd\\\":\\\"0E-8\\\"},\\\"estimates\\\":{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2E-7\\\"},\\\"limits\\\":{\\\"depth\\\":\\\"5\\\",\\\"steps\\\":\\\"3\\\",\\\"usd\\\":\\\"0.0000010\\\"},\\\"scope_id\\\":\\\"root\\\"}],\\\"lease_seconds\\\":\\\"30.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1\\\",\\\"ledger_key\\\":\\\"root-window\\\",\\\"limit\\\":\\\"2\\\",\\\"meter\\\":\\\"steps\\\",\\\"window_seconds\\\":\\\"10.0\\\"}]}\",\"request_digest\":\"7abe48e073db396b2f6c6b6f6cf7a18a11892cf01a13cc6c1762f7ea1c88399e\",\"state\":\"settled\"}",
+          "b": "{\"charges\":null,\"charges_digest\":null,\"completed_at\":1000.0,\"created_at\":1000.0,\"details\":[{\"amount\":\"1\",\"kind\":\"budget\",\"meter\":\"steps\",\"scope_id\":\"root\"},{\"amount\":\"2E-7\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"root\"},{\"amount\":\"1\",\"kind\":\"window\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"window_seconds\":10.0}],\"expires_at\":1030.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"steps\\\":\\\"0\\\",\\\"usd\\\":\\\"0E-8\\\"},\\\"estimates\\\":{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2E-7\\\"},\\\"limits\\\":{\\\"depth\\\":\\\"5\\\",\\\"steps\\\":\\\"3\\\",\\\"usd\\\":\\\"0.0000010\\\"},\\\"scope_id\\\":\\\"root\\\"}],\\\"lease_seconds\\\":\\\"30.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1\\\",\\\"ledger_key\\\":\\\"root-window\\\",\\\"limit\\\":\\\"2\\\",\\\"meter\\\":\\\"steps\\\",\\\"window_seconds\\\":\\\"10.0\\\"}]}\",\"request_digest\":\"7abe48e073db396b2f6c6b6f6cf7a18a11892cf01a13cc6c1762f7ea1c88399e\",\"state\":\"released\"}",
+          "c": "{\"charges\":\"{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2.0E-7\\\"}\",\"charges_digest\":\"916b7be3aaf8ff60fa4ae43a6717f76ba7604d1c82328d1e27601ffae4fdd2e5\",\"completed_at\":1003.0,\"created_at\":1000.0,\"details\":[{\"amount\":\"1\",\"kind\":\"budget\",\"meter\":\"steps\",\"scope_id\":\"root\"},{\"amount\":\"2E-7\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"root\"},{\"amount\":\"1\",\"kind\":\"window\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"window_seconds\":10.0}],\"expires_at\":1003.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"steps\\\":\\\"0\\\",\\\"usd\\\":\\\"0E-8\\\"},\\\"estimates\\\":{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2E-7\\\"},\\\"limits\\\":{\\\"depth\\\":\\\"5\\\",\\\"steps\\\":\\\"3\\\",\\\"usd\\\":\\\"0.0000010\\\"},\\\"scope_id\\\":\\\"root\\\"}],\\\"lease_seconds\\\":\\\"3.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1\\\",\\\"ledger_key\\\":\\\"root-window\\\",\\\"limit\\\":\\\"2\\\",\\\"meter\\\":\\\"steps\\\",\\\"window_seconds\\\":\\\"10.0\\\"}]}\",\"request_digest\":\"41af717df9210425516fe963fe22522364c34d798f5a926a6f06f546fff58bc6\",\"state\":\"settled\"}"
+        },
+        "window-events": {
+          "[\"a\",\"2\"]": "{\"amount\":\"1\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"settled_at\":1000.0,\"window_seconds\":10.0}",
+          "[\"c\",\"2\"]": "{\"amount\":\"1\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"settled_at\":1003.0,\"window_seconds\":10.0}"
+        }
+      }
+    },
+    {
+      "action": {
+        "op": "advance",
+        "seconds": 10.0
+      },
+      "state": {
+        "schema": {
+          "version": "1"
+        },
+        "budget": {
+          "[\"root\",\"steps\"]": "2",
+          "[\"root\",\"usd\"]": "3.0E-7"
+        },
+        "reservations": {
+          "a": "{\"charges\":\"{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"1.0E-7\\\"}\",\"charges_digest\":\"69292abeff2b4b0156d65fb7f8afc3ad12564f5276addbb3ac7d6084fe4eae7e\",\"completed_at\":1000.0,\"created_at\":1000.0,\"details\":[{\"amount\":\"1\",\"kind\":\"budget\",\"meter\":\"steps\",\"scope_id\":\"root\"},{\"amount\":\"2E-7\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"root\"},{\"amount\":\"1\",\"kind\":\"window\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"window_seconds\":10.0}],\"expires_at\":1030.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"steps\\\":\\\"0\\\",\\\"usd\\\":\\\"0E-8\\\"},\\\"estimates\\\":{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2E-7\\\"},\\\"limits\\\":{\\\"depth\\\":\\\"5\\\",\\\"steps\\\":\\\"3\\\",\\\"usd\\\":\\\"0.0000010\\\"},\\\"scope_id\\\":\\\"root\\\"}],\\\"lease_seconds\\\":\\\"30.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1\\\",\\\"ledger_key\\\":\\\"root-window\\\",\\\"limit\\\":\\\"2\\\",\\\"meter\\\":\\\"steps\\\",\\\"window_seconds\\\":\\\"10.0\\\"}]}\",\"request_digest\":\"7abe48e073db396b2f6c6b6f6cf7a18a11892cf01a13cc6c1762f7ea1c88399e\",\"state\":\"settled\"}",
+          "b": "{\"charges\":null,\"charges_digest\":null,\"completed_at\":1000.0,\"created_at\":1000.0,\"details\":[{\"amount\":\"1\",\"kind\":\"budget\",\"meter\":\"steps\",\"scope_id\":\"root\"},{\"amount\":\"2E-7\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"root\"},{\"amount\":\"1\",\"kind\":\"window\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"window_seconds\":10.0}],\"expires_at\":1030.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"steps\\\":\\\"0\\\",\\\"usd\\\":\\\"0E-8\\\"},\\\"estimates\\\":{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2E-7\\\"},\\\"limits\\\":{\\\"depth\\\":\\\"5\\\",\\\"steps\\\":\\\"3\\\",\\\"usd\\\":\\\"0.0000010\\\"},\\\"scope_id\\\":\\\"root\\\"}],\\\"lease_seconds\\\":\\\"30.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1\\\",\\\"ledger_key\\\":\\\"root-window\\\",\\\"limit\\\":\\\"2\\\",\\\"meter\\\":\\\"steps\\\",\\\"window_seconds\\\":\\\"10.0\\\"}]}\",\"request_digest\":\"7abe48e073db396b2f6c6b6f6cf7a18a11892cf01a13cc6c1762f7ea1c88399e\",\"state\":\"released\"}",
+          "c": "{\"charges\":\"{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2.0E-7\\\"}\",\"charges_digest\":\"916b7be3aaf8ff60fa4ae43a6717f76ba7604d1c82328d1e27601ffae4fdd2e5\",\"completed_at\":1003.0,\"created_at\":1000.0,\"details\":[{\"amount\":\"1\",\"kind\":\"budget\",\"meter\":\"steps\",\"scope_id\":\"root\"},{\"amount\":\"2E-7\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"root\"},{\"amount\":\"1\",\"kind\":\"window\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"window_seconds\":10.0}],\"expires_at\":1003.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"steps\\\":\\\"0\\\",\\\"usd\\\":\\\"0E-8\\\"},\\\"estimates\\\":{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2E-7\\\"},\\\"limits\\\":{\\\"depth\\\":\\\"5\\\",\\\"steps\\\":\\\"3\\\",\\\"usd\\\":\\\"0.0000010\\\"},\\\"scope_id\\\":\\\"root\\\"}],\\\"lease_seconds\\\":\\\"3.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1\\\",\\\"ledger_key\\\":\\\"root-window\\\",\\\"limit\\\":\\\"2\\\",\\\"meter\\\":\\\"steps\\\",\\\"window_seconds\\\":\\\"10.0\\\"}]}\",\"request_digest\":\"41af717df9210425516fe963fe22522364c34d798f5a926a6f06f546fff58bc6\",\"state\":\"settled\"}"
+        },
+        "window-events": {
+          "[\"a\",\"2\"]": "{\"amount\":\"1\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"settled_at\":1000.0,\"window_seconds\":10.0}",
+          "[\"c\",\"2\"]": "{\"amount\":\"1\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"settled_at\":1003.0,\"window_seconds\":10.0}"
+        }
+      }
+    },
+    {
+      "action": {
+        "op": "reserve",
+        "id": "d",
+        "budgets": [
+          {
+            "scope_id": "root",
+            "limits": {
+              "steps": "3",
+              "usd": "0.0000010",
+              "depth": "5"
+            },
+            "baseline": {
+              "steps": "0",
+              "usd": "0.00000000"
+            },
+            "estimates": {
+              "steps": "1",
+              "usd": "0.0000002"
+            }
+          }
+        ],
+        "windows": [
+          {
+            "ledger_key": "root-window",
+            "meter": "steps",
+            "limit": "2",
+            "amount": "1",
+            "window_seconds": 10.0
+          }
+        ],
+        "lease": 30.0
+      },
+      "check": {
+        "ok": true,
+        "reason": "budget",
+        "meter": null,
+        "requested": "0",
+        "remaining": "0",
+        "window_seconds": null
+      },
+      "state": {
+        "schema": {
+          "version": "1"
+        },
+        "budget": {
+          "[\"root\",\"steps\"]": "2",
+          "[\"root\",\"usd\"]": "3.0E-7"
+        },
+        "reservations": {
+          "a": "{\"charges\":\"{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"1.0E-7\\\"}\",\"charges_digest\":\"69292abeff2b4b0156d65fb7f8afc3ad12564f5276addbb3ac7d6084fe4eae7e\",\"completed_at\":1000.0,\"created_at\":1000.0,\"details\":[{\"amount\":\"1\",\"kind\":\"budget\",\"meter\":\"steps\",\"scope_id\":\"root\"},{\"amount\":\"2E-7\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"root\"},{\"amount\":\"1\",\"kind\":\"window\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"window_seconds\":10.0}],\"expires_at\":1030.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"steps\\\":\\\"0\\\",\\\"usd\\\":\\\"0E-8\\\"},\\\"estimates\\\":{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2E-7\\\"},\\\"limits\\\":{\\\"depth\\\":\\\"5\\\",\\\"steps\\\":\\\"3\\\",\\\"usd\\\":\\\"0.0000010\\\"},\\\"scope_id\\\":\\\"root\\\"}],\\\"lease_seconds\\\":\\\"30.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1\\\",\\\"ledger_key\\\":\\\"root-window\\\",\\\"limit\\\":\\\"2\\\",\\\"meter\\\":\\\"steps\\\",\\\"window_seconds\\\":\\\"10.0\\\"}]}\",\"request_digest\":\"7abe48e073db396b2f6c6b6f6cf7a18a11892cf01a13cc6c1762f7ea1c88399e\",\"state\":\"settled\"}",
+          "b": "{\"charges\":null,\"charges_digest\":null,\"completed_at\":1000.0,\"created_at\":1000.0,\"details\":[{\"amount\":\"1\",\"kind\":\"budget\",\"meter\":\"steps\",\"scope_id\":\"root\"},{\"amount\":\"2E-7\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"root\"},{\"amount\":\"1\",\"kind\":\"window\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"window_seconds\":10.0}],\"expires_at\":1030.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"steps\\\":\\\"0\\\",\\\"usd\\\":\\\"0E-8\\\"},\\\"estimates\\\":{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2E-7\\\"},\\\"limits\\\":{\\\"depth\\\":\\\"5\\\",\\\"steps\\\":\\\"3\\\",\\\"usd\\\":\\\"0.0000010\\\"},\\\"scope_id\\\":\\\"root\\\"}],\\\"lease_seconds\\\":\\\"30.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1\\\",\\\"ledger_key\\\":\\\"root-window\\\",\\\"limit\\\":\\\"2\\\",\\\"meter\\\":\\\"steps\\\",\\\"window_seconds\\\":\\\"10.0\\\"}]}\",\"request_digest\":\"7abe48e073db396b2f6c6b6f6cf7a18a11892cf01a13cc6c1762f7ea1c88399e\",\"state\":\"released\"}",
+          "c": "{\"charges\":\"{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2.0E-7\\\"}\",\"charges_digest\":\"916b7be3aaf8ff60fa4ae43a6717f76ba7604d1c82328d1e27601ffae4fdd2e5\",\"completed_at\":1003.0,\"created_at\":1000.0,\"details\":[{\"amount\":\"1\",\"kind\":\"budget\",\"meter\":\"steps\",\"scope_id\":\"root\"},{\"amount\":\"2E-7\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"root\"},{\"amount\":\"1\",\"kind\":\"window\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"window_seconds\":10.0}],\"expires_at\":1003.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"steps\\\":\\\"0\\\",\\\"usd\\\":\\\"0E-8\\\"},\\\"estimates\\\":{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2E-7\\\"},\\\"limits\\\":{\\\"depth\\\":\\\"5\\\",\\\"steps\\\":\\\"3\\\",\\\"usd\\\":\\\"0.0000010\\\"},\\\"scope_id\\\":\\\"root\\\"}],\\\"lease_seconds\\\":\\\"3.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1\\\",\\\"ledger_key\\\":\\\"root-window\\\",\\\"limit\\\":\\\"2\\\",\\\"meter\\\":\\\"steps\\\",\\\"window_seconds\\\":\\\"10.0\\\"}]}\",\"request_digest\":\"41af717df9210425516fe963fe22522364c34d798f5a926a6f06f546fff58bc6\",\"state\":\"settled\"}",
+          "d": "{\"charges\":null,\"charges_digest\":null,\"completed_at\":null,\"created_at\":1013.0,\"details\":[{\"amount\":\"1\",\"kind\":\"budget\",\"meter\":\"steps\",\"scope_id\":\"root\"},{\"amount\":\"2E-7\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"root\"},{\"amount\":\"1\",\"kind\":\"window\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"window_seconds\":10.0}],\"expires_at\":1043.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"steps\\\":\\\"0\\\",\\\"usd\\\":\\\"0E-8\\\"},\\\"estimates\\\":{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2E-7\\\"},\\\"limits\\\":{\\\"depth\\\":\\\"5\\\",\\\"steps\\\":\\\"3\\\",\\\"usd\\\":\\\"0.0000010\\\"},\\\"scope_id\\\":\\\"root\\\"}],\\\"lease_seconds\\\":\\\"30.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1\\\",\\\"ledger_key\\\":\\\"root-window\\\",\\\"limit\\\":\\\"2\\\",\\\"meter\\\":\\\"steps\\\",\\\"window_seconds\\\":\\\"10.0\\\"}]}\",\"request_digest\":\"7abe48e073db396b2f6c6b6f6cf7a18a11892cf01a13cc6c1762f7ea1c88399e\",\"state\":\"active\"}"
+        },
+        "window-events": {}
+      }
+    },
+    {
+      "action": {
+        "op": "renew",
+        "id": "d",
+        "lease": 50.0
+      },
+      "renewed": true,
+      "state": {
+        "schema": {
+          "version": "1"
+        },
+        "budget": {
+          "[\"root\",\"steps\"]": "2",
+          "[\"root\",\"usd\"]": "3.0E-7"
+        },
+        "reservations": {
+          "a": "{\"charges\":\"{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"1.0E-7\\\"}\",\"charges_digest\":\"69292abeff2b4b0156d65fb7f8afc3ad12564f5276addbb3ac7d6084fe4eae7e\",\"completed_at\":1000.0,\"created_at\":1000.0,\"details\":[{\"amount\":\"1\",\"kind\":\"budget\",\"meter\":\"steps\",\"scope_id\":\"root\"},{\"amount\":\"2E-7\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"root\"},{\"amount\":\"1\",\"kind\":\"window\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"window_seconds\":10.0}],\"expires_at\":1030.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"steps\\\":\\\"0\\\",\\\"usd\\\":\\\"0E-8\\\"},\\\"estimates\\\":{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2E-7\\\"},\\\"limits\\\":{\\\"depth\\\":\\\"5\\\",\\\"steps\\\":\\\"3\\\",\\\"usd\\\":\\\"0.0000010\\\"},\\\"scope_id\\\":\\\"root\\\"}],\\\"lease_seconds\\\":\\\"30.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1\\\",\\\"ledger_key\\\":\\\"root-window\\\",\\\"limit\\\":\\\"2\\\",\\\"meter\\\":\\\"steps\\\",\\\"window_seconds\\\":\\\"10.0\\\"}]}\",\"request_digest\":\"7abe48e073db396b2f6c6b6f6cf7a18a11892cf01a13cc6c1762f7ea1c88399e\",\"state\":\"settled\"}",
+          "b": "{\"charges\":null,\"charges_digest\":null,\"completed_at\":1000.0,\"created_at\":1000.0,\"details\":[{\"amount\":\"1\",\"kind\":\"budget\",\"meter\":\"steps\",\"scope_id\":\"root\"},{\"amount\":\"2E-7\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"root\"},{\"amount\":\"1\",\"kind\":\"window\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"window_seconds\":10.0}],\"expires_at\":1030.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"steps\\\":\\\"0\\\",\\\"usd\\\":\\\"0E-8\\\"},\\\"estimates\\\":{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2E-7\\\"},\\\"limits\\\":{\\\"depth\\\":\\\"5\\\",\\\"steps\\\":\\\"3\\\",\\\"usd\\\":\\\"0.0000010\\\"},\\\"scope_id\\\":\\\"root\\\"}],\\\"lease_seconds\\\":\\\"30.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1\\\",\\\"ledger_key\\\":\\\"root-window\\\",\\\"limit\\\":\\\"2\\\",\\\"meter\\\":\\\"steps\\\",\\\"window_seconds\\\":\\\"10.0\\\"}]}\",\"request_digest\":\"7abe48e073db396b2f6c6b6f6cf7a18a11892cf01a13cc6c1762f7ea1c88399e\",\"state\":\"released\"}",
+          "c": "{\"charges\":\"{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2.0E-7\\\"}\",\"charges_digest\":\"916b7be3aaf8ff60fa4ae43a6717f76ba7604d1c82328d1e27601ffae4fdd2e5\",\"completed_at\":1003.0,\"created_at\":1000.0,\"details\":[{\"amount\":\"1\",\"kind\":\"budget\",\"meter\":\"steps\",\"scope_id\":\"root\"},{\"amount\":\"2E-7\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"root\"},{\"amount\":\"1\",\"kind\":\"window\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"window_seconds\":10.0}],\"expires_at\":1003.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"steps\\\":\\\"0\\\",\\\"usd\\\":\\\"0E-8\\\"},\\\"estimates\\\":{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2E-7\\\"},\\\"limits\\\":{\\\"depth\\\":\\\"5\\\",\\\"steps\\\":\\\"3\\\",\\\"usd\\\":\\\"0.0000010\\\"},\\\"scope_id\\\":\\\"root\\\"}],\\\"lease_seconds\\\":\\\"3.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1\\\",\\\"ledger_key\\\":\\\"root-window\\\",\\\"limit\\\":\\\"2\\\",\\\"meter\\\":\\\"steps\\\",\\\"window_seconds\\\":\\\"10.0\\\"}]}\",\"request_digest\":\"41af717df9210425516fe963fe22522364c34d798f5a926a6f06f546fff58bc6\",\"state\":\"settled\"}",
+          "d": "{\"charges\":null,\"charges_digest\":null,\"completed_at\":null,\"created_at\":1013.0,\"details\":[{\"amount\":\"1\",\"kind\":\"budget\",\"meter\":\"steps\",\"scope_id\":\"root\"},{\"amount\":\"2E-7\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"root\"},{\"amount\":\"1\",\"kind\":\"window\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"window_seconds\":10.0}],\"expires_at\":1063.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"steps\\\":\\\"0\\\",\\\"usd\\\":\\\"0E-8\\\"},\\\"estimates\\\":{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2E-7\\\"},\\\"limits\\\":{\\\"depth\\\":\\\"5\\\",\\\"steps\\\":\\\"3\\\",\\\"usd\\\":\\\"0.0000010\\\"},\\\"scope_id\\\":\\\"root\\\"}],\\\"lease_seconds\\\":\\\"30.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1\\\",\\\"ledger_key\\\":\\\"root-window\\\",\\\"limit\\\":\\\"2\\\",\\\"meter\\\":\\\"steps\\\",\\\"window_seconds\\\":\\\"10.0\\\"}]}\",\"request_digest\":\"7abe48e073db396b2f6c6b6f6cf7a18a11892cf01a13cc6c1762f7ea1c88399e\",\"state\":\"active\"}"
+        },
+        "window-events": {}
+      }
+    },
+    {
+      "action": {
+        "op": "release",
+        "id": "missing"
+      },
+      "state": {
+        "schema": {
+          "version": "1"
+        },
+        "budget": {
+          "[\"root\",\"steps\"]": "2",
+          "[\"root\",\"usd\"]": "3.0E-7"
+        },
+        "reservations": {
+          "a": "{\"charges\":\"{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"1.0E-7\\\"}\",\"charges_digest\":\"69292abeff2b4b0156d65fb7f8afc3ad12564f5276addbb3ac7d6084fe4eae7e\",\"completed_at\":1000.0,\"created_at\":1000.0,\"details\":[{\"amount\":\"1\",\"kind\":\"budget\",\"meter\":\"steps\",\"scope_id\":\"root\"},{\"amount\":\"2E-7\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"root\"},{\"amount\":\"1\",\"kind\":\"window\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"window_seconds\":10.0}],\"expires_at\":1030.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"steps\\\":\\\"0\\\",\\\"usd\\\":\\\"0E-8\\\"},\\\"estimates\\\":{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2E-7\\\"},\\\"limits\\\":{\\\"depth\\\":\\\"5\\\",\\\"steps\\\":\\\"3\\\",\\\"usd\\\":\\\"0.0000010\\\"},\\\"scope_id\\\":\\\"root\\\"}],\\\"lease_seconds\\\":\\\"30.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1\\\",\\\"ledger_key\\\":\\\"root-window\\\",\\\"limit\\\":\\\"2\\\",\\\"meter\\\":\\\"steps\\\",\\\"window_seconds\\\":\\\"10.0\\\"}]}\",\"request_digest\":\"7abe48e073db396b2f6c6b6f6cf7a18a11892cf01a13cc6c1762f7ea1c88399e\",\"state\":\"settled\"}",
+          "b": "{\"charges\":null,\"charges_digest\":null,\"completed_at\":1000.0,\"created_at\":1000.0,\"details\":[{\"amount\":\"1\",\"kind\":\"budget\",\"meter\":\"steps\",\"scope_id\":\"root\"},{\"amount\":\"2E-7\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"root\"},{\"amount\":\"1\",\"kind\":\"window\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"window_seconds\":10.0}],\"expires_at\":1030.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"steps\\\":\\\"0\\\",\\\"usd\\\":\\\"0E-8\\\"},\\\"estimates\\\":{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2E-7\\\"},\\\"limits\\\":{\\\"depth\\\":\\\"5\\\",\\\"steps\\\":\\\"3\\\",\\\"usd\\\":\\\"0.0000010\\\"},\\\"scope_id\\\":\\\"root\\\"}],\\\"lease_seconds\\\":\\\"30.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1\\\",\\\"ledger_key\\\":\\\"root-window\\\",\\\"limit\\\":\\\"2\\\",\\\"meter\\\":\\\"steps\\\",\\\"window_seconds\\\":\\\"10.0\\\"}]}\",\"request_digest\":\"7abe48e073db396b2f6c6b6f6cf7a18a11892cf01a13cc6c1762f7ea1c88399e\",\"state\":\"released\"}",
+          "c": "{\"charges\":\"{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2.0E-7\\\"}\",\"charges_digest\":\"916b7be3aaf8ff60fa4ae43a6717f76ba7604d1c82328d1e27601ffae4fdd2e5\",\"completed_at\":1003.0,\"created_at\":1000.0,\"details\":[{\"amount\":\"1\",\"kind\":\"budget\",\"meter\":\"steps\",\"scope_id\":\"root\"},{\"amount\":\"2E-7\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"root\"},{\"amount\":\"1\",\"kind\":\"window\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"window_seconds\":10.0}],\"expires_at\":1003.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"steps\\\":\\\"0\\\",\\\"usd\\\":\\\"0E-8\\\"},\\\"estimates\\\":{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2E-7\\\"},\\\"limits\\\":{\\\"depth\\\":\\\"5\\\",\\\"steps\\\":\\\"3\\\",\\\"usd\\\":\\\"0.0000010\\\"},\\\"scope_id\\\":\\\"root\\\"}],\\\"lease_seconds\\\":\\\"3.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1\\\",\\\"ledger_key\\\":\\\"root-window\\\",\\\"limit\\\":\\\"2\\\",\\\"meter\\\":\\\"steps\\\",\\\"window_seconds\\\":\\\"10.0\\\"}]}\",\"request_digest\":\"41af717df9210425516fe963fe22522364c34d798f5a926a6f06f546fff58bc6\",\"state\":\"settled\"}",
+          "d": "{\"charges\":null,\"charges_digest\":null,\"completed_at\":null,\"created_at\":1013.0,\"details\":[{\"amount\":\"1\",\"kind\":\"budget\",\"meter\":\"steps\",\"scope_id\":\"root\"},{\"amount\":\"2E-7\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"root\"},{\"amount\":\"1\",\"kind\":\"window\",\"meter\":\"steps\",\"scope_id\":\"root-window\",\"window_seconds\":10.0}],\"expires_at\":1063.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"steps\\\":\\\"0\\\",\\\"usd\\\":\\\"0E-8\\\"},\\\"estimates\\\":{\\\"steps\\\":\\\"1\\\",\\\"usd\\\":\\\"2E-7\\\"},\\\"limits\\\":{\\\"depth\\\":\\\"5\\\",\\\"steps\\\":\\\"3\\\",\\\"usd\\\":\\\"0.0000010\\\"},\\\"scope_id\\\":\\\"root\\\"}],\\\"lease_seconds\\\":\\\"30.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1\\\",\\\"ledger_key\\\":\\\"root-window\\\",\\\"limit\\\":\\\"2\\\",\\\"meter\\\":\\\"steps\\\",\\\"window_seconds\\\":\\\"10.0\\\"}]}\",\"request_digest\":\"7abe48e073db396b2f6c6b6f6cf7a18a11892cf01a13cc6c1762f7ea1c88399e\",\"state\":\"active\"}"
+        },
+        "window-events": {}
+      }
+    }
+  ]
+}

@@ -1,0 +1,67 @@
+{
+  "status": "passed",
+  "namespace": "pollard_cli_0c8be4f1e8494a90988b92f3043aef55",
+  "binary_sha256": "c11205c181d2c729090377e47406603fb7e0bdb7634f49ce3b5788f576b787cf",
+  "checks": {
+    "postgres": {
+      "root_id": "42e7e911bc49a9d561b0611e576646090ab83e9bc61e73754ce0a04d1806f4ee",
+      "command": [
+        "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\.benchmarks\\remote-validation-final-4\\bin\\pollard.exe",
+        "runs",
+        "pg-env:POLLARD_TEST_POSTGRES_DSN#pollard_cli_0c8be4f1e8494a90988b92f3043aef55_postgres",
+        "--json"
+      ],
+      "matching_python_root": true,
+      "recorded_tree_unchanged": true,
+      "credentials_in_environment": true
+    },
+    "redis": {
+      "root_id": "42e7e911bc49a9d561b0611e576646090ab83e9bc61e73754ce0a04d1806f4ee",
+      "command": [
+        "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\.benchmarks\\remote-validation-final-4\\bin\\pollard.exe",
+        "runs",
+        "redis-env:POLLARD_REDIS_TEST_URL?prefix=pollard#pollard_cli_0c8be4f1e8494a90988b92f3043aef55_redis",
+        "--json"
+      ],
+      "matching_python_root": true,
+      "recorded_tree_unchanged": true,
+      "credentials_in_environment": true
+    },
+    "kafka": {
+      "root_id": "42e7e911bc49a9d561b0611e576646090ab83e9bc61e73754ce0a04d1806f4ee",
+      "command": [
+        "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\.benchmarks\\remote-validation-final-4\\bin\\pollard.exe",
+        "runs",
+        "kafka-env:POLLARD_CLI_KAFKA_CONFIG?topic=pollard_cli_0c8be4f1e8494a90988b92f3043aef55_kafka&timeout=10#default",
+        "--json"
+      ],
+      "matching_python_root": true,
+      "recorded_tree_unchanged": true,
+      "credentials_in_environment": true
+    },
+    "mongodb": {
+      "root_id": "42e7e911bc49a9d561b0611e576646090ab83e9bc61e73754ce0a04d1806f4ee",
+      "command": [
+        "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\.benchmarks\\remote-validation-final-4\\bin\\pollard.exe",
+        "runs",
+        "mongo-env:POLLARD_TEST_MONGO_URI?database=pollard_cli_0c8be4f1e8494a90988b92f3043aef55&prefix=pollard#pollard_cli_0c8be4f1e8494a90988b92f3043aef55_mongodb",
+        "--json"
+      ],
+      "matching_python_root": true,
+      "recorded_tree_unchanged": true,
+      "credentials_in_environment": true
+    },
+    "neo4j": {
+      "root_id": "42e7e911bc49a9d561b0611e576646090ab83e9bc61e73754ce0a04d1806f4ee",
+      "command": [
+        "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\.benchmarks\\remote-validation-final-4\\bin\\pollard.exe",
+        "runs",
+        "neo4j-env:POLLARD_TEST_NEO4J_URI?user-env=POLLARD_TEST_NEO4J_USER&password-env=POLLARD_TEST_NEO4J_PASSWORD#pollard_cli_0c8be4f1e8494a90988b92f3043aef55_neo4j",
+        "--json"
+      ],
+      "matching_python_root": true,
+      "recorded_tree_unchanged": true,
+      "credentials_in_environment": true
+    }
+  }
+}

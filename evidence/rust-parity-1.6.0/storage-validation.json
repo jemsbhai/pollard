@@ -1,0 +1,52 @@
+{
+  "baseline": "PyPI pollard 1.6.0",
+  "wheel_sha256": "569fb5f130a82c9be327b8dcbd285e3be063200bd9773ca15c5d6bb62edd627f",
+  "verified_on": "2026-10-08",
+  "commands": [
+    {
+      "command": "cargo test --manifest-path crates/pollardai/Cargo.toml --test storage_parity --test sqlite_arbitration --test seal_custody --test runtime_storage_contract",
+      "status": "passed",
+      "suites": {"storage_parity": 22, "sqlite_arbitration": 11, "seal_custody": 5, "runtime_storage_contract": 5},
+      "passed": 43,
+      "failed": 0,
+      "ignored": 0
+    },
+    {
+      "command": "cargo clippy --manifest-path crates/pollardai/Cargo.toml --lib --tests --examples -- -D warnings",
+      "status": "failed_during_active_runtime_integration",
+      "diagnostic": "large_enum_variant on runtime.rs RegisteredPreparation and CallPreparation; runtime owner notified; previous storage-only integration passed"
+    }
+  ],
+  "interop": ["sqlite-interop-result.json", "arbitration-interop-result.json", "runtime-interop-result.json"],
+  "tested_invariants": [
+    "Exact released Python first-run root/model IDs, result text/digest, manifest, and rolling seal",
+    "SQLite schema-v3 interoperability in both directions, including payload interning and literal reference escaping",
+    "Read-only access preserves main database bytes and never creates a missing database",
+    "Unsupported schemas, corrupt result bytes, and corrupt interned blobs fail closed",
+    "Pending settlement occurs once and persists across reopening; duplicate complete results preserve the original",
+    "Import fully validates all records, deterministic order, seals, ancestry, and destination conflicts before mutation",
+    "SQLite import and merge hold a transaction through destination reads and writes; concurrent conflicts are deterministic",
+    "Concurrent merge preserves all eight independent metadata updates",
+    "Independent connections reserve an exact shared budget of three under an eight-worker race",
+    "Actual Rust Runtime probes inside live Python callbacks share exact window, root, branch and ancestor scope identities and refuse before dispatch",
+    "Native Rust Runtime settlement exhausts the same window subsequently checked by Python Runtime",
+    "Sliding windows include pending and settled charges; old window events expire",
+    "Decimal 0.1 plus 0.2 consumes exactly a 0.3 limit in both Rust-only and mixed Python/Rust ledgers",
+    "Lease renewal uses an independent thread-safe connection, rejects expired or missing reservations, and never recreates a deleted database",
+    "Late settlement of expired reservations retains actual spend; repeated successful settlement is idempotent",
+    "Invalid settlement rolls back prior row updates and preserves the reservation",
+    "Custody publications append in sequence in a separate durable database; malformed reports cannot append",
+    "Custody publication modifies only the named sink; recording and unrelated file bytes remain unchanged and reopening to read adds no writes",
+    "SQLite-backed ordinary callback errors release capacity; unknown errors, panics and async cancellation settle conservative charges once and release reservations",
+    "Runtime heartbeat renewal is synchronized through an observed expiry extension before testing failure cleanup",
+    "Indexed MemoryStore traversal preserves kind-and-ID ordering and mutation revisions invalidate caches",
+    "Explicit GC removes pruned descendants without orphaning retained children and compacts unreferenced blobs"
+  ],
+  "remaining_storage_limits": [
+    "Legacy SQLite schemas require an explicit Python migration of a backed-up copy; this Rust constructor refuses implicit migration",
+    "rust_decimal uses a bounded 96-bit decimal coefficient rather than Python's arbitrary precision Decimal",
+    "Merge materializes source nodes in memory; Python CLI also supports bounded disk spooling",
+    "Custom Store default batch methods are sequential; atomic import/merge is guaranteed only by the native MemoryStore and SQLiteStore implementations",
+    "Remote PostgreSQL, Redis, MongoDB, Neo4j, Kafka and Hashrope backends are outside these modules"
+  ]
+}

@@ -123,3 +123,40 @@ determine pass or fail.
 Any later result is descriptive for its recorded local environment. It cannot
 establish a provider, network, concurrency, remote-store, throughput, service
 level, or performance-guarantee claim.
+
+## 2026-10-08 Native Rust Parity and Performance
+
+Final release-build measurements completed with all workload checksum and
+accounting assertions passing. Source and executable hashes remained unchanged
+through each run. Raw samples, environment, protocols and validation receipts
+are in evidence/rust-parity-1.6.0. This is separate from EXP-007.
+
+- MemoryStore, 1,000-call chains: record 108.56x, strict replay
+  453.43x, hybrid hits 2.45x faster than the pinned Python wheel.
+  Against the original Rust core the respective ratios are
+  46.26x, 99.12x and 56.96x.
+- Wide traversal of 10,000 children: 9.28x faster than Python and
+  86.56x faster than original Rust. The child index removes repeated
+  whole-store child scans; immutable-prefix caching reduces repeated ancestry work.
+- SQLite, 40 steps: record 1.39x and strict replay
+  1.85x faster than Python, but hybrid takes
+  2.48x as long. Native hybrid verifies ancestry; Python1.6 performs
+  the explicit verification pass only for strict replay. External SQLite mutation
+  prevents use of the native immutable-store cache. This is a behavior/cost
+  difference; not all benchmarked paths have identical verification work.
+- Identity-only hashing is 26.3% slower than original Rust, while still
+  2.66x faster than Python. The experiment does not isolate the cost of
+  expanded numeric and serialization fidelity from other changes.
+- At 200,000 unretained chunks, native total peak process memory is
+  5.20 MiB versus
+  96.93 MiB for Python: 94.64% lower peak,
+  with 1.76x faster callback/merge execution. This includes interpreter/runtime
+  startup memory, not just chunk allocations. Three fresh processes per case.
+
+Ratios summarize medians on one Intel i9-14900HX Windows host. Power profile and
+OS background activity were not controlled. SQLite engines differ (Python3.43.1,
+Rust3.45.0). Timing excludes providers, networking, setup and process startup;
+process-memory measurements include startup. No energy, remote throughput,
+provider-cost or complete-agent speedup claim is supported. Native budget-total
+caching is supported by read-count/invalidation tests, not by these no-budget
+latency workloads. Both regressions and raw distributions are retained.

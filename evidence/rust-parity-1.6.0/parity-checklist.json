@@ -1,0 +1,96 @@
+{
+  "baseline": {
+    "release": "pollard 1.6.0",
+    "verified_on": "2026-10-08",
+    "metadata_url": "https://pypi.org/pypi/pollard/json",
+    "upload_date": "2026-09-01",
+    "wheel_sha256": "569fb5f130a82c9be327b8dcbd285e3be063200bd9773ca15c5d6bb62edd627f",
+    "sdist_sha256": "e9a43a52e6875add922d9749028f2c96e7e83dd138ff65ef4d3f834485617fec",
+    "rust_baseline_commit": "51e3a24",
+    "rust_baseline_version": "0.1.0",
+    "source_checkout": "C:/Users/User/AppData/Local/Temp/pollard-release-audit-20261008/pollard-1.6.0",
+    "rust_checkout": "C:/Users/User/.codex/worktrees/npm-pypi-parity/pollard/crates/pollardai",
+    "note": "This is an audit of baseline gaps, not a claim about work implemented after the audit. Current main or the initial dirty Python checkout is not the release oracle."
+  },
+  "priorities": [
+    {
+      "priority": "P0",
+      "area": "Record-mode duplicate semantics",
+      "gap": "Rust unconditionally refuses duplicates; Python default redispatches and preserves original completed result, recording conflicts. 1.6.0 added an opt-in guard with default false.",
+      "acceptance": ["Default duplicate model/tool calls dispatch and preserve original result plus result_conflicts.", "Opt-in refusal occurs before budget reservation, policy re-evaluation and dispatch.", "Explicit attempt changes are accepted.", "Guard does not change hybrid/replay hits.", "Persistent reopen preserves refusal."],
+      "oracle_tests": ["tests/test_replay.py", "tests/test_aio.py"]
+    },
+    {
+      "priority": "P0",
+      "area": "Portable identity and accounting behavior",
+      "gap": "Rust rejects estimates absent under token budgets and raises UsageError for invalid usage; Python allows such calls and records conservative available estimate or zero token charge. Refusal payload/requested/remaining and metadata need byte-exact release fixtures.",
+      "acceptance": ["First-run root/model identities and result digest match verified wheel.", "With an estimate, invalid usage settles estimate and accounting_fallbacks.tokens reason/source metadata.", "Without an estimate, invalid usage records step charge only and succeeds.", "Actual usage overshoot persists and blocks later calls.", "Refusal reason, meter, blocked_kind, blocked_payload_digest, requested/remaining strings, estimated=true match.", "Arbitrary Python integer identities remain a documented numeric limitation unless intentionally implemented."],
+      "oracle_tests": ["tests/test_runtime.py", "tests/test_governor.py", "tests/test_meter_precheck_refusal.py", "tests/test_canon.py", "tests/test_hashing.py"]
+    },
+    {
+      "priority": "P1",
+      "area": "Runtime lifecycle, reports and dry run",
+      "gap": "resume, prune, structured report, dry_run and node callbacks missing.",
+      "acceptance": ["Resume deepest non-pruned leaf, lexical ID tiebreak, refuse missing root.", "Prune flags cursor; rollback does not refund; branch has independent cursor with shared ancestor budget.", "Report spent and avoided maps; replay skips live budgets/dispatch/policies.", "Dry-run registered tools produce resultless nodes and strict replay rejects these.", "Callback failures warn without invalidating completed runs."],
+      "oracle_tests": ["tests/test_runtime.py", "tests/test_policy.py", "tests/test_replay.py"]
+    },
+    {
+      "priority": "P1",
+      "area": "Streaming and asynchronous execution",
+      "gap": "All Rust callback calls synchronous and non-streaming.",
+      "acceptance": ["Chunks forward in order; keep_chunks stores and replay re-emits them.", "Chunk result replaces accumulator; delta merges recursively; strings append; lists concatenate; other values replace.", "Settle once after stream end; identity independent of streaming.", "Post-first-chunk failure conservatively settles estimates and preserves unknown-outcome marker.", "Async model/tool, confirmation, branch/resume/revalidation follow equivalent contracts."],
+      "oracle_tests": ["tests/test_runtime.py", "tests/test_aio.py", "tests/test_adapters.py"]
+    },
+    {
+      "priority": "P1",
+      "area": "Persistent storage and shared arbitration",
+      "gap": "Rust MemoryStore only; no SQLite or transaction reservation contract.",
+      "acceptance": ["SQLite schema compatible with Python, preserves exact result_text and detached data.", "Strict replay physically read-only and does not create missing DB.", "Atomic budget/window reservations across independent runtime connections.", "Lease renewal, stale leases, uncertain settlement, post-dispatch errors and reconnect are fail-closed.", "Schema versions fail closed; migrations explicit."],
+      "oracle_tests": ["tests/test_store_sqlite.py", "tests/test_store_transactional.py", "tests/test_store_shared.py", "tests/test_store_backend_failures.py", "tests/test_window_meter.py"]
+    },
+    {
+      "priority": "P1",
+      "area": "Seals, governance and merge",
+      "gap": "All unported in Rust baseline.",
+      "acceptance": ["Seal uses pollard/v1:seal newline domain and deterministic Store.walk ordering.", "Seal/export match first-run Python fixture including exact result text.", "Import fully validates format, all nodes and seal before writes; missing external parent rejected.", "Merge preserves first results, reports conflicts, validates ancestry and reruns idempotently.", "GC drops pruned descendants and returns survivor seals; explicit compaction.", "SQLiteSealSink independently persists seal custody."],
+      "oracle_tests": ["tests/test_seal.py", "tests/test_seal_custody.py", "tests/test_governance.py", "tests/test_import.py", "tests/test_merge.py"]
+    },
+    {
+      "priority": "P1",
+      "area": "Meters and complete Budget",
+      "gap": "Rust integer steps/tokens/depth only; Python usd, seconds, extra custom meters, CostMeter, WindowMeter and measurement hooks absent.",
+      "acceptance": ["Decimal-safe USD charge and limits.", "Default meters include steps/depth/wall-clock/tokens.", "Custom meter precheck/settle hooks, expected auditable refusal and configuration-error separation.", "Window limits with stable ledger key, exact transactional reservations.", "Tokenmaster 0.2 profile/output/context checks, tier pricing, governance factory; NVML optional local energy."],
+      "oracle_tests": ["tests/test_meters.py", "tests/test_governor.py", "tests/test_window_meter.py", "tests/test_meter_precheck_refusal.py", "tests/test_tokenmaster_meter.py", "tests/test_energy.py"]
+    },
+    {
+      "priority": "P1",
+      "area": "Live revalidation",
+      "gap": "ReplayContract, comparison types and live observation flow unported.",
+      "acceptance": ["Contracts bind immutable execution fingerprint into payload.", "Exact and normalized comparator differences are bounded value-free JSON pointers.", "Explicit record-mode observation spends budget but preserves golden recording.", "Failure evidence does not leak raw result values; sync/async behavior match."],
+      "oracle_tests": ["tests/test_revalidation.py"]
+    },
+    {
+      "priority": "P2",
+      "area": "Remote stores",
+      "gap": "PostgresStore, RedisStore, MongoStore, Neo4jStore, KafkaStore, HashRopeStore missing.",
+      "acceptance": ["Remote shared budgets retain exact Python reservation contract for PostgreSQL, Redis, MongoDB and Neo4j.", "Kafka is ordered replay/audit only; dedicated single partition infinite retention, no shared arbitration.", "Reconnect validates exact schema/coordinator/index constraints without implicit repair.", "Environment-backed credential-safe store selectors and destination prevalidation before writes.", "Hashrope is in-process append-only backend, not multi-writer database."],
+      "oracle_tests": ["tests/test_store_postgres.py", "tests/test_store_remote.py", "tests/test_store_kafka.py", "tests/test_store_hashrope.py", "tests/test_distributed_store_example.py"]
+    },
+    {
+      "priority": "P2",
+      "area": "CLI, provider/framework integrations and observability",
+      "gap": "Rust has no CLI or provider/framework adapters, MCP bridge, OTel export, prompt estimators or pytest replay plugin.",
+      "acceptance": ["CLI show/report/verify/seal/export/runs and validated merge; SQLite-only import/gc.", "OpenAI Responses/Chat, Anthropic, Bedrock and LiteLLM normalization with sync/async/stream coverage.", "No implicit credentials, clients or network at import/runtime.", "Pydantic schema helper/MCP discovery and registered handlers where Rust equivalents exist.", "Content-free OTel export and reproducible recording replay tooling."],
+      "oracle_tests": ["tests/test_cli.py", "tests/test_adapters.py", "tests/test_estimators.py", "tests/test_mcp.py", "tests/test_otel.py", "tests/test_pytest_plugin.py", "tests/test_recipes.py", "tests/test_framework_recipes.py"]
+    }
+  ],
+  "performance_acceptance": [
+    "Use exact verified PyPI wheel outside initial dirty checkout, not local source version.",
+    "Record exact wheel hash, Python/Rust versions, crate source/commit, machine/OS, release build, fixture/payload sizes, iterations, warmup and samples.",
+    "Compare MemoryStore record, hybrid-hit, strict replay-hit; add SQLite only when equivalent persistence and transactional guarantees exist.",
+    "Report median/distribution and raw samples. Check correctness/output charges before timing.",
+    "Benchmark both tiny empty/short payloads and growth with many stored nodes; total record/replay costs can become quadratic through accounting/walk/verify.",
+    "Separate native-core throughput from provider/network time; report regressions and unsupported features, no blanket full-parity or distributed throughput claims.",
+    "Python release EXP-007 registers protocol but explicitly makes no quantitative performance claim. Review evidence/EXP-007 and its runner before presenting release-comparable conclusions."
+  ]
+}

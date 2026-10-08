@@ -1,0 +1,37 @@
+{
+  "status": "passed",
+  "assertions_per_platform": 10,
+  "source_sha256": {
+    "validate_remote.py": "40432c21b8619922fb8b364673e19105a7939d840e09e4d12e9e72dd9e175468",
+    "remote_cli_smoke.py": "c45b7962cef7acdb508f3bf5bd14c55e7b35ab242ff5e5caa9d9f5ec2d232ceb",
+    "test_validate_remote.py": "479afad63b5b0e4231cb4b2c48c1ad9e54708fe4f2319eeb59e8d20146e15b8e"
+  },
+  "windows": {
+    "python_version": "3.12.2",
+    "platform": "Windows-11-10.0.26300-SP0",
+    "command": "python -m unittest discover -s evidence/rust-parity-1.6.0 -p test_validate_remote.py -v",
+    "exit_code": 0,
+    "tests": 10,
+    "seconds": 3.06
+  },
+  "linux": {
+    "image": "python:3.12-slim",
+    "image_digest": "sha256:05cda9777409a9c3ffddd94a4c476b79f0769a0b4857f0c7ed9226b6800b0d6f",
+    "command": "docker run --rm --mount type=bind,source=CHECKOUT,target=/work,readonly --workdir /work python:3.12-slim python -m unittest discover -s evidence/rust-parity-1.6.0 -p test_validate_remote.py -v",
+    "exit_code": 0,
+    "tests": 10,
+    "seconds": 5.372,
+    "container_removed": true
+  },
+  "coverage": [
+    "ownership labels and exact container IDs",
+    "failed startup cleanup",
+    "log timeout cleanup",
+    "daemon failure evidence",
+    "pinned wheel digest",
+    "test/fixture source fingerprints",
+    "zero-test rejection",
+    "generated password redaction",
+    "real child/grandchild timeout termination"
+  ]
+}

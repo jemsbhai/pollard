@@ -1,0 +1,16 @@
+{
+  "host": "Windows x86_64",
+  "computer_model": "MSI Raider GE78 HX 14VIG",
+  "processor": "Intel Core i9-14900HX",
+  "logical_processors": 32,
+  "physical_memory_bytes": 102764539904,
+  "platform": "Windows-11-10.0.26300-SP0",
+  "python": "3.12.2 (tags/v3.12.2:6abddd9, Feb  6 2024, 21:26:36) [MSC v.1937 64 bit (AMD64)]",
+  "rustc": "rustc 1.94.0 (4a4ef493e 2026-03-02)",
+  "msrv": "rustc 1.74.0 (79e9716c9 2023-11-13)",
+  "gpu_hardware_test": "NVIDIA GeForce RTX 4090 Laptop GPU",
+  "power_profile_controlled": false,
+  "background_test_services": "Dedicated validation containers removed before final measurements",
+  "hosted_provider_calls": 0,
+  "provider_spend_usd": 0
+}

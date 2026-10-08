@@ -1,0 +1,1765 @@
+{
+  "provenance": {
+    "pollard_version": "1.6.0",
+    "wheel_sha256": "569fb5f130a82c9be327b8dcbd285e3be063200bd9773ca15c5d6bb62edd627f",
+    "generator": "generate_decimal_wire_parity.py",
+    "cost_reference": "Python Decimal localcontext precision=200; exact mathematical reference, not default-context emulation"
+  },
+  "requests": [
+    {
+      "budgets": [
+        {
+          "scope_id": "decimal:é",
+          "limits": {
+            "usd": "1E+6"
+          },
+          "baseline": {
+            "usd": "1E+2"
+          },
+          "estimates": {
+            "usd": "1E+2"
+          }
+        }
+      ],
+      "windows": [
+        {
+          "ledger_key": "decimal:☃",
+          "meter": "usd",
+          "limit": "1.0E+6",
+          "amount": "1E+2",
+          "window_seconds": 30.0
+        }
+      ],
+      "lease": 60.0,
+      "request": "{\"budgets\":[{\"baseline\":{\"usd\":\"1E+2\"},\"estimates\":{\"usd\":\"1E+2\"},\"limits\":{\"usd\":\"1E+6\"},\"scope_id\":\"decimal:é\"}],\"lease_seconds\":\"60.0\",\"windows\":[{\"amount\":\"1E+2\",\"ledger_key\":\"decimal:☃\",\"limit\":\"1.0E+6\",\"meter\":\"usd\",\"window_seconds\":\"30.0\"}]}",
+      "digest": "f3890fa53bbe6d72abf75139abb684ea1a2ab7d2b3576c822891672004cc9ca7",
+      "charges": {
+        "usd": "1E+2"
+      },
+      "charges_text": "{\"usd\":\"1E+2\"}",
+      "charges_digest": "8a90ac60836ce6c219386789d78fe18ab63d936670a6afedaf91b3e6b3b08124",
+      "reserved": {
+        "schema": {
+          "version": "1"
+        },
+        "budget": {
+          "[\"decimal:é\",\"usd\"]": "1E+2"
+        },
+        "reservations": {
+          "decimal": "{\"charges\":null,\"charges_digest\":null,\"completed_at\":null,\"created_at\":1000.0,\"details\":[{\"amount\":\"1E+2\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"decimal:é\"},{\"amount\":\"1E+2\",\"kind\":\"window\",\"meter\":\"usd\",\"scope_id\":\"decimal:☃\",\"window_seconds\":30.0}],\"expires_at\":1060.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"usd\\\":\\\"1E+2\\\"},\\\"estimates\\\":{\\\"usd\\\":\\\"1E+2\\\"},\\\"limits\\\":{\\\"usd\\\":\\\"1E+6\\\"},\\\"scope_id\\\":\\\"decimal:é\\\"}],\\\"lease_seconds\\\":\\\"60.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1E+2\\\",\\\"ledger_key\\\":\\\"decimal:☃\\\",\\\"limit\\\":\\\"1.0E+6\\\",\\\"meter\\\":\\\"usd\\\",\\\"window_seconds\\\":\\\"30.0\\\"}]}\",\"request_digest\":\"f3890fa53bbe6d72abf75139abb684ea1a2ab7d2b3576c822891672004cc9ca7\",\"state\":\"active\"}"
+        }
+      },
+      "settled": {
+        "schema": {
+          "version": "1"
+        },
+        "budget": {
+          "[\"decimal:é\",\"usd\"]": "2E+2"
+        },
+        "reservations": {
+          "decimal": "{\"charges\":\"{\\\"usd\\\":\\\"1E+2\\\"}\",\"charges_digest\":\"8a90ac60836ce6c219386789d78fe18ab63d936670a6afedaf91b3e6b3b08124\",\"completed_at\":1000.0,\"created_at\":1000.0,\"details\":[{\"amount\":\"1E+2\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"decimal:é\"},{\"amount\":\"1E+2\",\"kind\":\"window\",\"meter\":\"usd\",\"scope_id\":\"decimal:☃\",\"window_seconds\":30.0}],\"expires_at\":1060.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"usd\\\":\\\"1E+2\\\"},\\\"estimates\\\":{\\\"usd\\\":\\\"1E+2\\\"},\\\"limits\\\":{\\\"usd\\\":\\\"1E+6\\\"},\\\"scope_id\\\":\\\"decimal:é\\\"}],\\\"lease_seconds\\\":\\\"60.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1E+2\\\",\\\"ledger_key\\\":\\\"decimal:☃\\\",\\\"limit\\\":\\\"1.0E+6\\\",\\\"meter\\\":\\\"usd\\\",\\\"window_seconds\\\":\\\"30.0\\\"}]}\",\"request_digest\":\"f3890fa53bbe6d72abf75139abb684ea1a2ab7d2b3576c822891672004cc9ca7\",\"state\":\"settled\"}"
+        },
+        "window-events": {
+          "[\"decimal\",\"1\"]": "{\"amount\":\"1E+2\",\"meter\":\"usd\",\"scope_id\":\"decimal:☃\",\"settled_at\":1000.0,\"window_seconds\":30.0}"
+        }
+      }
+    },
+    {
+      "budgets": [
+        {
+          "scope_id": "decimal:é",
+          "limits": {
+            "usd": "1E+6"
+          },
+          "baseline": {
+            "usd": "1E+2"
+          },
+          "estimates": {
+            "usd": "1.0E+2"
+          }
+        }
+      ],
+      "windows": [
+        {
+          "ledger_key": "decimal:☃",
+          "meter": "usd",
+          "limit": "1.0E+6",
+          "amount": "1.0E+2",
+          "window_seconds": 30.0
+        }
+      ],
+      "lease": 60.0,
+      "request": "{\"budgets\":[{\"baseline\":{\"usd\":\"1E+2\"},\"estimates\":{\"usd\":\"1.0E+2\"},\"limits\":{\"usd\":\"1E+6\"},\"scope_id\":\"decimal:é\"}],\"lease_seconds\":\"60.0\",\"windows\":[{\"amount\":\"1.0E+2\",\"ledger_key\":\"decimal:☃\",\"limit\":\"1.0E+6\",\"meter\":\"usd\",\"window_seconds\":\"30.0\"}]}",
+      "digest": "63511200027c1cf5f26e8c752b7584ebf22b929e58b57ff88a8f3d87ef407ddb",
+      "charges": {
+        "usd": "1.0E+2"
+      },
+      "charges_text": "{\"usd\":\"1.0E+2\"}",
+      "charges_digest": "21ca4baa9d1b8ea38074f49ba9a4af2e758dccab87783116a3bbafd85da6498d",
+      "reserved": {
+        "schema": {
+          "version": "1"
+        },
+        "budget": {
+          "[\"decimal:é\",\"usd\"]": "1E+2"
+        },
+        "reservations": {
+          "decimal": "{\"charges\":null,\"charges_digest\":null,\"completed_at\":null,\"created_at\":1000.0,\"details\":[{\"amount\":\"1.0E+2\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"decimal:é\"},{\"amount\":\"1.0E+2\",\"kind\":\"window\",\"meter\":\"usd\",\"scope_id\":\"decimal:☃\",\"window_seconds\":30.0}],\"expires_at\":1060.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"usd\\\":\\\"1E+2\\\"},\\\"estimates\\\":{\\\"usd\\\":\\\"1.0E+2\\\"},\\\"limits\\\":{\\\"usd\\\":\\\"1E+6\\\"},\\\"scope_id\\\":\\\"decimal:é\\\"}],\\\"lease_seconds\\\":\\\"60.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1.0E+2\\\",\\\"ledger_key\\\":\\\"decimal:☃\\\",\\\"limit\\\":\\\"1.0E+6\\\",\\\"meter\\\":\\\"usd\\\",\\\"window_seconds\\\":\\\"30.0\\\"}]}\",\"request_digest\":\"63511200027c1cf5f26e8c752b7584ebf22b929e58b57ff88a8f3d87ef407ddb\",\"state\":\"active\"}"
+        }
+      },
+      "settled": {
+        "schema": {
+          "version": "1"
+        },
+        "budget": {
+          "[\"decimal:é\",\"usd\"]": "2.0E+2"
+        },
+        "reservations": {
+          "decimal": "{\"charges\":\"{\\\"usd\\\":\\\"1.0E+2\\\"}\",\"charges_digest\":\"21ca4baa9d1b8ea38074f49ba9a4af2e758dccab87783116a3bbafd85da6498d\",\"completed_at\":1000.0,\"created_at\":1000.0,\"details\":[{\"amount\":\"1.0E+2\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"decimal:é\"},{\"amount\":\"1.0E+2\",\"kind\":\"window\",\"meter\":\"usd\",\"scope_id\":\"decimal:☃\",\"window_seconds\":30.0}],\"expires_at\":1060.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"usd\\\":\\\"1E+2\\\"},\\\"estimates\\\":{\\\"usd\\\":\\\"1.0E+2\\\"},\\\"limits\\\":{\\\"usd\\\":\\\"1E+6\\\"},\\\"scope_id\\\":\\\"decimal:é\\\"}],\\\"lease_seconds\\\":\\\"60.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1.0E+2\\\",\\\"ledger_key\\\":\\\"decimal:☃\\\",\\\"limit\\\":\\\"1.0E+6\\\",\\\"meter\\\":\\\"usd\\\",\\\"window_seconds\\\":\\\"30.0\\\"}]}\",\"request_digest\":\"63511200027c1cf5f26e8c752b7584ebf22b929e58b57ff88a8f3d87ef407ddb\",\"state\":\"settled\"}"
+        },
+        "window-events": {
+          "[\"decimal\",\"1\"]": "{\"amount\":\"1.0E+2\",\"meter\":\"usd\",\"scope_id\":\"decimal:☃\",\"settled_at\":1000.0,\"window_seconds\":30.0}"
+        }
+      }
+    },
+    {
+      "budgets": [
+        {
+          "scope_id": "decimal:é",
+          "limits": {
+            "usd": "1E+6"
+          },
+          "baseline": {
+            "usd": "1E+2"
+          },
+          "estimates": {
+            "usd": "1.00E+2"
+          }
+        }
+      ],
+      "windows": [
+        {
+          "ledger_key": "decimal:☃",
+          "meter": "usd",
+          "limit": "1.0E+6",
+          "amount": "1.00E+2",
+          "window_seconds": 30.0
+        }
+      ],
+      "lease": 60.0,
+      "request": "{\"budgets\":[{\"baseline\":{\"usd\":\"1E+2\"},\"estimates\":{\"usd\":\"100\"},\"limits\":{\"usd\":\"1E+6\"},\"scope_id\":\"decimal:é\"}],\"lease_seconds\":\"60.0\",\"windows\":[{\"amount\":\"100\",\"ledger_key\":\"decimal:☃\",\"limit\":\"1.0E+6\",\"meter\":\"usd\",\"window_seconds\":\"30.0\"}]}",
+      "digest": "eda1d13527ea0717fbf704deae3b73239a8df9b6561b1c7ddefd7069d33ec2d5",
+      "charges": {
+        "usd": "1.00E+2"
+      },
+      "charges_text": "{\"usd\":\"100\"}",
+      "charges_digest": "91cdca8f25e30b3a234f29b533129aabf0db41fc9f7dc1d9eb0b81525d3a9690",
+      "reserved": {
+        "schema": {
+          "version": "1"
+        },
+        "budget": {
+          "[\"decimal:é\",\"usd\"]": "1E+2"
+        },
+        "reservations": {
+          "decimal": "{\"charges\":null,\"charges_digest\":null,\"completed_at\":null,\"created_at\":1000.0,\"details\":[{\"amount\":\"100\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"decimal:é\"},{\"amount\":\"100\",\"kind\":\"window\",\"meter\":\"usd\",\"scope_id\":\"decimal:☃\",\"window_seconds\":30.0}],\"expires_at\":1060.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"usd\\\":\\\"1E+2\\\"},\\\"estimates\\\":{\\\"usd\\\":\\\"100\\\"},\\\"limits\\\":{\\\"usd\\\":\\\"1E+6\\\"},\\\"scope_id\\\":\\\"decimal:é\\\"}],\\\"lease_seconds\\\":\\\"60.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"100\\\",\\\"ledger_key\\\":\\\"decimal:☃\\\",\\\"limit\\\":\\\"1.0E+6\\\",\\\"meter\\\":\\\"usd\\\",\\\"window_seconds\\\":\\\"30.0\\\"}]}\",\"request_digest\":\"eda1d13527ea0717fbf704deae3b73239a8df9b6561b1c7ddefd7069d33ec2d5\",\"state\":\"active\"}"
+        }
+      },
+      "settled": {
+        "schema": {
+          "version": "1"
+        },
+        "budget": {
+          "[\"decimal:é\",\"usd\"]": "200"
+        },
+        "reservations": {
+          "decimal": "{\"charges\":\"{\\\"usd\\\":\\\"100\\\"}\",\"charges_digest\":\"91cdca8f25e30b3a234f29b533129aabf0db41fc9f7dc1d9eb0b81525d3a9690\",\"completed_at\":1000.0,\"created_at\":1000.0,\"details\":[{\"amount\":\"100\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"decimal:é\"},{\"amount\":\"100\",\"kind\":\"window\",\"meter\":\"usd\",\"scope_id\":\"decimal:☃\",\"window_seconds\":30.0}],\"expires_at\":1060.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"usd\\\":\\\"1E+2\\\"},\\\"estimates\\\":{\\\"usd\\\":\\\"100\\\"},\\\"limits\\\":{\\\"usd\\\":\\\"1E+6\\\"},\\\"scope_id\\\":\\\"decimal:é\\\"}],\\\"lease_seconds\\\":\\\"60.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"100\\\",\\\"ledger_key\\\":\\\"decimal:☃\\\",\\\"limit\\\":\\\"1.0E+6\\\",\\\"meter\\\":\\\"usd\\\",\\\"window_seconds\\\":\\\"30.0\\\"}]}\",\"request_digest\":\"eda1d13527ea0717fbf704deae3b73239a8df9b6561b1c7ddefd7069d33ec2d5\",\"state\":\"settled\"}"
+        },
+        "window-events": {
+          "[\"decimal\",\"1\"]": "{\"amount\":\"100\",\"meter\":\"usd\",\"scope_id\":\"decimal:☃\",\"settled_at\":1000.0,\"window_seconds\":30.0}"
+        }
+      }
+    },
+    {
+      "budgets": [
+        {
+          "scope_id": "decimal:é",
+          "limits": {
+            "usd": "1E+6"
+          },
+          "baseline": {
+            "usd": "1E+2"
+          },
+          "estimates": {
+            "usd": "-0"
+          }
+        }
+      ],
+      "windows": [
+        {
+          "ledger_key": "decimal:☃",
+          "meter": "usd",
+          "limit": "1.0E+6",
+          "amount": "-0",
+          "window_seconds": 30.0
+        }
+      ],
+      "lease": 60.0,
+      "request": "{\"budgets\":[{\"baseline\":{\"usd\":\"1E+2\"},\"estimates\":{\"usd\":\"-0\"},\"limits\":{\"usd\":\"1E+6\"},\"scope_id\":\"decimal:é\"}],\"lease_seconds\":\"60.0\",\"windows\":[{\"amount\":\"-0\",\"ledger_key\":\"decimal:☃\",\"limit\":\"1.0E+6\",\"meter\":\"usd\",\"window_seconds\":\"30.0\"}]}",
+      "digest": "e45c4171ce0b35f1919a9a8c088201741625eee8f75dbac9a91c2146a6ca1a6e",
+      "charges": {
+        "usd": "-0"
+      },
+      "charges_text": "{\"usd\":\"-0\"}",
+      "charges_digest": "69ea1b4dc003a31200a887d8642712a43301e9597baaf48f80941c8b50c6f63d",
+      "reserved": {
+        "schema": {
+          "version": "1"
+        },
+        "budget": {
+          "[\"decimal:é\",\"usd\"]": "1E+2"
+        },
+        "reservations": {
+          "decimal": "{\"charges\":null,\"charges_digest\":null,\"completed_at\":null,\"created_at\":1000.0,\"details\":[{\"amount\":\"-0\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"decimal:é\"},{\"amount\":\"-0\",\"kind\":\"window\",\"meter\":\"usd\",\"scope_id\":\"decimal:☃\",\"window_seconds\":30.0}],\"expires_at\":1060.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"usd\\\":\\\"1E+2\\\"},\\\"estimates\\\":{\\\"usd\\\":\\\"-0\\\"},\\\"limits\\\":{\\\"usd\\\":\\\"1E+6\\\"},\\\"scope_id\\\":\\\"decimal:é\\\"}],\\\"lease_seconds\\\":\\\"60.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"-0\\\",\\\"ledger_key\\\":\\\"decimal:☃\\\",\\\"limit\\\":\\\"1.0E+6\\\",\\\"meter\\\":\\\"usd\\\",\\\"window_seconds\\\":\\\"30.0\\\"}]}\",\"request_digest\":\"e45c4171ce0b35f1919a9a8c088201741625eee8f75dbac9a91c2146a6ca1a6e\",\"state\":\"active\"}"
+        }
+      },
+      "settled": {
+        "schema": {
+          "version": "1"
+        },
+        "budget": {
+          "[\"decimal:é\",\"usd\"]": "100"
+        },
+        "reservations": {
+          "decimal": "{\"charges\":\"{\\\"usd\\\":\\\"-0\\\"}\",\"charges_digest\":\"69ea1b4dc003a31200a887d8642712a43301e9597baaf48f80941c8b50c6f63d\",\"completed_at\":1000.0,\"created_at\":1000.0,\"details\":[{\"amount\":\"-0\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"decimal:é\"},{\"amount\":\"-0\",\"kind\":\"window\",\"meter\":\"usd\",\"scope_id\":\"decimal:☃\",\"window_seconds\":30.0}],\"expires_at\":1060.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"usd\\\":\\\"1E+2\\\"},\\\"estimates\\\":{\\\"usd\\\":\\\"-0\\\"},\\\"limits\\\":{\\\"usd\\\":\\\"1E+6\\\"},\\\"scope_id\\\":\\\"decimal:é\\\"}],\\\"lease_seconds\\\":\\\"60.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"-0\\\",\\\"ledger_key\\\":\\\"decimal:☃\\\",\\\"limit\\\":\\\"1.0E+6\\\",\\\"meter\\\":\\\"usd\\\",\\\"window_seconds\\\":\\\"30.0\\\"}]}\",\"request_digest\":\"e45c4171ce0b35f1919a9a8c088201741625eee8f75dbac9a91c2146a6ca1a6e\",\"state\":\"settled\"}"
+        }
+      }
+    },
+    {
+      "budgets": [
+        {
+          "scope_id": "decimal:é",
+          "limits": {
+            "usd": "1E+6"
+          },
+          "baseline": {
+            "usd": "1E+2"
+          },
+          "estimates": {
+            "usd": "-0.00"
+          }
+        }
+      ],
+      "windows": [
+        {
+          "ledger_key": "decimal:☃",
+          "meter": "usd",
+          "limit": "1.0E+6",
+          "amount": "-0.00",
+          "window_seconds": 30.0
+        }
+      ],
+      "lease": 60.0,
+      "request": "{\"budgets\":[{\"baseline\":{\"usd\":\"1E+2\"},\"estimates\":{\"usd\":\"-0.00\"},\"limits\":{\"usd\":\"1E+6\"},\"scope_id\":\"decimal:é\"}],\"lease_seconds\":\"60.0\",\"windows\":[{\"amount\":\"-0.00\",\"ledger_key\":\"decimal:☃\",\"limit\":\"1.0E+6\",\"meter\":\"usd\",\"window_seconds\":\"30.0\"}]}",
+      "digest": "e25775c51b0bc8294bc33849f1823fb1a2620daf17340757bfcb9afa8350bb19",
+      "charges": {
+        "usd": "-0.00"
+      },
+      "charges_text": "{\"usd\":\"-0.00\"}",
+      "charges_digest": "2e6988a41e2c258be656d8c8a57100c28354facec66b88b82145b66ed2c85588",
+      "reserved": {
+        "schema": {
+          "version": "1"
+        },
+        "budget": {
+          "[\"decimal:é\",\"usd\"]": "1E+2"
+        },
+        "reservations": {
+          "decimal": "{\"charges\":null,\"charges_digest\":null,\"completed_at\":null,\"created_at\":1000.0,\"details\":[{\"amount\":\"-0.00\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"decimal:é\"},{\"amount\":\"-0.00\",\"kind\":\"window\",\"meter\":\"usd\",\"scope_id\":\"decimal:☃\",\"window_seconds\":30.0}],\"expires_at\":1060.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"usd\\\":\\\"1E+2\\\"},\\\"estimates\\\":{\\\"usd\\\":\\\"-0.00\\\"},\\\"limits\\\":{\\\"usd\\\":\\\"1E+6\\\"},\\\"scope_id\\\":\\\"decimal:é\\\"}],\\\"lease_seconds\\\":\\\"60.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"-0.00\\\",\\\"ledger_key\\\":\\\"decimal:☃\\\",\\\"limit\\\":\\\"1.0E+6\\\",\\\"meter\\\":\\\"usd\\\",\\\"window_seconds\\\":\\\"30.0\\\"}]}\",\"request_digest\":\"e25775c51b0bc8294bc33849f1823fb1a2620daf17340757bfcb9afa8350bb19\",\"state\":\"active\"}"
+        }
+      },
+      "settled": {
+        "schema": {
+          "version": "1"
+        },
+        "budget": {
+          "[\"decimal:é\",\"usd\"]": "100.00"
+        },
+        "reservations": {
+          "decimal": "{\"charges\":\"{\\\"usd\\\":\\\"-0.00\\\"}\",\"charges_digest\":\"2e6988a41e2c258be656d8c8a57100c28354facec66b88b82145b66ed2c85588\",\"completed_at\":1000.0,\"created_at\":1000.0,\"details\":[{\"amount\":\"-0.00\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"decimal:é\"},{\"amount\":\"-0.00\",\"kind\":\"window\",\"meter\":\"usd\",\"scope_id\":\"decimal:☃\",\"window_seconds\":30.0}],\"expires_at\":1060.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"usd\\\":\\\"1E+2\\\"},\\\"estimates\\\":{\\\"usd\\\":\\\"-0.00\\\"},\\\"limits\\\":{\\\"usd\\\":\\\"1E+6\\\"},\\\"scope_id\\\":\\\"decimal:é\\\"}],\\\"lease_seconds\\\":\\\"60.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"-0.00\\\",\\\"ledger_key\\\":\\\"decimal:☃\\\",\\\"limit\\\":\\\"1.0E+6\\\",\\\"meter\\\":\\\"usd\\\",\\\"window_seconds\\\":\\\"30.0\\\"}]}\",\"request_digest\":\"e25775c51b0bc8294bc33849f1823fb1a2620daf17340757bfcb9afa8350bb19\",\"state\":\"settled\"}"
+        }
+      }
+    },
+    {
+      "budgets": [
+        {
+          "scope_id": "decimal:é",
+          "limits": {
+            "usd": "1E+6"
+          },
+          "baseline": {
+            "usd": "1E+2"
+          },
+          "estimates": {
+            "usd": "-0E+2"
+          }
+        }
+      ],
+      "windows": [
+        {
+          "ledger_key": "decimal:☃",
+          "meter": "usd",
+          "limit": "1.0E+6",
+          "amount": "-0E+2",
+          "window_seconds": 30.0
+        }
+      ],
+      "lease": 60.0,
+      "request": "{\"budgets\":[{\"baseline\":{\"usd\":\"1E+2\"},\"estimates\":{\"usd\":\"-0E+2\"},\"limits\":{\"usd\":\"1E+6\"},\"scope_id\":\"decimal:é\"}],\"lease_seconds\":\"60.0\",\"windows\":[{\"amount\":\"-0E+2\",\"ledger_key\":\"decimal:☃\",\"limit\":\"1.0E+6\",\"meter\":\"usd\",\"window_seconds\":\"30.0\"}]}",
+      "digest": "ad4eb396a8a6b17be1896e1c4627961a00b1ca8becb7d4aeed671e1008f85403",
+      "charges": {
+        "usd": "-0E+2"
+      },
+      "charges_text": "{\"usd\":\"-0E+2\"}",
+      "charges_digest": "2dca89ab3f2df8539dcecccaf4ee70e3aed82cb1abfacc9b2c8c77ca45c2d026",
+      "reserved": {
+        "schema": {
+          "version": "1"
+        },
+        "budget": {
+          "[\"decimal:é\",\"usd\"]": "1E+2"
+        },
+        "reservations": {
+          "decimal": "{\"charges\":null,\"charges_digest\":null,\"completed_at\":null,\"created_at\":1000.0,\"details\":[{\"amount\":\"-0E+2\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"decimal:é\"},{\"amount\":\"-0E+2\",\"kind\":\"window\",\"meter\":\"usd\",\"scope_id\":\"decimal:☃\",\"window_seconds\":30.0}],\"expires_at\":1060.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"usd\\\":\\\"1E+2\\\"},\\\"estimates\\\":{\\\"usd\\\":\\\"-0E+2\\\"},\\\"limits\\\":{\\\"usd\\\":\\\"1E+6\\\"},\\\"scope_id\\\":\\\"decimal:é\\\"}],\\\"lease_seconds\\\":\\\"60.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"-0E+2\\\",\\\"ledger_key\\\":\\\"decimal:☃\\\",\\\"limit\\\":\\\"1.0E+6\\\",\\\"meter\\\":\\\"usd\\\",\\\"window_seconds\\\":\\\"30.0\\\"}]}\",\"request_digest\":\"ad4eb396a8a6b17be1896e1c4627961a00b1ca8becb7d4aeed671e1008f85403\",\"state\":\"active\"}"
+        }
+      },
+      "settled": {
+        "schema": {
+          "version": "1"
+        },
+        "budget": {
+          "[\"decimal:é\",\"usd\"]": "1E+2"
+        },
+        "reservations": {
+          "decimal": "{\"charges\":\"{\\\"usd\\\":\\\"-0E+2\\\"}\",\"charges_digest\":\"2dca89ab3f2df8539dcecccaf4ee70e3aed82cb1abfacc9b2c8c77ca45c2d026\",\"completed_at\":1000.0,\"created_at\":1000.0,\"details\":[{\"amount\":\"-0E+2\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"decimal:é\"},{\"amount\":\"-0E+2\",\"kind\":\"window\",\"meter\":\"usd\",\"scope_id\":\"decimal:☃\",\"window_seconds\":30.0}],\"expires_at\":1060.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"usd\\\":\\\"1E+2\\\"},\\\"estimates\\\":{\\\"usd\\\":\\\"-0E+2\\\"},\\\"limits\\\":{\\\"usd\\\":\\\"1E+6\\\"},\\\"scope_id\\\":\\\"decimal:é\\\"}],\\\"lease_seconds\\\":\\\"60.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"-0E+2\\\",\\\"ledger_key\\\":\\\"decimal:☃\\\",\\\"limit\\\":\\\"1.0E+6\\\",\\\"meter\\\":\\\"usd\\\",\\\"window_seconds\\\":\\\"30.0\\\"}]}\",\"request_digest\":\"ad4eb396a8a6b17be1896e1c4627961a00b1ca8becb7d4aeed671e1008f85403\",\"state\":\"settled\"}"
+        }
+      }
+    },
+    {
+      "budgets": [
+        {
+          "scope_id": "decimal:é",
+          "limits": {
+            "usd": "1E+6"
+          },
+          "baseline": {
+            "usd": "1E+2"
+          },
+          "estimates": {
+            "usd": "-0E-7"
+          }
+        }
+      ],
+      "windows": [
+        {
+          "ledger_key": "decimal:☃",
+          "meter": "usd",
+          "limit": "1.0E+6",
+          "amount": "-0E-7",
+          "window_seconds": 30.0
+        }
+      ],
+      "lease": 60.0,
+      "request": "{\"budgets\":[{\"baseline\":{\"usd\":\"1E+2\"},\"estimates\":{\"usd\":\"-0E-7\"},\"limits\":{\"usd\":\"1E+6\"},\"scope_id\":\"decimal:é\"}],\"lease_seconds\":\"60.0\",\"windows\":[{\"amount\":\"-0E-7\",\"ledger_key\":\"decimal:☃\",\"limit\":\"1.0E+6\",\"meter\":\"usd\",\"window_seconds\":\"30.0\"}]}",
+      "digest": "aa69adfd9182a9249b1ef3c84b4d6184a0fa2ab4eb3a54854a7ee51be82ff055",
+      "charges": {
+        "usd": "-0E-7"
+      },
+      "charges_text": "{\"usd\":\"-0E-7\"}",
+      "charges_digest": "b5aad7c6b4c8957c19d59a0995a6a9c9a2e65fdc2d3db2f4fd19f64223933ce1",
+      "reserved": {
+        "schema": {
+          "version": "1"
+        },
+        "budget": {
+          "[\"decimal:é\",\"usd\"]": "1E+2"
+        },
+        "reservations": {
+          "decimal": "{\"charges\":null,\"charges_digest\":null,\"completed_at\":null,\"created_at\":1000.0,\"details\":[{\"amount\":\"-0E-7\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"decimal:é\"},{\"amount\":\"-0E-7\",\"kind\":\"window\",\"meter\":\"usd\",\"scope_id\":\"decimal:☃\",\"window_seconds\":30.0}],\"expires_at\":1060.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"usd\\\":\\\"1E+2\\\"},\\\"estimates\\\":{\\\"usd\\\":\\\"-0E-7\\\"},\\\"limits\\\":{\\\"usd\\\":\\\"1E+6\\\"},\\\"scope_id\\\":\\\"decimal:é\\\"}],\\\"lease_seconds\\\":\\\"60.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"-0E-7\\\",\\\"ledger_key\\\":\\\"decimal:☃\\\",\\\"limit\\\":\\\"1.0E+6\\\",\\\"meter\\\":\\\"usd\\\",\\\"window_seconds\\\":\\\"30.0\\\"}]}\",\"request_digest\":\"aa69adfd9182a9249b1ef3c84b4d6184a0fa2ab4eb3a54854a7ee51be82ff055\",\"state\":\"active\"}"
+        }
+      },
+      "settled": {
+        "schema": {
+          "version": "1"
+        },
+        "budget": {
+          "[\"decimal:é\",\"usd\"]": "100.0000000"
+        },
+        "reservations": {
+          "decimal": "{\"charges\":\"{\\\"usd\\\":\\\"-0E-7\\\"}\",\"charges_digest\":\"b5aad7c6b4c8957c19d59a0995a6a9c9a2e65fdc2d3db2f4fd19f64223933ce1\",\"completed_at\":1000.0,\"created_at\":1000.0,\"details\":[{\"amount\":\"-0E-7\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"decimal:é\"},{\"amount\":\"-0E-7\",\"kind\":\"window\",\"meter\":\"usd\",\"scope_id\":\"decimal:☃\",\"window_seconds\":30.0}],\"expires_at\":1060.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"usd\\\":\\\"1E+2\\\"},\\\"estimates\\\":{\\\"usd\\\":\\\"-0E-7\\\"},\\\"limits\\\":{\\\"usd\\\":\\\"1E+6\\\"},\\\"scope_id\\\":\\\"decimal:é\\\"}],\\\"lease_seconds\\\":\\\"60.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"-0E-7\\\",\\\"ledger_key\\\":\\\"decimal:☃\\\",\\\"limit\\\":\\\"1.0E+6\\\",\\\"meter\\\":\\\"usd\\\",\\\"window_seconds\\\":\\\"30.0\\\"}]}\",\"request_digest\":\"aa69adfd9182a9249b1ef3c84b4d6184a0fa2ab4eb3a54854a7ee51be82ff055\",\"state\":\"settled\"}"
+        }
+      }
+    },
+    {
+      "budgets": [
+        {
+          "scope_id": "decimal:é",
+          "limits": {
+            "usd": "1E+6"
+          },
+          "baseline": {
+            "usd": "1E+2"
+          },
+          "estimates": {
+            "usd": "0E+9"
+          }
+        }
+      ],
+      "windows": [
+        {
+          "ledger_key": "decimal:☃",
+          "meter": "usd",
+          "limit": "1.0E+6",
+          "amount": "0E+9",
+          "window_seconds": 30.0
+        }
+      ],
+      "lease": 60.0,
+      "request": "{\"budgets\":[{\"baseline\":{\"usd\":\"1E+2\"},\"estimates\":{\"usd\":\"0E+9\"},\"limits\":{\"usd\":\"1E+6\"},\"scope_id\":\"decimal:é\"}],\"lease_seconds\":\"60.0\",\"windows\":[{\"amount\":\"0E+9\",\"ledger_key\":\"decimal:☃\",\"limit\":\"1.0E+6\",\"meter\":\"usd\",\"window_seconds\":\"30.0\"}]}",
+      "digest": "53d316f6b58f602f80359fa4aeeeb56fbc34e06cebc56f138fb25d5fa2238aca",
+      "charges": {
+        "usd": "0E+9"
+      },
+      "charges_text": "{\"usd\":\"0E+9\"}",
+      "charges_digest": "23a6a69df6e00d19644c5091a68dae62317a2e596630b1d67515a36dfc31e0ff",
+      "reserved": {
+        "schema": {
+          "version": "1"
+        },
+        "budget": {
+          "[\"decimal:é\",\"usd\"]": "1E+2"
+        },
+        "reservations": {
+          "decimal": "{\"charges\":null,\"charges_digest\":null,\"completed_at\":null,\"created_at\":1000.0,\"details\":[{\"amount\":\"0E+9\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"decimal:é\"},{\"amount\":\"0E+9\",\"kind\":\"window\",\"meter\":\"usd\",\"scope_id\":\"decimal:☃\",\"window_seconds\":30.0}],\"expires_at\":1060.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"usd\\\":\\\"1E+2\\\"},\\\"estimates\\\":{\\\"usd\\\":\\\"0E+9\\\"},\\\"limits\\\":{\\\"usd\\\":\\\"1E+6\\\"},\\\"scope_id\\\":\\\"decimal:é\\\"}],\\\"lease_seconds\\\":\\\"60.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"0E+9\\\",\\\"ledger_key\\\":\\\"decimal:☃\\\",\\\"limit\\\":\\\"1.0E+6\\\",\\\"meter\\\":\\\"usd\\\",\\\"window_seconds\\\":\\\"30.0\\\"}]}\",\"request_digest\":\"53d316f6b58f602f80359fa4aeeeb56fbc34e06cebc56f138fb25d5fa2238aca\",\"state\":\"active\"}"
+        }
+      },
+      "settled": {
+        "schema": {
+          "version": "1"
+        },
+        "budget": {
+          "[\"decimal:é\",\"usd\"]": "1E+2"
+        },
+        "reservations": {
+          "decimal": "{\"charges\":\"{\\\"usd\\\":\\\"0E+9\\\"}\",\"charges_digest\":\"23a6a69df6e00d19644c5091a68dae62317a2e596630b1d67515a36dfc31e0ff\",\"completed_at\":1000.0,\"created_at\":1000.0,\"details\":[{\"amount\":\"0E+9\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"decimal:é\"},{\"amount\":\"0E+9\",\"kind\":\"window\",\"meter\":\"usd\",\"scope_id\":\"decimal:☃\",\"window_seconds\":30.0}],\"expires_at\":1060.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"usd\\\":\\\"1E+2\\\"},\\\"estimates\\\":{\\\"usd\\\":\\\"0E+9\\\"},\\\"limits\\\":{\\\"usd\\\":\\\"1E+6\\\"},\\\"scope_id\\\":\\\"decimal:é\\\"}],\\\"lease_seconds\\\":\\\"60.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"0E+9\\\",\\\"ledger_key\\\":\\\"decimal:☃\\\",\\\"limit\\\":\\\"1.0E+6\\\",\\\"meter\\\":\\\"usd\\\",\\\"window_seconds\\\":\\\"30.0\\\"}]}\",\"request_digest\":\"53d316f6b58f602f80359fa4aeeeb56fbc34e06cebc56f138fb25d5fa2238aca\",\"state\":\"settled\"}"
+        }
+      }
+    },
+    {
+      "budgets": [
+        {
+          "scope_id": "decimal:é",
+          "limits": {
+            "usd": "1E+6"
+          },
+          "baseline": {
+            "usd": "1E+2"
+          },
+          "estimates": {
+            "usd": "0E-28"
+          }
+        }
+      ],
+      "windows": [
+        {
+          "ledger_key": "decimal:☃",
+          "meter": "usd",
+          "limit": "1.0E+6",
+          "amount": "0E-28",
+          "window_seconds": 30.0
+        }
+      ],
+      "lease": 60.0,
+      "request": "{\"budgets\":[{\"baseline\":{\"usd\":\"1E+2\"},\"estimates\":{\"usd\":\"0E-28\"},\"limits\":{\"usd\":\"1E+6\"},\"scope_id\":\"decimal:é\"}],\"lease_seconds\":\"60.0\",\"windows\":[{\"amount\":\"0E-28\",\"ledger_key\":\"decimal:☃\",\"limit\":\"1.0E+6\",\"meter\":\"usd\",\"window_seconds\":\"30.0\"}]}",
+      "digest": "5d2e1040b060262a3c50fac0713394c971d0c4f371faa71caab98bcde7ca8a19",
+      "charges": {
+        "usd": "0E-28"
+      },
+      "charges_text": "{\"usd\":\"0E-28\"}",
+      "charges_digest": "eb3d6c7b3f437088c3db7af7d162078605303d04ebe44e702895ac75ddbf4087"
+    },
+    {
+      "budgets": [
+        {
+          "scope_id": "decimal:é",
+          "limits": {
+            "usd": "1E+6"
+          },
+          "baseline": {
+            "usd": "1E+2"
+          },
+          "estimates": {
+            "usd": "1.2300"
+          }
+        }
+      ],
+      "windows": [
+        {
+          "ledger_key": "decimal:☃",
+          "meter": "usd",
+          "limit": "1.0E+6",
+          "amount": "1.2300",
+          "window_seconds": 30.0
+        }
+      ],
+      "lease": 60.0,
+      "request": "{\"budgets\":[{\"baseline\":{\"usd\":\"1E+2\"},\"estimates\":{\"usd\":\"1.2300\"},\"limits\":{\"usd\":\"1E+6\"},\"scope_id\":\"decimal:é\"}],\"lease_seconds\":\"60.0\",\"windows\":[{\"amount\":\"1.2300\",\"ledger_key\":\"decimal:☃\",\"limit\":\"1.0E+6\",\"meter\":\"usd\",\"window_seconds\":\"30.0\"}]}",
+      "digest": "e9582f1e1b5b773676d0df411bfb19443df6fdd4b71aa46deebc39679ec7e370",
+      "charges": {
+        "usd": "1.2300"
+      },
+      "charges_text": "{\"usd\":\"1.2300\"}",
+      "charges_digest": "68f3bb0dda96adf0b21f421dcf29c6c3ee68de735beaed4d5d6f4da222d41439",
+      "reserved": {
+        "schema": {
+          "version": "1"
+        },
+        "budget": {
+          "[\"decimal:é\",\"usd\"]": "1E+2"
+        },
+        "reservations": {
+          "decimal": "{\"charges\":null,\"charges_digest\":null,\"completed_at\":null,\"created_at\":1000.0,\"details\":[{\"amount\":\"1.2300\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"decimal:é\"},{\"amount\":\"1.2300\",\"kind\":\"window\",\"meter\":\"usd\",\"scope_id\":\"decimal:☃\",\"window_seconds\":30.0}],\"expires_at\":1060.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"usd\\\":\\\"1E+2\\\"},\\\"estimates\\\":{\\\"usd\\\":\\\"1.2300\\\"},\\\"limits\\\":{\\\"usd\\\":\\\"1E+6\\\"},\\\"scope_id\\\":\\\"decimal:é\\\"}],\\\"lease_seconds\\\":\\\"60.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1.2300\\\",\\\"ledger_key\\\":\\\"decimal:☃\\\",\\\"limit\\\":\\\"1.0E+6\\\",\\\"meter\\\":\\\"usd\\\",\\\"window_seconds\\\":\\\"30.0\\\"}]}\",\"request_digest\":\"e9582f1e1b5b773676d0df411bfb19443df6fdd4b71aa46deebc39679ec7e370\",\"state\":\"active\"}"
+        }
+      },
+      "settled": {
+        "schema": {
+          "version": "1"
+        },
+        "budget": {
+          "[\"decimal:é\",\"usd\"]": "101.2300"
+        },
+        "reservations": {
+          "decimal": "{\"charges\":\"{\\\"usd\\\":\\\"1.2300\\\"}\",\"charges_digest\":\"68f3bb0dda96adf0b21f421dcf29c6c3ee68de735beaed4d5d6f4da222d41439\",\"completed_at\":1000.0,\"created_at\":1000.0,\"details\":[{\"amount\":\"1.2300\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"decimal:é\"},{\"amount\":\"1.2300\",\"kind\":\"window\",\"meter\":\"usd\",\"scope_id\":\"decimal:☃\",\"window_seconds\":30.0}],\"expires_at\":1060.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"usd\\\":\\\"1E+2\\\"},\\\"estimates\\\":{\\\"usd\\\":\\\"1.2300\\\"},\\\"limits\\\":{\\\"usd\\\":\\\"1E+6\\\"},\\\"scope_id\\\":\\\"decimal:é\\\"}],\\\"lease_seconds\\\":\\\"60.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"1.2300\\\",\\\"ledger_key\\\":\\\"decimal:☃\\\",\\\"limit\\\":\\\"1.0E+6\\\",\\\"meter\\\":\\\"usd\\\",\\\"window_seconds\\\":\\\"30.0\\\"}]}\",\"request_digest\":\"e9582f1e1b5b773676d0df411bfb19443df6fdd4b71aa46deebc39679ec7e370\",\"state\":\"settled\"}"
+        },
+        "window-events": {
+          "[\"decimal\",\"1\"]": "{\"amount\":\"1.2300\",\"meter\":\"usd\",\"scope_id\":\"decimal:☃\",\"settled_at\":1000.0,\"window_seconds\":30.0}"
+        }
+      }
+    },
+    {
+      "budgets": [
+        {
+          "scope_id": "decimal:é",
+          "limits": {
+            "usd": "1E+6"
+          },
+          "baseline": {
+            "usd": "1E+2"
+          },
+          "estimates": {
+            "usd": "2.500E+3"
+          }
+        }
+      ],
+      "windows": [
+        {
+          "ledger_key": "decimal:☃",
+          "meter": "usd",
+          "limit": "1.0E+6",
+          "amount": "2.500E+3",
+          "window_seconds": 30.0
+        }
+      ],
+      "lease": 60.0,
+      "request": "{\"budgets\":[{\"baseline\":{\"usd\":\"1E+2\"},\"estimates\":{\"usd\":\"2500\"},\"limits\":{\"usd\":\"1E+6\"},\"scope_id\":\"decimal:é\"}],\"lease_seconds\":\"60.0\",\"windows\":[{\"amount\":\"2500\",\"ledger_key\":\"decimal:☃\",\"limit\":\"1.0E+6\",\"meter\":\"usd\",\"window_seconds\":\"30.0\"}]}",
+      "digest": "13c88a6a6a9110e424674a16551aefe8d6470996d2f4c4e62db5dfa9ddbd8851",
+      "charges": {
+        "usd": "2.500E+3"
+      },
+      "charges_text": "{\"usd\":\"2500\"}",
+      "charges_digest": "033c0814c5a2177e3c48f7d654e0be1094fa0e3ee7786a97a4b7ee7bc322c17c",
+      "reserved": {
+        "schema": {
+          "version": "1"
+        },
+        "budget": {
+          "[\"decimal:é\",\"usd\"]": "1E+2"
+        },
+        "reservations": {
+          "decimal": "{\"charges\":null,\"charges_digest\":null,\"completed_at\":null,\"created_at\":1000.0,\"details\":[{\"amount\":\"2500\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"decimal:é\"},{\"amount\":\"2500\",\"kind\":\"window\",\"meter\":\"usd\",\"scope_id\":\"decimal:☃\",\"window_seconds\":30.0}],\"expires_at\":1060.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"usd\\\":\\\"1E+2\\\"},\\\"estimates\\\":{\\\"usd\\\":\\\"2500\\\"},\\\"limits\\\":{\\\"usd\\\":\\\"1E+6\\\"},\\\"scope_id\\\":\\\"decimal:é\\\"}],\\\"lease_seconds\\\":\\\"60.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"2500\\\",\\\"ledger_key\\\":\\\"decimal:☃\\\",\\\"limit\\\":\\\"1.0E+6\\\",\\\"meter\\\":\\\"usd\\\",\\\"window_seconds\\\":\\\"30.0\\\"}]}\",\"request_digest\":\"13c88a6a6a9110e424674a16551aefe8d6470996d2f4c4e62db5dfa9ddbd8851\",\"state\":\"active\"}"
+        }
+      },
+      "settled": {
+        "schema": {
+          "version": "1"
+        },
+        "budget": {
+          "[\"decimal:é\",\"usd\"]": "2600"
+        },
+        "reservations": {
+          "decimal": "{\"charges\":\"{\\\"usd\\\":\\\"2500\\\"}\",\"charges_digest\":\"033c0814c5a2177e3c48f7d654e0be1094fa0e3ee7786a97a4b7ee7bc322c17c\",\"completed_at\":1000.0,\"created_at\":1000.0,\"details\":[{\"amount\":\"2500\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"decimal:é\"},{\"amount\":\"2500\",\"kind\":\"window\",\"meter\":\"usd\",\"scope_id\":\"decimal:☃\",\"window_seconds\":30.0}],\"expires_at\":1060.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"usd\\\":\\\"1E+2\\\"},\\\"estimates\\\":{\\\"usd\\\":\\\"2500\\\"},\\\"limits\\\":{\\\"usd\\\":\\\"1E+6\\\"},\\\"scope_id\\\":\\\"decimal:é\\\"}],\\\"lease_seconds\\\":\\\"60.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"2500\\\",\\\"ledger_key\\\":\\\"decimal:☃\\\",\\\"limit\\\":\\\"1.0E+6\\\",\\\"meter\\\":\\\"usd\\\",\\\"window_seconds\\\":\\\"30.0\\\"}]}\",\"request_digest\":\"13c88a6a6a9110e424674a16551aefe8d6470996d2f4c4e62db5dfa9ddbd8851\",\"state\":\"settled\"}"
+        },
+        "window-events": {
+          "[\"decimal\",\"1\"]": "{\"amount\":\"2500\",\"meter\":\"usd\",\"scope_id\":\"decimal:☃\",\"settled_at\":1000.0,\"window_seconds\":30.0}"
+        }
+      }
+    },
+    {
+      "budgets": [
+        {
+          "scope_id": "decimal:é",
+          "limits": {
+            "usd": "1E+6"
+          },
+          "baseline": {
+            "usd": "1E+2"
+          },
+          "estimates": {
+            "usd": "1e-28"
+          }
+        }
+      ],
+      "windows": [
+        {
+          "ledger_key": "decimal:☃",
+          "meter": "usd",
+          "limit": "1.0E+6",
+          "amount": "1e-28",
+          "window_seconds": 30.0
+        }
+      ],
+      "lease": 60.0,
+      "request": "{\"budgets\":[{\"baseline\":{\"usd\":\"1E+2\"},\"estimates\":{\"usd\":\"1E-28\"},\"limits\":{\"usd\":\"1E+6\"},\"scope_id\":\"decimal:é\"}],\"lease_seconds\":\"60.0\",\"windows\":[{\"amount\":\"1E-28\",\"ledger_key\":\"decimal:☃\",\"limit\":\"1.0E+6\",\"meter\":\"usd\",\"window_seconds\":\"30.0\"}]}",
+      "digest": "6aa14a9adde34fe18397085ca94d3750868630b99f17f31dd6765f0c7e7b49a7",
+      "charges": {
+        "usd": "1e-28"
+      },
+      "charges_text": "{\"usd\":\"1E-28\"}",
+      "charges_digest": "6b14087038440440304de739c65102e738751b87417d2e2ec6bf137ad8446a61"
+    },
+    {
+      "budgets": [
+        {
+          "scope_id": "decimal:é",
+          "limits": {
+            "usd": "1E+6"
+          },
+          "baseline": {
+            "usd": "1E+2"
+          },
+          "estimates": {
+            "usd": "0.0000010"
+          }
+        }
+      ],
+      "windows": [
+        {
+          "ledger_key": "decimal:☃",
+          "meter": "usd",
+          "limit": "1.0E+6",
+          "amount": "0.0000010",
+          "window_seconds": 30.0
+        }
+      ],
+      "lease": 60.0,
+      "request": "{\"budgets\":[{\"baseline\":{\"usd\":\"1E+2\"},\"estimates\":{\"usd\":\"0.0000010\"},\"limits\":{\"usd\":\"1E+6\"},\"scope_id\":\"decimal:é\"}],\"lease_seconds\":\"60.0\",\"windows\":[{\"amount\":\"0.0000010\",\"ledger_key\":\"decimal:☃\",\"limit\":\"1.0E+6\",\"meter\":\"usd\",\"window_seconds\":\"30.0\"}]}",
+      "digest": "2c14777daa641130f89e4e06eb0467d7f6a5ebba18e3d5c07be4bc5f587699eb",
+      "charges": {
+        "usd": "0.0000010"
+      },
+      "charges_text": "{\"usd\":\"0.0000010\"}",
+      "charges_digest": "86ea50299fb58950edd06d018c76418429ca8dc63ae2ac58553e72630e34f7fb",
+      "reserved": {
+        "schema": {
+          "version": "1"
+        },
+        "budget": {
+          "[\"decimal:é\",\"usd\"]": "1E+2"
+        },
+        "reservations": {
+          "decimal": "{\"charges\":null,\"charges_digest\":null,\"completed_at\":null,\"created_at\":1000.0,\"details\":[{\"amount\":\"0.0000010\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"decimal:é\"},{\"amount\":\"0.0000010\",\"kind\":\"window\",\"meter\":\"usd\",\"scope_id\":\"decimal:☃\",\"window_seconds\":30.0}],\"expires_at\":1060.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"usd\\\":\\\"1E+2\\\"},\\\"estimates\\\":{\\\"usd\\\":\\\"0.0000010\\\"},\\\"limits\\\":{\\\"usd\\\":\\\"1E+6\\\"},\\\"scope_id\\\":\\\"decimal:é\\\"}],\\\"lease_seconds\\\":\\\"60.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"0.0000010\\\",\\\"ledger_key\\\":\\\"decimal:☃\\\",\\\"limit\\\":\\\"1.0E+6\\\",\\\"meter\\\":\\\"usd\\\",\\\"window_seconds\\\":\\\"30.0\\\"}]}\",\"request_digest\":\"2c14777daa641130f89e4e06eb0467d7f6a5ebba18e3d5c07be4bc5f587699eb\",\"state\":\"active\"}"
+        }
+      },
+      "settled": {
+        "schema": {
+          "version": "1"
+        },
+        "budget": {
+          "[\"decimal:é\",\"usd\"]": "100.0000010"
+        },
+        "reservations": {
+          "decimal": "{\"charges\":\"{\\\"usd\\\":\\\"0.0000010\\\"}\",\"charges_digest\":\"86ea50299fb58950edd06d018c76418429ca8dc63ae2ac58553e72630e34f7fb\",\"completed_at\":1000.0,\"created_at\":1000.0,\"details\":[{\"amount\":\"0.0000010\",\"kind\":\"budget\",\"meter\":\"usd\",\"scope_id\":\"decimal:é\"},{\"amount\":\"0.0000010\",\"kind\":\"window\",\"meter\":\"usd\",\"scope_id\":\"decimal:☃\",\"window_seconds\":30.0}],\"expires_at\":1060.0,\"request\":\"{\\\"budgets\\\":[{\\\"baseline\\\":{\\\"usd\\\":\\\"1E+2\\\"},\\\"estimates\\\":{\\\"usd\\\":\\\"0.0000010\\\"},\\\"limits\\\":{\\\"usd\\\":\\\"1E+6\\\"},\\\"scope_id\\\":\\\"decimal:é\\\"}],\\\"lease_seconds\\\":\\\"60.0\\\",\\\"windows\\\":[{\\\"amount\\\":\\\"0.0000010\\\",\\\"ledger_key\\\":\\\"decimal:☃\\\",\\\"limit\\\":\\\"1.0E+6\\\",\\\"meter\\\":\\\"usd\\\",\\\"window_seconds\\\":\\\"30.0\\\"}]}\",\"request_digest\":\"2c14777daa641130f89e4e06eb0467d7f6a5ebba18e3d5c07be4bc5f587699eb\",\"state\":\"settled\"}"
+        },
+        "window-events": {
+          "[\"decimal\",\"1\"]": "{\"amount\":\"0.0000010\",\"meter\":\"usd\",\"scope_id\":\"decimal:☃\",\"settled_at\":1000.0,\"window_seconds\":30.0}"
+        }
+      }
+    }
+  ],
+  "costs": [
+    {
+      "input_rate": "6e-23",
+      "output_rate": "0",
+      "inputs": 1,
+      "outputs": 0,
+      "exact": "6E-29",
+      "representable": false
+    },
+    {
+      "input_rate": "1e-28",
+      "output_rate": "0",
+      "inputs": 1,
+      "outputs": 0,
+      "exact": "1E-34",
+      "representable": false
+    },
+    {
+      "input_rate": "5e-23",
+      "output_rate": "5e-23",
+      "inputs": 1,
+      "outputs": 1,
+      "exact": "1E-28",
+      "representable": true
+    },
+    {
+      "input_rate": "79228162514264337593543950335",
+      "output_rate": "0",
+      "inputs": 1000000,
+      "outputs": 0,
+      "exact": "79228162514264337593543950335",
+      "representable": true
+    },
+    {
+      "input_rate": "79228162514264337593543950335",
+      "output_rate": "79228162514264337593543950335",
+      "inputs": 500000,
+      "outputs": 500000,
+      "exact": "79228162514264337593543950335",
+      "representable": true
+    },
+    {
+      "input_rate": "79228162514264337593543950335",
+      "output_rate": "79228162514264337593543950335",
+      "inputs": 1000000,
+      "outputs": 1000000,
+      "exact": "158456325028528675187087900670",
+      "representable": false
+    },
+    {
+      "input_rate": "7.9228162514264337593543950335",
+      "output_rate": "0.0000000000000000000000000065",
+      "inputs": 1000000,
+      "outputs": 1000000,
+      "exact": "7.9228162514264337593543950400",
+      "representable": true
+    },
+    {
+      "input_rate": "0.1234567890123456789012345678",
+      "output_rate": "0.0000000000000000000000000001",
+      "inputs": 1000000,
+      "outputs": 1000000,
+      "exact": "0.1234567890123456789012345679",
+      "representable": true
+    },
+    {
+      "input_rate": "1e-0",
+      "output_rate": "0",
+      "inputs": 0,
+      "outputs": 0,
+      "exact": "0",
+      "representable": true
+    },
+    {
+      "input_rate": "1e-0",
+      "output_rate": "0",
+      "inputs": 1,
+      "outputs": 0,
+      "exact": "0.000001",
+      "representable": true
+    },
+    {
+      "input_rate": "1e-0",
+      "output_rate": "0",
+      "inputs": 3,
+      "outputs": 0,
+      "exact": "0.000003",
+      "representable": true
+    },
+    {
+      "input_rate": "1e-0",
+      "output_rate": "0",
+      "inputs": 1000000,
+      "outputs": 0,
+      "exact": "1",
+      "representable": true
+    },
+    {
+      "input_rate": "1e-0",
+      "output_rate": "0",
+      "inputs": 18446744073709551615,
+      "outputs": 0,
+      "exact": "18446744073709.551615",
+      "representable": true
+    },
+    {
+      "input_rate": "1e-7",
+      "output_rate": "0",
+      "inputs": 0,
+      "outputs": 0,
+      "exact": "0E-7",
+      "representable": true
+    },
+    {
+      "input_rate": "1e-7",
+      "output_rate": "0",
+      "inputs": 1,
+      "outputs": 0,
+      "exact": "1E-13",
+      "representable": true
+    },
+    {
+      "input_rate": "1e-7",
+      "output_rate": "0",
+      "inputs": 3,
+      "outputs": 0,
+      "exact": "3E-13",
+      "representable": true
+    },
+    {
+      "input_rate": "1e-7",
+      "output_rate": "0",
+      "inputs": 1000000,
+      "outputs": 0,
+      "exact": "1E-7",
+      "representable": true
+    },
+    {
+      "input_rate": "1e-7",
+      "output_rate": "0",
+      "inputs": 18446744073709551615,
+      "outputs": 0,
+      "exact": "1844674.4073709551615",
+      "representable": true
+    },
+    {
+      "input_rate": "1e-22",
+      "output_rate": "0",
+      "inputs": 0,
+      "outputs": 0,
+      "exact": "0E-22",
+      "representable": true
+    },
+    {
+      "input_rate": "1e-22",
+      "output_rate": "0",
+      "inputs": 1,
+      "outputs": 0,
+      "exact": "1E-28",
+      "representable": true
+    },
+    {
+      "input_rate": "1e-22",
+      "output_rate": "0",
+      "inputs": 3,
+      "outputs": 0,
+      "exact": "3E-28",
+      "representable": true
+    },
+    {
+      "input_rate": "1e-22",
+      "output_rate": "0",
+      "inputs": 1000000,
+      "outputs": 0,
+      "exact": "1E-22",
+      "representable": true
+    },
+    {
+      "input_rate": "1e-22",
+      "output_rate": "0",
+      "inputs": 18446744073709551615,
+      "outputs": 0,
+      "exact": "1.8446744073709551615E-9",
+      "representable": true
+    },
+    {
+      "input_rate": "1e-23",
+      "output_rate": "0",
+      "inputs": 0,
+      "outputs": 0,
+      "exact": "0E-23",
+      "representable": true
+    },
+    {
+      "input_rate": "1e-23",
+      "output_rate": "0",
+      "inputs": 1,
+      "outputs": 0,
+      "exact": "1E-29",
+      "representable": false
+    },
+    {
+      "input_rate": "1e-23",
+      "output_rate": "0",
+      "inputs": 3,
+      "outputs": 0,
+      "exact": "3E-29",
+      "representable": false
+    },
+    {
+      "input_rate": "1e-23",
+      "output_rate": "0",
+      "inputs": 1000000,
+      "outputs": 0,
+      "exact": "1E-23",
+      "representable": true
+    },
+    {
+      "input_rate": "1e-23",
+      "output_rate": "0",
+      "inputs": 18446744073709551615,
+      "outputs": 0,
+      "exact": "1.8446744073709551615E-10",
+      "representable": false
+    },
+    {
+      "input_rate": "1e-28",
+      "output_rate": "0",
+      "inputs": 0,
+      "outputs": 0,
+      "exact": "0E-28",
+      "representable": true
+    },
+    {
+      "input_rate": "1e-28",
+      "output_rate": "0",
+      "inputs": 1,
+      "outputs": 0,
+      "exact": "1E-34",
+      "representable": false
+    },
+    {
+      "input_rate": "1e-28",
+      "output_rate": "0",
+      "inputs": 3,
+      "outputs": 0,
+      "exact": "3E-34",
+      "representable": false
+    },
+    {
+      "input_rate": "1e-28",
+      "output_rate": "0",
+      "inputs": 1000000,
+      "outputs": 0,
+      "exact": "1E-28",
+      "representable": true
+    },
+    {
+      "input_rate": "1e-28",
+      "output_rate": "0",
+      "inputs": 18446744073709551615,
+      "outputs": 0,
+      "exact": "1.8446744073709551615E-15",
+      "representable": false
+    },
+    {
+      "input_rate": "5e-0",
+      "output_rate": "0",
+      "inputs": 0,
+      "outputs": 0,
+      "exact": "0",
+      "representable": true
+    },
+    {
+      "input_rate": "5e-0",
+      "output_rate": "0",
+      "inputs": 1,
+      "outputs": 0,
+      "exact": "0.000005",
+      "representable": true
+    },
+    {
+      "input_rate": "5e-0",
+      "output_rate": "0",
+      "inputs": 3,
+      "outputs": 0,
+      "exact": "0.000015",
+      "representable": true
+    },
+    {
+      "input_rate": "5e-0",
+      "output_rate": "0",
+      "inputs": 1000000,
+      "outputs": 0,
+      "exact": "5",
+      "representable": true
+    },
+    {
+      "input_rate": "5e-0",
+      "output_rate": "0",
+      "inputs": 18446744073709551615,
+      "outputs": 0,
+      "exact": "92233720368547.758075",
+      "representable": true
+    },
+    {
+      "input_rate": "5e-7",
+      "output_rate": "0",
+      "inputs": 0,
+      "outputs": 0,
+      "exact": "0E-7",
+      "representable": true
+    },
+    {
+      "input_rate": "5e-7",
+      "output_rate": "0",
+      "inputs": 1,
+      "outputs": 0,
+      "exact": "5E-13",
+      "representable": true
+    },
+    {
+      "input_rate": "5e-7",
+      "output_rate": "0",
+      "inputs": 3,
+      "outputs": 0,
+      "exact": "1.5E-12",
+      "representable": true
+    },
+    {
+      "input_rate": "5e-7",
+      "output_rate": "0",
+      "inputs": 1000000,
+      "outputs": 0,
+      "exact": "5E-7",
+      "representable": true
+    },
+    {
+      "input_rate": "5e-7",
+      "output_rate": "0",
+      "inputs": 18446744073709551615,
+      "outputs": 0,
+      "exact": "9223372.0368547758075",
+      "representable": true
+    },
+    {
+      "input_rate": "5e-22",
+      "output_rate": "0",
+      "inputs": 0,
+      "outputs": 0,
+      "exact": "0E-22",
+      "representable": true
+    },
+    {
+      "input_rate": "5e-22",
+      "output_rate": "0",
+      "inputs": 1,
+      "outputs": 0,
+      "exact": "5E-28",
+      "representable": true
+    },
+    {
+      "input_rate": "5e-22",
+      "output_rate": "0",
+      "inputs": 3,
+      "outputs": 0,
+      "exact": "1.5E-27",
+      "representable": true
+    },
+    {
+      "input_rate": "5e-22",
+      "output_rate": "0",
+      "inputs": 1000000,
+      "outputs": 0,
+      "exact": "5E-22",
+      "representable": true
+    },
+    {
+      "input_rate": "5e-22",
+      "output_rate": "0",
+      "inputs": 18446744073709551615,
+      "outputs": 0,
+      "exact": "9.2233720368547758075E-9",
+      "representable": true
+    },
+    {
+      "input_rate": "5e-23",
+      "output_rate": "0",
+      "inputs": 0,
+      "outputs": 0,
+      "exact": "0E-23",
+      "representable": true
+    },
+    {
+      "input_rate": "5e-23",
+      "output_rate": "0",
+      "inputs": 1,
+      "outputs": 0,
+      "exact": "5E-29",
+      "representable": false
+    },
+    {
+      "input_rate": "5e-23",
+      "output_rate": "0",
+      "inputs": 3,
+      "outputs": 0,
+      "exact": "1.5E-28",
+      "representable": false
+    },
+    {
+      "input_rate": "5e-23",
+      "output_rate": "0",
+      "inputs": 1000000,
+      "outputs": 0,
+      "exact": "5E-23",
+      "representable": true
+    },
+    {
+      "input_rate": "5e-23",
+      "output_rate": "0",
+      "inputs": 18446744073709551615,
+      "outputs": 0,
+      "exact": "9.2233720368547758075E-10",
+      "representable": false
+    },
+    {
+      "input_rate": "5e-28",
+      "output_rate": "0",
+      "inputs": 0,
+      "outputs": 0,
+      "exact": "0E-28",
+      "representable": true
+    },
+    {
+      "input_rate": "5e-28",
+      "output_rate": "0",
+      "inputs": 1,
+      "outputs": 0,
+      "exact": "5E-34",
+      "representable": false
+    },
+    {
+      "input_rate": "5e-28",
+      "output_rate": "0",
+      "inputs": 3,
+      "outputs": 0,
+      "exact": "1.5E-33",
+      "representable": false
+    },
+    {
+      "input_rate": "5e-28",
+      "output_rate": "0",
+      "inputs": 1000000,
+      "outputs": 0,
+      "exact": "5E-28",
+      "representable": true
+    },
+    {
+      "input_rate": "5e-28",
+      "output_rate": "0",
+      "inputs": 18446744073709551615,
+      "outputs": 0,
+      "exact": "9.2233720368547758075E-15",
+      "representable": false
+    },
+    {
+      "input_rate": "6e-0",
+      "output_rate": "0",
+      "inputs": 0,
+      "outputs": 0,
+      "exact": "0",
+      "representable": true
+    },
+    {
+      "input_rate": "6e-0",
+      "output_rate": "0",
+      "inputs": 1,
+      "outputs": 0,
+      "exact": "0.000006",
+      "representable": true
+    },
+    {
+      "input_rate": "6e-0",
+      "output_rate": "0",
+      "inputs": 3,
+      "outputs": 0,
+      "exact": "0.000018",
+      "representable": true
+    },
+    {
+      "input_rate": "6e-0",
+      "output_rate": "0",
+      "inputs": 1000000,
+      "outputs": 0,
+      "exact": "6",
+      "representable": true
+    },
+    {
+      "input_rate": "6e-0",
+      "output_rate": "0",
+      "inputs": 18446744073709551615,
+      "outputs": 0,
+      "exact": "110680464442257.30969",
+      "representable": true
+    },
+    {
+      "input_rate": "6e-7",
+      "output_rate": "0",
+      "inputs": 0,
+      "outputs": 0,
+      "exact": "0E-7",
+      "representable": true
+    },
+    {
+      "input_rate": "6e-7",
+      "output_rate": "0",
+      "inputs": 1,
+      "outputs": 0,
+      "exact": "6E-13",
+      "representable": true
+    },
+    {
+      "input_rate": "6e-7",
+      "output_rate": "0",
+      "inputs": 3,
+      "outputs": 0,
+      "exact": "1.8E-12",
+      "representable": true
+    },
+    {
+      "input_rate": "6e-7",
+      "output_rate": "0",
+      "inputs": 1000000,
+      "outputs": 0,
+      "exact": "6E-7",
+      "representable": true
+    },
+    {
+      "input_rate": "6e-7",
+      "output_rate": "0",
+      "inputs": 18446744073709551615,
+      "outputs": 0,
+      "exact": "11068046.444225730969",
+      "representable": true
+    },
+    {
+      "input_rate": "6e-22",
+      "output_rate": "0",
+      "inputs": 0,
+      "outputs": 0,
+      "exact": "0E-22",
+      "representable": true
+    },
+    {
+      "input_rate": "6e-22",
+      "output_rate": "0",
+      "inputs": 1,
+      "outputs": 0,
+      "exact": "6E-28",
+      "representable": true
+    },
+    {
+      "input_rate": "6e-22",
+      "output_rate": "0",
+      "inputs": 3,
+      "outputs": 0,
+      "exact": "1.8E-27",
+      "representable": true
+    },
+    {
+      "input_rate": "6e-22",
+      "output_rate": "0",
+      "inputs": 1000000,
+      "outputs": 0,
+      "exact": "6E-22",
+      "representable": true
+    },
+    {
+      "input_rate": "6e-22",
+      "output_rate": "0",
+      "inputs": 18446744073709551615,
+      "outputs": 0,
+      "exact": "1.1068046444225730969E-8",
+      "representable": true
+    },
+    {
+      "input_rate": "6e-23",
+      "output_rate": "0",
+      "inputs": 0,
+      "outputs": 0,
+      "exact": "0E-23",
+      "representable": true
+    },
+    {
+      "input_rate": "6e-23",
+      "output_rate": "0",
+      "inputs": 1,
+      "outputs": 0,
+      "exact": "6E-29",
+      "representable": false
+    },
+    {
+      "input_rate": "6e-23",
+      "output_rate": "0",
+      "inputs": 3,
+      "outputs": 0,
+      "exact": "1.8E-28",
+      "representable": false
+    },
+    {
+      "input_rate": "6e-23",
+      "output_rate": "0",
+      "inputs": 1000000,
+      "outputs": 0,
+      "exact": "6E-23",
+      "representable": true
+    },
+    {
+      "input_rate": "6e-23",
+      "output_rate": "0",
+      "inputs": 18446744073709551615,
+      "outputs": 0,
+      "exact": "1.1068046444225730969E-9",
+      "representable": true
+    },
+    {
+      "input_rate": "6e-28",
+      "output_rate": "0",
+      "inputs": 0,
+      "outputs": 0,
+      "exact": "0E-28",
+      "representable": true
+    },
+    {
+      "input_rate": "6e-28",
+      "output_rate": "0",
+      "inputs": 1,
+      "outputs": 0,
+      "exact": "6E-34",
+      "representable": false
+    },
+    {
+      "input_rate": "6e-28",
+      "output_rate": "0",
+      "inputs": 3,
+      "outputs": 0,
+      "exact": "1.8E-33",
+      "representable": false
+    },
+    {
+      "input_rate": "6e-28",
+      "output_rate": "0",
+      "inputs": 1000000,
+      "outputs": 0,
+      "exact": "6E-28",
+      "representable": true
+    },
+    {
+      "input_rate": "6e-28",
+      "output_rate": "0",
+      "inputs": 18446744073709551615,
+      "outputs": 0,
+      "exact": "1.1068046444225730969E-14",
+      "representable": false
+    },
+    {
+      "input_rate": "19e-0",
+      "output_rate": "0",
+      "inputs": 0,
+      "outputs": 0,
+      "exact": "0",
+      "representable": true
+    },
+    {
+      "input_rate": "19e-0",
+      "output_rate": "0",
+      "inputs": 1,
+      "outputs": 0,
+      "exact": "0.000019",
+      "representable": true
+    },
+    {
+      "input_rate": "19e-0",
+      "output_rate": "0",
+      "inputs": 3,
+      "outputs": 0,
+      "exact": "0.000057",
+      "representable": true
+    },
+    {
+      "input_rate": "19e-0",
+      "output_rate": "0",
+      "inputs": 1000000,
+      "outputs": 0,
+      "exact": "19",
+      "representable": true
+    },
+    {
+      "input_rate": "19e-0",
+      "output_rate": "0",
+      "inputs": 18446744073709551615,
+      "outputs": 0,
+      "exact": "350488137400481.480685",
+      "representable": true
+    },
+    {
+      "input_rate": "19e-7",
+      "output_rate": "0",
+      "inputs": 0,
+      "outputs": 0,
+      "exact": "0E-7",
+      "representable": true
+    },
+    {
+      "input_rate": "19e-7",
+      "output_rate": "0",
+      "inputs": 1,
+      "outputs": 0,
+      "exact": "1.9E-12",
+      "representable": true
+    },
+    {
+      "input_rate": "19e-7",
+      "output_rate": "0",
+      "inputs": 3,
+      "outputs": 0,
+      "exact": "5.7E-12",
+      "representable": true
+    },
+    {
+      "input_rate": "19e-7",
+      "output_rate": "0",
+      "inputs": 1000000,
+      "outputs": 0,
+      "exact": "0.0000019",
+      "representable": true
+    },
+    {
+      "input_rate": "19e-7",
+      "output_rate": "0",
+      "inputs": 18446744073709551615,
+      "outputs": 0,
+      "exact": "35048813.7400481480685",
+      "representable": true
+    },
+    {
+      "input_rate": "19e-22",
+      "output_rate": "0",
+      "inputs": 0,
+      "outputs": 0,
+      "exact": "0E-22",
+      "representable": true
+    },
+    {
+      "input_rate": "19e-22",
+      "output_rate": "0",
+      "inputs": 1,
+      "outputs": 0,
+      "exact": "1.9E-27",
+      "representable": true
+    },
+    {
+      "input_rate": "19e-22",
+      "output_rate": "0",
+      "inputs": 3,
+      "outputs": 0,
+      "exact": "5.7E-27",
+      "representable": true
+    },
+    {
+      "input_rate": "19e-22",
+      "output_rate": "0",
+      "inputs": 1000000,
+      "outputs": 0,
+      "exact": "1.9E-21",
+      "representable": true
+    },
+    {
+      "input_rate": "19e-22",
+      "output_rate": "0",
+      "inputs": 18446744073709551615,
+      "outputs": 0,
+      "exact": "3.50488137400481480685E-8",
+      "representable": true
+    },
+    {
+      "input_rate": "19e-23",
+      "output_rate": "0",
+      "inputs": 0,
+      "outputs": 0,
+      "exact": "0E-23",
+      "representable": true
+    },
+    {
+      "input_rate": "19e-23",
+      "output_rate": "0",
+      "inputs": 1,
+      "outputs": 0,
+      "exact": "1.9E-28",
+      "representable": false
+    },
+    {
+      "input_rate": "19e-23",
+      "output_rate": "0",
+      "inputs": 3,
+      "outputs": 0,
+      "exact": "5.7E-28",
+      "representable": false
+    },
+    {
+      "input_rate": "19e-23",
+      "output_rate": "0",
+      "inputs": 1000000,
+      "outputs": 0,
+      "exact": "1.9E-22",
+      "representable": true
+    },
+    {
+      "input_rate": "19e-23",
+      "output_rate": "0",
+      "inputs": 18446744073709551615,
+      "outputs": 0,
+      "exact": "3.50488137400481480685E-9",
+      "representable": false
+    },
+    {
+      "input_rate": "19e-28",
+      "output_rate": "0",
+      "inputs": 0,
+      "outputs": 0,
+      "exact": "0E-28",
+      "representable": true
+    },
+    {
+      "input_rate": "19e-28",
+      "output_rate": "0",
+      "inputs": 1,
+      "outputs": 0,
+      "exact": "1.9E-33",
+      "representable": false
+    },
+    {
+      "input_rate": "19e-28",
+      "output_rate": "0",
+      "inputs": 3,
+      "outputs": 0,
+      "exact": "5.7E-33",
+      "representable": false
+    },
+    {
+      "input_rate": "19e-28",
+      "output_rate": "0",
+      "inputs": 1000000,
+      "outputs": 0,
+      "exact": "1.9E-27",
+      "representable": true
+    },
+    {
+      "input_rate": "19e-28",
+      "output_rate": "0",
+      "inputs": 18446744073709551615,
+      "outputs": 0,
+      "exact": "3.50488137400481480685E-14",
+      "representable": false
+    },
+    {
+      "input_rate": "12345e-0",
+      "output_rate": "0",
+      "inputs": 0,
+      "outputs": 0,
+      "exact": "0",
+      "representable": true
+    },
+    {
+      "input_rate": "12345e-0",
+      "output_rate": "0",
+      "inputs": 1,
+      "outputs": 0,
+      "exact": "0.012345",
+      "representable": true
+    },
+    {
+      "input_rate": "12345e-0",
+      "output_rate": "0",
+      "inputs": 3,
+      "outputs": 0,
+      "exact": "0.037035",
+      "representable": true
+    },
+    {
+      "input_rate": "12345e-0",
+      "output_rate": "0",
+      "inputs": 1000000,
+      "outputs": 0,
+      "exact": "12345",
+      "representable": true
+    },
+    {
+      "input_rate": "12345e-0",
+      "output_rate": "0",
+      "inputs": 18446744073709551615,
+      "outputs": 0,
+      "exact": "227725055589944414.687175",
+      "representable": true
+    },
+    {
+      "input_rate": "12345e-7",
+      "output_rate": "0",
+      "inputs": 0,
+      "outputs": 0,
+      "exact": "0E-7",
+      "representable": true
+    },
+    {
+      "input_rate": "12345e-7",
+      "output_rate": "0",
+      "inputs": 1,
+      "outputs": 0,
+      "exact": "1.2345E-9",
+      "representable": true
+    },
+    {
+      "input_rate": "12345e-7",
+      "output_rate": "0",
+      "inputs": 3,
+      "outputs": 0,
+      "exact": "3.7035E-9",
+      "representable": true
+    },
+    {
+      "input_rate": "12345e-7",
+      "output_rate": "0",
+      "inputs": 1000000,
+      "outputs": 0,
+      "exact": "0.0012345",
+      "representable": true
+    },
+    {
+      "input_rate": "12345e-7",
+      "output_rate": "0",
+      "inputs": 18446744073709551615,
+      "outputs": 0,
+      "exact": "22772505558.9944414687175",
+      "representable": true
+    },
+    {
+      "input_rate": "12345e-22",
+      "output_rate": "0",
+      "inputs": 0,
+      "outputs": 0,
+      "exact": "0E-22",
+      "representable": true
+    },
+    {
+      "input_rate": "12345e-22",
+      "output_rate": "0",
+      "inputs": 1,
+      "outputs": 0,
+      "exact": "1.2345E-24",
+      "representable": true
+    },
+    {
+      "input_rate": "12345e-22",
+      "output_rate": "0",
+      "inputs": 3,
+      "outputs": 0,
+      "exact": "3.7035E-24",
+      "representable": true
+    },
+    {
+      "input_rate": "12345e-22",
+      "output_rate": "0",
+      "inputs": 1000000,
+      "outputs": 0,
+      "exact": "1.2345E-18",
+      "representable": true
+    },
+    {
+      "input_rate": "12345e-22",
+      "output_rate": "0",
+      "inputs": 18446744073709551615,
+      "outputs": 0,
+      "exact": "0.0000227725055589944414687175",
+      "representable": true
+    },
+    {
+      "input_rate": "12345e-23",
+      "output_rate": "0",
+      "inputs": 0,
+      "outputs": 0,
+      "exact": "0E-23",
+      "representable": true
+    },
+    {
+      "input_rate": "12345e-23",
+      "output_rate": "0",
+      "inputs": 1,
+      "outputs": 0,
+      "exact": "1.2345E-25",
+      "representable": false
+    },
+    {
+      "input_rate": "12345e-23",
+      "output_rate": "0",
+      "inputs": 3,
+      "outputs": 0,
+      "exact": "3.7035E-25",
+      "representable": false
+    },
+    {
+      "input_rate": "12345e-23",
+      "output_rate": "0",
+      "inputs": 1000000,
+      "outputs": 0,
+      "exact": "1.2345E-19",
+      "representable": true
+    },
+    {
+      "input_rate": "12345e-23",
+      "output_rate": "0",
+      "inputs": 18446744073709551615,
+      "outputs": 0,
+      "exact": "0.00000227725055589944414687175",
+      "representable": false
+    },
+    {
+      "input_rate": "12345e-28",
+      "output_rate": "0",
+      "inputs": 0,
+      "outputs": 0,
+      "exact": "0E-28",
+      "representable": true
+    },
+    {
+      "input_rate": "12345e-28",
+      "output_rate": "0",
+      "inputs": 1,
+      "outputs": 0,
+      "exact": "1.2345E-30",
+      "representable": false
+    },
+    {
+      "input_rate": "12345e-28",
+      "output_rate": "0",
+      "inputs": 3,
+      "outputs": 0,
+      "exact": "3.7035E-30",
+      "representable": false
+    },
+    {
+      "input_rate": "12345e-28",
+      "output_rate": "0",
+      "inputs": 1000000,
+      "outputs": 0,
+      "exact": "1.2345E-24",
+      "representable": true
+    },
+    {
+      "input_rate": "12345e-28",
+      "output_rate": "0",
+      "inputs": 18446744073709551615,
+      "outputs": 0,
+      "exact": "2.27725055589944414687175E-11",
+      "representable": false
+    }
+  ]
+}

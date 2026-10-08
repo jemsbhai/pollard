@@ -1,0 +1,734 @@
+{
+  "status": "passed",
+  "run_id": "ab49a09b40674481850ef8151eb01a7d",
+  "pollard_version": "1.6.0",
+  "wheel_sha256": "569fb5f130a82c9be327b8dcbd285e3be063200bd9773ca15c5d6bb62edd627f",
+  "services": [
+    "postgres",
+    "redis",
+    "kafka",
+    "mongodb",
+    "neo4j"
+  ],
+  "commands": [
+    {
+      "name": "rustc-version",
+      "command": [
+        "rustc",
+        "--version"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.141,
+      "log": "logs\\00-rustc-version.log"
+    },
+    {
+      "name": "docker-version",
+      "command": [
+        "docker",
+        "version",
+        "--format",
+        "{{json .Server}}"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.125,
+      "log": "logs\\01-docker-version.log"
+    },
+    {
+      "name": "python-environment",
+      "command": [
+        "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\.benchmarks\\remote-validation-final\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pip",
+        "list",
+        "--format=json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 1.203,
+      "log": "logs\\02-python-environment.log"
+    },
+    {
+      "name": "cargo-metadata",
+      "command": [
+        "cargo",
+        "metadata",
+        "--locked",
+        "--no-deps",
+        "--format-version",
+        "1",
+        "--manifest-path",
+        "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\crates\\pollardai\\Cargo.toml"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.062,
+      "log": "logs\\03-cargo-metadata.log"
+    },
+    {
+      "name": "build-native-interop",
+      "command": [
+        "cargo",
+        "build",
+        "--locked",
+        "--manifest-path",
+        "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\crates\\pollardai\\Cargo.toml",
+        "--features",
+        "postgres,redis,kafka,mongodb,neo4j",
+        "--bin",
+        "pollard",
+        "--example",
+        "postgres_interop",
+        "--example",
+        "redis_interop",
+        "--example",
+        "kafka_interop",
+        "--example",
+        "document_interop"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 36.672,
+      "log": "logs\\04-build-native-interop.log"
+    },
+    {
+      "name": "start-postgres",
+      "command": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "pollard-parity-ab49a09b4067-postgres",
+        "--label",
+        "pollard.parity.run=ab49a09b40674481850ef8151eb01a7d",
+        "--label",
+        "pollard.parity.task=rust-pypi-parity",
+        "--label",
+        "pollard.parity.service=postgres",
+        "--publish",
+        "127.0.0.1:61049:5432",
+        "-e",
+        "POSTGRES_USER=pollard",
+        "-e",
+        "POSTGRES_PASSWORD=<generated-test-password>",
+        "-e",
+        "POSTGRES_DB=pollard_test",
+        "postgres:16-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.562,
+      "log": "logs\\05-start-postgres.log"
+    },
+    {
+      "name": "start-redis",
+      "command": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "pollard-parity-ab49a09b4067-redis",
+        "--label",
+        "pollard.parity.run=ab49a09b40674481850ef8151eb01a7d",
+        "--label",
+        "pollard.parity.task=rust-pypi-parity",
+        "--label",
+        "pollard.parity.service=redis",
+        "--publish",
+        "127.0.0.1:61050:6379",
+        "redis:7.4-alpine@sha256:858f009f9709ce576febc734aa78b8f6d624b82571f9ddb6bda4377c833b3499"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.484,
+      "log": "logs\\06-start-redis.log"
+    },
+    {
+      "name": "start-kafka",
+      "command": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "pollard-parity-ab49a09b4067-kafka",
+        "--label",
+        "pollard.parity.run=ab49a09b40674481850ef8151eb01a7d",
+        "--label",
+        "pollard.parity.task=rust-pypi-parity",
+        "--label",
+        "pollard.parity.service=kafka",
+        "--publish",
+        "127.0.0.1:61052:9092",
+        "docker.redpanda.com/redpandadata/redpanda:v24.1.21@sha256:dc33c62306c742c0d8850c883c39bea9ab5351c32a93e0d9fa560ae04b43a3c0",
+        "redpanda",
+        "start",
+        "--overprovisioned",
+        "--smp",
+        "1",
+        "--memory",
+        "512M",
+        "--reserve-memory",
+        "0M",
+        "--node-id",
+        "0",
+        "--check=false",
+        "--kafka-addr",
+        "PLAINTEXT://0.0.0.0:9092",
+        "--advertise-kafka-addr",
+        "PLAINTEXT://127.0.0.1:61052",
+        "--rpc-addr",
+        "0.0.0.0:33145",
+        "--advertise-rpc-addr",
+        "127.0.0.1:33145"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.437,
+      "log": "logs\\07-start-kafka.log"
+    },
+    {
+      "name": "start-mongodb",
+      "command": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "pollard-parity-ab49a09b4067-mongodb",
+        "--label",
+        "pollard.parity.run=ab49a09b40674481850ef8151eb01a7d",
+        "--label",
+        "pollard.parity.task=rust-pypi-parity",
+        "--label",
+        "pollard.parity.service=mongodb",
+        "--publish",
+        "127.0.0.1:61057:27017",
+        "mongo:7@sha256:1f995ad6fdb93244a1addab1b58f934a0bc2f5643c38e02f5e9d7f0c7d227a7b",
+        "--replSet",
+        "rs0",
+        "--bind_ip_all",
+        "--wiredTigerCacheSizeGB",
+        "0.25"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.531,
+      "log": "logs\\08-start-mongodb.log"
+    },
+    {
+      "name": "mongo-replica-init",
+      "command": [
+        "docker",
+        "exec",
+        "pollard-parity-ab49a09b4067-mongodb",
+        "mongosh",
+        "--quiet",
+        "--eval",
+        "rs.initiate({_id:\"rs0\",members:[{_id:0,host:\"127.0.0.1:27017\"}]})"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.531,
+      "log": "logs\\09-mongo-replica-init.log"
+    },
+    {
+      "name": "start-neo4j",
+      "command": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "pollard-parity-ab49a09b4067-neo4j",
+        "--label",
+        "pollard.parity.run=ab49a09b40674481850ef8151eb01a7d",
+        "--label",
+        "pollard.parity.task=rust-pypi-parity",
+        "--label",
+        "pollard.parity.service=neo4j",
+        "--publish",
+        "127.0.0.1:61058:7687",
+        "-e",
+        "NEO4J_AUTH=neo4j/<generated-test-password>",
+        "-e",
+        "NEO4J_server_bolt_advertised__address=127.0.0.1:61058",
+        "-e",
+        "NEO4J_server_memory_heap_initial__size=256m",
+        "-e",
+        "NEO4J_server_memory_heap_max__size=512m",
+        "-e",
+        "NEO4J_server_memory_pagecache_size=128m",
+        "neo4j:5.26-community@sha256:c7d25c0eeebfe125718d58b72ed5d663c85d0479047733845eb2237c67ce8069"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.438,
+      "log": "logs\\10-start-neo4j.log"
+    },
+    {
+      "name": "test-postgres",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--manifest-path",
+        "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\crates\\pollardai\\Cargo.toml",
+        "--features",
+        "postgres,redis,kafka,mongodb,neo4j",
+        "--test",
+        "postgres_parity",
+        "--",
+        "--ignored",
+        "--test-threads=1"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 71.5,
+      "log": "logs\\11-test-postgres.log",
+      "tests": {
+        "passed": 10,
+        "failed": 0,
+        "ignored": 0
+      }
+    },
+    {
+      "name": "test-postgres-lost-ack",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--manifest-path",
+        "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\crates\\pollardai\\Cargo.toml",
+        "--features",
+        "postgres,redis,kafka,mongodb,neo4j",
+        "--lib",
+        "live_lost_commit_ack",
+        "--",
+        "--ignored"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 16.938,
+      "log": "logs\\12-test-postgres-lost-ack.log",
+      "tests": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      }
+    },
+    {
+      "name": "test-redis",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--manifest-path",
+        "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\crates\\pollardai\\Cargo.toml",
+        "--features",
+        "postgres,redis,kafka,mongodb,neo4j",
+        "--test",
+        "redis_store",
+        "--",
+        "--include-ignored",
+        "--test-threads=1"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 10.469,
+      "log": "logs\\13-test-redis.log",
+      "tests": {
+        "passed": 8,
+        "failed": 0,
+        "ignored": 0
+      }
+    },
+    {
+      "name": "test-kafka",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--manifest-path",
+        "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\crates\\pollardai\\Cargo.toml",
+        "--features",
+        "postgres,redis,kafka,mongodb,neo4j",
+        "--test",
+        "kafka_live",
+        "--",
+        "--ignored",
+        "--test-threads=1"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 20.125,
+      "log": "logs\\14-test-kafka.log",
+      "tests": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      }
+    },
+    {
+      "name": "test-mongodb",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--manifest-path",
+        "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\crates\\pollardai\\Cargo.toml",
+        "--features",
+        "postgres,redis,kafka,mongodb,neo4j",
+        "--test",
+        "mongodb_parity",
+        "--",
+        "--ignored",
+        "--test-threads=1"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 15.64,
+      "log": "logs\\15-test-mongodb.log",
+      "tests": {
+        "passed": 6,
+        "failed": 0,
+        "ignored": 0
+      }
+    },
+    {
+      "name": "test-neo4j",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--manifest-path",
+        "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\crates\\pollardai\\Cargo.toml",
+        "--features",
+        "postgres,redis,kafka,mongodb,neo4j",
+        "--test",
+        "neo4j_parity",
+        "--",
+        "--ignored",
+        "--test-threads=1"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 15.438,
+      "log": "logs\\16-test-neo4j.log",
+      "tests": {
+        "passed": 6,
+        "failed": 0,
+        "ignored": 0
+      }
+    },
+    {
+      "name": "interop-postgres",
+      "command": [
+        "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\.benchmarks\\remote-validation-final\\.venv\\Scripts\\python.exe",
+        "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\evidence\\rust-parity-1.6.0\\postgres_interop.py",
+        "--wheel",
+        "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\.benchmarks\\remote-validation-final\\pollard-1.6.0-py3-none-any.whl",
+        "--binary",
+        "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\.benchmarks\\remote-validation-final-4\\bin\\postgres_interop.exe",
+        "--output",
+        "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\.benchmarks\\remote-validation-final-4\\results\\postgres-interop.json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 4.359,
+      "log": "logs\\17-interop-postgres.log"
+    },
+    {
+      "name": "interop-redis",
+      "command": [
+        "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\.benchmarks\\remote-validation-final\\.venv\\Scripts\\python.exe",
+        "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\evidence\\rust-parity-1.6.0\\redis_interop.py",
+        "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\.benchmarks\\remote-validation-final\\pollard-1.6.0-py3-none-any.whl",
+        "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\.benchmarks\\remote-validation-final-4\\bin\\redis_interop.exe"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 3.234,
+      "log": "logs\\18-interop-redis.log"
+    },
+    {
+      "name": "interop-kafka",
+      "command": [
+        "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\.benchmarks\\remote-validation-final\\.venv\\Scripts\\python.exe",
+        "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\evidence\\rust-parity-1.6.0\\kafka_interop.py",
+        "--wheel",
+        "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\.benchmarks\\remote-validation-final\\pollard-1.6.0-py3-none-any.whl",
+        "--crate",
+        "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\crates\\pollardai",
+        "--binary",
+        "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\.benchmarks\\remote-validation-final-4\\bin\\kafka_interop.exe",
+        "--bootstrap",
+        "127.0.0.1:61052",
+        "--output",
+        "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\.benchmarks\\remote-validation-final-4\\results\\kafka-interop.json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 18.625,
+      "log": "logs\\19-interop-kafka.log"
+    },
+    {
+      "name": "interop-mongodb",
+      "command": [
+        "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\.benchmarks\\remote-validation-final\\.venv\\Scripts\\python.exe",
+        "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\evidence\\rust-parity-1.6.0\\document_interop.py",
+        "--wheel",
+        "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\.benchmarks\\remote-validation-final\\pollard-1.6.0-py3-none-any.whl",
+        "--binary",
+        "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\.benchmarks\\remote-validation-final-4\\bin\\document_interop.exe",
+        "--backend",
+        "mongodb",
+        "--output",
+        "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\.benchmarks\\remote-validation-final-4\\results\\mongodb-interop.json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 9.266,
+      "log": "logs\\20-interop-mongodb.log"
+    },
+    {
+      "name": "interop-neo4j",
+      "command": [
+        "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\.benchmarks\\remote-validation-final\\.venv\\Scripts\\python.exe",
+        "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\evidence\\rust-parity-1.6.0\\document_interop.py",
+        "--wheel",
+        "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\.benchmarks\\remote-validation-final\\pollard-1.6.0-py3-none-any.whl",
+        "--binary",
+        "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\.benchmarks\\remote-validation-final-4\\bin\\document_interop.exe",
+        "--backend",
+        "neo4j",
+        "--output",
+        "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\.benchmarks\\remote-validation-final-4\\results\\neo4j-interop.json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 3.36,
+      "log": "logs\\21-interop-neo4j.log"
+    },
+    {
+      "name": "cli-remote-inspection",
+      "command": [
+        "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\.benchmarks\\remote-validation-final\\.venv\\Scripts\\python.exe",
+        "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\evidence\\rust-parity-1.6.0\\remote_cli_smoke.py",
+        "--wheel",
+        "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\.benchmarks\\remote-validation-final\\pollard-1.6.0-py3-none-any.whl",
+        "--binary",
+        "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\.benchmarks\\remote-validation-final-4\\bin\\pollard.exe",
+        "--services",
+        "postgres",
+        "redis",
+        "kafka",
+        "mongodb",
+        "neo4j",
+        "--output",
+        "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\.benchmarks\\remote-validation-final-4\\results\\cli-remote-inspection.json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 8.937,
+      "log": "logs\\22-cli-remote-inspection.log"
+    }
+  ],
+  "containers": [
+    {
+      "service": "postgres",
+      "name": "pollard-parity-ab49a09b4067-postgres",
+      "id": "4ac6952b0b9ba07a115be45636968719052f5b5cd4583f646f9954ab97fb083c",
+      "image": "postgres:16-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea",
+      "image_id": "sha256:81bd698b4594e751a3269e4dcd3e03a4a0ec0daf7b72e7aa1abd43cce9887542",
+      "host_port": 61049,
+      "readiness": {
+        "attempts": 3,
+        "seconds": 1.484
+      }
+    },
+    {
+      "service": "redis",
+      "name": "pollard-parity-ab49a09b4067-redis",
+      "id": "2db93ffe5dd2de53931cd95341b25ab254bf829c11962737efb743673f8e4d55",
+      "image": "redis:7.4-alpine@sha256:858f009f9709ce576febc734aa78b8f6d624b82571f9ddb6bda4377c833b3499",
+      "image_id": "sha256:f84b0c4678011602b9b98c227a4dcd5468bf8b088b02fdd4165cb7758bad8058",
+      "host_port": 61050,
+      "readiness": {
+        "attempts": 1,
+        "seconds": 0.172
+      }
+    },
+    {
+      "service": "kafka",
+      "name": "pollard-parity-ab49a09b4067-kafka",
+      "id": "e6038d0c80c6818904184cf07546efec63edfb62619bf728f4bf266670048ad3",
+      "image": "docker.redpanda.com/redpandadata/redpanda:v24.1.21@sha256:dc33c62306c742c0d8850c883c39bea9ab5351c32a93e0d9fa560ae04b43a3c0",
+      "image_id": "sha256:f04d0d7422c1b1be4b907e18d5067ef6d34bfc2f726c05e780e57cdbf7bf794b",
+      "host_port": 61052,
+      "readiness": {
+        "attempts": 2,
+        "seconds": 0.844
+      }
+    },
+    {
+      "service": "mongodb",
+      "name": "pollard-parity-ab49a09b4067-mongodb",
+      "id": "784d5242a7759cebd510546b6979ad8ccf72acd005d8ad19eef3f08124b95269",
+      "image": "mongo:7@sha256:1f995ad6fdb93244a1addab1b58f934a0bc2f5643c38e02f5e9d7f0c7d227a7b",
+      "image_id": "sha256:ac1502203bffd13c241ca25a7bae60cbd968fd0011247f6727524634b3f2f6e3",
+      "host_port": 61057,
+      "readiness": {
+        "attempts": 1,
+        "seconds": 0.375
+      }
+    },
+    {
+      "service": "neo4j",
+      "name": "pollard-parity-ab49a09b4067-neo4j",
+      "id": "e76381fd4653f810451c22bbb44c8c63310ac96c63fe5c1c6dcef100b8a42858",
+      "image": "neo4j:5.26-community@sha256:c7d25c0eeebfe125718d58b72ed5d663c85d0479047733845eb2237c67ce8069",
+      "image_id": "sha256:5ac4722f61af78f51063f5069ee61cdccf2b17a33d1836446535879ce279e0e8",
+      "host_port": 61058,
+      "readiness": {
+        "attempts": 4,
+        "seconds": 10.406
+      }
+    }
+  ],
+  "cleanup": [
+    {
+      "name": "pollard-parity-ab49a09b4067-neo4j",
+      "removed": true,
+      "id": "e76381fd4653f810451c22bbb44c8c63310ac96c63fe5c1c6dcef100b8a42858"
+    },
+    {
+      "name": "pollard-parity-ab49a09b4067-mongodb",
+      "removed": true,
+      "id": "784d5242a7759cebd510546b6979ad8ccf72acd005d8ad19eef3f08124b95269"
+    },
+    {
+      "name": "pollard-parity-ab49a09b4067-kafka",
+      "removed": true,
+      "id": "e6038d0c80c6818904184cf07546efec63edfb62619bf728f4bf266670048ad3"
+    },
+    {
+      "name": "pollard-parity-ab49a09b4067-redis",
+      "removed": true,
+      "id": "2db93ffe5dd2de53931cd95341b25ab254bf829c11962737efb743673f8e4d55"
+    },
+    {
+      "name": "pollard-parity-ab49a09b4067-postgres",
+      "removed": true,
+      "id": "4ac6952b0b9ba07a115be45636968719052f5b5cd4583f646f9954ab97fb083c"
+    }
+  ],
+  "rustc": "rustc 1.94.0 (4a4ef493e 2026-03-02)",
+  "docker": "{\"Platform\":{\"Name\":\"Docker Desktop 4.28.0 (139021)\"},\"Components\":[{\"Name\":\"Engine\",\"Version\":\"25.0.3\",\"Details\":{\"ApiVersion\":\"1.44\",\"Arch\":\"amd64\",\"BuildTime\":\"Tue Feb  6 21:14:25 2024\",\"Experimental\":\"false\",\"GitCommit\":\"f417435\",\"GoVersion\":\"go1.21.6\",\"KernelVersion\":\"5.15.146.1-microsoft-standard-WSL2\",\"MinAPIVersion\":\"1.24\",\"Os\":\"linux\"}},{\"Name\":\"containerd\",\"Version\":\"1.6.28\",\"Details\":{\"GitCommit\":\"ae07eda36dd25f8a1b98dfbf587313b99c0190bb\"}},{\"Name\":\"runc\",\"Version\":\"1.1.12\",\"Details\":{\"GitCommit\":\"v1.1.12-0-g51d5e94\"}},{\"Name\":\"docker-init\",\"Version\":\"0.19.0\",\"Details\":{\"GitCommit\":\"de40ad0\"}}],\"Version\":\"25.0.3\",\"ApiVersion\":\"1.44\",\"MinAPIVersion\":\"1.24\",\"GitCommit\":\"f417435\",\"GoVersion\":\"go1.21.6\",\"Os\":\"linux\",\"Arch\":\"amd64\",\"KernelVersion\":\"5.15.146.1-microsoft-standard-WSL2\",\"BuildTime\":\"2024-02-06T21:14:25.000000000+00:00\"}",
+  "source_sha256": {
+    "crates/pollardai/Cargo.lock": "acfb766765bd74f06cddfde5314682047b3bb7d3ce788271290cc51ca178ce7a",
+    "crates/pollardai/Cargo.toml": "30594fa0c9487d790b57f2addf11c32d216a5136d33a6c1603f9ec63c3950143",
+    "crates/pollardai/examples/arbitration_interop.rs": "6063a93db0122b8003a7a449a06112f64c42bcc6083d67ec3e5c8a6d2d77e582",
+    "crates/pollardai/examples/document_interop.rs": "8e8b40faa2f983071cb50b83cfd3cb378df78047ac3213ed48d6e563d2bf6435",
+    "crates/pollardai/examples/governed_call.rs": "aae354f657cb6e8518fd104b6959aa011bb87f1bdd6661e713e7731fd3cb334e",
+    "crates/pollardai/examples/kafka_interop.rs": "aed7448b12578540872d1d10a5e13925d0d229bd22c53d9239318828e33659d4",
+    "crates/pollardai/examples/performance.rs": "37034a5d125e1afdb305718d3ab9b18babef37057c26c3f2f947a3a904b8e793",
+    "crates/pollardai/examples/postgres_interop.rs": "41e197bb304aafd0085ad415db61d41156515ccc246bc6eb6fd279083e1ef727",
+    "crates/pollardai/examples/redis_interop.rs": "56a50bdd0e3dfd9af29998a81b093fb401c90a940a26e6c09df95d369a13167f",
+    "crates/pollardai/examples/runtime_interop.rs": "7fdbf2b6118ceb61aee625031bb7fbc8c0728ba24e7d1af21e683ac92b68270f",
+    "crates/pollardai/examples/storage_interop.rs": "d312b6a667c4050fc953f0e2ebbce7d02de92ca29822c2151300a02dd785cd6a",
+    "crates/pollardai/examples/storage_performance.rs": "3d3a80fdf1ff993f49f5d8992854c7c9c1c4b7998dcbee50f0cebd7c92ef4f3e",
+    "crates/pollardai/examples/stream_memory.rs": "c90e50fe3f0c24f15ac0e6524228e2fcc20b7a9f650623eeaa8763ebb9d0e208",
+    "crates/pollardai/src/adapters.rs": "3b2c206a81c099a11ecd64a538d32bd65f8ee3f84c10185b54773b391887ad2f",
+    "crates/pollardai/src/aio.rs": "bac10d6c7ecc45c06a4fbe80256baea10e401df5c0f81bfdf8dc98f3c05be431",
+    "crates/pollardai/src/bin/pollard.rs": "3ac3db78d90b20eaf0b00555b303b522cf8f408b810c9b247c3acc4314dc6dc5",
+    "crates/pollardai/src/decimal.rs": "e16747a3669b6f5235507bfe23f18d5b7821e9e7ec7564efa497d0c3b3380fd9",
+    "crates/pollardai/src/energy.rs": "1b5b61cf22847612de47c27a5904573a295f1563b79db456a5bcada66f510a7e",
+    "crates/pollardai/src/estimators.rs": "4dab7fcf285f7ef74906d636c9e65df76687f9e43cb0a7fd3995cdbbc8781f6b",
+    "crates/pollardai/src/hashrope.rs": "5628efeb4c730120d5105762b8fcb264b0fc0fa19446b44dbf2087b4eada4939",
+    "crates/pollardai/src/identity.rs": "4c6153b6ba9146b9bdff1ca4fb8e7760b6764cf81af844a0fb5279f359a36443",
+    "crates/pollardai/src/kafka.rs": "e1eeada88b09bb11a294b6df622d7285e963c72d23fa4bb1a43706a68402ae3b",
+    "crates/pollardai/src/kv.rs": "f2420c883ac7593e824f72a9cd2197077e9eefdd4550924cc7d639358afbb549",
+    "crates/pollardai/src/lib.rs": "3a57d149217449a726c72a74b94ce430d03cd21835b95aed914031901c90e672",
+    "crates/pollardai/src/mcp.rs": "c7d7fc84f6a7ffbcd04e58e93e72401dc88bea795c48702df17e1fb36ca8faa0",
+    "crates/pollardai/src/merge.rs": "8d079769df2bbc3c211d0cd019bb39cad1fbe30f28ac6b05150613bd635bca06",
+    "crates/pollardai/src/meters.rs": "a91f91db6296f258493b438a37327f55a97633aba40c5c74b57cf4a9572ab1b1",
+    "crates/pollardai/src/mongodb.rs": "284d6207f9a1375e442265a031f1bd0704d997e6ec141aa44e66b71c23503d76",
+    "crates/pollardai/src/neo4j.rs": "29236cd8daffca6a2327c478886c46480ceb1dbf20a2a1dd7d451aef5b1af371",
+    "crates/pollardai/src/nvml.rs": "0148be0d09fa2021ffa4e018cc04bec4468916eecb57c8cb7a38d474e8c4e186",
+    "crates/pollardai/src/otel.rs": "37d0858e013b34f52a15623e618f6abd73aa4eaefb622fcb6d665064d5c1147f",
+    "crates/pollardai/src/postgres.rs": "ae842582a93a0e218e73c4ef0e7a3b73beafd3320def47934c33cf33ed14aabf",
+    "crates/pollardai/src/python_display.rs": "859d9cb89b458a807a08fad965a0528056b6c9c03bb2ac81b166d832b2b18997",
+    "crates/pollardai/src/python_printable.rs": "5428029c831ca02b5b97c3ab49a34a276840a0a2bcc4dce40bf4bb670cc11080",
+    "crates/pollardai/src/redis.rs": "582356890612faaf726ce9077b2a7bb3d8543b4a1af0d00a7d4591ca0c4b8979",
+    "crates/pollardai/src/registry.rs": "0561acb64d9b18a1fef4dfaa0bbd6123b77fe8f19dc4d6ec0bc1f143b7d9dc7d",
+    "crates/pollardai/src/remote_worker.rs": "40acd856b12137a2a7c0464f496187b2956094ee5bc01f63f579ce3fa912217a",
+    "crates/pollardai/src/render.rs": "f1b452a6c1ae5a1c96bd932b702320dfb41f68a87088a6505460baa1f35474a2",
+    "crates/pollardai/src/revalidation.rs": "37e23119bf4c6a53be97e359be1ada1381c15fabf983fac38ac767eb89f168fd",
+    "crates/pollardai/src/runtime.rs": "bde122e488a29e784d1b0e646ee6c710ad229c56b44968dde662609367991cfe",
+    "crates/pollardai/src/seal.rs": "b13196e1018a1039704ebcc12b3d4c1de07bd54809d2fcb9e734bccabdb1c284",
+    "crates/pollardai/src/seal_custody.rs": "f21e3cf7688c82a4e4512b8dbc5b0dfcc58510836b394ec3072eb5d8dca78693",
+    "crates/pollardai/src/sqlite.rs": "870d42f1af7c938f145bb795af7b963710250ca0cf2b446f1c941d643587202f",
+    "crates/pollardai/src/store.rs": "d2adf703f157b7c95a461d8b530aa701f31ae454c0aa743494902ee2f65f88f5",
+    "crates/pollardai/src/store_spec.rs": "c11cf7479dd14ccdc9eada0d724e7329f94ee8b8b67bd138a63f620dd6fda838",
+    "crates/pollardai/src/stream.rs": "9543e17ace248cfac9e67f725b79f4d3ff24f04e146e847b240f701d9e626852",
+    "crates/pollardai/src/tokenmaster.rs": "3af24f0115fd3259842c201fcb05e848787c8cd003f5672ece2913c85debb851",
+    "crates/pollardai/tests/adapters_parity.rs": "e472f7c16d1286d1de277ef8778a3e7ba11350d9a6cae13095288b723dc25de8",
+    "crates/pollardai/tests/async_stream.rs": "58207b68487de9a9f6efa912cdc1158a559cec18e518dd5b97fc6a7caa812f3d",
+    "crates/pollardai/tests/cli.rs": "a5461bf81b7883c81625301c3355cf2c7e184ca11cf2b502736d2243ae756840",
+    "crates/pollardai/tests/core.rs": "f12f19c1ae1ccc855ea49d3cc5f7dc65753e8a9f2e5403b59414138a1d7a97e1",
+    "crates/pollardai/tests/decimal_exact.rs": "9408a5603afaaa20b56ca066fd044783a599602da41eb3fc7fc562d1b4c6c248",
+    "crates/pollardai/tests/display_parity.rs": "ae4bca7e900c2cf003450f70bb22354796b36f79569ef207cf5452a3b3aed66e",
+    "crates/pollardai/tests/estimators.rs": "423c443e59a0543316d3c9057b90398dd94468b885939dcd14ce7e65e57b9534",
+    "crates/pollardai/tests/generate_adapters_parity.py": "76ffc18041639b8657d94697386a775b34421d2d90b4b057100ab9f441ff1074",
+    "crates/pollardai/tests/generate_display_parity.py": "8174e20490472e2916a688c4ad3ad13e31f7831e77f1b0acb921e6b69958d465",
+    "crates/pollardai/tests/generate_estimator_parity.py": "876ceedfa1be78274968e0cf95c8f641b5f95ec0e3e52672d1d18ba75ee3def3",
+    "crates/pollardai/tests/generate_hashrope_parity.py": "04d3f80275ef7f4c4d00f5d611531e6f59cb0f5a113191db279a244e3e1f48f6",
+    "crates/pollardai/tests/generate_identity_registry_parity.py": "9bedda3ac9d5f3c7ac543dc5766327cf9cf6ac46f1e6b0dd28ab0824161c7dab",
+    "crates/pollardai/tests/generate_integration_parity.py": "f6c8383de7000038e7bb8e34a1468cdbe4b11004b9674e79d385d367f26cb266",
+    "crates/pollardai/tests/generate_kafka_parity.py": "6834b1260d3b5fe917034ca93df54a4eaef4b5eadaa4a766b9751e7b251c85e8",
+    "crates/pollardai/tests/generate_kv_parity.py": "71c3616374ecc886a37b4669eb133811049009e141a1a8bbd918fba09d242218",
+    "crates/pollardai/tests/generate_revalidation_parity.py": "b58d03a07eb0a0818cb2d050e6d8e8b41631f92e07943b9b575c24a282413bf0",
+    "crates/pollardai/tests/generate_tokenmaster_parity.py": "893b5027f7c63e28e406062bf52549aa23479cd24935f544b3fe3130a01c9818",
+    "crates/pollardai/tests/hashrope.rs": "55fe16c1a41ae0ec1afc2cf2eb6b8f8b9909f366ffe4b85c27dbb90c655f5a92",
+    "crates/pollardai/tests/identity_parity.rs": "7af0c5905bb42ec147f4649e26b92bdb1b4c6f94b9bfe9c494778a37faa302cb",
+    "crates/pollardai/tests/integrations.rs": "c7fe4c3c3811f3f87536337b8cdfd81cd6c145a8c4d790426b952c47a4f98c09",
+    "crates/pollardai/tests/kafka_live.rs": "efb04bb3abac8fb79dd6e3f52468ceda256a22956778ed7a48f0465f54d052a7",
+    "crates/pollardai/tests/kv_parity.rs": "0ca62f8361a1e6f981587b0e8156eeb6651d80490d258e255367450cd713b6b1",
+    "crates/pollardai/tests/measurement_lifecycle.rs": "28c9f0fba29b41dcc2b63e6608465404a1832ab53e8505a2a72ef47b6595bb53",
+    "crates/pollardai/tests/meters_stream.rs": "3476f3f2ce6d0f96a21e621066445c5278efe02039cc6ec4dbc1f0f699c9b814",
+    "crates/pollardai/tests/mongodb_parity.rs": "4826fd83bf78c34501602f0f8b007b53eec2ae9bb69c95e9dd0c46b1350e2e63",
+    "crates/pollardai/tests/neo4j_parity.rs": "4058a52dda01dd554eac3465b97843a12ed45988c31bfeb4bd4ea1932c6a7817",
+    "crates/pollardai/tests/nvml.rs": "7fe78b3175658ce59b59ae204d80e261b76243d48f7a1b816c822f0e0f11a7f1",
+    "crates/pollardai/tests/postgres_parity.rs": "a6612dcb557dcfa7316cc24bab7fd6eb903d183e634b452942bcb70db39ca6c7",
+    "crates/pollardai/tests/pypi160_adapters.json": "15394221111303890131a6a2499d9606375aa4119ec74dbf2d14b4e5880c6d83",
+    "crates/pollardai/tests/pypi160_display.json": "592829d440ac73b7eab6b27e7c49215a58d2d08d92404cf712269f33da2f0073",
+    "crates/pollardai/tests/pypi160_estimators.json": "1e2b9c2abf3a032955a3bbc67b7383d76faefe686f98668cdfbda4f37614fbcb",
+    "crates/pollardai/tests/pypi160_hashrope.json": "b66a91bb03767886486960bdb293be170fce94a4e0a072841028f8dc862ff4e0",
+    "crates/pollardai/tests/pypi160_identity_registry.json": "5812c6ff4ce76d867a54e43d06e18259be013c91b6868937b69c7dc75c02e721",
+    "crates/pollardai/tests/pypi160_integrations.json": "588233efe36d7b97a6a24ec57446e916facb18c3ae68ede539ee8a746c7cc58a",
+    "crates/pollardai/tests/pypi160_kafka.json": "1728d4fe97163fe511c169bf4ead96b9a06e909d4c5dbd05628b6f3ca415198c",
+    "crates/pollardai/tests/pypi160_kv.json": "72471eaf6356223421ea7cdb86734fafe215f44f6a8dd8f3e987cac574107eb7",
+    "crates/pollardai/tests/pypi160_revalidation.json": "5348efdc7bed0b6ef0d373bee1b7a31f0f6fc9f43892282cc5539a313866921a",
+    "crates/pollardai/tests/pypi160_tokenmaster020.json": "387215abfe31c20b9be733badb8d28b392f33f9a2a24b78b7339a5f4a5593a2d",
+    "crates/pollardai/tests/python_behavior.json": "5281bf2f667ae22b809d2517efd6abacb83a4b7ab343b20217391530823b325b",
+    "crates/pollardai/tests/python_first_run.json": "ee6095e66b17e936c1277aa3c1d2d8a46f3674148e880c6edfc98372e196ff19",
+    "crates/pollardai/tests/redis_store.rs": "08fa92ef4f6387e2c4a5bd9e8a3b832a7826d27538d7936692a48401cf36756d",
+    "crates/pollardai/tests/registry_parity.rs": "9e80dbd508a2221c1c8c3fdebe192c3569a29e1e789b6a34204dad35c80ec58d",
+    "crates/pollardai/tests/revalidation_parity.rs": "1e27658131c95531552b39031772e69d54458dcdfccf61af5ec5d1d63cfc7b5b",
+    "crates/pollardai/tests/runtime_parity.rs": "0763f983473552cf5581391e0b6d3c1a2db548695db5160a38a8243e91ee6a28",
+    "crates/pollardai/tests/runtime_storage_contract.rs": "388d508dbdf2a5333a11e02cab817b42e6f79dcf329e09a1938544ff5c2e60aa",
+    "crates/pollardai/tests/seal_custody.rs": "f905d67c01a71409b30b6759c51a9cf4c952d3d7cb2a62eca8372322366331e9",
+    "crates/pollardai/tests/sqlite_arbitration.rs": "b63c51f5923b5e2eab45f9626c6afb144a45dad9becfb5307f3061324ee558a1",
+    "crates/pollardai/tests/sqlite_migration.rs": "2879adee7104e0e33691353454ca74265b3c008ab7f7e87bc59f17a2c361766a",
+    "crates/pollardai/tests/storage_parity.rs": "2e6108ca96959bbb46bb0afdf2f0606bed89b834631ded262564808ed4efad10",
+    "crates/pollardai/tests/store_spec.rs": "ea6326d3fb98d70e23000e79d756ff6487f9d14c0f1ba8e54807a38927242afb",
+    "crates/pollardai/tests/stream_revalidation.rs": "d1e221f702c8d05f914bb470551c2aa67d948a0002e591c85d1403918ffe6e87",
+    "crates/pollardai/tests/stream_revalidation_review.rs": "95bd90b1c4f82e44ac8f9777b1c223574e6a766925e775e5b3fad5bf613f2579",
+    "crates/pollardai/tests/tokenmaster_parity.rs": "d0d5ff794568437bf1740155fb2908c452357bce9c2981c78b12fc6a6e2134a2",
+    "crates/pollardai/tests/vectors.json": "21ab7db4c20e2bd9f27d0587263386e14138836095984166cba89a1828ae54fb",
+    "evidence/rust-parity-1.6.0/arbitration_interop.py": "5cdbd3e257831025442ca3cf8b3b1132d7ec98c4ce30aef62eec84ece0806da2",
+    "evidence/rust-parity-1.6.0/audit_release.py": "a40564522181656f7f6fdff8a160576944138d990879f2d68a02be2ff8b83783",
+    "evidence/rust-parity-1.6.0/benchmark.py": "79fe5e8540222df2f21c3a7af36e30b5d16d80be56fb75b38c77be75f2e2b81b",
+    "evidence/rust-parity-1.6.0/benchmark_python.py": "8eff0b2edda65fb5fa02eca65a2bc37f76b7d576af6eddab4ac99cce3fa93429",
+    "evidence/rust-parity-1.6.0/document_interop.py": "3312ffc2f5afd31c61bcb49bc97d44ae63e7ddb842e9b1b0d2da1bb58186ffb1",
+    "evidence/rust-parity-1.6.0/kafka_interop.py": "7bd3fe29cec7fd1ebede437f362849857547e33c1a6983ea459e6405cf5ffe8a",
+    "evidence/rust-parity-1.6.0/postgres_interop.py": "99688cc46585cc631e4116da27042419af0eaa1914ce84cf57f0aa64ae41fbbb",
+    "evidence/rust-parity-1.6.0/prepare_baseline.py": "36e21ed3cbec72a029187db17c6db3a4269166ea7966a95c27c6e60199ad13a1",
+    "evidence/rust-parity-1.6.0/redis_interop.py": "5f2c285d0a2004084afe83ec8c706ce592453fbd123ee12b0c03ec0bfda4ef23",
+    "evidence/rust-parity-1.6.0/remote_cli_smoke.py": "c45b7962cef7acdb508f3bf5bd14c55e7b35ab242ff5e5caa9d9f5ec2d232ceb",
+    "evidence/rust-parity-1.6.0/runtime_interop.py": "b7451e0da550214598d3a2879f6c384dab50530e598da79a679e1dc82b0571b1",
+    "evidence/rust-parity-1.6.0/sqlite_interop.py": "1d5092ae71e2a44a121bd2ee5752a6ce4ff30419513c6bbb3492ed269ad25971",
+    "evidence/rust-parity-1.6.0/storage_performance.py": "007db8faa5701b24896f2663c77fc2d05d18a20bb000f6d7666fddbc894e9555",
+    "evidence/rust-parity-1.6.0/storage_performance_python.py": "89f73c305c6e69dbbddfd758b9b39b44edbfd3aa34f20490645da9c5516e0537",
+    "evidence/rust-parity-1.6.0/stream_memory.py": "f25f6cca207a37a44b644d3dca371c851b09657ffbecedf60f5da17e2ff179b8",
+    "evidence/rust-parity-1.6.0/stream_memory_python.py": "59d94dbdcce94ecc2abc3cf90aeb5e00c4aa488295b0115253e2d0549c528c86",
+    "evidence/rust-parity-1.6.0/test_validate_remote.py": "479afad63b5b0e4231cb4b2c48c1ad9e54708fe4f2319eeb59e8d20146e15b8e",
+    "evidence/rust-parity-1.6.0/validate_native.py": "b2a9b81f26857e0c1745c46fef3855268e1334cf966359961fa68f34bbc2ec70",
+    "evidence/rust-parity-1.6.0/validate_remote.py": "40432c21b8619922fb8b364673e19105a7939d840e09e4d12e9e72dd9e175468"
+  },
+  "binary_sha256": {
+    "postgres_interop": "274756d9d4783e7a8d8ba100e2c6ec0aabc9d0b68c8c76c4f92178a37ec41eb6",
+    "redis_interop": "cdfb24f0c1714ebc58f3b51612d8de5d5deef66ed0006a1700ccae0a6b7624c3",
+    "kafka_interop": "3437032b4a863d055caf87049a493a1b294d8e68e3d7650e4e7e2e266bda3ec9",
+    "document_interop": "85d7604f275af64325755c7e0ae7773b834f36aa8a3c9509b050d2d31f74142f",
+    "pollard": "c11205c181d2c729090377e47406603fb7e0bdb7634f49ce3b5788f576b787cf"
+  },
+  "source_changed_during_run": false,
+  "elapsed_seconds": 270.61
+}

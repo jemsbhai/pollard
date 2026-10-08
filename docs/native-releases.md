@@ -6,6 +6,14 @@ The native packages start at version 0.1.0 and have their own version line.
 
 ## Release status
 
+Rust 0.2.0 is the prepared compatibility release for PyPI `pollard==1.6.0`.
+It adds native persistent stores, shared arbitration, async streaming, measurement
+and Tokenmaster meters, provider normalization, revalidation, audit interchange
+and the CLI. npm and Python versions are unchanged. Publication and clean-consumer
+verification are recorded in the [release evidence](../evidence/rust-parity-1.6.0/release-0.2.0.md).
+
+The following records the earlier 0.1.0 release:
+
 Both 0.1.0 packages are published:
 [npm](https://www.npmjs.com/package/pollardai/v/0.1.0) and
 [crates.io](https://crates.io/crates/pollardai/0.1.0). Clean public-registry
@@ -33,6 +41,17 @@ Each package includes its own usage examples and supported API.
 
 ## First-release scope
 
+The table below describes the published 0.1.0 archives. The Rust 0.2.0
+source includes PyPI 1.6.0 compatibility work for native runtime behavior,
+all eight native storage backends and shared reservations, async streaming,
+measurement/Tokenmaster meters, provider normalization, streaming revalidation,
+MCP/OTel bridges, optional NVML/tokenization, seals, custody, import/export,
+merge, and CLI rendering/remote inspection. See the release status above for publication evidence.
+Rust equivalents and language-specific integration boundaries are documented in the
+[Rust crate README](https://github.com/jemsbhai/pollard/blob/main/crates/pollardai/README.md)
+and [test and performance evidence](https://github.com/jemsbhai/pollard/tree/main/evidence/rust-parity-1.6.0)
+for its exact scope, known gaps, and reproducible measurements.
+
 The first native releases provide an execution ledger that does not require
 Python or a model-provider account. Applications supply their own model and
 tool functions. The native API follows each language's conventions and is
@@ -56,7 +75,7 @@ does not rename the content-addressed node protocol. Shared fixtures generated
 from the Python implementation check canonical text, node IDs, registry
 digests, and stored result digests.
 
-Native identity integers are restricted to the portable exact range
+In the 0.1.0 archives, native identity integers are restricted to the portable exact range
 `-9007199254740991` through `9007199254740991`. Identity floats are rejected.
 Python accepts larger integers; native callers must reject or transform those
 values explicitly. Native result serialization can differ between languages

@@ -1,0 +1,92 @@
+{
+  "oracle": {
+    "name": "pollard",
+    "version": "1.6.0",
+    "wheel_sha256": "569fb5f130a82c9be327b8dcbd285e3be063200bd9773ca15c5d6bb62edd627f"
+  },
+  "validation": {
+    "rust_1_74": "cargo +1.74.0 check --features mongodb,neo4j --locked passed; PostgreSQL feature separately passed earlier",
+    "clippy": "cargo clippy --features postgres,mongodb,neo4j --lib --test postgres_parity --test mongodb_parity --test neo4j_parity --example postgres_interop --example document_interop --locked -- -D warnings passed",
+    "offline_units": 6,
+    "explicitly_ignored_live_tests": {
+      "postgres_parity": 10,
+      "postgres_lost_commit_ack_unit": 1,
+      "mongodb_parity": 6,
+      "neo4j_parity": 6
+    },
+    "live_test_results": "all explicitly requested live tests passed",
+    "logs": [
+      "postgres-live-tests.log",
+      "postgres-lost-ack-test.log",
+      "native-database-unit-tests.log"
+    ]
+  },
+  "postgres": {
+    "driver": "postgres0.19.9,tokio-postgres0.7.12,postgres-types0.2.8,postgres-protocol0.6.8",
+    "image": [
+      "postgres@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea"
+    ],
+    "format": "Python schema-v2, NUMERIC settled amounts, blob literal escapes, permanent request/settlement tombstones",
+    "isolation": "row locks acquired in deterministic scope order; clock_timestamp sampled after locks; atomic import/merge table lock",
+    "transport": "convenience NoTls; connect_with_factory accepts an independently configured real postgres TLS client and is reused for heartbeats",
+    "interop": "postgres-interop-result.json"
+  },
+  "mongodb": {
+    "driver": "mongodb2.8.2 official native Rust client",
+    "image": [
+      "mongo@sha256:1f995ad6fdb93244a1addab1b58f934a0bc2f5643c38e02f5e9d7f0c7d227a7b"
+    ],
+    "format": "Python schema1 key/value documents and SHA256 record IDs, exact compound unique index and coordinator shape",
+    "isolation": "snapshot read concern, majority write concern, primary reads, transactional coordinator update with server $$NOW; bounded transient retries and commit acknowledgement retry",
+    "runtime": "dedicated driver worker avoids nested Tokio runtime panic; provider callbacks stay on caller thread",
+    "interop": "mongodb-interop-result.json",
+    "python_configuration_required": "MongoStore(uri, ..., tz_aware=True)",
+    "upstream_default_timezone_bug": "Pollard1.6 calls .timestamp() on default naive BSON UTC datetime. On Mountain Daylight host the result is 21600 seconds ahead of UTC, causing Rust window events to appear expired. Rust uses BSON epoch milliseconds. The aware oracle matches native server time.",
+    "standalone_rejected": true
+  },
+  "neo4j": {
+    "driver": "neo4j0.2.0 (neo4j-driver dependency alias)",
+    "driver_docs": "https://docs.rs/neo4j/0.2.0/neo4j/",
+    "image": [
+      "neo4j@sha256:c7d25c0eeebfe125718d58b72ed5d663c85d0479047733845eb2237c67ce8069"
+    ],
+    "format": "Python schema1 _PollardKV/_PollardCoordinator labels, SHA256 IDs, exact named uniqueness constraints and online RANGE indexes",
+    "isolation": "writer routing for reads and writes, shared driver bookmark manager, coordinator revision lock before server datetime.realtime epochMillis, bounded transient retries",
+    "interop": "neo4j-interop-result.json",
+    "tested_uri": "neo4j://127.0.0.1:57689",
+    "routing_and_bookmarks_tested": "single-node real routing discovery, transactions across sessions and independent clients",
+    "cluster_failover_tested": false
+  },
+  "limitations": [
+    "Rust exact decimal amounts use rust_decimal 96-bit coefficient and scale up to28; Python Decimal supports larger values. Out-of-range values fail closed.",
+    "No dedicated MongoDB sharded-deployment, PostgreSQL failover or Neo4j multi-node failover tests were run. Native driver routing/auth/TLS mechanisms are used; standalone routing and real PostgreSQL reconnect were exercised.",
+    "PostgreSQL convenience connection uses NoTls; TLS requires caller factory. MongoDB/Neo4j database TLS has native driver support but was not exercised in these plaintext localhost service tests.",
+    "Remote traversal retains the Python shared-KV scan semantics; no remote performance advantage is claimed. Recorded performance benchmarks cover the native in-process runtime and explicitly named local stores."
+  ],
+  "msrv_pins": {
+    "time": "0.3.36",
+    "powerfmt": "0.2.0",
+    "uuid": "1.8.0",
+    "zeroize": "1.8.1",
+    "ipconfig_windows": "0.3.2",
+    "jobserver": "0.1.32"
+  },
+  "source_sha256": {
+    "src/postgres.rs": "1e6e423abb093fadfd1a9a9359b079684e107eeb85198f7a9e9db8cf03e06d68",
+    "src/mongodb.rs": "284d6207f9a1375e442265a031f1bd0704d997e6ec141aa44e66b71c23503d76",
+    "src/neo4j.rs": "29236cd8daffca6a2327c478886c46480ceb1dbf20a2a1dd7d451aef5b1af371",
+    "src/remote_worker.rs": "40acd856b12137a2a7c0464f496187b2956094ee5bc01f63f579ce3fa912217a",
+    "tests/postgres_parity.rs": "a6612dcb557dcfa7316cc24bab7fd6eb903d183e634b452942bcb70db39ca6c7",
+    "tests/mongodb_parity.rs": "4826fd83bf78c34501602f0f8b007b53eec2ae9bb69c95e9dd0c46b1350e2e63",
+    "tests/neo4j_parity.rs": "4058a52dda01dd554eac3465b97843a12ed45988c31bfeb4bd4ea1932c6a7817",
+    "examples/document_interop.rs": "8e8b40faa2f983071cb50b83cfd3cb378df78047ac3213ed48d6e563d2bf6435",
+    "examples/postgres_interop.rs": "41e197bb304aafd0085ad415db61d41156515ccc246bc6eb6fd279083e1ef727",
+    "Cargo.toml": "30594fa0c9487d790b57f2addf11c32d216a5136d33a6c1603f9ec63c3950143",
+    "Cargo.lock": "acfb766765bd74f06cddfde5314682047b3bb7d3ce788271290cc51ca178ce7a"
+  },
+  "test_environment": {
+    "host": "Windows x86_64",
+    "docker_services": "three dedicated disposable labelled containers",
+    "database_cleanup": "PostgreSQL temporary schemas, MongoDB temporary databases, Neo4j temporary logical namespace records all removed by tests"
+  }
+}

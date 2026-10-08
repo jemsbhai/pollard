@@ -6,7 +6,23 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 
 ## [Unreleased]
 
-### Added
+### Rust pollardai 0.2.0 compatibility release
+
+- Expand the Rust crate against the verified PyPI 1.6.0 release:
+  compatible duplicate/fallback behavior, async calls and streams, SQLite,
+  PostgreSQL, Redis, MongoDB, Neo4j, Kafka and HashRope stores, shared budget
+  leases, native measurement/Tokenmaster meters, optional NVML and tokenization,
+  provider normalization, streaming revalidation, MCP/OTel bridges, seals/custody,
+  transactional SQLite import/merge, and a CLI with tree rendering and remote selectors.
+  Add release-generated differential fixtures, cross-language integration
+  checks, live backend fault tests, and reproducible performance evidence.
+  Numeric and Python ecosystem boundaries are documented. Native package
+  versions remain independent of the Python package version.
+- Align native CLI JSON tree fields with the released Python contract and add
+  a wheel-generated comparison for JSON, ASCII and Unicode output.
+- Correct MongoDB server-clock conversion in Python source so default naive BSON
+  datetimes are interpreted as UTC. The existing PyPI 1.6.0 wheel still requires
+  `tz_aware=True` for mixed-language lease/window accounting on non-UTC hosts.
 
 - Add native npm and Rust `pollardai` 0.1.0 core packages with independent
   versions, in-memory execution, integer budgets, registered tool gating, and

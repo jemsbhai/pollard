@@ -1,0 +1,29 @@
+   Compiling phf v0.11.3
+   Compiling futures-util v0.3.34
+   Compiling tokio-util v0.7.19
+   Compiling ipconfig v0.3.2
+   Compiling chrono-tz-build v0.3.0
+   Compiling chrono-tz v0.9.0
+   Compiling futures-executor v0.3.34
+   Compiling trust-dns-proto v0.21.2
+   Compiling tokio-postgres v0.7.12
+   Compiling futures v0.3.34
+   Compiling trust-dns-resolver v0.21.2
+   Compiling postgres v0.19.9
+   Compiling mongodb v2.8.2
+   Compiling neo4j v0.2.0
+   Compiling pollardai v0.1.0 (C:\Users\User\.codex\worktrees\rust-pypi-parity\pollard\crates\pollardai)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 22.04s
+     Running unittests src\lib.rs (target\debug\deps\pollardai-33ebe455176afc6f.exe)
+
+running 7 tests
+test postgres::tests::live_lost_commit_ack_retries_observe_permanent_tombstones ... ignored, requires isolated PostgreSQL: POLLARD_TEST_POSTGRES_DSN
+test mongodb::tests::invalid_configuration_fails_before_connecting ... ok
+test mongodb::tests::bson_coordinator_identity_and_types_are_strict ... ok
+test neo4j::tests::invalid_uri_is_rejected_without_network_fallback ... ok
+test postgres::tests::invalid_leases_requests_and_stored_amounts_fail_closed ... ok
+test neo4j::tests::constraints_require_exact_names_signatures_and_online_owned_indexes ... ok
+test postgres::tests::request_codec_sorts_scopes_and_preserves_decimal_scale ... ok
+
+test result: ok. 6 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.01s
+

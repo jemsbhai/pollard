@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import re
 from collections.abc import Callable
+from datetime import datetime, timezone
 from importlib import import_module
 from typing import Any, TypeVar, cast
 
@@ -323,8 +324,7 @@ class MongoStore(TransactionalKVStore):
             or revision < 1
         ):
             raise IntegrityError("MongoDB coordinator collision or corruption")
-        if locked_at is None or not hasattr(locked_at, "timestamp"):
-            raise IntegrityError("MongoDB did not return its current time")
+        _server_timestamp(locked_at)
 
     def _transaction_options(self) -> tuple[Any, Any, Any]:
         read_concern = import_module("pymongo.read_concern").ReadConcern("snapshot")
@@ -392,7 +392,7 @@ class MongoStore(TransactionalKVStore):
                     self._records,
                     session,
                     self.store_id,
-                    timestamp=float(locked_at.timestamp()),
+                    timestamp=_server_timestamp(locked_at),
                 )
             )
 
@@ -499,9 +499,7 @@ class _MongoTransaction:
         else:
             command = self._records.database.command("hello", session=self._session)
             current = command.get("localTime")
-        if current is None or not hasattr(current, "timestamp"):
-            raise IntegrityError("MongoDB did not return its current time")
-        self._timestamp = float(current.timestamp())
+        self._timestamp = _server_timestamp(current)
         return self._timestamp
 
     def _validate(self, record: dict[str, Any], bucket: str, key: str) -> None:
@@ -516,3 +514,16 @@ class _MongoTransaction:
 
 def _record_id(store_id: str, bucket: str, key: str) -> str:
     return hashlib.sha256(canonical_bytes([store_id, bucket, key])).hexdigest()
+
+
+def _server_timestamp(value: object) -> float:
+    """Interpret BSON datetimes in UTC, including PyMongo's default naive form."""
+
+    if not isinstance(value, datetime):
+        raise IntegrityError("MongoDB did not return its current time")
+    # BSON stores UTC milliseconds. PyMongo defaults to decoding those as a
+    # naive datetime, whose timestamp() otherwise uses the process's timezone.
+    # Preserve explicit offsets when the caller enables timezone-aware decoding.
+    if value.utcoffset() is None:
+        value = value.replace(tzinfo=timezone.utc)
+    return value.timestamp()

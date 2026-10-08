@@ -1,0 +1,345 @@
+{
+  "provenance": {
+    "wheel_sha256": "569fb5f130a82c9be327b8dcbd285e3be063200bd9773ca15c5d6bb62edd627f",
+    "hashrope_version": "0.2.2",
+    "hashrope_source_sha256": {
+      "polynomial_hash.py": "5b8e4fae590ae0e262fdaed01dd4ce30566a62f4cd26b2eac635c8dd121d8c37",
+      "rope.py": "55127ade6945778f0073e5d78ae8ae00c1a73d829ecb665bb1d1265b528415a4",
+      "sliding.py": "5682a99b1bf297b52acc230a81068c1a2f0f96dd25e84b9b32a1eee1328eff9f",
+      "__init__.py": "93b9edb670de17512f4ce847f245360ca3ece7979b2f2bd5d50f892d180d5880"
+    }
+  },
+  "operations": [
+    {
+      "op": "put",
+      "node": {
+        "id": "ad2b938dcbcd38488ca0bcb47e6881f59242e93340c37e31614d9fbba668639d",
+        "parent": null,
+        "kind": "root",
+        "attempt": 0,
+        "payload": {
+          "run": "hashrope-é"
+        },
+        "result": null,
+        "result_digest": null,
+        "meta": {},
+        "result_text": null
+      }
+    },
+    {
+      "op": "put",
+      "node": {
+        "id": "0d046c13361f51a96acb8e1f69e1fd1002b6c8795bd6465338e502801aa9e0e5",
+        "parent": "ad2b938dcbcd38488ca0bcb47e6881f59242e93340c37e31614d9fbba668639d",
+        "kind": "model_call",
+        "attempt": 0,
+        "payload": {
+          "model": "mock-1",
+          "large": 340282366920938463463374607431768211456,
+          "text": "🦊"
+        },
+        "result": {
+          "text": "first",
+          "small": 1e-07
+        },
+        "result_digest": "80804cb88c1cfa6a2cd455e8bb2cd3b67667c39e99c84ebc39f37bf6ed870258",
+        "meta": {
+          "charges": {
+            "usd": 0.3
+          }
+        },
+        "result_text": "{\"small\":1e-07,\"text\":\"first\"}"
+      }
+    },
+    {
+      "op": "put",
+      "node": {
+        "id": "0d046c13361f51a96acb8e1f69e1fd1002b6c8795bd6465338e502801aa9e0e5",
+        "parent": "ad2b938dcbcd38488ca0bcb47e6881f59242e93340c37e31614d9fbba668639d",
+        "kind": "model_call",
+        "attempt": 0,
+        "payload": {
+          "model": "mock-1",
+          "large": 340282366920938463463374607431768211456,
+          "text": "🦊"
+        },
+        "result": {
+          "text": "first",
+          "small": 1e-07
+        },
+        "result_digest": "80804cb88c1cfa6a2cd455e8bb2cd3b67667c39e99c84ebc39f37bf6ed870258",
+        "meta": {
+          "charges": {
+            "usd": 0.3
+          }
+        },
+        "result_text": "{\"small\":1e-07,\"text\":\"first\"}"
+      }
+    },
+    {
+      "op": "put",
+      "node": {
+        "id": "0d046c13361f51a96acb8e1f69e1fd1002b6c8795bd6465338e502801aa9e0e5",
+        "parent": "ad2b938dcbcd38488ca0bcb47e6881f59242e93340c37e31614d9fbba668639d",
+        "kind": "model_call",
+        "attempt": 0,
+        "payload": {
+          "model": "mock-1",
+          "large": 340282366920938463463374607431768211456,
+          "text": "🦊"
+        },
+        "result": {
+          "text": "second",
+          "small": 1e-06
+        },
+        "result_digest": "7664be77fd3d4295138a837e2a06928a70663d6efe557d318e27b7f21b98a2e6",
+        "meta": {},
+        "result_text": "{\"small\":1e-06,\"text\":\"second\"}"
+      }
+    },
+    {
+      "op": "put",
+      "node": {
+        "id": "b4f46851943378126a275748705c2c4b8154f90266c1b262124674ff8d929e6c",
+        "parent": "0d046c13361f51a96acb8e1f69e1fd1002b6c8795bd6465338e502801aa9e0e5",
+        "kind": "note",
+        "attempt": 0,
+        "payload": {
+          "note": "leaf"
+        },
+        "result": null,
+        "result_digest": null,
+        "meta": {},
+        "result_text": null
+      }
+    },
+    {
+      "op": "meta",
+      "id": "0d046c13361f51a96acb8e1f69e1fd1002b6c8795bd6465338e502801aa9e0e5",
+      "patch": {
+        "label": "kept",
+        "fraction": 1e+16
+      }
+    }
+  ],
+  "snapshots": {
+    "recorded": {
+      "log": "{\"attempt\":0,\"id\":\"ad2b938dcbcd38488ca0bcb47e6881f59242e93340c37e31614d9fbba668639d\",\"kind\":\"root\",\"meta\":\"{}\",\"op\":\"put\",\"parent\":null,\"payload\":\"{\\\"run\\\":\\\"hashrope-é\\\"}\",\"result\":null,\"result_digest\":null}\n{\"attempt\":0,\"id\":\"0d046c13361f51a96acb8e1f69e1fd1002b6c8795bd6465338e502801aa9e0e5\",\"kind\":\"model_call\",\"meta\":\"{\\\"charges\\\":{\\\"usd\\\":0.3}}\",\"op\":\"put\",\"parent\":\"ad2b938dcbcd38488ca0bcb47e6881f59242e93340c37e31614d9fbba668639d\",\"payload\":\"{\\\"large\\\":340282366920938463463374607431768211456,\\\"model\\\":\\\"mock-1\\\",\\\"text\\\":\\\"🦊\\\"}\",\"result\":\"{\\\"small\\\":1e-07,\\\"text\\\":\\\"first\\\"}\",\"result_digest\":\"80804cb88c1cfa6a2cd455e8bb2cd3b67667c39e99c84ebc39f37bf6ed870258\"}\n{\"attempt\":0,\"id\":\"0d046c13361f51a96acb8e1f69e1fd1002b6c8795bd6465338e502801aa9e0e5\",\"kind\":\"model_call\",\"meta\":\"{}\",\"op\":\"put\",\"parent\":\"ad2b938dcbcd38488ca0bcb47e6881f59242e93340c37e31614d9fbba668639d\",\"payload\":\"{\\\"large\\\":340282366920938463463374607431768211456,\\\"model\\\":\\\"mock-1\\\",\\\"text\\\":\\\"🦊\\\"}\",\"result\":\"{\\\"small\\\":1e-06,\\\"text\\\":\\\"second\\\"}\",\"result_digest\":\"7664be77fd3d4295138a837e2a06928a70663d6efe557d318e27b7f21b98a2e6\"}\n{\"attempt\":0,\"id\":\"b4f46851943378126a275748705c2c4b8154f90266c1b262124674ff8d929e6c\",\"kind\":\"note\",\"meta\":\"{}\",\"op\":\"put\",\"parent\":\"0d046c13361f51a96acb8e1f69e1fd1002b6c8795bd6465338e502801aa9e0e5\",\"payload\":\"{\\\"note\\\":\\\"leaf\\\"}\",\"result\":null,\"result_digest\":null}\n{\"id\":\"0d046c13361f51a96acb8e1f69e1fd1002b6c8795bd6465338e502801aa9e0e5\",\"op\":\"meta\",\"patch\":{\"fraction\":1e+16,\"label\":\"kept\"}}\n",
+      "hash": 312686160129199951,
+      "ascii": "root ad2b938d hashrope-é\n\\-- model_call 0d046c13 mock-1 charges[usd=0.3]\n    \\-- note b4f46851 note",
+      "unicode": "root ad2b938d hashrope-é\n└─ model_call 0d046c13 mock-1 charges[usd=0.3]\n   └─ note b4f46851 note",
+      "ascii_payloads": "root ad2b938d hashrope-é\n    payload={\"run\":\"hashrope-é\"}\n\\-- model_call 0d046c13 mock-1 charges[usd=0.3]\n        payload={\"large\":340282366920938463463374607431768211456,\"model\":\"mock-1\",\"text\":\"🦊\"}\n        result={\"small\":1e-07,\"text\":\"first\"}\n    \\-- note b4f46851 note\n            payload={\"note\":\"leaf\"}",
+      "nodes": [
+        {
+          "id": "ad2b938dcbcd38488ca0bcb47e6881f59242e93340c37e31614d9fbba668639d",
+          "parent": null,
+          "kind": "root",
+          "attempt": 0,
+          "payload": {
+            "run": "hashrope-é"
+          },
+          "result": null,
+          "result_digest": null,
+          "meta": {},
+          "result_text": null
+        },
+        {
+          "id": "0d046c13361f51a96acb8e1f69e1fd1002b6c8795bd6465338e502801aa9e0e5",
+          "parent": "ad2b938dcbcd38488ca0bcb47e6881f59242e93340c37e31614d9fbba668639d",
+          "kind": "model_call",
+          "attempt": 0,
+          "payload": {
+            "model": "mock-1",
+            "large": 340282366920938463463374607431768211456,
+            "text": "🦊"
+          },
+          "result": {
+            "text": "first",
+            "small": 1e-07
+          },
+          "result_digest": "80804cb88c1cfa6a2cd455e8bb2cd3b67667c39e99c84ebc39f37bf6ed870258",
+          "meta": {
+            "charges": {
+              "usd": 0.3
+            },
+            "result_conflicts": [
+              {
+                "result_digest": "7664be77fd3d4295138a837e2a06928a70663d6efe557d318e27b7f21b98a2e6",
+                "result": {
+                  "text": "second",
+                  "small": 1e-06
+                }
+              }
+            ],
+            "label": "kept",
+            "fraction": 1e+16
+          },
+          "result_text": "{\"small\":1e-07,\"text\":\"first\"}"
+        },
+        {
+          "id": "b4f46851943378126a275748705c2c4b8154f90266c1b262124674ff8d929e6c",
+          "parent": "0d046c13361f51a96acb8e1f69e1fd1002b6c8795bd6465338e502801aa9e0e5",
+          "kind": "note",
+          "attempt": 0,
+          "payload": {
+            "note": "leaf"
+          },
+          "result": null,
+          "result_digest": null,
+          "meta": {},
+          "result_text": null
+        }
+      ]
+    },
+    "compacted": {
+      "log": "{\"attempt\":0,\"id\":\"ad2b938dcbcd38488ca0bcb47e6881f59242e93340c37e31614d9fbba668639d\",\"kind\":\"root\",\"meta\":\"{}\",\"op\":\"put\",\"parent\":null,\"payload\":\"{\\\"run\\\":\\\"hashrope-é\\\"}\",\"result\":null,\"result_digest\":null}\n{\"attempt\":0,\"id\":\"0d046c13361f51a96acb8e1f69e1fd1002b6c8795bd6465338e502801aa9e0e5\",\"kind\":\"model_call\",\"meta\":\"{\\\"charges\\\":{\\\"usd\\\":0.3},\\\"fraction\\\":1e+16,\\\"label\\\":\\\"kept\\\",\\\"result_conflicts\\\":[{\\\"result\\\":{\\\"small\\\":1e-06,\\\"text\\\":\\\"second\\\"},\\\"result_digest\\\":\\\"7664be77fd3d4295138a837e2a06928a70663d6efe557d318e27b7f21b98a2e6\\\"}]}\",\"op\":\"put\",\"parent\":\"ad2b938dcbcd38488ca0bcb47e6881f59242e93340c37e31614d9fbba668639d\",\"payload\":\"{\\\"large\\\":340282366920938463463374607431768211456,\\\"model\\\":\\\"mock-1\\\",\\\"text\\\":\\\"🦊\\\"}\",\"result\":\"{\\\"small\\\":1e-07,\\\"text\\\":\\\"first\\\"}\",\"result_digest\":\"80804cb88c1cfa6a2cd455e8bb2cd3b67667c39e99c84ebc39f37bf6ed870258\"}\n{\"attempt\":0,\"id\":\"b4f46851943378126a275748705c2c4b8154f90266c1b262124674ff8d929e6c\",\"kind\":\"note\",\"meta\":\"{}\",\"op\":\"put\",\"parent\":\"0d046c13361f51a96acb8e1f69e1fd1002b6c8795bd6465338e502801aa9e0e5\",\"payload\":\"{\\\"note\\\":\\\"leaf\\\"}\",\"result\":null,\"result_digest\":null}\n",
+      "hash": 1860702289978542200,
+      "ascii": "root ad2b938d hashrope-é\n\\-- model_call 0d046c13 mock-1 charges[usd=0.3]\n    \\-- note b4f46851 note",
+      "unicode": "root ad2b938d hashrope-é\n└─ model_call 0d046c13 mock-1 charges[usd=0.3]\n   └─ note b4f46851 note",
+      "ascii_payloads": "root ad2b938d hashrope-é\n    payload={\"run\":\"hashrope-é\"}\n\\-- model_call 0d046c13 mock-1 charges[usd=0.3]\n        payload={\"large\":340282366920938463463374607431768211456,\"model\":\"mock-1\",\"text\":\"🦊\"}\n        result={\"small\":1e-07,\"text\":\"first\"}\n    \\-- note b4f46851 note\n            payload={\"note\":\"leaf\"}",
+      "nodes": [
+        {
+          "id": "ad2b938dcbcd38488ca0bcb47e6881f59242e93340c37e31614d9fbba668639d",
+          "parent": null,
+          "kind": "root",
+          "attempt": 0,
+          "payload": {
+            "run": "hashrope-é"
+          },
+          "result": null,
+          "result_digest": null,
+          "meta": {},
+          "result_text": null
+        },
+        {
+          "id": "0d046c13361f51a96acb8e1f69e1fd1002b6c8795bd6465338e502801aa9e0e5",
+          "parent": "ad2b938dcbcd38488ca0bcb47e6881f59242e93340c37e31614d9fbba668639d",
+          "kind": "model_call",
+          "attempt": 0,
+          "payload": {
+            "model": "mock-1",
+            "large": 340282366920938463463374607431768211456,
+            "text": "🦊"
+          },
+          "result": {
+            "text": "first",
+            "small": 1e-07
+          },
+          "result_digest": "80804cb88c1cfa6a2cd455e8bb2cd3b67667c39e99c84ebc39f37bf6ed870258",
+          "meta": {
+            "charges": {
+              "usd": 0.3
+            },
+            "result_conflicts": [
+              {
+                "result_digest": "7664be77fd3d4295138a837e2a06928a70663d6efe557d318e27b7f21b98a2e6",
+                "result": {
+                  "text": "second",
+                  "small": 1e-06
+                }
+              }
+            ],
+            "label": "kept",
+            "fraction": 1e+16
+          },
+          "result_text": "{\"small\":1e-07,\"text\":\"first\"}"
+        },
+        {
+          "id": "b4f46851943378126a275748705c2c4b8154f90266c1b262124674ff8d929e6c",
+          "parent": "0d046c13361f51a96acb8e1f69e1fd1002b6c8795bd6465338e502801aa9e0e5",
+          "kind": "note",
+          "attempt": 0,
+          "payload": {
+            "note": "leaf"
+          },
+          "result": null,
+          "result_digest": null,
+          "meta": {},
+          "result_text": null
+        }
+      ]
+    },
+    "dropped": {
+      "log": "{\"attempt\":0,\"id\":\"ad2b938dcbcd38488ca0bcb47e6881f59242e93340c37e31614d9fbba668639d\",\"kind\":\"root\",\"meta\":\"{}\",\"op\":\"put\",\"parent\":null,\"payload\":\"{\\\"run\\\":\\\"hashrope-é\\\"}\",\"result\":null,\"result_digest\":null}\n{\"attempt\":0,\"id\":\"0d046c13361f51a96acb8e1f69e1fd1002b6c8795bd6465338e502801aa9e0e5\",\"kind\":\"model_call\",\"meta\":\"{\\\"charges\\\":{\\\"usd\\\":0.3},\\\"fraction\\\":1e+16,\\\"label\\\":\\\"kept\\\",\\\"result_conflicts\\\":[{\\\"result\\\":{\\\"small\\\":1e-06,\\\"text\\\":\\\"second\\\"},\\\"result_digest\\\":\\\"7664be77fd3d4295138a837e2a06928a70663d6efe557d318e27b7f21b98a2e6\\\"}]}\",\"op\":\"put\",\"parent\":\"ad2b938dcbcd38488ca0bcb47e6881f59242e93340c37e31614d9fbba668639d\",\"payload\":\"{\\\"large\\\":340282366920938463463374607431768211456,\\\"model\\\":\\\"mock-1\\\",\\\"text\\\":\\\"🦊\\\"}\",\"result\":\"{\\\"small\\\":1e-07,\\\"text\\\":\\\"first\\\"}\",\"result_digest\":\"80804cb88c1cfa6a2cd455e8bb2cd3b67667c39e99c84ebc39f37bf6ed870258\"}\n",
+      "hash": 2097656090314630520,
+      "ascii": "root ad2b938d hashrope-é\n\\-- model_call 0d046c13 mock-1 charges[usd=0.3]",
+      "unicode": "root ad2b938d hashrope-é\n└─ model_call 0d046c13 mock-1 charges[usd=0.3]",
+      "ascii_payloads": "root ad2b938d hashrope-é\n    payload={\"run\":\"hashrope-é\"}\n\\-- model_call 0d046c13 mock-1 charges[usd=0.3]\n        payload={\"large\":340282366920938463463374607431768211456,\"model\":\"mock-1\",\"text\":\"🦊\"}\n        result={\"small\":1e-07,\"text\":\"first\"}",
+      "nodes": [
+        {
+          "id": "ad2b938dcbcd38488ca0bcb47e6881f59242e93340c37e31614d9fbba668639d",
+          "parent": null,
+          "kind": "root",
+          "attempt": 0,
+          "payload": {
+            "run": "hashrope-é"
+          },
+          "result": null,
+          "result_digest": null,
+          "meta": {},
+          "result_text": null
+        },
+        {
+          "id": "0d046c13361f51a96acb8e1f69e1fd1002b6c8795bd6465338e502801aa9e0e5",
+          "parent": "ad2b938dcbcd38488ca0bcb47e6881f59242e93340c37e31614d9fbba668639d",
+          "kind": "model_call",
+          "attempt": 0,
+          "payload": {
+            "model": "mock-1",
+            "large": 340282366920938463463374607431768211456,
+            "text": "🦊"
+          },
+          "result": {
+            "text": "first",
+            "small": 1e-07
+          },
+          "result_digest": "80804cb88c1cfa6a2cd455e8bb2cd3b67667c39e99c84ebc39f37bf6ed870258",
+          "meta": {
+            "charges": {
+              "usd": 0.3
+            },
+            "result_conflicts": [
+              {
+                "result_digest": "7664be77fd3d4295138a837e2a06928a70663d6efe557d318e27b7f21b98a2e6",
+                "result": {
+                  "text": "second",
+                  "small": 1e-06
+                }
+              }
+            ],
+            "label": "kept",
+            "fraction": 1e+16
+          },
+          "result_text": "{\"small\":1e-07,\"text\":\"first\"}"
+        }
+      ]
+    }
+  },
+  "leaf": "b4f46851943378126a275748705c2c4b8154f90266c1b262124674ff8d929e6c",
+  "imports": [
+    {
+      "log": "{\"attempt\":0,\"id\":\"ad2b938dcbcd38488ca0bcb47e6881f59242e93340c37e31614d9fbba668639d\",\"kind\":\"root\",\"meta\":\"{}\",\"op\":\"put\",\"parent\":null,\"payload\":\"{\\\"run\\\":\\\"hashrope-é\\\"}\",\"result\":null,\"result_digest\":null}\n{\"attempt\":0,\"id\":\"0d046c13361f51a96acb8e1f69e1fd1002b6c8795bd6465338e502801aa9e0e5\",\"kind\":\"model_call\",\"meta\":\"{\\\"charges\\\":{\\\"usd\\\":0.3}}\",\"op\":\"put\",\"parent\":\"ad2b938dcbcd38488ca0bcb47e6881f59242e93340c37e31614d9fbba668639d\",\"payload\":\"{\\\"large\\\":340282366920938463463374607431768211456,\\\"model\\\":\\\"mock-1\\\",\\\"text\\\":\\\"🦊\\\"}\",\"result\":\"{\\\"small\\\":1e-07,\\\"text\\\":\\\"first\\\"}\",\"result_digest\":\"80804cb88c1cfa6a2cd455e8bb2cd3b67667c39e99c84ebc39f37bf6ed870258\"}\n{\"attempt\":0,\"id\":\"0d046c13361f51a96acb8e1f69e1fd1002b6c8795bd6465338e502801aa9e0e5\",\"kind\":\"model_call\",\"meta\":\"{}\",\"op\":\"put\",\"parent\":\"ad2b938dcbcd38488ca0bcb47e6881f59242e93340c37e31614d9fbba668639d\",\"payload\":\"{\\\"large\\\":340282366920938463463374607431768211456,\\\"model\\\":\\\"mock-1\\\",\\\"text\\\":\\\"🦊\\\"}\",\"result\":\"{\\\"small\\\":1e-06,\\\"text\\\":\\\"second\\\"}\",\"result_digest\":\"7664be77fd3d4295138a837e2a06928a70663d6efe557d318e27b7f21b98a2e6\"}\n{\"attempt\":0,\"id\":\"b4f46851943378126a275748705c2c4b8154f90266c1b262124674ff8d929e6c\",\"kind\":\"note\",\"meta\":\"{}\",\"op\":\"put\",\"parent\":\"0d046c13361f51a96acb8e1f69e1fd1002b6c8795bd6465338e502801aa9e0e5\",\"payload\":\"{\\\"note\\\":\\\"leaf\\\"}\",\"result\":null,\"result_digest\":null}\n{\"id\":\"0d046c13361f51a96acb8e1f69e1fd1002b6c8795bd6465338e502801aa9e0e5\",\"op\":\"meta\",\"patch\":{\"fraction\":1e+16,\"label\":\"kept\"}}",
+      "hash": 882479668861174790
+    },
+    {
+      "log": "{\"attempt\":0,\"id\":\"ad2b938dcbcd38488ca0bcb47e6881f59242e93340c37e31614d9fbba668639d\",\"kind\":\"root\",\"meta\":\"{}\",\"op\":\"put\",\"parent\":null,\"payload\":\"{\\\"run\\\":\\\"hashrope-é\\\"}\",\"result\":null,\"result_digest\":null}\n{\"attempt\":0,\"id\":\"0d046c13361f51a96acb8e1f69e1fd1002b6c8795bd6465338e502801aa9e0e5\",\"kind\":\"model_call\",\"meta\":\"{\\\"charges\\\":{\\\"usd\\\":0.3}}\",\"op\":\"put\",\"parent\":\"ad2b938dcbcd38488ca0bcb47e6881f59242e93340c37e31614d9fbba668639d\",\"payload\":\"{\\\"large\\\":340282366920938463463374607431768211456,\\\"model\\\":\\\"mock-1\\\",\\\"text\\\":\\\"🦊\\\"}\",\"result\":\"{\\\"small\\\":1e-07,\\\"text\\\":\\\"first\\\"}\",\"result_digest\":\"80804cb88c1cfa6a2cd455e8bb2cd3b67667c39e99c84ebc39f37bf6ed870258\"}\n{\"attempt\":0,\"id\":\"0d046c13361f51a96acb8e1f69e1fd1002b6c8795bd6465338e502801aa9e0e5\",\"kind\":\"model_call\",\"meta\":\"{}\",\"op\":\"put\",\"parent\":\"ad2b938dcbcd38488ca0bcb47e6881f59242e93340c37e31614d9fbba668639d\",\"payload\":\"{\\\"large\\\":340282366920938463463374607431768211456,\\\"model\\\":\\\"mock-1\\\",\\\"text\\\":\\\"🦊\\\"}\",\"result\":\"{\\\"small\\\":1e-06,\\\"text\\\":\\\"second\\\"}\",\"result_digest\":\"7664be77fd3d4295138a837e2a06928a70663d6efe557d318e27b7f21b98a2e6\"}\n{\"attempt\":0,\"id\":\"b4f46851943378126a275748705c2c4b8154f90266c1b262124674ff8d929e6c\",\"kind\":\"note\",\"meta\":\"{}\",\"op\":\"put\",\"parent\":\"0d046c13361f51a96acb8e1f69e1fd1002b6c8795bd6465338e502801aa9e0e5\",\"payload\":\"{\\\"note\\\":\\\"leaf\\\"}\",\"result\":null,\"result_digest\":null}\n{\"id\":\"0d046c13361f51a96acb8e1f69e1fd1002b6c8795bd6465338e502801aa9e0e5\",\"op\":\"meta\",\"patch\":{\"fraction\":1e+16,\"label\":\"kept\"}}\n",
+      "hash": 312686160129199951
+    },
+    {
+      "log": "{\"attempt\":0,\"id\":\"ad2b938dcbcd38488ca0bcb47e6881f59242e93340c37e31614d9fbba668639d\",\"kind\":\"root\",\"meta\":\"{}\",\"op\":\"put\",\"parent\":null,\"payload\":\"{\\\"run\\\":\\\"hashrope-é\\\"}\",\"result\":null,\"result_digest\":null}\r\n{\"attempt\":0,\"id\":\"0d046c13361f51a96acb8e1f69e1fd1002b6c8795bd6465338e502801aa9e0e5\",\"kind\":\"model_call\",\"meta\":\"{\\\"charges\\\":{\\\"usd\\\":0.3}}\",\"op\":\"put\",\"parent\":\"ad2b938dcbcd38488ca0bcb47e6881f59242e93340c37e31614d9fbba668639d\",\"payload\":\"{\\\"large\\\":340282366920938463463374607431768211456,\\\"model\\\":\\\"mock-1\\\",\\\"text\\\":\\\"🦊\\\"}\",\"result\":\"{\\\"small\\\":1e-07,\\\"text\\\":\\\"first\\\"}\",\"result_digest\":\"80804cb88c1cfa6a2cd455e8bb2cd3b67667c39e99c84ebc39f37bf6ed870258\"}\r\n{\"attempt\":0,\"id\":\"0d046c13361f51a96acb8e1f69e1fd1002b6c8795bd6465338e502801aa9e0e5\",\"kind\":\"model_call\",\"meta\":\"{}\",\"op\":\"put\",\"parent\":\"ad2b938dcbcd38488ca0bcb47e6881f59242e93340c37e31614d9fbba668639d\",\"payload\":\"{\\\"large\\\":340282366920938463463374607431768211456,\\\"model\\\":\\\"mock-1\\\",\\\"text\\\":\\\"🦊\\\"}\",\"result\":\"{\\\"small\\\":1e-06,\\\"text\\\":\\\"second\\\"}\",\"result_digest\":\"7664be77fd3d4295138a837e2a06928a70663d6efe557d318e27b7f21b98a2e6\"}\r\n{\"attempt\":0,\"id\":\"b4f46851943378126a275748705c2c4b8154f90266c1b262124674ff8d929e6c\",\"kind\":\"note\",\"meta\":\"{}\",\"op\":\"put\",\"parent\":\"0d046c13361f51a96acb8e1f69e1fd1002b6c8795bd6465338e502801aa9e0e5\",\"payload\":\"{\\\"note\\\":\\\"leaf\\\"}\",\"result\":null,\"result_digest\":null}\r\n{\"id\":\"0d046c13361f51a96acb8e1f69e1fd1002b6c8795bd6465338e502801aa9e0e5\",\"op\":\"meta\",\"patch\":{\"fraction\":1e+16,\"label\":\"kept\"}}",
+      "hash": 1705587417334047425
+    },
+    {
+      "log": "{\"attempt\":0,\"id\":\"ad2b938dcbcd38488ca0bcb47e6881f59242e93340c37e31614d9fbba668639d\",\"kind\":\"root\",\"meta\":\"{}\",\"op\":\"put\",\"parent\":null,\"payload\":\"{\\\"run\\\":\\\"hashrope-é\\\"}\",\"result\":null,\"result_digest\":null}\r\n{\"attempt\":0,\"id\":\"0d046c13361f51a96acb8e1f69e1fd1002b6c8795bd6465338e502801aa9e0e5\",\"kind\":\"model_call\",\"meta\":\"{\\\"charges\\\":{\\\"usd\\\":0.3}}\",\"op\":\"put\",\"parent\":\"ad2b938dcbcd38488ca0bcb47e6881f59242e93340c37e31614d9fbba668639d\",\"payload\":\"{\\\"large\\\":340282366920938463463374607431768211456,\\\"model\\\":\\\"mock-1\\\",\\\"text\\\":\\\"🦊\\\"}\",\"result\":\"{\\\"small\\\":1e-07,\\\"text\\\":\\\"first\\\"}\",\"result_digest\":\"80804cb88c1cfa6a2cd455e8bb2cd3b67667c39e99c84ebc39f37bf6ed870258\"}\r\n{\"attempt\":0,\"id\":\"0d046c13361f51a96acb8e1f69e1fd1002b6c8795bd6465338e502801aa9e0e5\",\"kind\":\"model_call\",\"meta\":\"{}\",\"op\":\"put\",\"parent\":\"ad2b938dcbcd38488ca0bcb47e6881f59242e93340c37e31614d9fbba668639d\",\"payload\":\"{\\\"large\\\":340282366920938463463374607431768211456,\\\"model\\\":\\\"mock-1\\\",\\\"text\\\":\\\"🦊\\\"}\",\"result\":\"{\\\"small\\\":1e-06,\\\"text\\\":\\\"second\\\"}\",\"result_digest\":\"7664be77fd3d4295138a837e2a06928a70663d6efe557d318e27b7f21b98a2e6\"}\r\n{\"attempt\":0,\"id\":\"b4f46851943378126a275748705c2c4b8154f90266c1b262124674ff8d929e6c\",\"kind\":\"note\",\"meta\":\"{}\",\"op\":\"put\",\"parent\":\"0d046c13361f51a96acb8e1f69e1fd1002b6c8795bd6465338e502801aa9e0e5\",\"payload\":\"{\\\"note\\\":\\\"leaf\\\"}\",\"result\":null,\"result_digest\":null}\r\n{\"id\":\"0d046c13361f51a96acb8e1f69e1fd1002b6c8795bd6465338e502801aa9e0e5\",\"op\":\"meta\",\"patch\":{\"fraction\":1e+16,\"label\":\"kept\"}}\r\n",
+      "hash": 1520352920170542227
+    },
+    {
+      "log": "{\"attempt\":0,\"id\":\"ad2b938dcbcd38488ca0bcb47e6881f59242e93340c37e31614d9fbba668639d\",\"kind\":\"root\",\"meta\":\"{}\",\"op\":\"put\",\"parent\":null,\"payload\":\"{\\\"run\\\":\\\"hashrope-é\\\"}\",\"result\":null,\"result_digest\":null}\r{\"attempt\":0,\"id\":\"0d046c13361f51a96acb8e1f69e1fd1002b6c8795bd6465338e502801aa9e0e5\",\"kind\":\"model_call\",\"meta\":\"{\\\"charges\\\":{\\\"usd\\\":0.3}}\",\"op\":\"put\",\"parent\":\"ad2b938dcbcd38488ca0bcb47e6881f59242e93340c37e31614d9fbba668639d\",\"payload\":\"{\\\"large\\\":340282366920938463463374607431768211456,\\\"model\\\":\\\"mock-1\\\",\\\"text\\\":\\\"🦊\\\"}\",\"result\":\"{\\\"small\\\":1e-07,\\\"text\\\":\\\"first\\\"}\",\"result_digest\":\"80804cb88c1cfa6a2cd455e8bb2cd3b67667c39e99c84ebc39f37bf6ed870258\"}\r{\"attempt\":0,\"id\":\"0d046c13361f51a96acb8e1f69e1fd1002b6c8795bd6465338e502801aa9e0e5\",\"kind\":\"model_call\",\"meta\":\"{}\",\"op\":\"put\",\"parent\":\"ad2b938dcbcd38488ca0bcb47e6881f59242e93340c37e31614d9fbba668639d\",\"payload\":\"{\\\"large\\\":340282366920938463463374607431768211456,\\\"model\\\":\\\"mock-1\\\",\\\"text\\\":\\\"🦊\\\"}\",\"result\":\"{\\\"small\\\":1e-06,\\\"text\\\":\\\"second\\\"}\",\"result_digest\":\"7664be77fd3d4295138a837e2a06928a70663d6efe557d318e27b7f21b98a2e6\"}\r{\"attempt\":0,\"id\":\"b4f46851943378126a275748705c2c4b8154f90266c1b262124674ff8d929e6c\",\"kind\":\"note\",\"meta\":\"{}\",\"op\":\"put\",\"parent\":\"0d046c13361f51a96acb8e1f69e1fd1002b6c8795bd6465338e502801aa9e0e5\",\"payload\":\"{\\\"note\\\":\\\"leaf\\\"}\",\"result\":null,\"result_digest\":null}\r{\"id\":\"0d046c13361f51a96acb8e1f69e1fd1002b6c8795bd6465338e502801aa9e0e5\",\"op\":\"meta\",\"patch\":{\"fraction\":1e+16,\"label\":\"kept\"}}",
+      "hash": 2140554363534838658
+    },
+    {
+      "log": "{\"attempt\":0,\"id\":\"ad2b938dcbcd38488ca0bcb47e6881f59242e93340c37e31614d9fbba668639d\",\"kind\":\"root\",\"meta\":\"{}\",\"op\":\"put\",\"parent\":null,\"payload\":\"{\\\"run\\\":\\\"hashrope-é\\\"}\",\"result\":null,\"result_digest\":null}\r{\"attempt\":0,\"id\":\"0d046c13361f51a96acb8e1f69e1fd1002b6c8795bd6465338e502801aa9e0e5\",\"kind\":\"model_call\",\"meta\":\"{\\\"charges\\\":{\\\"usd\\\":0.3}}\",\"op\":\"put\",\"parent\":\"ad2b938dcbcd38488ca0bcb47e6881f59242e93340c37e31614d9fbba668639d\",\"payload\":\"{\\\"large\\\":340282366920938463463374607431768211456,\\\"model\\\":\\\"mock-1\\\",\\\"text\\\":\\\"🦊\\\"}\",\"result\":\"{\\\"small\\\":1e-07,\\\"text\\\":\\\"first\\\"}\",\"result_digest\":\"80804cb88c1cfa6a2cd455e8bb2cd3b67667c39e99c84ebc39f37bf6ed870258\"}\r{\"attempt\":0,\"id\":\"0d046c13361f51a96acb8e1f69e1fd1002b6c8795bd6465338e502801aa9e0e5\",\"kind\":\"model_call\",\"meta\":\"{}\",\"op\":\"put\",\"parent\":\"ad2b938dcbcd38488ca0bcb47e6881f59242e93340c37e31614d9fbba668639d\",\"payload\":\"{\\\"large\\\":340282366920938463463374607431768211456,\\\"model\\\":\\\"mock-1\\\",\\\"text\\\":\\\"🦊\\\"}\",\"result\":\"{\\\"small\\\":1e-06,\\\"text\\\":\\\"second\\\"}\",\"result_digest\":\"7664be77fd3d4295138a837e2a06928a70663d6efe557d318e27b7f21b98a2e6\"}\r{\"attempt\":0,\"id\":\"b4f46851943378126a275748705c2c4b8154f90266c1b262124674ff8d929e6c\",\"kind\":\"note\",\"meta\":\"{}\",\"op\":\"put\",\"parent\":\"0d046c13361f51a96acb8e1f69e1fd1002b6c8795bd6465338e502801aa9e0e5\",\"payload\":\"{\\\"note\\\":\\\"leaf\\\"}\",\"result\":null,\"result_digest\":null}\r{\"id\":\"0d046c13361f51a96acb8e1f69e1fd1002b6c8795bd6465338e502801aa9e0e5\",\"op\":\"meta\",\"patch\":{\"fraction\":1e+16,\"label\":\"kept\"}}\r",
+      "hash": 1405617508206896141
+    }
+  ]
+}

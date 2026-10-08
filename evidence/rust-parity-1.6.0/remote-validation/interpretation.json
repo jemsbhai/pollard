@@ -1,0 +1,59 @@
+{
+  "status": "passed",
+  "native_test_cases": 32,
+  "live_backend_test_cases": 31,
+  "offline_configuration_test_cases": 1,
+  "by_suite": {
+    "test-postgres": {
+      "passed": 10,
+      "failed": 0,
+      "ignored": 0
+    },
+    "test-postgres-lost-ack": {
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0
+    },
+    "test-redis": {
+      "passed": 8,
+      "failed": 0,
+      "ignored": 0
+    },
+    "test-kafka": {
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0
+    },
+    "test-mongodb": {
+      "passed": 6,
+      "failed": 0,
+      "ignored": 0
+    },
+    "test-neo4j": {
+      "passed": 6,
+      "failed": 0,
+      "ignored": 0
+    }
+  },
+  "interoperability_backends": [
+    "postgres",
+    "redis",
+    "kafka",
+    "mongodb",
+    "neo4j"
+  ],
+  "cli_remote_selectors_passed": 5,
+  "runner_guard_tests_per_platform": 10,
+  "guard_platforms": [
+    "Windows",
+    "Linux"
+  ],
+  "guard_evidence": "../remote-runner-guards.json",
+  "source_changed_during_run": false,
+  "owned_containers_removed": 5,
+  "notes": [
+    "Redis suite includes seven live tests and one offline URL validation test.",
+    "Live broker transport is plaintext and local; TLS/SASL capabilities are compile-tested separately.",
+    "GitHub Actions jobs are configured; the hosted workflow has not been executed here."
+  ]
+}

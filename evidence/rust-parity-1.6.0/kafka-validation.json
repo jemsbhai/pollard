@@ -1,0 +1,42 @@
+{
+  "status": "passed",
+  "pollard_release": "1.6.0",
+  "pollard_wheel_sha256": "569fb5f130a82c9be327b8dcbd285e3be063200bd9773ca15c5d6bb62edd627f",
+  "rdkafka": "0.39.0",
+  "rdkafka_sys": "4.10.0+2.12.1",
+  "librdkafka": "2.12.1",
+  "openssl_sys": "0.9.111",
+  "openssl_source": "3.6.3",
+  "broker": {
+    "image": "docker.redpanda.com/redpandadata/redpanda:v24.1.21",
+    "image_digest": "sha256:dc33c62306c742c0d8850c883c39bea9ab5351c32a93e0d9fa560ae04b43a3c0",
+    "transport": "PLAINTEXT",
+    "partitions": 1,
+    "replication_factor": 1,
+    "topic_configuration": {"cleanup.policy":"delete", "retention.ms":"-1", "retention.bytes":"-1"}
+  },
+  "checks": {
+    "windows_native_unit_tests": {"passed":10,"failed":0},
+    "windows_live_broker_tests": {"passed":1,"failed":0},
+    "rust_1_74_windows_kafka_check": "passed",
+    "rust_1_74_linux_kafka_tls_tests": {"passed":11,"failed":0},
+    "clippy_warnings_denied": "passed",
+    "python_to_rust_replay": "passed",
+    "rust_to_python_replay_and_verification": "passed",
+    "cross_language_metadata_updates": "passed"
+  },
+  "tls_build_environment": {
+    "image":"rust:1.74-bookworm",
+    "image_digest":"sha256:fd45a543ed41160eae2ce9e749e5b3c972625b0778104e8962e9bfb113535301",
+    "features":["kafka-tls"],
+    "driver_capabilities":["ssl","sasl_plain","sasl_scram"],
+    "log":"kafka-tls-rust174-linux.txt"
+  },
+  "interoperability_evidence":"kafka-interop-result.json",
+  "limitations":[
+    "Live integration covers plaintext broker connections; TLS certificate validation and authenticated remote connections were not exercised.",
+    "SASL GSSAPI/Kerberos is not enabled by kafka-tls.",
+    "Kafka provides an ordered audit log, not atomic shared budget arbitration.",
+    "Pending calls remain transient until finalized; a process crash can lose an in-flight marker."
+  ]
+}

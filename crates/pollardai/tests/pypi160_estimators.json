@@ -1,0 +1,2544 @@
+{
+  "provenance": {
+    "wheel_sha256": "569fb5f130a82c9be327b8dcbd285e3be063200bd9773ca15c5d6bb62edd627f",
+    "tiktoken_version": "0.9.0"
+  },
+  "cases": [
+    {
+      "model": null,
+      "tokens_per_message": 3,
+      "payload": {
+        "prompt": "Hello, world!"
+      },
+      "fallback": "cl100k_base",
+      "tokens": 4
+    },
+    {
+      "model": "",
+      "tokens_per_message": 3,
+      "payload": {
+        "prompt": "Hello, world!"
+      },
+      "fallback": "cl100k_base",
+      "tokens": 4
+    },
+    {
+      "model": "gpt-4o",
+      "tokens_per_message": 3,
+      "payload": {
+        "prompt": "Hello, world!"
+      },
+      "fallback": "o200k_base",
+      "tokens": 4
+    },
+    {
+      "model": null,
+      "tokens_per_message": 3,
+      "payload": {
+        "model": null,
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello é 🦊\n世界"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "fine",
+                "n": 3
+              }
+            ]
+          }
+        ],
+        "nested": {
+          "model": "skip me",
+          "array": [
+            "model",
+            true,
+            null,
+            3
+          ]
+        }
+      },
+      "fallback": "cl100k_base",
+      "tokens": 19
+    },
+    {
+      "model": "",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": null,
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello é 🦊\n世界"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "fine",
+                "n": 3
+              }
+            ]
+          }
+        ],
+        "nested": {
+          "model": "skip me",
+          "array": [
+            "model",
+            true,
+            null,
+            3
+          ]
+        }
+      },
+      "fallback": "cl100k_base",
+      "tokens": 19
+    },
+    {
+      "model": "gpt-4o",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": null,
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello é 🦊\n世界"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "fine",
+                "n": 3
+              }
+            ]
+          }
+        ],
+        "nested": {
+          "model": "skip me",
+          "array": [
+            "model",
+            true,
+            null,
+            3
+          ]
+        }
+      },
+      "fallback": "o200k_base",
+      "tokens": 17
+    },
+    {
+      "model": null,
+      "tokens_per_message": 3,
+      "payload": {
+        "model": null,
+        "prompt": "<|endoftext|>"
+      },
+      "fallback": "cl100k_base",
+      "error": "ValueError"
+    },
+    {
+      "model": "",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": null,
+        "prompt": "<|endoftext|>"
+      },
+      "fallback": "cl100k_base",
+      "error": "ValueError"
+    },
+    {
+      "model": "gpt-4o",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": null,
+        "prompt": "<|endoftext|>"
+      },
+      "fallback": "o200k_base",
+      "error": "ValueError"
+    },
+    {
+      "model": null,
+      "tokens_per_message": 3,
+      "payload": {
+        "prompt": "Hello, world!"
+      },
+      "fallback": "cl100k_base",
+      "tokens": 4
+    },
+    {
+      "model": "",
+      "tokens_per_message": 3,
+      "payload": {
+        "prompt": "Hello, world!"
+      },
+      "fallback": "cl100k_base",
+      "tokens": 4
+    },
+    {
+      "model": "gpt-4o",
+      "tokens_per_message": 3,
+      "payload": {
+        "prompt": "Hello, world!"
+      },
+      "fallback": "o200k_base",
+      "tokens": 4
+    },
+    {
+      "model": null,
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello é 🦊\n世界"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "fine",
+                "n": 3
+              }
+            ]
+          }
+        ],
+        "nested": {
+          "model": "skip me",
+          "array": [
+            "model",
+            true,
+            null,
+            3
+          ]
+        }
+      },
+      "fallback": "cl100k_base",
+      "tokens": 19
+    },
+    {
+      "model": "",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello é 🦊\n世界"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "fine",
+                "n": 3
+              }
+            ]
+          }
+        ],
+        "nested": {
+          "model": "skip me",
+          "array": [
+            "model",
+            true,
+            null,
+            3
+          ]
+        }
+      },
+      "fallback": "cl100k_base",
+      "tokens": 19
+    },
+    {
+      "model": "gpt-4o",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello é 🦊\n世界"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "fine",
+                "n": 3
+              }
+            ]
+          }
+        ],
+        "nested": {
+          "model": "skip me",
+          "array": [
+            "model",
+            true,
+            null,
+            3
+          ]
+        }
+      },
+      "fallback": "o200k_base",
+      "tokens": 17
+    },
+    {
+      "model": null,
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "",
+        "prompt": "<|endoftext|>"
+      },
+      "fallback": "cl100k_base",
+      "error": "ValueError"
+    },
+    {
+      "model": "",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "",
+        "prompt": "<|endoftext|>"
+      },
+      "fallback": "cl100k_base",
+      "error": "ValueError"
+    },
+    {
+      "model": "gpt-4o",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "",
+        "prompt": "<|endoftext|>"
+      },
+      "fallback": "o200k_base",
+      "error": "ValueError"
+    },
+    {
+      "model": null,
+      "tokens_per_message": 3,
+      "payload": {
+        "prompt": "Hello, world!"
+      },
+      "fallback": "cl100k_base",
+      "tokens": 4
+    },
+    {
+      "model": "",
+      "tokens_per_message": 3,
+      "payload": {
+        "prompt": "Hello, world!"
+      },
+      "fallback": "cl100k_base",
+      "tokens": 4
+    },
+    {
+      "model": "gpt-4o",
+      "tokens_per_message": 3,
+      "payload": {
+        "prompt": "Hello, world!"
+      },
+      "fallback": "o200k_base",
+      "tokens": 4
+    },
+    {
+      "model": null,
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "unknown",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello é 🦊\n世界"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "fine",
+                "n": 3
+              }
+            ]
+          }
+        ],
+        "nested": {
+          "model": "skip me",
+          "array": [
+            "model",
+            true,
+            null,
+            3
+          ]
+        }
+      },
+      "fallback": "cl100k_base",
+      "tokens": 19
+    },
+    {
+      "model": "",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "unknown",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello é 🦊\n世界"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "fine",
+                "n": 3
+              }
+            ]
+          }
+        ],
+        "nested": {
+          "model": "skip me",
+          "array": [
+            "model",
+            true,
+            null,
+            3
+          ]
+        }
+      },
+      "fallback": "cl100k_base",
+      "tokens": 19
+    },
+    {
+      "model": "gpt-4o",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "unknown",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello é 🦊\n世界"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "fine",
+                "n": 3
+              }
+            ]
+          }
+        ],
+        "nested": {
+          "model": "skip me",
+          "array": [
+            "model",
+            true,
+            null,
+            3
+          ]
+        }
+      },
+      "fallback": "o200k_base",
+      "tokens": 17
+    },
+    {
+      "model": null,
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "unknown",
+        "prompt": "<|endoftext|>"
+      },
+      "fallback": "cl100k_base",
+      "error": "ValueError"
+    },
+    {
+      "model": "",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "unknown",
+        "prompt": "<|endoftext|>"
+      },
+      "fallback": "cl100k_base",
+      "error": "ValueError"
+    },
+    {
+      "model": "gpt-4o",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "unknown",
+        "prompt": "<|endoftext|>"
+      },
+      "fallback": "o200k_base",
+      "error": "ValueError"
+    },
+    {
+      "model": null,
+      "tokens_per_message": 3,
+      "payload": {
+        "prompt": "Hello, world!"
+      },
+      "fallback": "cl100k_base",
+      "tokens": 4
+    },
+    {
+      "model": "",
+      "tokens_per_message": 3,
+      "payload": {
+        "prompt": "Hello, world!"
+      },
+      "fallback": "cl100k_base",
+      "tokens": 4
+    },
+    {
+      "model": "gpt-4o",
+      "tokens_per_message": 3,
+      "payload": {
+        "prompt": "Hello, world!"
+      },
+      "fallback": "o200k_base",
+      "tokens": 4
+    },
+    {
+      "model": null,
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "gpt-4o",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello é 🦊\n世界"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "fine",
+                "n": 3
+              }
+            ]
+          }
+        ],
+        "nested": {
+          "model": "skip me",
+          "array": [
+            "model",
+            true,
+            null,
+            3
+          ]
+        }
+      },
+      "fallback": "o200k_base",
+      "tokens": 17
+    },
+    {
+      "model": "",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "gpt-4o",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello é 🦊\n世界"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "fine",
+                "n": 3
+              }
+            ]
+          }
+        ],
+        "nested": {
+          "model": "skip me",
+          "array": [
+            "model",
+            true,
+            null,
+            3
+          ]
+        }
+      },
+      "fallback": "o200k_base",
+      "tokens": 17
+    },
+    {
+      "model": "gpt-4o",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "gpt-4o",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello é 🦊\n世界"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "fine",
+                "n": 3
+              }
+            ]
+          }
+        ],
+        "nested": {
+          "model": "skip me",
+          "array": [
+            "model",
+            true,
+            null,
+            3
+          ]
+        }
+      },
+      "fallback": "o200k_base",
+      "tokens": 17
+    },
+    {
+      "model": null,
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "gpt-4o",
+        "prompt": "<|endoftext|>"
+      },
+      "fallback": "o200k_base",
+      "error": "ValueError"
+    },
+    {
+      "model": "",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "gpt-4o",
+        "prompt": "<|endoftext|>"
+      },
+      "fallback": "o200k_base",
+      "error": "ValueError"
+    },
+    {
+      "model": "gpt-4o",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "gpt-4o",
+        "prompt": "<|endoftext|>"
+      },
+      "fallback": "o200k_base",
+      "error": "ValueError"
+    },
+    {
+      "model": null,
+      "tokens_per_message": 3,
+      "payload": {
+        "prompt": "Hello, world!"
+      },
+      "fallback": "cl100k_base",
+      "tokens": 4
+    },
+    {
+      "model": "",
+      "tokens_per_message": 3,
+      "payload": {
+        "prompt": "Hello, world!"
+      },
+      "fallback": "cl100k_base",
+      "tokens": 4
+    },
+    {
+      "model": "gpt-4o",
+      "tokens_per_message": 3,
+      "payload": {
+        "prompt": "Hello, world!"
+      },
+      "fallback": "o200k_base",
+      "tokens": 4
+    },
+    {
+      "model": null,
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "gpt-5-demo",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello é 🦊\n世界"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "fine",
+                "n": 3
+              }
+            ]
+          }
+        ],
+        "nested": {
+          "model": "skip me",
+          "array": [
+            "model",
+            true,
+            null,
+            3
+          ]
+        }
+      },
+      "fallback": "o200k_base",
+      "tokens": 17
+    },
+    {
+      "model": "",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "gpt-5-demo",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello é 🦊\n世界"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "fine",
+                "n": 3
+              }
+            ]
+          }
+        ],
+        "nested": {
+          "model": "skip me",
+          "array": [
+            "model",
+            true,
+            null,
+            3
+          ]
+        }
+      },
+      "fallback": "o200k_base",
+      "tokens": 17
+    },
+    {
+      "model": "gpt-4o",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "gpt-5-demo",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello é 🦊\n世界"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "fine",
+                "n": 3
+              }
+            ]
+          }
+        ],
+        "nested": {
+          "model": "skip me",
+          "array": [
+            "model",
+            true,
+            null,
+            3
+          ]
+        }
+      },
+      "fallback": "o200k_base",
+      "tokens": 17
+    },
+    {
+      "model": null,
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "gpt-5-demo",
+        "prompt": "<|endoftext|>"
+      },
+      "fallback": "o200k_base",
+      "error": "ValueError"
+    },
+    {
+      "model": "",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "gpt-5-demo",
+        "prompt": "<|endoftext|>"
+      },
+      "fallback": "o200k_base",
+      "error": "ValueError"
+    },
+    {
+      "model": "gpt-4o",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "gpt-5-demo",
+        "prompt": "<|endoftext|>"
+      },
+      "fallback": "o200k_base",
+      "error": "ValueError"
+    },
+    {
+      "model": null,
+      "tokens_per_message": 3,
+      "payload": {
+        "prompt": "Hello, world!"
+      },
+      "fallback": "cl100k_base",
+      "tokens": 4
+    },
+    {
+      "model": "",
+      "tokens_per_message": 3,
+      "payload": {
+        "prompt": "Hello, world!"
+      },
+      "fallback": "cl100k_base",
+      "tokens": 4
+    },
+    {
+      "model": "gpt-4o",
+      "tokens_per_message": 3,
+      "payload": {
+        "prompt": "Hello, world!"
+      },
+      "fallback": "o200k_base",
+      "tokens": 4
+    },
+    {
+      "model": null,
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "gpt-4.1-mini",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello é 🦊\n世界"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "fine",
+                "n": 3
+              }
+            ]
+          }
+        ],
+        "nested": {
+          "model": "skip me",
+          "array": [
+            "model",
+            true,
+            null,
+            3
+          ]
+        }
+      },
+      "fallback": "o200k_base",
+      "tokens": 17
+    },
+    {
+      "model": "",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "gpt-4.1-mini",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello é 🦊\n世界"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "fine",
+                "n": 3
+              }
+            ]
+          }
+        ],
+        "nested": {
+          "model": "skip me",
+          "array": [
+            "model",
+            true,
+            null,
+            3
+          ]
+        }
+      },
+      "fallback": "o200k_base",
+      "tokens": 17
+    },
+    {
+      "model": "gpt-4o",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "gpt-4.1-mini",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello é 🦊\n世界"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "fine",
+                "n": 3
+              }
+            ]
+          }
+        ],
+        "nested": {
+          "model": "skip me",
+          "array": [
+            "model",
+            true,
+            null,
+            3
+          ]
+        }
+      },
+      "fallback": "o200k_base",
+      "tokens": 17
+    },
+    {
+      "model": null,
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "gpt-4.1-mini",
+        "prompt": "<|endoftext|>"
+      },
+      "fallback": "o200k_base",
+      "error": "ValueError"
+    },
+    {
+      "model": "",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "gpt-4.1-mini",
+        "prompt": "<|endoftext|>"
+      },
+      "fallback": "o200k_base",
+      "error": "ValueError"
+    },
+    {
+      "model": "gpt-4o",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "gpt-4.1-mini",
+        "prompt": "<|endoftext|>"
+      },
+      "fallback": "o200k_base",
+      "error": "ValueError"
+    },
+    {
+      "model": null,
+      "tokens_per_message": 3,
+      "payload": {
+        "prompt": "Hello, world!"
+      },
+      "fallback": "cl100k_base",
+      "tokens": 4
+    },
+    {
+      "model": "",
+      "tokens_per_message": 3,
+      "payload": {
+        "prompt": "Hello, world!"
+      },
+      "fallback": "cl100k_base",
+      "tokens": 4
+    },
+    {
+      "model": "gpt-4o",
+      "tokens_per_message": 3,
+      "payload": {
+        "prompt": "Hello, world!"
+      },
+      "fallback": "o200k_base",
+      "tokens": 4
+    },
+    {
+      "model": null,
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "gpt-4.5-preview",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello é 🦊\n世界"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "fine",
+                "n": 3
+              }
+            ]
+          }
+        ],
+        "nested": {
+          "model": "skip me",
+          "array": [
+            "model",
+            true,
+            null,
+            3
+          ]
+        }
+      },
+      "fallback": "o200k_base",
+      "tokens": 17
+    },
+    {
+      "model": "",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "gpt-4.5-preview",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello é 🦊\n世界"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "fine",
+                "n": 3
+              }
+            ]
+          }
+        ],
+        "nested": {
+          "model": "skip me",
+          "array": [
+            "model",
+            true,
+            null,
+            3
+          ]
+        }
+      },
+      "fallback": "o200k_base",
+      "tokens": 17
+    },
+    {
+      "model": "gpt-4o",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "gpt-4.5-preview",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello é 🦊\n世界"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "fine",
+                "n": 3
+              }
+            ]
+          }
+        ],
+        "nested": {
+          "model": "skip me",
+          "array": [
+            "model",
+            true,
+            null,
+            3
+          ]
+        }
+      },
+      "fallback": "o200k_base",
+      "tokens": 17
+    },
+    {
+      "model": null,
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "gpt-4.5-preview",
+        "prompt": "<|endoftext|>"
+      },
+      "fallback": "o200k_base",
+      "error": "ValueError"
+    },
+    {
+      "model": "",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "gpt-4.5-preview",
+        "prompt": "<|endoftext|>"
+      },
+      "fallback": "o200k_base",
+      "error": "ValueError"
+    },
+    {
+      "model": "gpt-4o",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "gpt-4.5-preview",
+        "prompt": "<|endoftext|>"
+      },
+      "fallback": "o200k_base",
+      "error": "ValueError"
+    },
+    {
+      "model": null,
+      "tokens_per_message": 3,
+      "payload": {
+        "prompt": "Hello, world!"
+      },
+      "fallback": "cl100k_base",
+      "tokens": 4
+    },
+    {
+      "model": "",
+      "tokens_per_message": 3,
+      "payload": {
+        "prompt": "Hello, world!"
+      },
+      "fallback": "cl100k_base",
+      "tokens": 4
+    },
+    {
+      "model": "gpt-4o",
+      "tokens_per_message": 3,
+      "payload": {
+        "prompt": "Hello, world!"
+      },
+      "fallback": "o200k_base",
+      "tokens": 4
+    },
+    {
+      "model": null,
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "chatgpt-4o-latest",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello é 🦊\n世界"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "fine",
+                "n": 3
+              }
+            ]
+          }
+        ],
+        "nested": {
+          "model": "skip me",
+          "array": [
+            "model",
+            true,
+            null,
+            3
+          ]
+        }
+      },
+      "fallback": "o200k_base",
+      "tokens": 17
+    },
+    {
+      "model": "",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "chatgpt-4o-latest",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello é 🦊\n世界"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "fine",
+                "n": 3
+              }
+            ]
+          }
+        ],
+        "nested": {
+          "model": "skip me",
+          "array": [
+            "model",
+            true,
+            null,
+            3
+          ]
+        }
+      },
+      "fallback": "o200k_base",
+      "tokens": 17
+    },
+    {
+      "model": "gpt-4o",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "chatgpt-4o-latest",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello é 🦊\n世界"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "fine",
+                "n": 3
+              }
+            ]
+          }
+        ],
+        "nested": {
+          "model": "skip me",
+          "array": [
+            "model",
+            true,
+            null,
+            3
+          ]
+        }
+      },
+      "fallback": "o200k_base",
+      "tokens": 17
+    },
+    {
+      "model": null,
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "chatgpt-4o-latest",
+        "prompt": "<|endoftext|>"
+      },
+      "fallback": "o200k_base",
+      "error": "ValueError"
+    },
+    {
+      "model": "",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "chatgpt-4o-latest",
+        "prompt": "<|endoftext|>"
+      },
+      "fallback": "o200k_base",
+      "error": "ValueError"
+    },
+    {
+      "model": "gpt-4o",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "chatgpt-4o-latest",
+        "prompt": "<|endoftext|>"
+      },
+      "fallback": "o200k_base",
+      "error": "ValueError"
+    },
+    {
+      "model": null,
+      "tokens_per_message": 3,
+      "payload": {
+        "prompt": "Hello, world!"
+      },
+      "fallback": "cl100k_base",
+      "tokens": 4
+    },
+    {
+      "model": "",
+      "tokens_per_message": 3,
+      "payload": {
+        "prompt": "Hello, world!"
+      },
+      "fallback": "cl100k_base",
+      "tokens": 4
+    },
+    {
+      "model": "gpt-4o",
+      "tokens_per_message": 3,
+      "payload": {
+        "prompt": "Hello, world!"
+      },
+      "fallback": "o200k_base",
+      "tokens": 4
+    },
+    {
+      "model": null,
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "o1-demo",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello é 🦊\n世界"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "fine",
+                "n": 3
+              }
+            ]
+          }
+        ],
+        "nested": {
+          "model": "skip me",
+          "array": [
+            "model",
+            true,
+            null,
+            3
+          ]
+        }
+      },
+      "fallback": "o200k_base",
+      "tokens": 17
+    },
+    {
+      "model": "",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "o1-demo",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello é 🦊\n世界"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "fine",
+                "n": 3
+              }
+            ]
+          }
+        ],
+        "nested": {
+          "model": "skip me",
+          "array": [
+            "model",
+            true,
+            null,
+            3
+          ]
+        }
+      },
+      "fallback": "o200k_base",
+      "tokens": 17
+    },
+    {
+      "model": "gpt-4o",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "o1-demo",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello é 🦊\n世界"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "fine",
+                "n": 3
+              }
+            ]
+          }
+        ],
+        "nested": {
+          "model": "skip me",
+          "array": [
+            "model",
+            true,
+            null,
+            3
+          ]
+        }
+      },
+      "fallback": "o200k_base",
+      "tokens": 17
+    },
+    {
+      "model": null,
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "o1-demo",
+        "prompt": "<|endoftext|>"
+      },
+      "fallback": "o200k_base",
+      "error": "ValueError"
+    },
+    {
+      "model": "",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "o1-demo",
+        "prompt": "<|endoftext|>"
+      },
+      "fallback": "o200k_base",
+      "error": "ValueError"
+    },
+    {
+      "model": "gpt-4o",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "o1-demo",
+        "prompt": "<|endoftext|>"
+      },
+      "fallback": "o200k_base",
+      "error": "ValueError"
+    },
+    {
+      "model": null,
+      "tokens_per_message": 3,
+      "payload": {
+        "prompt": "Hello, world!"
+      },
+      "fallback": "cl100k_base",
+      "tokens": 4
+    },
+    {
+      "model": "",
+      "tokens_per_message": 3,
+      "payload": {
+        "prompt": "Hello, world!"
+      },
+      "fallback": "cl100k_base",
+      "tokens": 4
+    },
+    {
+      "model": "gpt-4o",
+      "tokens_per_message": 3,
+      "payload": {
+        "prompt": "Hello, world!"
+      },
+      "fallback": "o200k_base",
+      "tokens": 4
+    },
+    {
+      "model": null,
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "o3-demo",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello é 🦊\n世界"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "fine",
+                "n": 3
+              }
+            ]
+          }
+        ],
+        "nested": {
+          "model": "skip me",
+          "array": [
+            "model",
+            true,
+            null,
+            3
+          ]
+        }
+      },
+      "fallback": "o200k_base",
+      "tokens": 17
+    },
+    {
+      "model": "",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "o3-demo",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello é 🦊\n世界"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "fine",
+                "n": 3
+              }
+            ]
+          }
+        ],
+        "nested": {
+          "model": "skip me",
+          "array": [
+            "model",
+            true,
+            null,
+            3
+          ]
+        }
+      },
+      "fallback": "o200k_base",
+      "tokens": 17
+    },
+    {
+      "model": "gpt-4o",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "o3-demo",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello é 🦊\n世界"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "fine",
+                "n": 3
+              }
+            ]
+          }
+        ],
+        "nested": {
+          "model": "skip me",
+          "array": [
+            "model",
+            true,
+            null,
+            3
+          ]
+        }
+      },
+      "fallback": "o200k_base",
+      "tokens": 17
+    },
+    {
+      "model": null,
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "o3-demo",
+        "prompt": "<|endoftext|>"
+      },
+      "fallback": "o200k_base",
+      "error": "ValueError"
+    },
+    {
+      "model": "",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "o3-demo",
+        "prompt": "<|endoftext|>"
+      },
+      "fallback": "o200k_base",
+      "error": "ValueError"
+    },
+    {
+      "model": "gpt-4o",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "o3-demo",
+        "prompt": "<|endoftext|>"
+      },
+      "fallback": "o200k_base",
+      "error": "ValueError"
+    },
+    {
+      "model": null,
+      "tokens_per_message": 3,
+      "payload": {
+        "prompt": "Hello, world!"
+      },
+      "fallback": "cl100k_base",
+      "tokens": 4
+    },
+    {
+      "model": "",
+      "tokens_per_message": 3,
+      "payload": {
+        "prompt": "Hello, world!"
+      },
+      "fallback": "cl100k_base",
+      "tokens": 4
+    },
+    {
+      "model": "gpt-4o",
+      "tokens_per_message": 3,
+      "payload": {
+        "prompt": "Hello, world!"
+      },
+      "fallback": "o200k_base",
+      "tokens": 4
+    },
+    {
+      "model": null,
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "o4-mini",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello é 🦊\n世界"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "fine",
+                "n": 3
+              }
+            ]
+          }
+        ],
+        "nested": {
+          "model": "skip me",
+          "array": [
+            "model",
+            true,
+            null,
+            3
+          ]
+        }
+      },
+      "fallback": "o200k_base",
+      "tokens": 17
+    },
+    {
+      "model": "",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "o4-mini",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello é 🦊\n世界"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "fine",
+                "n": 3
+              }
+            ]
+          }
+        ],
+        "nested": {
+          "model": "skip me",
+          "array": [
+            "model",
+            true,
+            null,
+            3
+          ]
+        }
+      },
+      "fallback": "o200k_base",
+      "tokens": 17
+    },
+    {
+      "model": "gpt-4o",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "o4-mini",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello é 🦊\n世界"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "fine",
+                "n": 3
+              }
+            ]
+          }
+        ],
+        "nested": {
+          "model": "skip me",
+          "array": [
+            "model",
+            true,
+            null,
+            3
+          ]
+        }
+      },
+      "fallback": "o200k_base",
+      "tokens": 17
+    },
+    {
+      "model": null,
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "o4-mini",
+        "prompt": "<|endoftext|>"
+      },
+      "fallback": "o200k_base",
+      "error": "ValueError"
+    },
+    {
+      "model": "",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "o4-mini",
+        "prompt": "<|endoftext|>"
+      },
+      "fallback": "o200k_base",
+      "error": "ValueError"
+    },
+    {
+      "model": "gpt-4o",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "o4-mini",
+        "prompt": "<|endoftext|>"
+      },
+      "fallback": "o200k_base",
+      "error": "ValueError"
+    },
+    {
+      "model": null,
+      "tokens_per_message": 3,
+      "payload": {
+        "prompt": "Hello, world!"
+      },
+      "fallback": "cl100k_base",
+      "tokens": 4
+    },
+    {
+      "model": "",
+      "tokens_per_message": 3,
+      "payload": {
+        "prompt": "Hello, world!"
+      },
+      "fallback": "cl100k_base",
+      "tokens": 4
+    },
+    {
+      "model": "gpt-4o",
+      "tokens_per_message": 3,
+      "payload": {
+        "prompt": "Hello, world!"
+      },
+      "fallback": "o200k_base",
+      "tokens": 4
+    },
+    {
+      "model": null,
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "gpt-3.5-turbo",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello é 🦊\n世界"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "fine",
+                "n": 3
+              }
+            ]
+          }
+        ],
+        "nested": {
+          "model": "skip me",
+          "array": [
+            "model",
+            true,
+            null,
+            3
+          ]
+        }
+      },
+      "fallback": "cl100k_base",
+      "tokens": 19
+    },
+    {
+      "model": "",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "gpt-3.5-turbo",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello é 🦊\n世界"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "fine",
+                "n": 3
+              }
+            ]
+          }
+        ],
+        "nested": {
+          "model": "skip me",
+          "array": [
+            "model",
+            true,
+            null,
+            3
+          ]
+        }
+      },
+      "fallback": "cl100k_base",
+      "tokens": 19
+    },
+    {
+      "model": "gpt-4o",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "gpt-3.5-turbo",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello é 🦊\n世界"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "fine",
+                "n": 3
+              }
+            ]
+          }
+        ],
+        "nested": {
+          "model": "skip me",
+          "array": [
+            "model",
+            true,
+            null,
+            3
+          ]
+        }
+      },
+      "fallback": "o200k_base",
+      "tokens": 17
+    },
+    {
+      "model": null,
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "gpt-3.5-turbo",
+        "prompt": "<|endoftext|>"
+      },
+      "fallback": "cl100k_base",
+      "error": "ValueError"
+    },
+    {
+      "model": "",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "gpt-3.5-turbo",
+        "prompt": "<|endoftext|>"
+      },
+      "fallback": "cl100k_base",
+      "error": "ValueError"
+    },
+    {
+      "model": "gpt-4o",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "gpt-3.5-turbo",
+        "prompt": "<|endoftext|>"
+      },
+      "fallback": "o200k_base",
+      "error": "ValueError"
+    },
+    {
+      "model": null,
+      "tokens_per_message": 3,
+      "payload": {
+        "prompt": "Hello, world!"
+      },
+      "fallback": "cl100k_base",
+      "tokens": 4
+    },
+    {
+      "model": "",
+      "tokens_per_message": 3,
+      "payload": {
+        "prompt": "Hello, world!"
+      },
+      "fallback": "cl100k_base",
+      "tokens": 4
+    },
+    {
+      "model": "gpt-4o",
+      "tokens_per_message": 3,
+      "payload": {
+        "prompt": "Hello, world!"
+      },
+      "fallback": "o200k_base",
+      "tokens": 4
+    },
+    {
+      "model": null,
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "text-davinci-003",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello é 🦊\n世界"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "fine",
+                "n": 3
+              }
+            ]
+          }
+        ],
+        "nested": {
+          "model": "skip me",
+          "array": [
+            "model",
+            true,
+            null,
+            3
+          ]
+        }
+      },
+      "fallback": "cl100k_base",
+      "tokens": 21
+    },
+    {
+      "model": "",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "text-davinci-003",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello é 🦊\n世界"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "fine",
+                "n": 3
+              }
+            ]
+          }
+        ],
+        "nested": {
+          "model": "skip me",
+          "array": [
+            "model",
+            true,
+            null,
+            3
+          ]
+        }
+      },
+      "fallback": "cl100k_base",
+      "tokens": 21
+    },
+    {
+      "model": "gpt-4o",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "text-davinci-003",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello é 🦊\n世界"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "fine",
+                "n": 3
+              }
+            ]
+          }
+        ],
+        "nested": {
+          "model": "skip me",
+          "array": [
+            "model",
+            true,
+            null,
+            3
+          ]
+        }
+      },
+      "fallback": "o200k_base",
+      "tokens": 17
+    },
+    {
+      "model": null,
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "text-davinci-003",
+        "prompt": "<|endoftext|>"
+      },
+      "fallback": "cl100k_base",
+      "error": "ValueError"
+    },
+    {
+      "model": "",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "text-davinci-003",
+        "prompt": "<|endoftext|>"
+      },
+      "fallback": "cl100k_base",
+      "error": "ValueError"
+    },
+    {
+      "model": "gpt-4o",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "text-davinci-003",
+        "prompt": "<|endoftext|>"
+      },
+      "fallback": "o200k_base",
+      "error": "ValueError"
+    },
+    {
+      "model": null,
+      "tokens_per_message": 3,
+      "payload": {
+        "prompt": "Hello, world!"
+      },
+      "fallback": "cl100k_base",
+      "tokens": 4
+    },
+    {
+      "model": "",
+      "tokens_per_message": 3,
+      "payload": {
+        "prompt": "Hello, world!"
+      },
+      "fallback": "cl100k_base",
+      "tokens": 4
+    },
+    {
+      "model": "gpt-4o",
+      "tokens_per_message": 3,
+      "payload": {
+        "prompt": "Hello, world!"
+      },
+      "fallback": "o200k_base",
+      "tokens": 4
+    },
+    {
+      "model": null,
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "text-davinci-edit-001",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello é 🦊\n世界"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "fine",
+                "n": 3
+              }
+            ]
+          }
+        ],
+        "nested": {
+          "model": "skip me",
+          "array": [
+            "model",
+            true,
+            null,
+            3
+          ]
+        }
+      },
+      "fallback": "cl100k_base",
+      "tokens": 21
+    },
+    {
+      "model": "",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "text-davinci-edit-001",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello é 🦊\n世界"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "fine",
+                "n": 3
+              }
+            ]
+          }
+        ],
+        "nested": {
+          "model": "skip me",
+          "array": [
+            "model",
+            true,
+            null,
+            3
+          ]
+        }
+      },
+      "fallback": "cl100k_base",
+      "tokens": 21
+    },
+    {
+      "model": "gpt-4o",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "text-davinci-edit-001",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello é 🦊\n世界"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "fine",
+                "n": 3
+              }
+            ]
+          }
+        ],
+        "nested": {
+          "model": "skip me",
+          "array": [
+            "model",
+            true,
+            null,
+            3
+          ]
+        }
+      },
+      "fallback": "o200k_base",
+      "tokens": 17
+    },
+    {
+      "model": null,
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "text-davinci-edit-001",
+        "prompt": "<|endoftext|>"
+      },
+      "fallback": "cl100k_base",
+      "error": "ValueError"
+    },
+    {
+      "model": "",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "text-davinci-edit-001",
+        "prompt": "<|endoftext|>"
+      },
+      "fallback": "cl100k_base",
+      "error": "ValueError"
+    },
+    {
+      "model": "gpt-4o",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "text-davinci-edit-001",
+        "prompt": "<|endoftext|>"
+      },
+      "fallback": "o200k_base",
+      "error": "ValueError"
+    },
+    {
+      "model": null,
+      "tokens_per_message": 3,
+      "payload": {
+        "prompt": "Hello, world!"
+      },
+      "fallback": "cl100k_base",
+      "tokens": 4
+    },
+    {
+      "model": "",
+      "tokens_per_message": 3,
+      "payload": {
+        "prompt": "Hello, world!"
+      },
+      "fallback": "cl100k_base",
+      "tokens": 4
+    },
+    {
+      "model": "gpt-4o",
+      "tokens_per_message": 3,
+      "payload": {
+        "prompt": "Hello, world!"
+      },
+      "fallback": "o200k_base",
+      "tokens": 4
+    },
+    {
+      "model": null,
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "davinci",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello é 🦊\n世界"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "fine",
+                "n": 3
+              }
+            ]
+          }
+        ],
+        "nested": {
+          "model": "skip me",
+          "array": [
+            "model",
+            true,
+            null,
+            3
+          ]
+        }
+      },
+      "fallback": "cl100k_base",
+      "tokens": 21
+    },
+    {
+      "model": "",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "davinci",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello é 🦊\n世界"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "fine",
+                "n": 3
+              }
+            ]
+          }
+        ],
+        "nested": {
+          "model": "skip me",
+          "array": [
+            "model",
+            true,
+            null,
+            3
+          ]
+        }
+      },
+      "fallback": "cl100k_base",
+      "tokens": 21
+    },
+    {
+      "model": "gpt-4o",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "davinci",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello é 🦊\n世界"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "fine",
+                "n": 3
+              }
+            ]
+          }
+        ],
+        "nested": {
+          "model": "skip me",
+          "array": [
+            "model",
+            true,
+            null,
+            3
+          ]
+        }
+      },
+      "fallback": "o200k_base",
+      "tokens": 17
+    },
+    {
+      "model": null,
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "davinci",
+        "prompt": "<|endoftext|>"
+      },
+      "fallback": "cl100k_base",
+      "error": "ValueError"
+    },
+    {
+      "model": "",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "davinci",
+        "prompt": "<|endoftext|>"
+      },
+      "fallback": "cl100k_base",
+      "error": "ValueError"
+    },
+    {
+      "model": "gpt-4o",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "davinci",
+        "prompt": "<|endoftext|>"
+      },
+      "fallback": "o200k_base",
+      "error": "ValueError"
+    },
+    {
+      "model": null,
+      "tokens_per_message": 3,
+      "payload": {
+        "prompt": "Hello, world!"
+      },
+      "fallback": "cl100k_base",
+      "tokens": 4
+    },
+    {
+      "model": "",
+      "tokens_per_message": 3,
+      "payload": {
+        "prompt": "Hello, world!"
+      },
+      "fallback": "cl100k_base",
+      "tokens": 4
+    },
+    {
+      "model": "gpt-4o",
+      "tokens_per_message": 3,
+      "payload": {
+        "prompt": "Hello, world!"
+      },
+      "fallback": "o200k_base",
+      "tokens": 4
+    },
+    {
+      "model": null,
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "namespace:GPT-5-custom",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello é 🦊\n世界"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "fine",
+                "n": 3
+              }
+            ]
+          }
+        ],
+        "nested": {
+          "model": "skip me",
+          "array": [
+            "model",
+            true,
+            null,
+            3
+          ]
+        }
+      },
+      "fallback": "o200k_base",
+      "tokens": 17
+    },
+    {
+      "model": "",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "namespace:GPT-5-custom",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello é 🦊\n世界"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "fine",
+                "n": 3
+              }
+            ]
+          }
+        ],
+        "nested": {
+          "model": "skip me",
+          "array": [
+            "model",
+            true,
+            null,
+            3
+          ]
+        }
+      },
+      "fallback": "o200k_base",
+      "tokens": 17
+    },
+    {
+      "model": "gpt-4o",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "namespace:GPT-5-custom",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello é 🦊\n世界"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "fine",
+                "n": 3
+              }
+            ]
+          }
+        ],
+        "nested": {
+          "model": "skip me",
+          "array": [
+            "model",
+            true,
+            null,
+            3
+          ]
+        }
+      },
+      "fallback": "o200k_base",
+      "tokens": 17
+    },
+    {
+      "model": null,
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "namespace:GPT-5-custom",
+        "prompt": "<|endoftext|>"
+      },
+      "fallback": "o200k_base",
+      "error": "ValueError"
+    },
+    {
+      "model": "",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "namespace:GPT-5-custom",
+        "prompt": "<|endoftext|>"
+      },
+      "fallback": "o200k_base",
+      "error": "ValueError"
+    },
+    {
+      "model": "gpt-4o",
+      "tokens_per_message": 3,
+      "payload": {
+        "model": "namespace:GPT-5-custom",
+        "prompt": "<|endoftext|>"
+      },
+      "fallback": "o200k_base",
+      "error": "ValueError"
+    }
+  ],
+  "encodings": {
+    "cl100k_base": {
+      "vocab_sha256": "6ed67a08b2abd9e73d17ebd62070d4ba9f061a36b7627f7c6c3df3df0b20b968",
+      "special_tokens": {
+        "<|endoftext|>": 100257,
+        "<|fim_prefix|>": 100258,
+        "<|fim_middle|>": 100259,
+        "<|fim_suffix|>": 100260,
+        "<|endofprompt|>": 100276
+      }
+    },
+    "o200k_base": {
+      "vocab_sha256": "dbac433f416b678a17b3c4d6e713b256f0b3da90f387022c037f2a3238ab3d3c",
+      "special_tokens": {
+        "<|endoftext|>": 199999,
+        "<|endofprompt|>": 200018
+      }
+    },
+    "p50k_base": {
+      "vocab_sha256": "7b311264f823207e328885492e6a740ccca6a89edbedab4e57121db1bea93876",
+      "special_tokens": {
+        "<|endoftext|>": 50256
+      }
+    },
+    "p50k_edit": {
+      "vocab_sha256": "7b311264f823207e328885492e6a740ccca6a89edbedab4e57121db1bea93876",
+      "special_tokens": {
+        "<|endoftext|>": 50256,
+        "<|fim_prefix|>": 50281,
+        "<|fim_middle|>": 50282,
+        "<|fim_suffix|>": 50283
+      }
+    },
+    "r50k_base": {
+      "vocab_sha256": "57632df5c84a5228c9187a7d279c1ad86f31713c8441eba2b03329aea0fd0f9d",
+      "special_tokens": {
+        "<|endoftext|>": 50256
+      }
+    }
+  }
+}

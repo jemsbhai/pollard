@@ -1,0 +1,1 @@
+{"status": "passed", "checks": ["postgres", "redis", "kafka", "mongodb", "neo4j"]}

@@ -923,3 +923,101 @@ Provenance gate:
 No environment, timing, or performance finding is recorded at this checkpoint.
 The raw result and numeric claims must be added only after the final integrated
 wheel passes this provenance gate. No network or provider credential is needed.
+
+## 2026-10-08 Rust PyPI 1.6.0 Parity: Protocol and Implementation
+
+This is a separate native-port experiment, not the pending EXP-007 paired
+Python-callable overhead protocol. The oracle is the published Pollard 1.6.0
+wheel (SHA-256 569fb5f130a82c9be327b8dcbd285e3be063200bd9773ca15c5d6bb62edd627f).
+The original dirty Python checkout remains unchanged. Work was implemented in
+an isolated worktree from 51e3a245641044fc8b3d6a90fc49f3cbfcbf107d.
+
+Implementation covers runtime/registry semantics, async calls and streams,
+streaming revalidation, measurements, Tokenmaster profiles, optional tokenization
+and NVML sampling, all eight stores, shared reservations, seals/custody and
+merge/import/export, MCP/OTel bridges and native operator commands. The evidence
+README lists numeric limits, caller-owned SDK interfaces and database conditions.
+
+Validation combines release-generated differential fixtures, native failure
+regressions, stable and Rust 1.74 checks, optimized tests, package verification,
+three SQLite interop programs, and live PostgreSQL/Redis/MongoDB/Neo4j/Kafka
+interchange. Lost acknowledgements, reservation contention, cancellation,
+post-result failures, corrupt state, reconnect and readonly boundaries are
+covered where detailed in the test matrix. Remote suites are explicitly ignored
+unless requested and fail when required configuration is absent. Reusable CI
+jobs were added; no claim is made that hosted CI has already run.
+
+A cross-language MongoDB test exposed the release's default naive datetime
+conversion bug on non-UTC hosts. The mixed-runtime test uses Python
+MongoStore(..., tz_aware=True); native server epoch time is not changed to
+reproduce the incorrect local-time conversion. Real Neo4j routed discovery and
+bookmarks are tested on one server, without claiming cluster failover coverage.
+
+Performance protocol: release builds; two warmups/seven samples for identity,
+MemoryStore record/hybrid/replay and wide traversal; separate fresh-database
+SQLite40-step batches with WAL/NORMAL; three fresh-process stream samples at
+10,000/200,000 chunks with unretained chunks and equal observers. The identical
+MemoryStore benchmark runner also runs the archived original Rust core. Checksums,
+accounting and no-dispatch invariants are checked outside timed regions.
+Raw samples, medians, extrema, source/binary hashes and wheel import provenance
+are retained. Process memory includes Python/native runtime startup. No real
+provider latency, remote-store performance, pricing savings or energy savings
+are inferred. No budgets are active in timing kernels, so budget-total cache
+benefits are validated by read-count regressions rather than attributed to
+these latency ratios. Provider spend is 0 USD.
+
+Final review found a precision edge before measurement: the dependency's
+ordinary Decimal parser could round tiny input prices/ledger amounts to zero.
+A shared exact parser now rejects significant digits outside the native range,
+checks original profile JSON before float conversion, bounds exponent expansion,
+and permits only exact removal of redundant zeros. Cost multiplication/division
+rejects nonzero underflow. Regression tests cover prices, limits, imported ledger
+and recording charges, and Tokenmaster quotations. Finite nonzero decimal
+arithmetic can still round; no arbitrary-precision claim is made.
+
+Final native validation passed on unchanged sources: 185 default tests on stable
+Rust1.94, Rust1.74 and optimized release builds; 205 optional-feature tests on
+each toolchain; stable/MSRV default/optional Clippy with warnings denied;
+formatting; verified package archive; all three SQLite interchange programs;
+and explicit local NVML sampling. The 31 live service tests plus one Redis
+configuration test, all five remote interchange programs and all five CLI
+selectors passed after the decimal fix. The ten disposable-runner guards passed
+on both Windows and Linux. All owned test containers were removed. Hosted CI
+was configured but not executed here. Counts overlap across configurations.
+
+## 2026-10-08 Rust PyPI 1.6.0 Parity: Measured Results
+
+Final release-build measurements completed with all workload checksum and
+accounting assertions passing. Source and executable hashes remained unchanged
+through each run. Raw samples, environment, protocols and validation receipts
+are in evidence/rust-parity-1.6.0. This is separate from EXP-007.
+
+- MemoryStore, 1,000-call chains: record 108.56x, strict replay
+  453.43x, hybrid hits 2.45x faster than the pinned Python wheel.
+  Against the original Rust core the respective ratios are
+  46.26x, 99.12x and 56.96x.
+- Wide traversal of 10,000 children: 9.28x faster than Python and
+  86.56x faster than original Rust. The child index removes repeated
+  whole-store child scans; immutable-prefix caching reduces repeated ancestry work.
+- SQLite, 40 steps: record 1.39x and strict replay
+  1.85x faster than Python, but hybrid takes
+  2.48x as long. Native hybrid verifies ancestry; Python1.6 performs
+  the explicit verification pass only for strict replay. External SQLite mutation
+  prevents use of the native immutable-store cache. This is a behavior/cost
+  difference; not all benchmarked paths have identical verification work.
+- Identity-only hashing is 26.3% slower than original Rust, while still
+  2.66x faster than Python. The experiment does not isolate the cost of
+  expanded numeric and serialization fidelity from other changes.
+- At 200,000 unretained chunks, native total peak process memory is
+  5.20 MiB versus
+  96.93 MiB for Python: 94.64% lower peak,
+  with 1.76x faster callback/merge execution. This includes interpreter/runtime
+  startup memory, not just chunk allocations. Three fresh processes per case.
+
+Ratios summarize medians on one Intel i9-14900HX Windows host. Power profile and
+OS background activity were not controlled. SQLite engines differ (Python3.43.1,
+Rust3.45.0). Timing excludes providers, networking, setup and process startup;
+process-memory measurements include startup. No energy, remote throughput,
+provider-cost or complete-agent speedup claim is supported. Native budget-total
+caching is supported by read-count/invalidation tests, not by these no-budget
+latency workloads. Both regressions and raw distributions are retained.

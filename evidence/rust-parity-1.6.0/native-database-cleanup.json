@@ -1,0 +1,27 @@
+{
+  "status": "passed",
+  "containers": [
+    {
+      "name": "pollard-parity-postgres-20261008",
+      "verified_container_id": "dae49edee6288b2c49fa9ded3d30e461eb185985f47e1545f9e2cf5451f8d699",
+      "label_verified": true,
+      "removed": true,
+      "anonymous_volumes_removed": true
+    },
+    {
+      "name": "pollard-parity-mongo-20261008",
+      "verified_container_id": "f0acfa4c3dbb486a1c277efcea3b0a0fdf84579527ce869b17a52fb7182ffd47",
+      "label_verified": true,
+      "removed": true,
+      "anonymous_volumes_removed": true
+    },
+    {
+      "name": "pollard-parity-neo4j-20261008",
+      "verified_container_id": "f8b2abd30c46061cfcf1e45087d21eb8dd7ea879dc22bcbdde985a2d5f403c7c",
+      "label_verified": true,
+      "removed": true,
+      "anonymous_volumes_removed": true
+    }
+  ],
+  "unrelated_services_untouched": true
+}

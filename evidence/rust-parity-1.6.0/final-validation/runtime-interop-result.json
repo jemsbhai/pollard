@@ -1,0 +1,300 @@
+{
+  "status": "passed",
+  "wheel_sha256": "569fb5f130a82c9be327b8dcbd285e3be063200bd9773ca15c5d6bb62edd627f",
+  "python": "3.12.2 (tags/v3.12.2:6abddd9, Feb  6 2024, 21:26:36) [MSC v.1937 64 bit (AMD64)]",
+  "checks": [
+    "Rust Runtime shares exact Python integer-limit window ledger key",
+    "Rust Runtime refuses a live Python window reservation before dispatch",
+    "Rust Runtime observes settled Python window usage",
+    "Python Runtime refuses after native Rust runtime exhausts shared window",
+    "Root budget scope identity matches across runtimes",
+    "Branch and ancestor budget scopes match across runtimes",
+    "Completed mixed-runtime probes leave no reservation rows"
+  ],
+  "cases": {
+    "window": {
+      "during_python_callback": [
+        {
+          "rust": {
+            "mode": "window",
+            "status": "refused",
+            "dispatched": false,
+            "root_id": "c419ffd2df90bd5b956445881dc7ca39d8841c93f9a38df1bc8d14c63590c2b7",
+            "anchor_id": "c419ffd2df90bd5b956445881dc7ca39d8841c93f9a38df1bc8d14c63590c2b7",
+            "window_key": "9f7a56f630934d91de672acb968f6250acce40cd7428db36c0b02fedb327fe7e",
+            "cursor": {
+              "id": "faa916fc842c2497980c5e5bb2d9a156416ca0d4dc8903dc37f27555bbefa42d",
+              "parent": "c419ffd2df90bd5b956445881dc7ca39d8841c93f9a38df1bc8d14c63590c2b7",
+              "kind": "refusal",
+              "attempt": 0,
+              "payload": {
+                "blocked_kind": "model_call",
+                "blocked_payload_digest": "e2f4759be0db0fcd8cd52c61493a5a8fa8763e3000187e7d645b7eb91423dd2b",
+                "meter": "requests",
+                "reason": "window",
+                "remaining": "0",
+                "requested": "1",
+                "window_seconds": 60
+              },
+              "result": null,
+              "result_text": null,
+              "result_digest": null,
+              "meta": {}
+            }
+          },
+          "active_python_reservations": [
+            [
+              "window",
+              "9f7a56f630934d91de672acb968f6250acce40cd7428db36c0b02fedb327fe7e",
+              "requests",
+              "1"
+            ]
+          ]
+        }
+      ],
+      "after_python_settlement": {
+        "mode": "window",
+        "status": "refused",
+        "dispatched": false,
+        "root_id": "c419ffd2df90bd5b956445881dc7ca39d8841c93f9a38df1bc8d14c63590c2b7",
+        "anchor_id": "c419ffd2df90bd5b956445881dc7ca39d8841c93f9a38df1bc8d14c63590c2b7",
+        "window_key": "9f7a56f630934d91de672acb968f6250acce40cd7428db36c0b02fedb327fe7e",
+        "cursor": {
+          "id": "faa916fc842c2497980c5e5bb2d9a156416ca0d4dc8903dc37f27555bbefa42d",
+          "parent": "c419ffd2df90bd5b956445881dc7ca39d8841c93f9a38df1bc8d14c63590c2b7",
+          "kind": "refusal",
+          "attempt": 0,
+          "payload": {
+            "blocked_kind": "model_call",
+            "blocked_payload_digest": "e2f4759be0db0fcd8cd52c61493a5a8fa8763e3000187e7d645b7eb91423dd2b",
+            "meter": "requests",
+            "reason": "window",
+            "remaining": "0",
+            "requested": "1",
+            "window_seconds": 60
+          },
+          "result": null,
+          "result_text": null,
+          "result_digest": null,
+          "meta": {}
+        }
+      },
+      "python_root": "c419ffd2df90bd5b956445881dc7ca39d8841c93f9a38df1bc8d14c63590c2b7",
+      "python_anchor": "c419ffd2df90bd5b956445881dc7ca39d8841c93f9a38df1bc8d14c63590c2b7"
+    },
+    "budget": {
+      "during_python_callback": [
+        {
+          "rust": {
+            "mode": "budget",
+            "status": "refused",
+            "dispatched": false,
+            "root_id": "3c997b6f08ae85707607cdc79123419b66073ea465e84b75cd52691b392a9ef7",
+            "anchor_id": "3c997b6f08ae85707607cdc79123419b66073ea465e84b75cd52691b392a9ef7",
+            "window_key": "621683cb3abbd51a64b5dfc5a3198ba31d3dd222fce2482087f62155e4ff7681",
+            "cursor": {
+              "id": "c384e62a3715e68165053e59b0ab6596340ae447886f419be86cf9b0f23b0fe2",
+              "parent": "3c997b6f08ae85707607cdc79123419b66073ea465e84b75cd52691b392a9ef7",
+              "kind": "refusal",
+              "attempt": 0,
+              "payload": {
+                "blocked_kind": "model_call",
+                "blocked_payload_digest": "47c5ab3b107ffb18d34d8d9ccfcbb3a2d02af37736c0ad5c6b31b1e1ea0b4d80",
+                "meter": "steps",
+                "reason": "budget",
+                "remaining": "0",
+                "requested": "1"
+              },
+              "result": null,
+              "result_text": null,
+              "result_digest": null,
+              "meta": {}
+            }
+          },
+          "active_python_reservations": [
+            [
+              "budget",
+              "3c997b6f08ae85707607cdc79123419b66073ea465e84b75cd52691b392a9ef7",
+              "steps",
+              "1"
+            ]
+          ]
+        }
+      ],
+      "after_python_settlement": {
+        "mode": "budget",
+        "status": "refused",
+        "dispatched": false,
+        "root_id": "3c997b6f08ae85707607cdc79123419b66073ea465e84b75cd52691b392a9ef7",
+        "anchor_id": "3c997b6f08ae85707607cdc79123419b66073ea465e84b75cd52691b392a9ef7",
+        "window_key": "621683cb3abbd51a64b5dfc5a3198ba31d3dd222fce2482087f62155e4ff7681",
+        "cursor": {
+          "id": "c384e62a3715e68165053e59b0ab6596340ae447886f419be86cf9b0f23b0fe2",
+          "parent": "3c997b6f08ae85707607cdc79123419b66073ea465e84b75cd52691b392a9ef7",
+          "kind": "refusal",
+          "attempt": 0,
+          "payload": {
+            "blocked_kind": "model_call",
+            "blocked_payload_digest": "47c5ab3b107ffb18d34d8d9ccfcbb3a2d02af37736c0ad5c6b31b1e1ea0b4d80",
+            "meter": "steps",
+            "reason": "budget",
+            "remaining": "0",
+            "requested": "1"
+          },
+          "result": null,
+          "result_text": null,
+          "result_digest": null,
+          "meta": {}
+        }
+      },
+      "python_root": "3c997b6f08ae85707607cdc79123419b66073ea465e84b75cd52691b392a9ef7",
+      "python_anchor": "3c997b6f08ae85707607cdc79123419b66073ea465e84b75cd52691b392a9ef7"
+    },
+    "branch": {
+      "during_python_callback": [
+        {
+          "rust": {
+            "mode": "branch",
+            "status": "refused",
+            "dispatched": false,
+            "root_id": "443f6a07b461e3ea66566b591716a7b6d5dd6f4a2667604dc74861150b475d4b",
+            "anchor_id": "66b2dc40d1f7776ac6fa606a9048919ce747d11214f6d41ef3288c3f57ec995f",
+            "window_key": "366aeb0df0c8bd5eeeadc46138e5e8fe86579d2f16defb424478cf2f1c83ec2a",
+            "cursor": {
+              "id": "b1a8af337746195d2589c9f337b0e535ac09a4626fe6fb39cfb60a8e3b22d622",
+              "parent": "66b2dc40d1f7776ac6fa606a9048919ce747d11214f6d41ef3288c3f57ec995f",
+              "kind": "refusal",
+              "attempt": 0,
+              "payload": {
+                "blocked_kind": "model_call",
+                "blocked_payload_digest": "585f207a78230cc1ab947477abd48a2dd65257e6b4ee6c947d2be313a8d042da",
+                "meter": "steps",
+                "reason": "budget",
+                "remaining": "0",
+                "requested": "1"
+              },
+              "result": null,
+              "result_text": null,
+              "result_digest": null,
+              "meta": {}
+            }
+          },
+          "active_python_reservations": [
+            [
+              "budget",
+              "443f6a07b461e3ea66566b591716a7b6d5dd6f4a2667604dc74861150b475d4b",
+              "steps",
+              "1"
+            ],
+            [
+              "budget",
+              "66b2dc40d1f7776ac6fa606a9048919ce747d11214f6d41ef3288c3f57ec995f",
+              "steps",
+              "1"
+            ]
+          ]
+        }
+      ],
+      "after_python_settlement": {
+        "mode": "branch",
+        "status": "refused",
+        "dispatched": false,
+        "root_id": "443f6a07b461e3ea66566b591716a7b6d5dd6f4a2667604dc74861150b475d4b",
+        "anchor_id": "66b2dc40d1f7776ac6fa606a9048919ce747d11214f6d41ef3288c3f57ec995f",
+        "window_key": "366aeb0df0c8bd5eeeadc46138e5e8fe86579d2f16defb424478cf2f1c83ec2a",
+        "cursor": {
+          "id": "b1a8af337746195d2589c9f337b0e535ac09a4626fe6fb39cfb60a8e3b22d622",
+          "parent": "66b2dc40d1f7776ac6fa606a9048919ce747d11214f6d41ef3288c3f57ec995f",
+          "kind": "refusal",
+          "attempt": 0,
+          "payload": {
+            "blocked_kind": "model_call",
+            "blocked_payload_digest": "585f207a78230cc1ab947477abd48a2dd65257e6b4ee6c947d2be313a8d042da",
+            "meter": "steps",
+            "reason": "budget",
+            "remaining": "0",
+            "requested": "1"
+          },
+          "result": null,
+          "result_text": null,
+          "result_digest": null,
+          "meta": {}
+        }
+      },
+      "python_root": "443f6a07b461e3ea66566b591716a7b6d5dd6f4a2667604dc74861150b475d4b",
+      "python_anchor": "66b2dc40d1f7776ac6fa606a9048919ce747d11214f6d41ef3288c3f57ec995f"
+    },
+    "window_reverse": {
+      "rust": {
+        "mode": "window",
+        "status": "completed",
+        "dispatched": true,
+        "root_id": "d3e763ef8b6e03c589aa2080c295c3f367c1885276d5c7528775a6568d3763ff",
+        "anchor_id": "d3e763ef8b6e03c589aa2080c295c3f367c1885276d5c7528775a6568d3763ff",
+        "window_key": "888fe20f2bd502660c33ad681aad7a28abc02ea20339a32aa853a1671a885c92",
+        "cursor": {
+          "id": "c84cbcdc61c4fe4005aba2a11f0b9f47901b0a8d1d100003f34c1a21f615a758",
+          "parent": "d3e763ef8b6e03c589aa2080c295c3f367c1885276d5c7528775a6568d3763ff",
+          "kind": "model_call",
+          "attempt": 0,
+          "payload": {
+            "case": "window",
+            "source": "rust"
+          },
+          "result": {
+            "text": "rust dispatched",
+            "usage": {
+              "input_tokens": 0,
+              "output_tokens": 0
+            }
+          },
+          "result_text": "{\"text\":\"rust dispatched\",\"usage\":{\"input_tokens\":0,\"output_tokens\":0}}",
+          "result_digest": "f88dbdd1567f16e1a2f58714bf83da8ce6bb009ed2c9f9779d3c8c2f1635e195",
+          "meta": {
+            "state": "completed",
+            "duration_s": 0.0001486,
+            "created_at_unix": 1791455997.2839348,
+            "usage": {
+              "input_tokens": 0,
+              "output_tokens": 0
+            },
+            "charges": {
+              "requests": 1,
+              "seconds": 0.0001486,
+              "steps": 1
+            },
+            "window_events": [
+              {
+                "time": 1791455997.283977,
+                "charges": {
+                  "requests": 1
+                },
+                "keys": {
+                  "requests": "888fe20f2bd502660c33ad681aad7a28abc02ea20339a32aa853a1671a885c92"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "window_events": [
+        [
+          "888fe20f2bd502660c33ad681aad7a28abc02ea20339a32aa853a1671a885c92",
+          "requests",
+          "1"
+        ],
+        [
+          "888fe20f2bd502660c33ad681aad7a28abc02ea20339a32aa853a1671a885c92",
+          "requests",
+          "1"
+        ],
+        [
+          "888fe20f2bd502660c33ad681aad7a28abc02ea20339a32aa853a1671a885c92",
+          "requests",
+          "1"
+        ]
+      ],
+      "python_dispatch_refused": true
+    }
+  }
+}

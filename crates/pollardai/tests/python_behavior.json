@@ -1,0 +1,310 @@
+{
+  "version": "1.6.0",
+  "wheel_sha256": "569fb5f130a82c9be327b8dcbd285e3be063200bd9773ca15c5d6bb62edd627f",
+  "first_run": {
+    "root_id": "fb4f2a23cc196e53f0fa800a71c025e0a9b7ac5890b83c4d9d1a0214175d9dd5",
+    "node": {
+      "id": "c4882b75addd9867f623049798e2c6cebc3d49daa80bd5a825c102cf0580fd30",
+      "parent": "fb4f2a23cc196e53f0fa800a71c025e0a9b7ac5890b83c4d9d1a0214175d9dd5",
+      "kind": "model_call",
+      "attempt": 0,
+      "payload": {
+        "model": "local-demo",
+        "prompt": "hello"
+      },
+      "result": {
+        "text": "offline reply for hello",
+        "usage": {
+          "input_tokens": 2,
+          "output_tokens": 4
+        }
+      },
+      "result_text": "{\"text\":\"offline reply for hello\",\"usage\":{\"input_tokens\":2,\"output_tokens\":4}}",
+      "result_digest": "c2191d10ae61e0576759845ae6d9e78946cf0bfc34d93685d30e1dba6dc66551",
+      "meta": {
+        "charges": {
+          "steps": 1,
+          "tokens": 6
+        },
+        "usage": {
+          "input_tokens": 2,
+          "output_tokens": 4
+        }
+      }
+    },
+    "report": {
+      "spent": {
+        "steps": 1.0,
+        "tokens": 6.0
+      },
+      "avoided": {}
+    },
+    "seal": {
+      "root_id": "fb4f2a23cc196e53f0fa800a71c025e0a9b7ac5890b83c4d9d1a0214175d9dd5",
+      "algorithm": "sha256:pollard/v1:seal",
+      "digest": "33bd9249f8166ca470553dfada515f44a9f0ce24b7c615dad48e0a89a5936ee3",
+      "entries": [
+        {
+          "index": 0,
+          "node_id": "fb4f2a23cc196e53f0fa800a71c025e0a9b7ac5890b83c4d9d1a0214175d9dd5",
+          "parent_id": null,
+          "kind": "root",
+          "result_digest": null,
+          "previous": null,
+          "seal": "97bf4d3d9cde3aeb5705f68f4b4f1d92dd04937c9dd659ddf076902ed4b12037"
+        },
+        {
+          "index": 1,
+          "node_id": "c4882b75addd9867f623049798e2c6cebc3d49daa80bd5a825c102cf0580fd30",
+          "parent_id": "fb4f2a23cc196e53f0fa800a71c025e0a9b7ac5890b83c4d9d1a0214175d9dd5",
+          "kind": "model_call",
+          "result_digest": "c2191d10ae61e0576759845ae6d9e78946cf0bfc34d93685d30e1dba6dc66551",
+          "previous": "97bf4d3d9cde3aeb5705f68f4b4f1d92dd04937c9dd659ddf076902ed4b12037",
+          "seal": "33bd9249f8166ca470553dfada515f44a9f0ce24b7c615dad48e0a89a5936ee3"
+        }
+      ]
+    }
+  },
+  "default_duplicate": {
+    "returned": {
+      "id": "091ff446ad87f61bb794f40e840a4528361e118a7d81c59e3768bdfb9f9373d8",
+      "parent": "a92ce9a4017d0b3936a91a2b2cfb83565e14d4df1815c1cb0b9eb0defc8fe339",
+      "kind": "model_call",
+      "attempt": 0,
+      "payload": {
+        "model": "mock",
+        "prompt": "hello"
+      },
+      "result": {
+        "text": "first",
+        "usage": {
+          "input_tokens": 2,
+          "output_tokens": 3
+        }
+      },
+      "result_text": "{\"text\":\"first\",\"usage\":{\"input_tokens\":2,\"output_tokens\":3}}",
+      "result_digest": "068f3f681538ef0c8d3165e33db5ceb5c75c85bf9c51c93ea854e80292089e2c",
+      "meta": {
+        "charges": {
+          "steps": 1,
+          "tokens": 5
+        },
+        "usage": {
+          "input_tokens": 2,
+          "output_tokens": 3
+        },
+        "result_conflicts": [
+          {
+            "result_digest": "bd96e6ca1ed6c9006e576beaee5b4d0033562bfbaf9a1644ffed9f2b6857b9c3",
+            "result": {
+              "text": "second",
+              "usage": {
+                "input_tokens": 4,
+                "output_tokens": 5
+              }
+            }
+          }
+        ]
+      }
+    },
+    "stored": {
+      "id": "091ff446ad87f61bb794f40e840a4528361e118a7d81c59e3768bdfb9f9373d8",
+      "parent": "a92ce9a4017d0b3936a91a2b2cfb83565e14d4df1815c1cb0b9eb0defc8fe339",
+      "kind": "model_call",
+      "attempt": 0,
+      "payload": {
+        "model": "mock",
+        "prompt": "hello"
+      },
+      "result": {
+        "text": "first",
+        "usage": {
+          "input_tokens": 2,
+          "output_tokens": 3
+        }
+      },
+      "result_text": "{\"text\":\"first\",\"usage\":{\"input_tokens\":2,\"output_tokens\":3}}",
+      "result_digest": "068f3f681538ef0c8d3165e33db5ceb5c75c85bf9c51c93ea854e80292089e2c",
+      "meta": {
+        "charges": {
+          "steps": 1,
+          "tokens": 5
+        },
+        "usage": {
+          "input_tokens": 2,
+          "output_tokens": 3
+        },
+        "result_conflicts": [
+          {
+            "result_digest": "bd96e6ca1ed6c9006e576beaee5b4d0033562bfbaf9a1644ffed9f2b6857b9c3",
+            "result": {
+              "text": "second",
+              "usage": {
+                "input_tokens": 4,
+                "output_tokens": 5
+              }
+            }
+          }
+        ]
+      }
+    },
+    "report": {
+      "spent": {
+        "steps": 1.0,
+        "tokens": 5.0
+      },
+      "avoided": {}
+    }
+  },
+  "budget_refusal": {
+    "error": "budget exceeded for steps",
+    "node": {
+      "id": "d0bc6c9028759bafa2627dc5edd3fe0906d03f45dcec233c6d77cd31cb5120ab",
+      "parent": "1bcb9fc74e3e80474c2bdb56d2918ac558668e3a46f0337996789086dd8f694e",
+      "kind": "refusal",
+      "attempt": 0,
+      "payload": {
+        "reason": "budget",
+        "meter": "steps",
+        "blocked_kind": "model_call",
+        "blocked_payload_digest": "d43331c2068633fb5ab28c4d51aab1bf3056914905db648ac94a8bc09ed7d66f",
+        "requested": "1",
+        "remaining": "0"
+      },
+      "result": null,
+      "result_text": null,
+      "result_digest": null,
+      "meta": {}
+    },
+    "report": {
+      "spent": {},
+      "avoided": {}
+    }
+  },
+  "missing_usage_estimate": {
+    "node": {
+      "id": "dbfd554c256ae8f1aaa5432b2b9883a93f6928228a2544c31673252e20466c8f",
+      "parent": "a1afae97f7a656eb5629ac27c5d48e4dda12f425ab868189c24be7a08198047d",
+      "kind": "model_call",
+      "attempt": 0,
+      "payload": {
+        "model": "mock",
+        "prompt": "hello"
+      },
+      "result": {
+        "text": "unaccounted"
+      },
+      "result_text": "{\"text\":\"unaccounted\"}",
+      "result_digest": "b31ba7f10624ee965049e50d56a00275e8bb552449089bb058ed045add1bff89",
+      "meta": {
+        "accounting_fallbacks": {
+          "tokens": {
+            "reason": "missing_or_invalid_provider_usage",
+            "source": "precheck_estimate"
+          }
+        },
+        "charges": {
+          "steps": 1,
+          "tokens": 10
+        }
+      }
+    },
+    "report": {
+      "spent": {
+        "steps": 1.0,
+        "tokens": 10.0
+      },
+      "avoided": {}
+    }
+  },
+  "missing_usage_no_estimate": {
+    "node": {
+      "id": "95208367cf8d044778f0cebed419e8c08097e802c301f263ef5a5e9374cb0192",
+      "parent": "83dd72b6c14affa14e4a99b393b89f6f98b7f0e62c2f03ee244e93d1971c373d",
+      "kind": "model_call",
+      "attempt": 0,
+      "payload": {
+        "model": "mock",
+        "prompt": "hello"
+      },
+      "result": {
+        "text": "unaccounted"
+      },
+      "result_text": "{\"text\":\"unaccounted\"}",
+      "result_digest": "b31ba7f10624ee965049e50d56a00275e8bb552449089bb058ed045add1bff89",
+      "meta": {
+        "charges": {
+          "steps": 1
+        }
+      }
+    },
+    "report": {
+      "spent": {
+        "steps": 1.0
+      },
+      "avoided": {}
+    }
+  },
+  "stream": {
+    "node": {
+      "id": "f1f6ce930a10b00ca90eb22b5c4de73d54b03db7827d888988b4f8eee366bf96",
+      "parent": "c91fabc9559f98c68f279e8d1f291111dff0be6f44d881bf60eb1176db99526d",
+      "kind": "model_call",
+      "attempt": 0,
+      "payload": {
+        "model": "mock",
+        "prompt": "hello"
+      },
+      "result": {
+        "text": "hello",
+        "usage": {
+          "input_tokens": 2,
+          "output_tokens": 3
+        },
+        "chunks": [
+          {
+            "text": "hel"
+          },
+          {
+            "text": "lo",
+            "usage": {
+              "input_tokens": 2,
+              "output_tokens": 3
+            }
+          }
+        ]
+      },
+      "result_text": "{\"chunks\":[{\"text\":\"hel\"},{\"text\":\"lo\",\"usage\":{\"input_tokens\":2,\"output_tokens\":3}}],\"text\":\"hello\",\"usage\":{\"input_tokens\":2,\"output_tokens\":3}}",
+      "result_digest": "f8c2c34faa6374c03331d2c220002e6a7d887d6ed45d3a426afe0b428d29793b",
+      "meta": {
+        "charges": {
+          "steps": 1,
+          "tokens": 5
+        },
+        "usage": {
+          "input_tokens": 2,
+          "output_tokens": 3
+        }
+      }
+    },
+    "report": {
+      "spent": {
+        "steps": 1.0,
+        "tokens": 5.0
+      },
+      "avoided": {}
+    },
+    "received": [
+      {
+        "text": "hel"
+      },
+      {
+        "text": "lo",
+        "usage": {
+          "input_tokens": 2,
+          "output_tokens": 3
+        }
+      }
+    ]
+  }
+}
