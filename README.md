@@ -6,7 +6,7 @@ Native Node.js/TypeScript and Rust packages use the name `pollardai` and have
 independent version lines. The Rust 0.2.0 source targets PyPI 1.6.0 runtime behavior,
 eight native storage backends, shared budgets, async streaming, audit operations,
 provider normalization, Tokenmaster profiles, MCP/OTel bridges and optional NVML
-sampling. The npm 0.2.0 source also expands streaming, persistence, distributed
+sampling. The published npm 0.2.0 release also expands streaming, persistence, distributed
 budgets, adapters, revalidation, governance and integrations. See the
 [native release status](https://github.com/jemsbhai/pollard/blob/main/docs/native-releases.md),
 [npm parity matrix](https://github.com/jemsbhai/pollard/blob/main/docs/npm-parity.md)

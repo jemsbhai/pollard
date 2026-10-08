@@ -2,36 +2,43 @@
 
 `pollardai` is the native package name for Pollard's Node.js/TypeScript and
 Rust core runtimes. The Python distribution keeps the name `pollard`.
-The native packages start at version 0.1.0 and have their own version line.
+The native packages have independent version lines.
 
 ## Release status
 
-Rust 0.2.0 is the prepared compatibility release for PyPI `pollard==1.6.0`.
+Rust 0.2.0 targets compatibility with PyPI `pollard==1.6.0`.
 It adds native persistent stores, shared arbitration, async streaming, measurement
 and Tokenmaster meters, provider normalization, revalidation, audit interchange
-and the CLI. npm and Python versions are unchanged. Publication and clean-consumer
-verification are recorded in the [release evidence](../evidence/rust-parity-1.6.0/release-0.2.0.md).
+and the CLI. The [release evidence](../evidence/rust-parity-1.6.0/release-0.2.0.md)
+records compatibility tests and measured performance. See the
+[Rust 0.2.0 GitHub release](https://github.com/jemsbhai/pollard/releases/tag/pollardai-rust-v0.2.0)
+for publication status, the source commit, successful CI receipt, archive checksum
+and clean public-registry consumer verification.
 
-The following records the earlier 0.1.0 release:
-
-Both 0.1.0 packages are published:
-[npm](https://www.npmjs.com/package/pollardai/v/0.1.0) and
-[crates.io](https://crates.io/crates/pollardai/0.1.0). Clean public-registry
-consumers verified both released packages, their archive checksums, golden
-node identities, budget settlement, and strict replay.
+[npm 0.2.0](https://www.npmjs.com/package/pollardai/v/0.2.0) is published with
+the `latest` dist-tag. Native package versions are independent of Python.
 
 ```sh
-npm install pollardai@0.1.0
+npm install pollardai@0.2.0
 ```
 
 ```sh
-cargo add pollardai
+cargo add pollardai@0.2.0
 ```
 
-Both package archives, checksums, and the checked source commit are recorded
-in the
-[tagged GitHub release](https://github.com/jemsbhai/pollard/releases/tag/pollardai-v0.1.0).
-The native source passed all 49 CI checks.
+The npm release expands the port against Python Pollard 1.6.0. Validation
+includes 142 local tests, 31 live distributed-store tests, Python interchange,
+and Node 20/24 CI on Linux, Windows and macOS. A fresh public-registry install
+verified ESM, CommonJS, streaming, metering, replay, seals, exports and the CLI.
+The downloaded archive matched the exact tested upload.
+
+The source commit, package archive, file list, integrity hashes and public
+consumer evidence are attached to the
+[npm 0.2.0 GitHub release](https://github.com/jemsbhai/pollard/releases/tag/pollardai-v0.2.0).
+The archive SHA-256 is
+`879c8491e950aea307526245c0be40eea7d4b7feeacc83fe229448f14ca390ed`.
+The original npm and Rust 0.1.0 archives remain in their
+[shared release](https://github.com/jemsbhai/pollard/releases/tag/pollardai-v0.1.0).
 
 The npm source is in
 [packages/npm](https://github.com/jemsbhai/pollard/tree/main/packages/npm).
@@ -107,6 +114,9 @@ Run these commands from the repository root in PowerShell:
 python interop/generate_vectors.py --check
 Push-Location packages/npm
 npm ci
+if ([int](node -p "process.versions.node.split('.')[0]") -ge 24) {
+  npm install --no-save --package-lock=false better-sqlite3@13.0.3
+}
 npm test
 npm run build
 npm pack --dry-run
@@ -143,19 +153,22 @@ token in source, command arguments, a recording, or CI secrets.
    and SHA-256 hashes before uploading. Inspect archives for generated caches,
    credentials, and unrelated files.
 3. From `packages/npm`, run `npm pack`. Upload that exact archive with
-   `npm publish ./pollardai-0.1.0.tgz --access public
-   --registry=https://registry.npmjs.org/`. The first release uses the default
+   `npm publish ./pollardai-0.2.0.tgz --access public
+   --registry=https://registry.npmjs.org/`. npm releases use the default
    `latest` dist-tag. Use `npm login --registry=https://registry.npmjs.org/`
    when local authentication needs refreshing; finish account verification in
    the browser.
-4. From `crates/pollardai`, run `cargo publish --locked`. Cargo packages the
-   unchanged checked source before upload. A saved crates.io token must permit
-   creating and publishing `pollardai`; use `cargo login` locally if needed.
+4. If releasing Rust, from `crates/pollardai` run `cargo publish --locked`.
+   Cargo packages the unchanged checked source before upload. A saved crates.io
+   token must permit creating and publishing `pollardai`; use `cargo login`
+   locally if needed.
 5. Fetch fresh public metadata and compare archive hashes. Install npm from
    the public registry into a clean directory and run the offline example.
-   Compile and run a clean Rust consumer using the public crates.io release.
-6. Tag the reviewed source `pollardai-v0.1.0`, create a GitHub release
-   with the package artifacts and hashes, and update this release status.
+   For a Rust release, also compile and run a clean public-registry consumer.
+6. Tag the reviewed source and create a GitHub release with the package
+   artifacts and hashes. The npm 0.2.0 tag is `pollardai-v0.2.0`; the independent
+   Rust 0.2.0 tag is `pollardai-rust-v0.2.0`. Attach the final CI and public-registry
+   consumer receipts to the corresponding release.
 
 Package versions are immutable after release. Repair an incorrect release with
 a new version. If only one registry upload succeeds, check public metadata
