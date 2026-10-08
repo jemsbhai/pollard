@@ -193,6 +193,14 @@ for contracts, observation IDs, comparators, and an optional replacement payload
 | `KafkaStore(options)` | `kafkajs` | Ordered audit/replay, no shared budget arbiter |
 
 Install only the selected peers. Always close persistent and remote stores.
+For SQLite, install `better-sqlite3@11.10.0` on Node 20, or
+`better-sqlite3@13.0.3` on Node 22 and newer. Version 13 requires Node 22+.
+Node 24+ requires version 13.0.3+ because older drivers can abort the process
+during native statement cleanup with recent Node build headers
+([upstream issue](https://github.com/nodejs/node/issues/65446)). Pollard checks
+driver compatibility before loading the native addon. Importing Pollard or
+using another store does not require a SQLite driver.
+
 Remote options include `storeId`, `create` (false opens an existing namespace),
 and `timeoutMs`. Mongo adds `database`/`prefix`; Neo4j requires
 `username`/`password` and optional `database`; Kafka requires `brokers` and `topic`
@@ -272,6 +280,8 @@ for verified coverage and deliberate differences.
 
 ```sh
 npm ci
+# On Node 24+, replace the Node 20 development driver before running tests:
+# npm install --no-save --package-lock=false better-sqlite3@13.0.3
 npm test
 npm run smoke:pack
 npm run test:remote

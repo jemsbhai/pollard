@@ -56,6 +56,10 @@ that every Python import or storage format has an identical JavaScript API.
   portable exchange. Remote backends deliberately use separate physical
   schemas. Native workers share budgets with each other, not with Python
   workers pointed at the same server. Transfer through sealed exports.
+- SQLite uses an optional native driver: `better-sqlite3@11.10.0` for Node 20,
+  or `better-sqlite3@13.0.3` for Node 22+. Node 24+ requires version 13.0.3+;
+  older addons can abort during cleanup with recent Node build headers.
+  Pollard rejects unsupported combinations before loading the addon.
 - Native remote mutations serialize one full logical namespace, validating its
   content on every operation. MongoDB's document limit bounds a namespace;
   throughput and scale differ from Python's storage architecture. No performance
@@ -76,6 +80,8 @@ From `packages/npm`:
 
 ```sh
 npm ci
+# On Node 24+, replace the Node 20 development driver before running tests:
+# npm install --no-save --package-lock=false better-sqlite3@13.0.3
 npm test
 npm run smoke:pack
 npm run test:remote

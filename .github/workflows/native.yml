@@ -42,6 +42,9 @@ jobs:
         with:
           python-version: "3.12"
       - run: npm ci
+      - name: Install Node 24 compatible SQLite driver
+        if: matrix.node == '24'
+        run: npm install --no-save --package-lock=false better-sqlite3@13.0.3
       - run: npm test
       - run: npm pack --dry-run
       - run: npm run smoke:pack
@@ -61,6 +64,8 @@ jobs:
           cache: npm
           cache-dependency-path: packages/npm/package-lock.json
       - run: npm ci
+      - name: Install Node 24 compatible SQLite driver
+        run: npm install --no-save --package-lock=false better-sqlite3@13.0.3
       - run: npm run test:remote
 
   rust:
