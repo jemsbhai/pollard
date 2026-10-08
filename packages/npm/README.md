@@ -5,10 +5,14 @@ stream, replay, and audit caller-owned model and tool calls. Both ESM and Common
 builds include TypeScript declarations. The core has no runtime dependencies and
 does not launch Python.
 
-This checkout prepares **0.2.0**, with behavior checked against **PyPI Pollard
-1.6.0**. The already published npm release is 0.1.0; the additions below become
-available when 0.2.0 is published, or by installing this checkout's packed archive.
-The Rust package retains its independent 0.1.0 scope.
+**pollardai 0.2.0** brings streaming, configurable metering, persistent stores,
+provider adapters, and audit tools to the native npm port, targeting **PyPI
+Pollard 1.6.0**. The compatibility notes below describe interoperability and
+deliberate differences. The Rust package retains its independent 0.1.0 scope.
+
+```sh
+npm install pollardai@0.2.0
+```
 
 ## First run
 

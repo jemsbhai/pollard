@@ -8,20 +8,6 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 
 ### Added
 
-- Prepare npm `pollardai` 0.2.0 against the published Python 1.6.0 release:
-  sync/async streaming and chunk replay; configurable token, USD, wall, window,
-  energy and custom meters; replay contracts and live revalidation; Python v3
-  SQLite interchange; HashRope logs; PostgreSQL, Redis, MongoDB, Neo4j and Kafka
-  stores; seals, custody, atomic maintenance and exchange; provider adapters;
-  local schema references; MCP, OpenTelemetry and an inspection CLI. Tokenmaster
-  profile/pricing support takes an explicitly supplied JavaScript client.
-  Native remote storage uses an independent schema with whole-namespace
-  transactions; Python/Node remote live budgets are not interoperable.
-- Add Python release behavior fixtures, bidirectional storage checks, real
-  Docker service concurrency tests, and cross-platform npm test discovery.
-  npm 0.2.0 retains duplicate refusal, while default token accounting now follows
-  Python's optional estimate and conservative fallback semantics. Rust remains
-  at its separate 0.1.0 scope; npm publication is a separate release action.
 - Add native npm and Rust `pollardai` 0.1.0 core packages with independent
   versions, in-memory execution, integer budgets, registered tool gating, and
   strict replay. Shared Python-generated vectors check the frozen node identity
@@ -31,6 +17,28 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
   in the tagged GitHub release. Clean public-registry consumers verify both.
 - Add native package validation and a local release runbook. Package publishing
   remains a maintainer-controlled local action.
+
+## [npm 0.2.0] - 2026-10-08
+
+### Added
+
+- Expand npm `pollardai` against the Python 1.6.0 release: sync/async streaming
+  and chunk replay; configurable token, USD, wall, window, energy and custom
+  meters; replay contracts and live revalidation; Python v3 SQLite interchange;
+  HashRope logs; PostgreSQL, Redis, MongoDB, Neo4j and Kafka stores; seals,
+  custody, atomic maintenance and exchange; provider adapters; local schema
+  references; MCP, OpenTelemetry and an inspection CLI. Tokenmaster
+  profile/pricing support takes an explicitly supplied JavaScript client.
+  Native remote storage uses an independent schema with whole-namespace
+  transactions; Python/Node remote live budgets are not interoperable.
+- Add Python release behavior fixtures, bidirectional storage checks, real
+  Docker service concurrency tests, and cross-platform npm test discovery.
+
+### Changed
+
+- Align default npm token accounting with Python's optional estimates and
+  conservative fallback semantics while retaining duplicate refusal.
+  Rust remains at its separate 0.1.0 scope.
 
 ## [1.6.0] - 2026-09-01
 
