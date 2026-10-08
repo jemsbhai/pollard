@@ -115,13 +115,37 @@ export function validateNode(node: Node): void {
 export class MemoryStore implements RecordingStore {
   #nodes = new Map<string, StorageRecord>();
   #finalizable = new Set<string>();
+  /** Execute an offline mutation atomically; callbacks must be synchronous. */
+  transaction<T>(operation: () => T): T {
+    const nodes = new Map(this.#nodes);
+    const finalizable = new Set(this.#finalizable);
+    try {
+      const result = operation();
+      if (result && typeof (result as { then?: unknown }).then === 'function') throw new TypeError('store transactions must be synchronous');
+      return result;
+    } catch (error) { this.#nodes = nodes; this.#finalizable = finalizable; throw error; }
+  }
+  dropNodes(nodeIds: ReadonlySet<string>): void {
+    for (const record of this.#nodes.values()) if (!nodeIds.has(record.id) && record.parent !== null && nodeIds.has(record.parent)) throw new IntegrityError('cannot remove a parent while retaining its children');
+    for (const id of nodeIds) { this.#nodes.delete(id); this.#finalizable.delete(id); }
+  }
+  compact(): number { return 0; }
+  claim(node: Node): boolean {
+    validateNode(node);
+    if (node.resultText !== null || node.meta.state !== 'pending') throw new IntegrityError('dispatch claim requires a pending node');
+    if (this.exists(node.id)) return false;
+    this.put(node); return true;
+  }
   put(node: Node): void {
     validateNode(node);
     if (node.parent !== null && !this.#nodes.has(node.parent)) throw new MissingNodeError(node.parent);
     const existing = this.#nodes.get(node.id);
     if (existing) {
       if (canonicalText(existing.payload) !== canonicalText(node.payload) || existing.kind !== node.kind || existing.parent !== node.parent || existing.attempt !== node.attempt) throw new IntegrityError('node id collision');
-      if (node.resultText !== null && existing.result_text !== node.resultText) throw new IntegrityError('append-only result conflict');
+      if (node.resultText !== null && existing.result_text !== node.resultText) {
+        const conflicts = Array.isArray(existing.meta.result_conflicts) ? existing.meta.result_conflicts : [];
+        this.#nodes.set(node.id, { ...existing, meta: snapshot({ ...existing.meta, result_conflicts: [...conflicts, { result_digest: node.resultDigest, result: node.result }] }) });
+      }
       return;
     }
     this.#nodes.set(node.id, node.toStorage());

@@ -33,6 +33,13 @@ Each package includes its own usage examples and supported API.
 
 ## First-release scope
 
+The table below describes the published 0.1.0 packages. The npm **0.2.0 source**
+has since expanded to the Python 1.6.0 runtime, provider, persistence, and
+governance capabilities documented in the [npm parity matrix](npm-parity.md)
+and [npm README](../packages/npm/README.md). Its remote schemas and some
+language-specific integrations differ deliberately. This work does not update
+the Rust package or imply that npm 0.2.0 has already been published.
+
 The first native releases provide an execution ledger that does not require
 Python or a model-provider account. Applications supply their own model and
 tool functions. The native API follows each language's conventions and is

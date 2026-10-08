@@ -1,10 +1,12 @@
 import { canonicalText, codePointCompare, deepFreeze, digestPayload, IdentityPayload, IdentityValue, JsonObject, objectPayload, redact, snapshot } from './identity.js';
 import { UnsupportedSchema } from './tree.js';
+import { resolveLocalRefs, schemaHasLocalRefs } from './schema.js';
+import type { AsyncStepResult } from './streaming.js';
 
 const KEYS = new Set(['type', 'properties', 'required', 'enum', 'anyOf', 'items', 'minimum', 'maximum', 'exclusiveMinimum', 'exclusiveMaximum', 'minLength', 'maxLength', 'minItems', 'maxItems', 'additionalProperties', 'title', 'description', 'default', 'sensitive']);
 const TYPES = new Set(['object', 'string', 'integer', 'boolean', 'array', 'null']);
-type Schema = IdentityPayload;
-export type ActionHandler = (args: IdentityPayload) => JsonObject | Promise<JsonObject>;
+export type Schema = IdentityPayload;
+export type ActionHandler = (args: IdentityPayload) => AsyncStepResult | Promise<AsyncStepResult>;
 export interface ActionSpecInput {
   name: string;
   version: string;
@@ -127,11 +129,12 @@ export class ActionSpec {
   constructor(input: ActionSpecInput) {
     if (typeof input.name !== 'string' || !input.name || typeof input.version !== 'string' || !input.version || typeof input.description !== 'string' || typeof input.sideEffects !== 'boolean') throw new TypeError('invalid action spec');
     if (input.handler !== undefined && typeof input.handler !== 'function') throw new TypeError('handler must be a function');
-    checkSchema(input.schema, `schema for ${input.name}`);
+    const schema = schemaHasLocalRefs(input.schema) ? resolveLocalRefs(input.schema) : input.schema;
+    checkSchema(schema, `schema for ${input.name}`);
     this.name = input.name;
     this.version = input.version;
     this.description = input.description;
-    this.schema = deepFreeze(snapshot(input.schema, true));
+    this.schema = deepFreeze(snapshot(schema, true));
     this.sideEffects = input.sideEffects;
     this.handler = input.handler;
     this.specDigest = digestPayload({ name: this.name, version: this.version, description: this.description, schema: this.schema, side_effects: this.sideEffects });
@@ -165,6 +168,7 @@ export class Registry implements Iterable<ActionSpec> {
     if (!spec || (version !== undefined && version !== spec.version)) throw new Error(`unknown registered action: ${name}${version === undefined ? '' : `@${version}`}`);
     return spec;
   }
+  has(name: string): boolean { return this.#specs.has(name); }
   [Symbol.iterator](): Iterator<ActionSpec> { return this.#specs.values(); }
 }
 
@@ -174,6 +178,6 @@ export interface PolicyContext {
   readonly args: IdentityPayload;
   readonly cursorId: string;
   readonly runLabel: string;
-  readonly counters: { steps: number; tokens: number };
+  readonly counters: Readonly<Record<string, number>>;
 }
 export interface Policy { decide(context: PolicyContext): Decision; }

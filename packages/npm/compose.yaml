@@ -1,0 +1,68 @@
+name: pollard-npm-parity
+services:
+  postgres:
+    image: postgres:16-alpine
+    labels: { pollard.npm.parity: "true" }
+    ports: ["127.0.0.1:55432:5432"]
+    environment: { POSTGRES_USER: pollard, POSTGRES_PASSWORD: pollard, POSTGRES_DB: pollard }
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pollard -d pollard"]
+      interval: 2s
+      timeout: 2s
+      retries: 60
+  redis:
+    image: redis:7-alpine
+    labels: { pollard.npm.parity: "true" }
+    ports: ["127.0.0.1:56379:6379"]
+    command: ["redis-server", "--appendonly", "yes", "--appendfsync", "always", "--maxmemory-policy", "noeviction"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 2s
+      retries: 60
+  mongo:
+    image: mongo:8.0
+    labels: { pollard.npm.parity: "true" }
+    ports: ["127.0.0.1:57017:27017"]
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+    healthcheck:
+      test: ["CMD-SHELL", "mongosh --quiet --eval 'try { if (!db.hello().isWritablePrimary) { rs.initiate({_id:\"rs0\",members:[{_id:0,host:\"localhost:27017\"}]}); quit(1); } } catch(e) { quit(1); }'"]
+      interval: 3s
+      timeout: 5s
+      retries: 60
+  neo4j:
+    image: neo4j:5.26-community
+    labels: { pollard.npm.parity: "true" }
+    ports: ["127.0.0.1:57687:7687"]
+    environment:
+      NEO4J_AUTH: neo4j/pollard-test-password
+      NEO4J_server_memory_heap_initial__size: 128m
+      NEO4J_server_memory_heap_max__size: 256m
+      NEO4J_server_memory_pagecache_size: 128m
+    healthcheck:
+      test: ["CMD-SHELL", "cypher-shell -u neo4j -p pollard-test-password 'RETURN 1;' >/dev/null 2>&1"]
+      interval: 5s
+      timeout: 10s
+      retries: 60
+  kafka:
+    image: apache/kafka:4.3.1
+    labels: { pollard.npm.parity: "true" }
+    ports: ["127.0.0.1:59092:9092"]
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:59092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_HEAP_OPTS: -Xms128m -Xmx256m
+    healthcheck:
+      test: ["CMD", "bash", "-c", "</dev/tcp/127.0.0.1/9092"]
+      interval: 5s
+      timeout: 10s
+      retries: 60

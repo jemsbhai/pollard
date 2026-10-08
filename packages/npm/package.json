@@ -1,7 +1,7 @@
 {
   "name": "pollardai",
-  "version": "0.1.0",
-  "description": "Experimental native TypeScript core for Pollard governed, content-addressed execution trees",
+  "version": "0.2.0",
+  "description": "Native TypeScript governed execution trees with streaming, replay, persistence and metering",
   "license": "MIT",
   "author": "Muntaser Syed",
   "type": "module",
@@ -10,22 +10,96 @@
   "types": "./dist/esm/index.d.ts",
   "exports": {
     ".": {
-      "import": { "types": "./dist/esm/index.d.ts", "default": "./dist/esm/index.js" },
-      "require": { "types": "./dist/cjs/index.d.ts", "default": "./dist/cjs/index.js" }
+      "import": {
+        "types": "./dist/esm/index.d.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/cjs/index.d.ts",
+        "default": "./dist/cjs/index.js"
+      }
     }
   },
-  "files": ["dist", "README.md", "LICENSE"],
-  "engines": { "node": ">=20" },
-  "repository": { "type": "git", "url": "git+https://github.com/jemsbhai/pollard.git", "directory": "packages/npm" },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jemsbhai/pollard.git",
+    "directory": "packages/npm"
+  },
   "homepage": "https://github.com/jemsbhai/pollard/tree/main/packages/npm",
   "bugs": "https://github.com/jemsbhai/pollard/issues",
-  "keywords": ["ai", "agents", "governance", "replay", "pollard"],
-  "publishConfig": { "access": "public" },
+  "keywords": [
+    "ai",
+    "agents",
+    "governance",
+    "replay",
+    "pollard"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json && tsc -p tsconfig.cjs.json && node scripts/build.cjs",
-    "test": "npm run build && node --test test/core.test.mjs",
+    "test": "npm run build && node scripts/test.cjs",
+    "test:remote": "node scripts/test-remote.mjs",
     "smoke:pack": "node scripts/smoke-pack.cjs",
     "prepack": "npm run build"
   },
-  "devDependencies": { "@types/node": "^22.0.0", "typescript": "^5.7.0" }
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "better-sqlite3": "^11.10.0",
+    "js-tiktoken": "^1.0.21",
+    "kafkajs": "^2.2.4",
+    "mongodb": "^6.21.0",
+    "neo4j-driver": "^6.2.0",
+    "pg": "^8.23.1",
+    "redis": "^6.3.0",
+    "typescript": "^5.7.0"
+  },
+  "peerDependencies": {
+    "@opentelemetry/api": ">=1.9 <2",
+    "better-sqlite3": ">=11 <14",
+    "js-tiktoken": "^1.0.21",
+    "pg": "^8.23.1",
+    "redis": "^6.3.0",
+    "mongodb": "^6.21.0",
+    "neo4j-driver": "^6.2.0",
+    "kafkajs": "^2.2.4"
+  },
+  "peerDependenciesMeta": {
+    "@opentelemetry/api": {
+      "optional": true
+    },
+    "better-sqlite3": {
+      "optional": true
+    },
+    "js-tiktoken": {
+      "optional": true
+    },
+    "pg": {
+      "optional": true
+    },
+    "redis": {
+      "optional": true
+    },
+    "mongodb": {
+      "optional": true
+    },
+    "neo4j-driver": {
+      "optional": true
+    },
+    "kafkajs": {
+      "optional": true
+    }
+  },
+  "bin": {
+    "pollardai": "./dist/esm/cli.js"
+  }
 }
