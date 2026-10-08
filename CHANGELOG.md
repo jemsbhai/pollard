@@ -30,6 +30,10 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 - Retry temporary Kafka leader-routing failures within the watermark read's
   existing timeout. Authentication, missing topics and history validation
   errors still fail closed; deterministic tests cover retries and exhaustion.
+- Wait for a confirmed Kafka consumer group assignment before opening an npm
+  audit store. Bound retries of eligible startup failures, preserve terminal
+  replay and uncertain-write failures, and retain safe error codes in worker
+  diagnostics.
 
 ## [npm 0.2.0] - 2026-10-08
 
