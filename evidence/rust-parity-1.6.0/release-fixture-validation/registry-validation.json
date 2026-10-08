@@ -1,0 +1,111 @@
+{
+  "schema": 1,
+  "recorded_at_utc": "2026-10-08T16:59:02.467966+00:00",
+  "git_head": "9c80f843aa2b06df7853819fdfbe7171a4bfaed7",
+  "purpose": "Validate AtomicU64 suffixes in test-only temporary paths and namespace names without modifying production or benchmark code.",
+  "source_sha256": {
+    "crates/pollardai/tests/identity_parity.rs": "b7b4d81b1db888fa363f132110876f9eb205d36a8f10f6979b5d67cf50f3fcf4",
+    "crates/pollardai/tests/runtime_parity.rs": "54bafe41885a1d708278e6cfa8895fa63ea7f30264d8f1d9614f41a646f55dfb",
+    "crates/pollardai/tests/kafka_live.rs": "13833a41b927c92cd3ba2cac51fea01b826f7ec7a83bda1a6230c9007c2d2962",
+    "crates/pollardai/tests/redis_store.rs": "f2e9b898d105eaf1b7e3bd3d47534083c58bab66fee8bee3fd593bc930878538"
+  },
+  "sources_unchanged_during_validation": true,
+  "tool_versions": {
+    "cargo +1.74.0 --version": "cargo 1.74.0 (ecb9851af 2023-10-18)",
+    "cargo +1.99.0 --version": "cargo 1.99.0 (5f94df478 2026-08-27)",
+    "rustc +1.74.0 --version": "rustc 1.74.0 (79e9716c9 2023-11-13)",
+    "rustc +1.99.0 --version": "rustc 1.99.0 (b940084d7 2026-09-28)"
+  },
+  "benchmark_source_baseline": "be9e565a408776dd67f93891697503e8ae32c20a",
+  "production_and_example_diff_from_baseline": [],
+  "checks": [
+    {
+      "command": [
+        "cargo",
+        "+1.74.0",
+        "test",
+        "--locked",
+        "--test",
+        "identity_parity",
+        "--test",
+        "runtime_parity",
+        "--",
+        "--test-threads=8"
+      ],
+      "cwd": "crates/pollardai",
+      "exit_code": 0,
+      "duration_seconds": 8.968,
+      "log": "evidence/rust-parity-1.6.0/release-fixture-validation/registry-msrv-tests.log",
+      "log_sha256": "40a3f838de3b4a6b608e42f3b35904a6dd7d0be0dac2a46e011ba24a6a47f77d",
+      "summaries": [
+        "test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s",
+        "test result: ok. 26 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.57s"
+      ]
+    },
+    {
+      "command": [
+        "cargo",
+        "+1.99.0",
+        "test",
+        "--locked",
+        "--features",
+        "redis,kafka",
+        "--test",
+        "identity_parity",
+        "--test",
+        "runtime_parity",
+        "--test",
+        "redis_store",
+        "--test",
+        "kafka_live",
+        "--",
+        "--test-threads=8"
+      ],
+      "cwd": "crates/pollardai",
+      "exit_code": 0,
+      "duration_seconds": 3.016,
+      "log": "evidence/rust-parity-1.6.0/release-fixture-validation/registry-stable-tests.log",
+      "log_sha256": "792a418ad871abc968790a535d7c2217e08e66a694aeef323fccc314b8671976",
+      "summaries": [
+        "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.24s",
+        "test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s",
+        "test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 1 passed; 0 failed; 7 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 26 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.63s"
+      ]
+    },
+    {
+      "command": [
+        "cargo",
+        "+1.99.0",
+        "clippy",
+        "--locked",
+        "--features",
+        "redis,kafka",
+        "--test",
+        "identity_parity",
+        "--test",
+        "runtime_parity",
+        "--test",
+        "redis_store",
+        "--test",
+        "kafka_live",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "cwd": "crates/pollardai",
+      "exit_code": 0,
+      "duration_seconds": 4.734,
+      "log": "evidence/rust-parity-1.6.0/release-fixture-validation/registry-stable-clippy.log",
+      "log_sha256": "f0ad3a2f0cecd1e0c489c6a57ee79996d6225359f4763a364667718828025c90",
+      "summaries": [
+        "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 4.57s"
+      ]
+    }
+  ],
+  "limitations": [
+    "Live Redis and Kafka cases require isolated services and are explicitly ignored in these targeted test commands.",
+    "This is focused test-helper validation; the new release candidate CI performs the full matrix."
+  ]
+}

@@ -1,0 +1,19 @@
+   Compiling pollardai v0.2.0 (/home/runner/work/pollard/pollard/crates/pollardai)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.02s
+     Running tests/postgres_parity.rs (crates/pollardai/target/debug/deps/postgres_parity-bd3192617491a776)
+
+running 11 tests
+test decimal_text_retries_match_python_fingerprints_and_rounded_settlement_rolls_back ... ok
+test explicit_migration_requires_drained_valid_legacy_schema ... ok
+test import_merge_batch_rollback_and_gc_are_transactional ... ok
+test native_storage_preserves_exact_results_interning_and_isolation ... ok
+test parallel_writers_preserve_first_result_and_all_metadata ... ok
+test read_only_and_reconnect_never_repair_missing_schema ... ok
+test reconnect_after_backend_termination_and_persistent_uncertainty ... ok
+test reservation_clock_is_sampled_after_row_lock_wait ... ok
+test reservation_tombstones_exact_amounts_and_expiry ... ok
+test runtime_records_replays_and_respects_shared_budget ... ok
+test windows_atomically_limit_eight_connections_and_renew ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.97s
+

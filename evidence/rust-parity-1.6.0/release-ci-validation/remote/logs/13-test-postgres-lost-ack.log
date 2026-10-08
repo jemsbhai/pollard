@@ -1,0 +1,9 @@
+   Compiling pollardai v0.2.0 (/home/runner/work/pollard/pollard/crates/pollardai)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.47s
+     Running unittests src/lib.rs (crates/pollardai/target/debug/deps/pollardai-67335ca147585b7f)
+
+running 1 test
+test postgres::tests::live_lost_commit_ack_retries_observe_permanent_tombstones ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 19 filtered out; finished in 0.22s
+

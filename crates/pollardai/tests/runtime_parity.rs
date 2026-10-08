@@ -1,5 +1,15 @@
 use pollardai::*;
-use std::{cell::Cell, collections::BTreeMap, rc::Rc, sync::Arc};
+use std::{
+    cell::Cell,
+    collections::BTreeMap,
+    rc::Rc,
+    sync::{
+        atomic::{AtomicU64, Ordering},
+        Arc,
+    },
+};
+
+static NEXT_TEMP: AtomicU64 = AtomicU64::new(0);
 
 fn usage(n: u64) -> Value {
     json!({"text":"first","usage":{"input_tokens":n,"output_tokens":0}})
@@ -579,12 +589,13 @@ fn ordinary_failure_releases_but_unknown_failure_preserves_charges() {
 
 fn sqlite_runtime_path(label: &str) -> std::path::PathBuf {
     std::env::temp_dir().join(format!(
-        "pollard-runtime-{label}-{}-{}.db",
+        "pollard-runtime-{label}-{}-{}-{}.db",
         std::process::id(),
         std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap()
-            .as_nanos()
+            .as_nanos(),
+        NEXT_TEMP.fetch_add(1, Ordering::Relaxed)
     ))
 }
 

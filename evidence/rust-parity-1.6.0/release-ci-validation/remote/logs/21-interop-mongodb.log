@@ -1,0 +1,1 @@
+{"status": "passed", "cases": ["python_clock_configuration", "exact_records", "budget", "window", "reverse_window", "mixed_idempotent_settlement", "scientific_decimal_wire_digest"], "output": "/home/runner/work/pollard/pollard/.benchmarks/remote-validation/results/mongodb-interop.json"}

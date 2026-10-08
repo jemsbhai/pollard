@@ -1,16 +1,19 @@
 # Rust pollardai 0.2.0
 
-An earlier local validation matrix passed for the Rust 0.2.0 release candidate.
-Hosted PR CI then reproduced a SQLite concurrency failure across all platform
-jobs at source `8176e3a`: eight workers could exhaust the runtime's three
-optimistic verification/accounting attempts while other workers committed
-legitimate changes. A coherent-snapshot fallback is now implemented and targeted
-checks pass. The new full matrix, hosted CI and final performance results remain
-pending; the earlier 206/226 test counts below are historical checkpoint results.
-This report records implementation and validation; it does not assert that the
-crate has been uploaded or verified through a registry installation. Publication
-scope is the Rust crate. The repository's separate npm package is already at
-0.2.0; the Python release oracle remains `pollard==1.6.0`.
+The final local validation matrix passes for the Rust 0.2.0 release candidate at
+source `be9e565`: 212 default tests and 232 optional-feature tests pass on both
+stable Rust 1.94 and Rust 1.74, and all 212 default tests pass in the optimized
+build. Formatting, warnings-denied Clippy, package verification, SQLite
+interoperability and explicit NVML sampling also pass with unchanged source
+hashes. Later macOS CI exposed a collision in timestamp-only temporary test
+paths. The helpers now include atomic serials, and an additional regression
+forces eight threads to allocate 1,024 paths at an identical clock tick.
+Migration tests pass in debug and release builds on Rust 1.74 and 1.99,
+including 20 repeated runs per compiler/profile. These subsequent changes affect
+test fixtures only; the production and benchmark sources remain unchanged.
+See the [tagged release](https://github.com/jemsbhai/pollard/releases/tag/pollardai-rust-v0.2.0)
+for final CI, source, archive and registry receipts and publication status.
+Publication scope is the Rust crate; the Python release oracle remains 1.6.0.
 
 The target is the published Python 1.6.0 wheel, SHA-256
 `569fb5f130a82c9be327b8dcbd285e3be063200bd9773ca15c5d6bb62edd627f`.
@@ -42,7 +45,10 @@ commits. See the [Decimal tests](../../crates/pollardai/tests/decimal_exact.rs),
 [wire fixtures](../../crates/pollardai/tests/pypi160_decimal_wire.json) and
 [SQLite cache tests](../../crates/pollardai/tests/sqlite_cache.rs).
 
-The SQLite contention fix keeps the existing three optimistic attempts and
+Hosted CI previously reproduced a SQLite concurrency failure across all platform
+jobs at source `8176e3a`: eight workers could exhaust three optimistic attempts
+while other workers committed legitimate changes. The SQLite contention fix
+keeps the existing three optimistic attempts and
 then requests a consistent backend snapshot. SQLite reads the complete ancestry
 or subtree, including external ancestors and interned payload blobs, inside one
 deferred read transaction. Verification, accounting and depth checks validate
@@ -63,42 +69,55 @@ warnings denied and formatting checks. Each also passes 20 repeated contention
 runs, each with eight workers in both budget and window scenarios
 ([Rust 1.74](release-contention-validation/stress-rust174.json),
 [Rust 1.99](release-contention-validation/stress-rust199.json)). These are
-targeted results, not a replacement full-matrix result. The cache tests cover
-later external commits becoming visible,
-tampering and missing ancestors, and fallback without historical cache promotion.
+targeted results that supplement the completed full matrix below. The cache tests
+cover later external commits becoming visible, tampering and missing ancestors,
+and fallback without historical cache promotion.
 
-The earlier completed checks, before the snapshot fallback, are recorded below.
-Optional tests include the default tests, and repeated toolchains are separate
-executions of the same cases; these counts must not be added as unique coverage.
+The primary release matrix used
+[`be9e565a408776dd67f93891697503e8ae32c20a`](https://github.com/jemsbhai/pollard/commit/be9e565a408776dd67f93891697503e8ae32c20a),
+including the snapshot fallback. Its [receipt](release-final-validation/validation.json)
+records `all_checks_passed: true` and `source_unchanged_during_run: true`.
+Optional tests include default tests, and repeated toolchains execute the same
+cases; these counts must not be added as unique coverage.
 
-| Earlier checkpoint check | Completed result | Receipt |
+| Completed check at `be9e565` | Completed result | Receipt |
 | --- | --- | --- |
-| Default tests | 206 passed on stable, 206 on Rust 1.74, and 206 in the optimized build | [Native matrix](release-validation/validation.json) |
-| Optional features | 226 passed on stable and 226 on Rust 1.74; 33 explicitly ignored in each ordinary run | [Native matrix](release-validation/validation.json) |
-| Live storage | 32 live tests passed, plus one Redis configuration check | [Remote run](release-remote-validation/summary.json) |
-| NVIDIA hardware | One explicit device-wide NVML sampling test passed | [Hardware log](release-validation/nvml-hardware.log) |
-| SQLite interchange | Recording/seals/custody, direct arbitration and mixed runtime budget/window checks passed | [Storage](release-validation/interop-sqlite.log), [arbitration](release-validation/interop-arbitration.log), [runtime](release-validation/interop-runtime.log) |
-| Remote interchange | All five backends and their CLI selectors passed; Redis includes 11 bidirectional Decimal-text cases | [Results](release-remote-validation/results), [Redis](release-remote-validation/results/redis-interop.json), [CLI](release-remote-validation/results/cli-remote-inspection.json) |
-| Formatting, lint and packaging | Stable/MSRV formatting, warnings-denied Clippy and crate package verification passed | [Native matrix](release-validation/validation.json), [package log](release-validation/package.log) |
-| Fresh downstream installation model | Default Rust 1.74.0 Windows consumer and all-feature Rust 1.74.1 Linux consumer resolved, compiled and recorded/replayed successfully | [Default consumer](release-consumer-validation/default-rust174-windows/summary.json), [all-feature consumer](release-consumer-validation/all-rust174-linux/summary.json) |
+| Default tests | 212 passed on stable Rust 1.94, 212 on Rust 1.74, and 212 in the optimized build | [Native matrix](release-final-validation/validation.json) |
+| Optional features | 232 passed on stable and 232 on Rust 1.74; 33 explicitly ignored in each ordinary run | [Native matrix](release-final-validation/validation.json) |
+| NVIDIA hardware | One explicit device-wide NVML sampling test passed | [Hardware log](release-final-validation/nvml-hardware.log) |
+| SQLite interchange | Recording/seals/custody, direct arbitration and mixed runtime budget/window checks passed | [Storage](release-final-validation/interop-sqlite.log), [arbitration](release-final-validation/interop-arbitration.log), [runtime](release-final-validation/interop-runtime.log) |
+| Formatting, lint and packaging | Stable/MSRV formatting, warnings-denied Clippy and crate package verification passed | [Native matrix](release-final-validation/validation.json), [package log](release-final-validation/package.log) |
+| Live services and remote interchange | 32 live tests plus one Redis configuration check; all 25 commands passed, five frozen-wheel backend interchanges, corrected-source MongoDB and five CLI selectors passed | [CI remote receipt](release-ci-validation/remote/summary.json) |
+| Fresh Rust 1.74.0 consumers | Default and all features, including TLS, resolved without borrowing the library lockfile and compiled and ran successfully | [Default](release-ci-validation/consumer-default/summary.json), [all features](release-ci-validation/consumer-all/summary.json) |
 
 The 33 optional-test ignores are the 32 live service tests and the GPU test,
-executed separately above. The Windows optional matrix excludes vendored Kafka
-TLS; the Linux all-feature consumer includes it. Fresh consumers generated their
-own lockfiles instead of copying the library lockfile. These checks exposed and
-fixed Rust 1.74 resolution failures that locked repository builds had hidden.
+which are counted only in their separately executed receipts. The Windows
+optional matrix excludes vendored Kafka TLS. The current CI consumer receipts
+above use exactly Rust 1.74.0 for both default and all features, including TLS.
+Each consumer generated its own lockfile instead of copying the library
+lockfile. Earlier local consumer checks exposed Rust 1.74 resolution failures that
+locked repository builds had hidden.
 The [manifest](../../crates/pollardai/Cargo.toml) constrains incompatible
 transitive versions, and the [CI workflow](../../.github/workflows/native.yml)
 now repeats clean default/all-feature consumer resolution.
 
-The earlier full native matrix and its corresponding remote run used
+The current [remote CI run](release-ci-validation/remote/summary.json) used
+`be9e565`, records `source_changed_during_run: false`, and passed all 25 commands.
+[Redis interchange](release-ci-validation/remote/results/redis-interop.json)
+includes 11 bidirectional Decimal-text cases; the
+[CLI receipt](release-ci-validation/remote/results/cli-remote-inspection.json)
+checks all five read-only remote selectors. Its receipt records service images,
+commands, source hashes and executable hashes. All five uniquely labelled test
+containers were removed successfully. CI artifact files retain their raw bytes.
+
+The historical [206-default/226-optional matrix](release-validation/validation.json)
+and [earlier local remote run](release-remote-validation/summary.json) used
 [`15e771aaca2d3e4b4b3fbe8aa833e121a5c5db3b`](https://github.com/jemsbhai/pollard/commit/15e771aaca2d3e4b4b3fbe8aa833e121a5c5db3b).
 Both receipts include source hashes and confirm unchanged source during their
-runs. The remote receipt additionally records pinned service images, commands,
-Python driver versions and frozen executable hashes. All five uniquely labelled
-test containers were removed successfully. The interrupted
+runs. These remain checkpoint evidence, superseded by the current matrix and
+remote CI receipts above. The interrupted
 [earlier remote checkpoint](release-remote-checkpoint/summary.json) deliberately
-retains its failed source-change guard and is superseded by that completed run.
+retains its failed source-change guard.
 
 [Hash provenance](release-validation/hash-provenance.json) preserves the original
 receipt hashes and distinguishes CRLF-to-LF source normalization from actual
@@ -115,10 +134,20 @@ prerequisite and updates evidence/documentation. Current stable
 [Clippy passed](release-validation/clippy-rust199.log), and all ten
 [targeted Kafka tests passed](release-validation/kafka-post-ci-fix.log).
 The earlier full-matrix receipt is not relabelled as a full rerun of this later
-commit. Fresh-consumer receipts are also identified as checkpoints with their
-own source hashes. Hosted CI at this later commit exposed the concurrent SQLite
-failure described above. The snapshot correction is a subsequent source change
-and needs its own completed full matrix and hosted CI result.
+commit. Historical fresh-consumer receipts retain their own source hashes;
+the current CI consumer receipts above use `be9e565`. Hosted CI at `8176e3a`
+exposed the concurrent SQLite
+failure described above. The snapshot correction now has the completed
+`be9e565` full matrix and repeated contention checks. The later macOS fixture
+failure is corrected by per-process atomic serials in the migration, identity,
+runtime, Kafka and Redis test helpers. The migration regression deliberately
+uses identical timestamps across threads; both compilers pass all four tests
+in debug and release, plus 80 repeated test-binary runs overall
+([Rust 1.74](release-fixture-validation/migration-stress-rust174.json),
+[Rust 1.99](release-fixture-validation/migration-stress-rust199.json)). The final
+suite includes this one additional test beyond the local matrix above. Final
+publication requires successful CI on the exact release source; see the tagged
+release for that CI receipt.
 
 MongoDB needs an explicit distinction between the release oracle and the source
 fix. The unchanged Python 1.6.0 wheel must use **`tz_aware=True`** for mixed
@@ -129,7 +158,7 @@ records the resulting approximately six-hour error on this host. Rust already
 uses the server UTC epoch. The [Python source fix](../../src/pollard/stores/mongodb.py)
 normalizes naive BSON datetimes to UTC and preserves explicit offsets, without
 emulating the erroneous clock. That Python fix has **not been uploaded to
-PyPI**. A separately identified [corrected-source live check](release-remote-validation/results/mongodb-corrected-source-interop.json)
+PyPI**. A separately identified [corrected-source live check](release-ci-validation/remote/results/mongodb-corrected-source-interop.json)
 passes with default client options, including shared-budget contention and
 settlement. [Timezone regressions](release-consumer-validation/checkpoint.json)
 passed all 20 Linux cases, including UTC, Mountain and India settings; the
@@ -164,12 +193,94 @@ The TLS build check does not establish live certificate-authentication
 interoperability. The NVML result verifies device-wide sampling, not an energy
 saving attributable to this port.
 
-Performance evidence is being collected under
-[`release-performance/`](release-performance), with source fingerprints and the
-pinned release oracle. Measurements at `8176e3a` precede the new snapshot fix;
-the memory, storage and combined timing results are not yet a complete reviewed
-measurement set for the corrected release source. This report makes no final
-speedup or memory-reduction claim. Earlier timings remain checkpoint evidence.
-The completed full matrix, hosted CI and final performance interpretation will
-be added when available; no registry upload or post-publication consumer result
-is claimed here.
+
+## Completed performance measurements
+
+All three measurement sets completed against source `be9e565` with unchanged
+source and executable hashes. Receipts record `git_dirty: true` because evidence
+and documentation were being assembled; their source maps and unchanged-source
+guards identify the measured code. Raw samples, extrema, medians, import-path
+checks and hashes are retained in [MemoryStore/identity](release-performance/performance.json),
+[SQLite](release-performance/storage-performance.json) and
+[stream memory/time](release-performance/stream-memory.json).
+
+Measurements used one Intel Core i9-14900HX Windows 11 host (32 logical CPUs),
+Rust 1.94.0 release builds and Python 3.12.2. MemoryStore/identity and SQLite used
+two warmups and seven retained samples, with deterministic engine-order shuffling.
+SQLite used 40-step batches, a fresh database per sample, WAL/NORMAL and physically
+read-only strict replay; Python SQLite was 3.43.1 and Rust's bundled SQLite 3.45.0.
+Streaming used three fresh processes per case, equal counted observers,
+`keep_chunks=false` and a constant final result. Windows peak working set includes
+process/runtime startup. Timing excludes compilation, setup, process startup and
+correctness checks. Checksum, accounting, callback-count and forbidden-dispatch
+invariants passed. These are offline local kernels; power profile and background
+OS activity were not controlled, and timing thresholds are not correctness gates.
+
+**MemoryStore and identity: batch median times.** Ratios divide the comparison
+median by Rust 0.2.0's median; values above one mean a shorter Rust time. Both Rust
+versions use the same benchmark program. The baseline is the original 0.1.0 core
+at `51e3a245641044fc8b3d6a90fc49f3cbfcbf107d`, with its source verified separately.
+
+| Operation | Size | Python 1.6.0 ms | Rust 0.1.0 ms | Rust 0.2.0 ms | Python / Rust 0.2.0 | Old / new Rust |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| identity | 10,000 | 40.092 | 11.679 | 2.883 | 13.91× | 4.05× |
+| record | 100 | 57.535 | 22.936 | 3.012 | 19.10× | 7.62× |
+| record | 1,000 | 5164.280 | 2174.830 | 30.869 | 167.30× | 70.45× |
+| replay | 100 | 84.689 | 17.384 | 1.153 | 73.43× | 15.07× |
+| replay | 1,000 | 8062.100 | 1705.966 | 11.731 | 687.22× | 145.42× |
+| hybrid | 100 | 7.472 | 17.381 | 1.789 | 4.18× | 9.72× |
+| hybrid | 1,000 | 71.702 | 1688.737 | 18.406 | 3.90× | 91.75× |
+| walk | 1,000 | 6.240 | 4.594 | 0.659 | 9.47× | 6.97× |
+| walk | 10,000 | 70.142 | 636.744 | 8.030 | 8.74× | 79.30× |
+
+**SQLite: batch median times.** The original Rust 0.1.0 core has no corresponding
+SQLite implementation, so no old/new Rust ratio is reported here.
+
+| Operation | Steps | Python ms | Rust ms | Python / Rust |
+| --- | ---: | ---: | ---: | ---: |
+| record | 40 | 24.887 | 6.764 | 3.68× |
+| hybrid | 40 | 6.854 | 5.962 | 1.15× |
+| replay | 40 | 28.495 | 1.430 | 19.92× |
+
+**Unretained streams: median total process peak memory.**
+
+| Chunks | Python peak MiB | Rust peak MiB | Lower total peak |
+| --- | ---: | ---: | ---: |
+| 10,000 | 25.61 | 5.20 | 79.69% |
+| 200,000 | 97.57 | 5.34 | 94.52% |
+
+**Unretained streams: median callback/merge execution time.**
+
+| Chunks | Python ms | Rust ms | Python / Rust |
+| --- | ---: | ---: | ---: |
+| 10,000 | 4.229 | 3.275 | 1.29× |
+| 200,000 | 114.144 | 62.846 | 1.82× |
+
+The earlier identity regression is resolved: the current 10,000-identity batch
+is 4.05× faster than the original Rust baseline and 13.91× faster than Python.
+SQLite hybrid's median is now 1.15× faster than Python, but its sample ranges
+overlap (Rust 5.450–6.484 ms; Python 6.094–7.568 ms), so this is a descriptive
+median difference, not an established statistical advantage. Native hybrid also
+verifies ancestry; Python 1.6.0 performs its explicit verification pass only for
+strict replay. Successful outputs do not imply identical verification work.
+
+The implementation reduces repeated work through indexed child traversal,
+verified ancestry-prefix reuse and revision-aware SQLite caches. The snapshot
+fallback preserves coherent verification during concurrent commits, without
+promoting historical reads to the current cache. Direct identity encoding,
+preallocated hexadecimal output and fewer temporary allocations reduce work in
+the native path. Unretained stream chunks are released after merging, while the
+Python release temporarily retains its list. These mechanisms explain intended
+benefits, but the before/after measurements do not isolate each change's causal
+contribution; added validation and metering also changed the implementation.
+There are no budgets in the timing kernels: incremental accounting benefits are
+supported by read-count and invalidation tests, not these latency ratios.
+
+Total process memory includes interpreters, allocators and loaded libraries,
+so the entire memory difference cannot be assigned to chunk retention. Results
+are limited to these workloads and this host. They establish no provider-latency,
+remote-throughput, energy-saving, provider-cost or complete-agent speedup claim.
+They are separate from EXP-007's Python-callable overhead protocol. Earlier
+checkpoint measurements remain historical and are superseded for this release.
+
+See the [tagged release](https://github.com/jemsbhai/pollard/releases/tag/pollardai-rust-v0.2.0) for final CI, source, archive and registry receipts and publication status.

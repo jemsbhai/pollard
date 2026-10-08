@@ -1,0 +1,36 @@
+{
+  "status": "passed",
+  "pollard_version": "1.6.0",
+  "wheel_sha256": "569fb5f130a82c9be327b8dcbd285e3be063200bd9773ca15c5d6bb62edd627f",
+  "python_kafka_client": "2.15.0",
+  "binary_sha256": "00091898c4db4a47a5d71e76b4ddf099a0d09a034149e1904ab2ea1dd10017bc",
+  "rust_kafka_client": "rdkafka 0.39.0 / librdkafka 2.12.1",
+  "broker": "Redpanda v24.1.21",
+  "broker_image_digest": "sha256:dc33c62306c742c0d8850c883c39bea9ab5351c32a93e0d9fa560ae04b43a3c0",
+  "cases": {
+    "python_to_rust": {
+      "node_id": "434e403a2db58ee05faff3c5dfd32f89822ab68d2f915f51cac5970c4a6a8699",
+      "native_report": {
+        "spent": {
+          "seconds": 1.0886000040954968e-05,
+          "steps": 1.0,
+          "tokens": 6.0
+        },
+        "avoided": {
+          "seconds": 1.0886000040954968e-05,
+          "steps": 1.0,
+          "tokens": 6.0
+        }
+      },
+      "matching_result": true
+    },
+    "rust_to_python": {
+      "node_id": "c70a652a9bf1ce312bf54a7e404c74ff0a1051d78d1ea99f09bc9b5d99594629",
+      "matching_result": true,
+      "python_verification": true
+    },
+    "cross_language_metadata": {
+      "python_reviewed": true
+    }
+  }
+}

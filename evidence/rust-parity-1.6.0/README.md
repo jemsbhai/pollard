@@ -1,14 +1,119 @@
 # Rust parity with PyPI Pollard 1.6.0
 
-This work targets the published **`pollard==1.6.0`** wheel, not an editable Python checkout. The native implementation lives in `crates/pollardai` at version 0.2.0. The public 0.1.0 archive does not contain these additions. Follow [the 0.2.0 release receipt](https://github.com/jemsbhai/pollard/blob/main/evidence/rust-parity-1.6.0/release-0.2.0.md) for publication and final validation status.
+Rust `pollardai` 0.2.0 targets the SHA-pinned Python `pollard==1.6.0` release.
+The completed `be9e565` matrix passes **212 default tests** on stable/MSRV/release
+and **232 optional-feature tests** on stable/MSRV, plus packaging, SQLite
+interchange and NVML sampling. The current
+[remote CI receipt](https://github.com/jemsbhai/pollard/blob/main/evidence/rust-parity-1.6.0/release-ci-validation/remote/summary.json)
+covers 32 live tests, one Redis configuration check, all five frozen-wheel backend
+interchanges, corrected-source MongoDB and all five CLI selectors. Fresh
+[default](https://github.com/jemsbhai/pollard/blob/main/evidence/rust-parity-1.6.0/release-ci-validation/consumer-default/summary.json)
+and [all-feature consumers](https://github.com/jemsbhai/pollard/blob/main/evidence/rust-parity-1.6.0/release-ci-validation/consumer-all/summary.json)
+resolved and ran on exactly Rust 1.74.0 without borrowing the library lockfile.
+The [release report](https://github.com/jemsbhai/pollard/blob/main/evidence/rust-parity-1.6.0/release-0.2.0.md) preserves the exact scope and source
+provenance. CI passed its first 29 executed jobs. After macOS capacity retries,
+debug passed but two optimized SQLite migration tests exposed colliding temporary
+paths. The fixture correction and final CI confirmation remain in progress.
+See the [tagged release](https://github.com/jemsbhai/pollard/releases/tag/pollardai-rust-v0.2.0) for final CI, source, archive and registry
+receipts and publication status.
 
-An earlier checkpoint passed 185 core tests, 205 tests with optional features,
-31 live backend tests, and Python/Rust interchange checks. In the 1,000-call
-MemoryStore workload, recording is 108.56× and strict replay 453.43× faster than
-Python; hybrid hits improve 2.45×. The 200,000-chunk test uses 94.64% less total
-peak process memory. Regressions are also recorded: identity hashing is 26.3%
-slower than original Rust, and SQLite hybrid hits take 2.48× as long as Python.
-These are local workload measurements, not complete-agent speedups.
+The original Python 1.6.0 MongoDB store still requires **`tz_aware=True`** for
+mixed-language windows and leases on non-UTC hosts. The repository's UTC fix is
+separately tested and has not been uploaded to PyPI. Native Decimal and SDK/API
+boundaries are detailed in the release report and below.
+
+## Completed performance measurements
+
+All three measurement sets completed against source `be9e565` with unchanged
+source and executable hashes. Receipts record `git_dirty: true` because evidence
+and documentation were being assembled; their source maps and unchanged-source
+guards identify the measured code. Raw samples, extrema, medians, import-path
+checks and hashes are retained in [MemoryStore/identity](https://github.com/jemsbhai/pollard/blob/main/evidence/rust-parity-1.6.0/release-performance/performance.json),
+[SQLite](https://github.com/jemsbhai/pollard/blob/main/evidence/rust-parity-1.6.0/release-performance/storage-performance.json) and
+[stream memory/time](https://github.com/jemsbhai/pollard/blob/main/evidence/rust-parity-1.6.0/release-performance/stream-memory.json).
+
+Measurements used one Intel Core i9-14900HX Windows 11 host (32 logical CPUs),
+Rust 1.94.0 release builds and Python 3.12.2. MemoryStore/identity and SQLite used
+two warmups and seven retained samples, with deterministic engine-order shuffling.
+SQLite used 40-step batches, a fresh database per sample, WAL/NORMAL and physically
+read-only strict replay; Python SQLite was 3.43.1 and Rust's bundled SQLite 3.45.0.
+Streaming used three fresh processes per case, equal counted observers,
+`keep_chunks=false` and a constant final result. Windows peak working set includes
+process/runtime startup. Timing excludes compilation, setup, process startup and
+correctness checks. Checksum, accounting, callback-count and forbidden-dispatch
+invariants passed. These are offline local kernels; power profile and background
+OS activity were not controlled, and timing thresholds are not correctness gates.
+
+**MemoryStore and identity: batch median times.** Ratios divide the comparison
+median by Rust 0.2.0's median; values above one mean a shorter Rust time. Both Rust
+versions use the same benchmark program. The baseline is the original 0.1.0 core
+at `51e3a245641044fc8b3d6a90fc49f3cbfcbf107d`, with its source verified separately.
+
+| Operation | Size | Python 1.6.0 ms | Rust 0.1.0 ms | Rust 0.2.0 ms | Python / Rust 0.2.0 | Old / new Rust |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| identity | 10,000 | 40.092 | 11.679 | 2.883 | 13.91× | 4.05× |
+| record | 100 | 57.535 | 22.936 | 3.012 | 19.10× | 7.62× |
+| record | 1,000 | 5164.280 | 2174.830 | 30.869 | 167.30× | 70.45× |
+| replay | 100 | 84.689 | 17.384 | 1.153 | 73.43× | 15.07× |
+| replay | 1,000 | 8062.100 | 1705.966 | 11.731 | 687.22× | 145.42× |
+| hybrid | 100 | 7.472 | 17.381 | 1.789 | 4.18× | 9.72× |
+| hybrid | 1,000 | 71.702 | 1688.737 | 18.406 | 3.90× | 91.75× |
+| walk | 1,000 | 6.240 | 4.594 | 0.659 | 9.47× | 6.97× |
+| walk | 10,000 | 70.142 | 636.744 | 8.030 | 8.74× | 79.30× |
+
+**SQLite: batch median times.** The original Rust 0.1.0 core has no corresponding
+SQLite implementation, so no old/new Rust ratio is reported here.
+
+| Operation | Steps | Python ms | Rust ms | Python / Rust |
+| --- | ---: | ---: | ---: | ---: |
+| record | 40 | 24.887 | 6.764 | 3.68× |
+| hybrid | 40 | 6.854 | 5.962 | 1.15× |
+| replay | 40 | 28.495 | 1.430 | 19.92× |
+
+**Unretained streams: median total process peak memory.**
+
+| Chunks | Python peak MiB | Rust peak MiB | Lower total peak |
+| --- | ---: | ---: | ---: |
+| 10,000 | 25.61 | 5.20 | 79.69% |
+| 200,000 | 97.57 | 5.34 | 94.52% |
+
+**Unretained streams: median callback/merge execution time.**
+
+| Chunks | Python ms | Rust ms | Python / Rust |
+| --- | ---: | ---: | ---: |
+| 10,000 | 4.229 | 3.275 | 1.29× |
+| 200,000 | 114.144 | 62.846 | 1.82× |
+
+The earlier identity regression is resolved: the current 10,000-identity batch
+is 4.05× faster than the original Rust baseline and 13.91× faster than Python.
+SQLite hybrid's median is now 1.15× faster than Python, but its sample ranges
+overlap (Rust 5.450–6.484 ms; Python 6.094–7.568 ms), so this is a descriptive
+median difference, not an established statistical advantage. Native hybrid also
+verifies ancestry; Python 1.6.0 performs its explicit verification pass only for
+strict replay. Successful outputs do not imply identical verification work.
+
+The implementation reduces repeated work through indexed child traversal,
+verified ancestry-prefix reuse and revision-aware SQLite caches. The snapshot
+fallback preserves coherent verification during concurrent commits, without
+promoting historical reads to the current cache. Direct identity encoding,
+preallocated hexadecimal output and fewer temporary allocations reduce work in
+the native path. Unretained stream chunks are released after merging, while the
+Python release temporarily retains its list. These mechanisms explain intended
+benefits, but the before/after measurements do not isolate each change's causal
+contribution; added validation and metering also changed the implementation.
+There are no budgets in the timing kernels: incremental accounting benefits are
+supported by read-count and invalidation tests, not these latency ratios.
+
+Total process memory includes interpreters, allocators and loaded libraries,
+so the entire memory difference cannot be assigned to chunk retention. Results
+are limited to these workloads and this host. They establish no provider-latency,
+remote-throughput, energy-saving, provider-cost or complete-agent speedup claim.
+They are separate from EXP-007's Python-callable overhead protocol. Earlier
+checkpoint measurements remain historical and are superseded for this release.
+
+
+The following audit and explicitly labelled earlier checkpoints remain available
+for historical comparison; the completed results above are the current release measurements.
 
 ## Release and source provenance
 
@@ -188,7 +293,7 @@ python evidence/rust-parity-1.6.0/stream_memory.py
 
 `stream_memory.py` requires `psutil`. Stop other builds and dedicated test services first. All runners reject changed sources/binaries during measurement and stale release binaries. Source/binary hashes identify the measured state; freshness timestamps are not cryptographic proof of compilation.
 
-## Final performance results
+## Earlier checkpoint performance results
 
 All values below are **batch medians on this one host**. Speedup is comparison time divided by updated Rust time; below 1 means Rust took longer. Raw samples and hashes are in [performance.json](https://github.com/jemsbhai/pollard/blob/main/evidence/rust-parity-1.6.0/performance.json), [storage-performance.json](https://github.com/jemsbhai/pollard/blob/main/evidence/rust-parity-1.6.0/storage-performance.json), and [stream-memory.json](https://github.com/jemsbhai/pollard/blob/main/evidence/rust-parity-1.6.0/stream-memory.json).
 
@@ -252,7 +357,7 @@ Python SQLite is 3.43.1; native bundled SQLite is 3.45.0.
 
 - These kernels do not measure hosted model latency, remote-store throughput, concurrency, startup latency, energy savings or provider costs. The largest ratios apply to growing in-memory chains, not complete agent workloads.
 
-## Optimization rationale
+## Earlier checkpoint optimization notes
 
 MemoryStore's child index replaces repeated full-map scans during traversal. The runtime verifies an immutable ancestry prefix once and extends it as calls advance; custom or externally mutable stores retain full verification unless they explicitly guarantee revision/identity invariants. Incremental charge totals invalidate on revision changes and account for sibling work; read-count and mutation regressions validate this separately from latency benchmarks.
 

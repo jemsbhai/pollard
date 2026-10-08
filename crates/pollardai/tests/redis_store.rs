@@ -4,11 +4,14 @@ use rust_decimal::Decimal;
 use std::{
     collections::BTreeMap,
     sync::{
-        atomic::{AtomicUsize, Ordering},
+        atomic::{AtomicU64, AtomicUsize, Ordering},
         Arc, Barrier,
     },
     time::Duration,
 };
+
+static NEXT_STORE: AtomicU64 = AtomicU64::new(0);
+
 fn url() -> String {
     std::env::var("POLLARD_REDIS_TEST_URL")
         .expect("set POLLARD_REDIS_TEST_URL to an isolated test server")
@@ -16,12 +19,13 @@ fn url() -> String {
 fn options(label: &str) -> RedisOptions {
     RedisOptions {
         store_id: format!(
-            "rust-parity-{label}-{}-{}",
+            "rust-parity-{label}-{}-{}-{}",
             std::process::id(),
             std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
                 .unwrap()
-                .as_nanos()
+                .as_nanos(),
+            NEXT_STORE.fetch_add(1, Ordering::Relaxed)
         ),
         timeout: Duration::from_secs(3),
         ..Default::default()

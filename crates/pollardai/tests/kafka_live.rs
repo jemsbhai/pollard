@@ -7,8 +7,11 @@ use rdkafka::{
 };
 use std::{
     collections::BTreeMap,
+    sync::atomic::{AtomicU64, Ordering},
     time::{Duration, SystemTime, UNIX_EPOCH},
 };
+
+static NEXT_TOPIC: AtomicU64 = AtomicU64::new(0);
 
 struct Topic {
     admin: AdminClient<DefaultClientContext>,
@@ -28,12 +31,13 @@ fn topic(bootstrap: &str, partitions: i32, cleanup: &str, retention: &str) -> To
         .create()
         .unwrap();
     let name = format!(
-        "pollard-parity-rust-{}-{}",
+        "pollard-parity-rust-{}-{}-{}",
         std::process::id(),
         SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .unwrap()
-            .as_nanos()
+            .as_nanos(),
+        NEXT_TOPIC.fetch_add(1, Ordering::Relaxed)
     );
     let topic = NewTopic::new(&name, partitions, TopicReplication::Fixed(1))
         .set("cleanup.policy", cleanup)

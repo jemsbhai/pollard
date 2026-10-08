@@ -985,7 +985,7 @@ selectors passed after the decimal fix. The ten disposable-runner guards passed
 on both Windows and Linux. All owned test containers were removed. Hosted CI
 was configured but not executed here. Counts overlap across configurations.
 
-## 2026-10-08 Rust PyPI 1.6.0 Parity: Measured Results
+## 2026-10-08 Rust PyPI 1.6.0 Parity: Earlier Checkpoint Measurements
 
 Final release-build measurements completed with all workload checksum and
 accounting assertions passing. Source and executable hashes remained unchanged
@@ -1021,3 +1021,56 @@ process-memory measurements include startup. No energy, remote throughput,
 provider-cost or complete-agent speedup claim is supported. Native budget-total
 caching is supported by read-count/invalidation tests, not by these no-budget
 latency workloads. Both regressions and raw distributions are retained.
+
+## 2026-10-08 Rust 0.2.0 Completed Validation and Measurements
+
+Source `be9e565a408776dd67f93891697503e8ae32c20a`; pinned Python 1.6.0 wheel;
+Rust 1.94.0 release builds; Python 3.12.2; Intel i9-14900HX Windows 11 host.
+The final matrix passes 212 default tests on stable/MSRV/optimized builds and 232
+optional tests on each compiler (33 explicitly ignored, tested separately in
+live-service/GPU receipts). Coherent SQLite snapshots fix the earlier CI
+contention failure without inflating retry limits or caching historical reads.
+The first 29 executed CI jobs passed. After macOS capacity retries, debug passed
+but two optimized SQLite migration tests exposed colliding temporary paths.
+The fixture correction and final CI confirmation remain in progress.
+Current [remote CI evidence](evidence/rust-parity-1.6.0/release-ci-validation/remote/summary.json)
+passes all 25 commands: 32 live tests plus one Redis configuration check, five
+frozen-wheel interchanges, corrected-source MongoDB and five CLI selectors; all
+five containers were removed. Fresh [default](evidence/rust-parity-1.6.0/release-ci-validation/consumer-default/summary.json)
+and [all-feature](evidence/rust-parity-1.6.0/release-ci-validation/consumer-all/summary.json)
+consumers resolved and ran on exactly Rust 1.74.0 with their own lockfiles.
+
+The completed [release report](evidence/rust-parity-1.6.0/release-0.2.0.md)
+contains all nine MemoryStore/identity rows, three SQLite rows and both stream
+memory/time tables with medians and old/new ratios. Raw receipts are
+[MemoryStore/identity](evidence/rust-parity-1.6.0/release-performance/performance.json),
+[SQLite](evidence/rust-parity-1.6.0/release-performance/storage-performance.json) and
+[stream memory/time](evidence/rust-parity-1.6.0/release-performance/stream-memory.json).
+All source/executable guards passed; receipts preserve raw samples and hashes.
+Documentation/evidence changes explain dirty-worktree flags without changing
+measured source hashes.
+
+- At 1,000 calls, Rust record/replay/hybrid medians are 30.869/11.731/18.406 ms,
+  versus Python 5164.280/8062.100/71.702 ms: 167.30×/687.22×/3.90× ratios.
+  Ratios versus original Rust 0.1.0 are 70.45×/145.42×/91.75×.
+- Identity 10,000 median is 2.883 ms versus original Rust 11.679 ms and Python 40.092 ms:
+  the earlier regression is resolved at 4.05× original Rust and 13.91× Python.
+- SQLite 40-step record/hybrid/replay medians are 6.764/5.962/1.430 ms,
+  versus Python 24.887/6.854/28.495 ms: 3.68×/1.15×/19.92×.
+  Hybrid sample ranges overlap, and native ancestry checks are stronger.
+- At 200,000 unretained chunks, median peak is 5.34 MiB versus Python 97.57 MiB
+  (94.52% lower total process peak); callback/merge time is 62.846 ms versus
+  114.144 ms (1.82×). At 10,000 chunks the corresponding memory reduction is 79.69%
+  and time ratio 1.29×. Memory includes runtime/interpreter startup.
+
+Methods: two warmups/seven samples for memory and SQLite kernels; three fresh
+processes per stream case; equivalent successful outputs and accounting checked
+outside timings. Child indexes, ancestry-prefix/revision caching, direct identity
+encoding and allocation reduction explain intended benefits, without isolating
+individual causes. SQLite snapshots retain correctness under mutation. Timing
+kernels have no budgets; budget-cache benefits have read-count tests instead.
+No provider, remote-throughput, energy, cost-saving or complete-agent speedup
+claim follows. This remains separate from EXP-007. Python 1.6.0 MongoDB mixed
+leases/windows require `tz_aware=True`; the source UTC fix is not a PyPI upload.
+See the [tagged release](https://github.com/jemsbhai/pollard/releases/tag/pollardai-rust-v0.2.0) for final CI, source, archive and registry
+receipts and publication status.

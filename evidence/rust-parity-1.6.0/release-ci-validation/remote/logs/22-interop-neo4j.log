@@ -1,0 +1,1 @@
+{"status": "passed", "cases": ["exact_records", "budget", "window", "reverse_window", "mixed_idempotent_settlement", "scientific_decimal_wire_digest"], "output": "/home/runner/work/pollard/pollard/.benchmarks/remote-validation/results/neo4j-interop.json"}

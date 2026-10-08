@@ -1,0 +1,1 @@
+{"status": "passed", "cases": ["exact_records", "budget", "window", "reverse_window", "mixed_idempotent_settlement"], "output": "/home/runner/work/pollard/pollard/.benchmarks/remote-validation/results/postgres-interop.json"}

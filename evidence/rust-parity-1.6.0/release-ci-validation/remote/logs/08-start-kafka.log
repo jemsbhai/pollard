@@ -1,0 +1,27 @@
+Unable to find image 'docker.redpanda.com/redpandadata/redpanda:v24.1.21@sha256:dc33c62306c742c0d8850c883c39bea9ab5351c32a93e0d9fa560ae04b43a3c0' locally
+docker.redpanda.com/redpandadata/redpanda@sha256:dc33c62306c742c0d8850c883c39bea9ab5351c32a93e0d9fa560ae04b43a3c0: Pulling from redpandadata/redpanda
+61ffccc6e275: Pulling fs layer
+d95211892180: Pulling fs layer
+d9a23508ba09: Pulling fs layer
+d1507bdea288: Pulling fs layer
+2c337f04138b: Pulling fs layer
+d1507bdea288: Waiting
+2c337f04138b: Waiting
+d9a23508ba09: Verifying Checksum
+d9a23508ba09: Download complete
+61ffccc6e275: Verifying Checksum
+61ffccc6e275: Download complete
+d95211892180: Verifying Checksum
+d95211892180: Download complete
+d1507bdea288: Verifying Checksum
+d1507bdea288: Download complete
+2c337f04138b: Verifying Checksum
+2c337f04138b: Download complete
+61ffccc6e275: Pull complete
+d95211892180: Pull complete
+d9a23508ba09: Pull complete
+d1507bdea288: Pull complete
+2c337f04138b: Pull complete
+Digest: sha256:dc33c62306c742c0d8850c883c39bea9ab5351c32a93e0d9fa560ae04b43a3c0
+Status: Downloaded newer image for docker.redpanda.com/redpandadata/redpanda@sha256:dc33c62306c742c0d8850c883c39bea9ab5351c32a93e0d9fa560ae04b43a3c0
+09aa376f012e0e5aee71b58f743a3c7e664cb88b942e541bb7c5163086d2583c

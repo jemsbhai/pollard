@@ -62,6 +62,8 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
   does not become an integrity error.
 - Resolve fresh downstream applications on Rust 1.74 without borrowing this
   repository's Cargo.lock, including every optional feature on Linux.
+- Give parallel test fixtures atomic temporary-path suffixes so coarse clock
+  resolution cannot cause database collisions in optimized macOS runs.
 
 ## [npm 0.2.0] - 2026-10-08
 

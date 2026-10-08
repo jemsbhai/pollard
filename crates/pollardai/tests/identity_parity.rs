@@ -1,4 +1,7 @@
 use pollardai::*;
+use std::sync::atomic::{AtomicU64, Ordering};
+
+static NEXT_TEMP: AtomicU64 = AtomicU64::new(0);
 
 fn fixture() -> Value {
     serde_json::from_str(include_str!("pypi160_identity_registry.json")).unwrap()
@@ -235,12 +238,13 @@ fn memory_and_reopened_sqlite_nodes_compare_equal_without_weakening_text_integri
         }
     }
     let database = Database(std::env::temp_dir().join(format!(
-            "pollard-node-float-{}-{}.db",
+            "pollard-node-float-{}-{}-{}.db",
             std::process::id(),
             std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
                 .unwrap()
-                .as_nanos()
+                .as_nanos(),
+            NEXT_TEMP.fetch_add(1, Ordering::Relaxed)
         )));
     let root = Node::make(
         NodeKind::Root,

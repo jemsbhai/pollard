@@ -1,0 +1,11 @@
+{
+  ok: 1,
+  '$clusterTime': {
+    clusterTime: Timestamp({ t: 1791476832, i: 1 }),
+    signature: {
+      hash: Binary.createFromBase64('AAAAAAAAAAAAAAAAAAAAAAAAAAA=', 0),
+      keyId: Long('0')
+    }
+  },
+  operationTime: Timestamp({ t: 1791476832, i: 1 })
+}

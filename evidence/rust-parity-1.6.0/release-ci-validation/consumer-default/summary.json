@@ -1,0 +1,387 @@
+{
+  "status": "passed",
+  "crate_version": "0.2.0",
+  "features": [],
+  "toolchain": "1.74.0",
+  "consumer_started_without_lockfile": true,
+  "library_lock_sha256_before": "b2e37c2d5126ccecb0b2b70eae412837ae4e3d2af0709ae7a5ab37b4c123589a",
+  "manifest_sha256": "6571ee27ad40a54b123402a418eae77bdb1bd11778d82cefd3f5cf86d70d7dab",
+  "source_sha256": {
+    "src/adapters.rs": "3b2c206a81c099a11ecd64a538d32bd65f8ee3f84c10185b54773b391887ad2f",
+    "src/aio.rs": "bac10d6c7ecc45c06a4fbe80256baea10e401df5c0f81bfdf8dc98f3c05be431",
+    "src/bin/pollard.rs": "48090e9644a7ebdb3c3517544d60f577403a6e0bdead30e1246fbd4091c883cb",
+    "src/decimal.rs": "fbed4a5932fc64ba80b687f84e361f019ef6d2fb7ee64fac2a36f82b98cfebe4",
+    "src/decimal_wire.rs": "79e9ba60d7fba9c90495fe22f2eab6c8ec9d43ea270aebfd931702479e633549",
+    "src/energy.rs": "1b5b61cf22847612de47c27a5904573a295f1563b79db456a5bcada66f510a7e",
+    "src/estimators.rs": "4dab7fcf285f7ef74906d636c9e65df76687f9e43cb0a7fd3995cdbbc8781f6b",
+    "src/hashrope.rs": "5628efeb4c730120d5105762b8fcb264b0fc0fa19446b44dbf2087b4eada4939",
+    "src/identity.rs": "462a656aa3d8c1d7fc81ccb21a4741a75cc0b5084c5598d797b068e367fda6dc",
+    "src/kafka.rs": "e14563834f2681045b6cb651e8a3db3d972ecfefd775ad1b1ee7242c9e66aec0",
+    "src/kv.rs": "db0ca1a9b56026dff96af4889e19ce8fd2b3efd26f2d72a3420ae20361d3dcfd",
+    "src/lib.rs": "48fa142df757093b6c40934c1d8c3e93752b20bac1d0a7e7026e6bfad2fddf83",
+    "src/mcp.rs": "c7d7fc84f6a7ffbcd04e58e93e72401dc88bea795c48702df17e1fb36ca8faa0",
+    "src/merge.rs": "8d079769df2bbc3c211d0cd019bb39cad1fbe30f28ac6b05150613bd635bca06",
+    "src/meters.rs": "9d85707c6f6733089e137fc12b354ad9dbb554d3d4008196c2fb57f27670ed50",
+    "src/mongodb.rs": "284d6207f9a1375e442265a031f1bd0704d997e6ec141aa44e66b71c23503d76",
+    "src/neo4j.rs": "42406fff2cbaf1e655489e4472d4d976750ad724d6bbb47243bccc885669b839",
+    "src/nvml.rs": "0148be0d09fa2021ffa4e018cc04bec4468916eecb57c8cb7a38d474e8c4e186",
+    "src/otel.rs": "37d0858e013b34f52a15623e618f6abd73aa4eaefb622fcb6d665064d5c1147f",
+    "src/postgres.rs": "7ed42a1afd5801b67f61e936a80147dfb6cb4ccfd5e8593800c5342a6e379925",
+    "src/python_display.rs": "859d9cb89b458a807a08fad965a0528056b6c9c03bb2ac81b166d832b2b18997",
+    "src/python_printable.rs": "5428029c831ca02b5b97c3ab49a34a276840a0a2bcc4dce40bf4bb670cc11080",
+    "src/redis.rs": "582356890612faaf726ce9077b2a7bb3d8543b4a1af0d00a7d4591ca0c4b8979",
+    "src/registry.rs": "0561acb64d9b18a1fef4dfaa0bbd6123b77fe8f19dc4d6ec0bc1f143b7d9dc7d",
+    "src/remote_worker.rs": "40acd856b12137a2a7c0464f496187b2956094ee5bc01f63f579ce3fa912217a",
+    "src/render.rs": "7210d38a7bff72fab94abfda7bb6dd5008b23941a3c6602208c0beb146591f42",
+    "src/revalidation.rs": "37e23119bf4c6a53be97e359be1ada1381c15fabf983fac38ac767eb89f168fd",
+    "src/runtime.rs": "4a6616cd69cba17171f1a79bdffcc8c4efc79a5c5eee4b7d20f0673a2883b8a5",
+    "src/seal.rs": "b13196e1018a1039704ebcc12b3d4c1de07bd54809d2fcb9e734bccabdb1c284",
+    "src/seal_custody.rs": "f21e3cf7688c82a4e4512b8dbc5b0dfcc58510836b394ec3072eb5d8dca78693",
+    "src/sqlite.rs": "0d613f35d63d53e4a6ba7312caf989f184834128f01d0bf00f86d3fa66b3aa7f",
+    "src/store.rs": "1f64bf4d31407fead1bd01ecb7e6e18f586863ec731bf716c4080714b0f1edfc",
+    "src/store_spec.rs": "c11cf7479dd14ccdc9eada0d724e7329f94ee8b8b67bd138a63f620dd6fda838",
+    "src/stream.rs": "9543e17ace248cfac9e67f725b79f4d3ff24f04e146e847b240f701d9e626852",
+    "src/tokenmaster.rs": "02159a8ffe2fa318894bee3a84071b6d6913c5d0056c49de30c07b31be974f57"
+  },
+  "commands": [
+    {
+      "name": "toolchain",
+      "command": [
+        "cargo",
+        "+1.74.0",
+        "--version"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.008781672999987222
+    },
+    {
+      "name": "resolve",
+      "command": [
+        "cargo",
+        "+1.74.0",
+        "generate-lockfile",
+        "--manifest-path",
+        "/home/runner/work/pollard/pollard/.benchmarks/fresh-consumer/Cargo.toml"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.2077644190000001
+    },
+    {
+      "name": "run",
+      "command": [
+        "cargo",
+        "+1.74.0",
+        "run",
+        "--locked",
+        "--manifest-path",
+        "/home/runner/work/pollard/pollard/.benchmarks/fresh-consumer/Cargo.toml"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 19.276620916000013
+    }
+  ],
+  "library_lock_sha256_after": "b2e37c2d5126ccecb0b2b70eae412837ae4e3d2af0709ae7a5ab37b4c123589a",
+  "consumer_lock_sha256": "147f30c769b260ac8e9794b4f5fcf0e4398fbc6ae5540dddb5c980c0299a83d3",
+  "resolved_packages": [
+    {
+      "name": "ahash",
+      "version": "0.8.12"
+    },
+    {
+      "name": "arrayvec",
+      "version": "0.7.8"
+    },
+    {
+      "name": "autocfg",
+      "version": "1.5.1"
+    },
+    {
+      "name": "bitflags",
+      "version": "2.13.2"
+    },
+    {
+      "name": "block-buffer",
+      "version": "0.10.4"
+    },
+    {
+      "name": "borsh",
+      "version": "1.5.7"
+    },
+    {
+      "name": "borsh-derive",
+      "version": "1.5.7"
+    },
+    {
+      "name": "bumpalo",
+      "version": "3.20.3"
+    },
+    {
+      "name": "bytes",
+      "version": "1.12.1"
+    },
+    {
+      "name": "cc",
+      "version": "1.6.0"
+    },
+    {
+      "name": "cfg-if",
+      "version": "1.0.5"
+    },
+    {
+      "name": "cfg_aliases",
+      "version": "0.2.2"
+    },
+    {
+      "name": "cpufeatures",
+      "version": "0.2.17"
+    },
+    {
+      "name": "crypto-common",
+      "version": "0.1.7"
+    },
+    {
+      "name": "digest",
+      "version": "0.10.7"
+    },
+    {
+      "name": "equivalent",
+      "version": "1.0.2"
+    },
+    {
+      "name": "fallible-iterator",
+      "version": "0.3.0"
+    },
+    {
+      "name": "fallible-streaming-iterator",
+      "version": "0.1.9"
+    },
+    {
+      "name": "find-msvc-tools",
+      "version": "0.1.14"
+    },
+    {
+      "name": "generic-array",
+      "version": "0.14.7"
+    },
+    {
+      "name": "getrandom",
+      "version": "0.2.17"
+    },
+    {
+      "name": "getrandom",
+      "version": "0.3.4"
+    },
+    {
+      "name": "hashbrown",
+      "version": "0.14.5"
+    },
+    {
+      "name": "hashbrown",
+      "version": "0.16.1"
+    },
+    {
+      "name": "hashlink",
+      "version": "0.9.1"
+    },
+    {
+      "name": "indexmap",
+      "version": "2.11.4"
+    },
+    {
+      "name": "itoa",
+      "version": "1.0.18"
+    },
+    {
+      "name": "libc",
+      "version": "0.2.190"
+    },
+    {
+      "name": "libsqlite3-sys",
+      "version": "0.28.0"
+    },
+    {
+      "name": "memchr",
+      "version": "2.8.3"
+    },
+    {
+      "name": "num-traits",
+      "version": "0.2.19"
+    },
+    {
+      "name": "once_cell",
+      "version": "1.21.4"
+    },
+    {
+      "name": "pkg-config",
+      "version": "0.3.34"
+    },
+    {
+      "name": "pollard-fresh-consumer",
+      "version": "0.0.0"
+    },
+    {
+      "name": "pollardai",
+      "version": "0.2.0"
+    },
+    {
+      "name": "ppv-lite86",
+      "version": "0.2.21"
+    },
+    {
+      "name": "proc-macro-crate",
+      "version": "3.1.0"
+    },
+    {
+      "name": "proc-macro2",
+      "version": "1.0.107"
+    },
+    {
+      "name": "quote",
+      "version": "1.0.47"
+    },
+    {
+      "name": "r-efi",
+      "version": "5.3.0"
+    },
+    {
+      "name": "rand",
+      "version": "0.8.8"
+    },
+    {
+      "name": "rand",
+      "version": "0.9.5"
+    },
+    {
+      "name": "rand_chacha",
+      "version": "0.3.1"
+    },
+    {
+      "name": "rand_chacha",
+      "version": "0.9.0"
+    },
+    {
+      "name": "rand_core",
+      "version": "0.6.4"
+    },
+    {
+      "name": "rand_core",
+      "version": "0.9.5"
+    },
+    {
+      "name": "rusqlite",
+      "version": "0.31.0"
+    },
+    {
+      "name": "rust_decimal",
+      "version": "1.43.0"
+    },
+    {
+      "name": "rustversion",
+      "version": "1.0.23"
+    },
+    {
+      "name": "serde",
+      "version": "1.0.229"
+    },
+    {
+      "name": "serde_core",
+      "version": "1.0.229"
+    },
+    {
+      "name": "serde_derive",
+      "version": "1.0.229"
+    },
+    {
+      "name": "serde_json",
+      "version": "1.0.151"
+    },
+    {
+      "name": "sha2",
+      "version": "0.10.9"
+    },
+    {
+      "name": "shlex",
+      "version": "2.0.1"
+    },
+    {
+      "name": "smallvec",
+      "version": "1.16.2"
+    },
+    {
+      "name": "syn",
+      "version": "2.0.119"
+    },
+    {
+      "name": "syn",
+      "version": "3.0.6"
+    },
+    {
+      "name": "toml_datetime",
+      "version": "0.6.11"
+    },
+    {
+      "name": "toml_edit",
+      "version": "0.21.1"
+    },
+    {
+      "name": "typenum",
+      "version": "1.20.1"
+    },
+    {
+      "name": "unicode-ident",
+      "version": "1.0.26"
+    },
+    {
+      "name": "vcpkg",
+      "version": "0.2.15"
+    },
+    {
+      "name": "version_check",
+      "version": "0.9.5"
+    },
+    {
+      "name": "wasi",
+      "version": "0.11.1+wasi-snapshot-preview1"
+    },
+    {
+      "name": "wasip2",
+      "version": "1.0.4+wasi-0.2.12"
+    },
+    {
+      "name": "wasm-bindgen",
+      "version": "0.2.129"
+    },
+    {
+      "name": "wasm-bindgen-macro",
+      "version": "0.2.129"
+    },
+    {
+      "name": "wasm-bindgen-macro-support",
+      "version": "0.2.129"
+    },
+    {
+      "name": "wasm-bindgen-shared",
+      "version": "0.2.129"
+    },
+    {
+      "name": "winnow",
+      "version": "0.5.40"
+    },
+    {
+      "name": "wit-bindgen",
+      "version": "0.57.1"
+    },
+    {
+      "name": "zerocopy",
+      "version": "0.8.62"
+    },
+    {
+      "name": "zerocopy-derive",
+      "version": "0.8.62"
+    },
+    {
+      "name": "zmij",
+      "version": "1.0.23"
+    }
+  ]
+}

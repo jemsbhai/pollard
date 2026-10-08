@@ -1,0 +1,51 @@
+   Compiling pollardai v0.2.0 (C:\Users\User\.codex\worktrees\rust-pypi-parity\pollard\crates\pollardai)
+    Finished test [unoptimized + debuginfo] target(s) in 1.55s
+     Running tests\identity_parity.rs (target\debug\deps\identity_parity-abd04dd5cf8269b4.exe)
+
+running 11 tests
+test borrowed_identity_envelope_retains_first_invalid_leaf_error_path ... ok
+test identity_rejects_floating_spellings_without_rounding_large_integers ... ok
+test float_result_integrity_still_rejects_changed_values_types_and_signed_zero ... ok
+test native_float_results_remain_valid_nodes_after_python_text_normalization ... ok
+test node_attempts_cover_the_full_native_unsigned_range ... ok
+test nonfinite_exponent_metadata_and_imported_results_are_rejected ... ok
+test result_serialization_is_recursive_sorted_and_preserves_imported_text ... ok
+test exact_pypi_160_redaction_marker_recognition ... ok
+test exact_pypi_160_integer_unicode_hashing_and_redaction_vectors ... ok
+test exact_pypi_160_native_result_float_text_and_digests ... ok
+test memory_and_reopened_sqlite_nodes_compare_equal_without_weakening_text_integrity ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests\runtime_parity.rs (target\debug\deps\runtime_parity-998344e9ec32f1d6.exe)
+
+running 26 tests
+test callback_failures_are_inspectable_and_do_not_lose_recordings ... ok
+test decimal_meter_budget_does_not_refuse_exact_boundary ... ok
+test cancelled_duplicate_dispatch_consumes_local_window_capacity ... ok
+test custom_meter_scopes_overshoot_and_replay_avoidance ... ok
+test default_duplicates_execute_preserve_original_and_append_conflict ... ok
+test async_revalidation_comparison_failure_keeps_original_and_safe_evidence ... ok
+test async_registered_actions_gate_and_confirm_before_constructing_future ... ok
+test dry_run_only_skips_registered_side_effects ... ok
+test expected_meter_refusal_is_audited_before_dispatch_and_revalidates_metadata ... ok
+test explicit_meter_list_replaces_defaults_like_python ... ok
+test invalid_custom_estimate_stops_before_pending_marker_or_handler ... ok
+test async_revalidation_records_separate_observation_and_checks_budget_before_future ... ok
+test duplicate_dispatches_also_consume_window_capacity ... ok
+test ordinary_failure_releases_but_unknown_failure_preserves_charges ... ok
+test post_result_storage_failure_settles_conservative_record_on_drop ... ok
+test fallback_and_no_estimate_match_python_160 ... ok
+test resumes_pruning_and_rollback_steps_are_deterministic ... ok
+test revalidation_estimators_receive_original_live_payload ... ok
+test revalidation_comparator_failure_retains_safe_evidence_and_restores_cursor ... ok
+test live_revalidation_preserves_recording_and_returns_original_cursor ... ok
+test window_meter_gates_across_resumes_and_never_dispatches_refused_call ... ok
+test shared_cached_accounting_tracks_siblings_and_pending_settlement ... ok
+test cancelled_async_registered_action_settles_sqlite_budget ... ok
+test incremental_accounting_has_linear_reads_and_invalidates_external_changes ... ok
+test sqlite_runtime_arbitrates_concurrent_dispatches_and_shared_window ... ok
+test sqlite_runtime_renews_live_lease_and_releases_known_errors ... ok
+
+test result: ok. 26 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.57s
+

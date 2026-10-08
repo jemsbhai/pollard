@@ -1,16 +1,26 @@
 use pollardai::*;
 use rusqlite::{params, Connection};
 use std::path::PathBuf;
+use std::sync::atomic::{AtomicU64, Ordering};
+
+static NEXT_TEMP: AtomicU64 = AtomicU64::new(0);
+
 struct Temp(PathBuf);
 impl Temp {
     fn new() -> Self {
-        let filename = format!(
-            "pollard-legacy-test-{}-{}.db",
-            std::process::id(),
+        Self::at_time(
             std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
                 .unwrap()
-                .as_nanos()
+                .as_nanos(),
+        )
+    }
+    fn at_time(timestamp: u128) -> Self {
+        let filename = format!(
+            "pollard-legacy-test-{}-{}-{}.db",
+            std::process::id(),
+            timestamp,
+            NEXT_TEMP.fetch_add(1, Ordering::Relaxed),
         );
         Self(std::env::temp_dir().join(filename))
     }
@@ -22,6 +32,28 @@ impl Drop for Temp {
         }
     }
 }
+
+#[test]
+fn temporary_paths_are_unique_when_parallel_allocations_share_a_clock_tick() {
+    let barrier = std::sync::Arc::new(std::sync::Barrier::new(8));
+    let workers: Vec<_> = (0..8)
+        .map(|_| {
+            let barrier = barrier.clone();
+            std::thread::spawn(move || {
+                barrier.wait();
+                (0..128).map(|_| Temp::at_time(0)).collect::<Vec<_>>()
+            })
+        })
+        .collect();
+    let paths: Vec<_> = workers
+        .into_iter()
+        .flat_map(|worker| worker.join().unwrap())
+        .collect();
+    let unique: std::collections::BTreeSet<_> = paths.iter().map(|path| &path.0).collect();
+    assert_eq!(unique.len(), paths.len());
+    assert_eq!(paths.len(), 1024);
+}
+
 fn legacy(version: Option<&str>, tamper: bool) -> (Temp, Node) {
     let path = Temp::new();
     let conn = Connection::open(&path.0).unwrap();

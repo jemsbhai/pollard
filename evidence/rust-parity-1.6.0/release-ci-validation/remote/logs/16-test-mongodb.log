@@ -1,0 +1,14 @@
+   Compiling pollardai v0.2.0 (/home/runner/work/pollard/pollard/crates/pollardai)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.00s
+     Running tests/mongodb_parity.rs (crates/pollardai/target/debug/deps/mongodb_parity-53900af7976795a0)
+
+running 6 tests
+test corrupt_identity_coordinator_and_sparse_indexes_fail_closed ... ok
+test exact_decimal_reservations_retry_expiry_and_permanent_tombstones ... ok
+test independent_connections_contend_on_one_window ... ok
+test native_manifest_seal_reopen_and_failed_batch_are_atomic ... ok
+test readonly_and_reconnect_never_repair_corrupt_schema ... ok
+test sync_store_is_safe_inside_an_existing_async_runtime ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.18s
+

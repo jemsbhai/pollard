@@ -1,0 +1,35 @@
+Unable to find image 'mongo:7@sha256:1f995ad6fdb93244a1addab1b58f934a0bc2f5643c38e02f5e9d7f0c7d227a7b' locally
+docker.io/library/mongo@sha256:1f995ad6fdb93244a1addab1b58f934a0bc2f5643c38e02f5e9d7f0c7d227a7b: Pulling from library/mongo
+98c4455a9898: Already exists
+cbbf1927e501: Pulling fs layer
+763db67a4019: Pulling fs layer
+47f7b7c9d009: Pulling fs layer
+a58c554e4124: Pulling fs layer
+1ba0da4cb69c: Pulling fs layer
+c1ae443f1e54: Pulling fs layer
+7abe9b2477b0: Pulling fs layer
+1ba0da4cb69c: Waiting
+c1ae443f1e54: Waiting
+7abe9b2477b0: Waiting
+a58c554e4124: Waiting
+cbbf1927e501: Download complete
+47f7b7c9d009: Download complete
+763db67a4019: Verifying Checksum
+763db67a4019: Download complete
+cbbf1927e501: Pull complete
+a58c554e4124: Verifying Checksum
+a58c554e4124: Download complete
+1ba0da4cb69c: Verifying Checksum
+1ba0da4cb69c: Download complete
+7abe9b2477b0: Verifying Checksum
+7abe9b2477b0: Download complete
+763db67a4019: Pull complete
+c1ae443f1e54: Download complete
+47f7b7c9d009: Pull complete
+a58c554e4124: Pull complete
+1ba0da4cb69c: Pull complete
+c1ae443f1e54: Pull complete
+7abe9b2477b0: Pull complete
+Digest: sha256:1f995ad6fdb93244a1addab1b58f934a0bc2f5643c38e02f5e9d7f0c7d227a7b
+Status: Downloaded newer image for mongo@sha256:1f995ad6fdb93244a1addab1b58f934a0bc2f5643c38e02f5e9d7f0c7d227a7b
+9344a4d321da1409b17581380ccd1696d63bd494121166eeaf9913bd972db6bf

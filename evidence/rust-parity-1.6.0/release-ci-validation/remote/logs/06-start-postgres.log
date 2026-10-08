@@ -1,0 +1,49 @@
+Unable to find image 'postgres:16-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea' locally
+docker.io/library/postgres@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea: Pulling from library/postgres
+e2de96513ba9: Already exists
+1b7f9cd581ee: Pulling fs layer
+210b280f9556: Pulling fs layer
+81717818649a: Pulling fs layer
+3ae6141cfd99: Pulling fs layer
+25b77f59fd95: Pulling fs layer
+6c25da34e03f: Pulling fs layer
+a88782f92806: Pulling fs layer
+d8d21be4bf02: Pulling fs layer
+6117bd39f23f: Pulling fs layer
+509688edf37b: Pulling fs layer
+3ae6141cfd99: Waiting
+25b77f59fd95: Waiting
+6c25da34e03f: Waiting
+a88782f92806: Waiting
+d8d21be4bf02: Waiting
+6117bd39f23f: Waiting
+509688edf37b: Waiting
+81717818649a: Download complete
+210b280f9556: Verifying Checksum
+210b280f9556: Download complete
+1b7f9cd581ee: Verifying Checksum
+1b7f9cd581ee: Download complete
+3ae6141cfd99: Download complete
+6c25da34e03f: Verifying Checksum
+6c25da34e03f: Download complete
+a88782f92806: Download complete
+d8d21be4bf02: Download complete
+6117bd39f23f: Verifying Checksum
+6117bd39f23f: Download complete
+25b77f59fd95: Verifying Checksum
+25b77f59fd95: Download complete
+509688edf37b: Verifying Checksum
+509688edf37b: Download complete
+1b7f9cd581ee: Pull complete
+210b280f9556: Pull complete
+81717818649a: Pull complete
+3ae6141cfd99: Pull complete
+25b77f59fd95: Pull complete
+6c25da34e03f: Pull complete
+a88782f92806: Pull complete
+d8d21be4bf02: Pull complete
+6117bd39f23f: Pull complete
+509688edf37b: Pull complete
+Digest: sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea
+Status: Downloaded newer image for postgres@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea
+224696a7089b8724cf3d9a259ac4d839eabf114ff9a7e973fc7ed3406f97e7be

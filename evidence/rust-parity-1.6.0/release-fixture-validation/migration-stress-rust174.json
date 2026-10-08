@@ -1,0 +1,20 @@
+[
+  {
+    "toolchain": "1.74.0",
+    "profile": "debug",
+    "iterations": 20,
+    "tests_per_iteration": 4,
+    "status": "passed",
+    "seconds": 2.3987395763397217,
+    "binary_sha256": "8fe8b99bbf7f5b61a4cb9c352c626db4dc3922f228021fdef61216f27dd93928"
+  },
+  {
+    "toolchain": "1.74.0",
+    "profile": "release",
+    "iterations": 20,
+    "tests_per_iteration": 4,
+    "status": "passed",
+    "seconds": 2.381011486053467,
+    "binary_sha256": "ba59a904d11c12e61ef40b26a9cc63661c32f6a4305ecb6d1b13ef55e04b68e1"
+  }
+]

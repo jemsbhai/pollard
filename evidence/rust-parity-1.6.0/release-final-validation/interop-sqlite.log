@@ -1,0 +1,29 @@
+{
+  "status": "passed",
+  "python": "3.12.2 (tags/v3.12.2:6abddd9, Feb  6 2024, 21:26:36) [MSC v.1937 64 bit (AMD64)]",
+  "loaded_from": "C:\\Users\\User\\AppData\\Local\\Temp\\pollard-release-audit-20261008\\pollard-1.6.0-py3-none-any.whl\\pollard\\__init__.py",
+  "wheel_sha256": "569fb5f130a82c9be327b8dcbd285e3be063200bd9773ca15c5d6bb62edd627f",
+  "python_root": "f59f8431d4d1354dfb0ef3e9d8b46a89351df92053fcab571b424c370ab193ae",
+  "python_node": "f3be311246ecaa4800a8c9db2177536c2b5fbd00d46d1204522315344bdb1d46",
+  "python_seal": "21bcf583fe9d4a5a8ae592cf8038bcaa97032f9259a61d33176ff5931d6832ba",
+  "rust": {
+    "copied": 2,
+    "source_roots": [
+      "f59f8431d4d1354dfb0ef3e9d8b46a89351df92053fcab571b424c370ab193ae"
+    ],
+    "native_root": "77867c7d5d04056d5cb3b9204eafdebd7074fd9f8d67a474c5f686d93844f967",
+    "native_node": "0d9e256f6c30b9dd22cbd9a01ac724b73a0c3fd548d4cb21a8627189c89835a4",
+    "native_seal": "a54fb0f298fb4c23f3586b8401ed3987a7d3769141a63245715cda8c2050b4e8"
+  },
+  "checks": [
+    "Python-created schema v3 opened read-only by Rust",
+    "interned strings and literal references retained",
+    "exact Python result text and seal retained through Rust merge",
+    "Rust-created schema v3 opened read-only by Python",
+    "Rust result id and float digest verified in Python",
+    "Rust manifest imported and verified in Python",
+    "Python and Rust appended interoperable custody records in sequence"
+  ],
+  "cargo_stdout": "{\"copied\":2,\"source_roots\":[\"f59f8431d4d1354dfb0ef3e9d8b46a89351df92053fcab571b424c370ab193ae\"],\"native_root\":\"77867c7d5d04056d5cb3b9204eafdebd7074fd9f8d67a474c5f686d93844f967\",\"native_node\":\"0d9e256f6c30b9dd22cbd9a01ac724b73a0c3fd548d4cb21a8627189c89835a4\",\"native_seal\":\"a54fb0f298fb4c23f3586b8401ed3987a7d3769141a63245715cda8c2050b4e8\"}\n",
+  "cargo_stderr": ""
+}

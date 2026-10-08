@@ -1,0 +1,1 @@
+{"status": "passed", "cases": ["python_to_rust", "rust_to_python", "cross_language_metadata"], "output": "/home/runner/work/pollard/pollard/.benchmarks/remote-validation/results/kafka-interop.json"}

@@ -1,0 +1,978 @@
+{
+  "generated_at": "2026-10-08T16:46:39.967047+00:00",
+  "pypi_version": "1.6.0",
+  "wheel_sha256": "569fb5f130a82c9be327b8dcbd285e3be063200bd9773ca15c5d6bb62edd627f",
+  "git_base": "be9e565a408776dd67f93891697503e8ae32c20a",
+  "git_dirty": true,
+  "rustc": "rustc 1.94.0 (4a4ef493e 2026-03-02)",
+  "source_sha256": {
+    "crates/pollardai/Cargo.lock": "b2e37c2d5126ccecb0b2b70eae412837ae4e3d2af0709ae7a5ab37b4c123589a",
+    "crates/pollardai/Cargo.toml": "a4dbe4a3eb3c847ffb719877ef323c5b6ddc161b915d4bd791d94a4adb52e453",
+    "crates/pollardai/examples/arbitration_interop.rs": "6063a93db0122b8003a7a449a06112f64c42bcc6083d67ec3e5c8a6d2d77e582",
+    "crates/pollardai/examples/document_interop.rs": "8e8b40faa2f983071cb50b83cfd3cb378df78047ac3213ed48d6e563d2bf6435",
+    "crates/pollardai/examples/governed_call.rs": "aae354f657cb6e8518fd104b6959aa011bb87f1bdd6661e713e7731fd3cb334e",
+    "crates/pollardai/examples/kafka_interop.rs": "aed7448b12578540872d1d10a5e13925d0d229bd22c53d9239318828e33659d4",
+    "crates/pollardai/examples/performance.rs": "37034a5d125e1afdb305718d3ab9b18babef37057c26c3f2f947a3a904b8e793",
+    "crates/pollardai/examples/postgres_interop.rs": "41e197bb304aafd0085ad415db61d41156515ccc246bc6eb6fd279083e1ef727",
+    "crates/pollardai/examples/redis_interop.rs": "63413811390af845be523aebd43fae2c32f71b89c0fea02a923b2c647554b218",
+    "crates/pollardai/examples/runtime_interop.rs": "7fdbf2b6118ceb61aee625031bb7fbc8c0728ba24e7d1af21e683ac92b68270f",
+    "crates/pollardai/examples/storage_interop.rs": "d312b6a667c4050fc953f0e2ebbce7d02de92ca29822c2151300a02dd785cd6a",
+    "crates/pollardai/examples/storage_performance.rs": "3d3a80fdf1ff993f49f5d8992854c7c9c1c4b7998dcbee50f0cebd7c92ef4f3e",
+    "crates/pollardai/examples/stream_memory.rs": "c90e50fe3f0c24f15ac0e6524228e2fcc20b7a9f650623eeaa8763ebb9d0e208",
+    "crates/pollardai/src/adapters.rs": "3b2c206a81c099a11ecd64a538d32bd65f8ee3f84c10185b54773b391887ad2f",
+    "crates/pollardai/src/aio.rs": "bac10d6c7ecc45c06a4fbe80256baea10e401df5c0f81bfdf8dc98f3c05be431",
+    "crates/pollardai/src/bin/pollard.rs": "48090e9644a7ebdb3c3517544d60f577403a6e0bdead30e1246fbd4091c883cb",
+    "crates/pollardai/src/decimal.rs": "fbed4a5932fc64ba80b687f84e361f019ef6d2fb7ee64fac2a36f82b98cfebe4",
+    "crates/pollardai/src/decimal_wire.rs": "79e9ba60d7fba9c90495fe22f2eab6c8ec9d43ea270aebfd931702479e633549",
+    "crates/pollardai/src/energy.rs": "1b5b61cf22847612de47c27a5904573a295f1563b79db456a5bcada66f510a7e",
+    "crates/pollardai/src/estimators.rs": "4dab7fcf285f7ef74906d636c9e65df76687f9e43cb0a7fd3995cdbbc8781f6b",
+    "crates/pollardai/src/hashrope.rs": "5628efeb4c730120d5105762b8fcb264b0fc0fa19446b44dbf2087b4eada4939",
+    "crates/pollardai/src/identity.rs": "462a656aa3d8c1d7fc81ccb21a4741a75cc0b5084c5598d797b068e367fda6dc",
+    "crates/pollardai/src/kafka.rs": "e14563834f2681045b6cb651e8a3db3d972ecfefd775ad1b1ee7242c9e66aec0",
+    "crates/pollardai/src/kv.rs": "db0ca1a9b56026dff96af4889e19ce8fd2b3efd26f2d72a3420ae20361d3dcfd",
+    "crates/pollardai/src/lib.rs": "48fa142df757093b6c40934c1d8c3e93752b20bac1d0a7e7026e6bfad2fddf83",
+    "crates/pollardai/src/mcp.rs": "c7d7fc84f6a7ffbcd04e58e93e72401dc88bea795c48702df17e1fb36ca8faa0",
+    "crates/pollardai/src/merge.rs": "8d079769df2bbc3c211d0cd019bb39cad1fbe30f28ac6b05150613bd635bca06",
+    "crates/pollardai/src/meters.rs": "9d85707c6f6733089e137fc12b354ad9dbb554d3d4008196c2fb57f27670ed50",
+    "crates/pollardai/src/mongodb.rs": "284d6207f9a1375e442265a031f1bd0704d997e6ec141aa44e66b71c23503d76",
+    "crates/pollardai/src/neo4j.rs": "29236cd8daffca6a2327c478886c46480ceb1dbf20a2a1dd7d451aef5b1af371",
+    "crates/pollardai/src/nvml.rs": "0148be0d09fa2021ffa4e018cc04bec4468916eecb57c8cb7a38d474e8c4e186",
+    "crates/pollardai/src/otel.rs": "37d0858e013b34f52a15623e618f6abd73aa4eaefb622fcb6d665064d5c1147f",
+    "crates/pollardai/src/postgres.rs": "7ed42a1afd5801b67f61e936a80147dfb6cb4ccfd5e8593800c5342a6e379925",
+    "crates/pollardai/src/python_display.rs": "859d9cb89b458a807a08fad965a0528056b6c9c03bb2ac81b166d832b2b18997",
+    "crates/pollardai/src/python_printable.rs": "5428029c831ca02b5b97c3ab49a34a276840a0a2bcc4dce40bf4bb670cc11080",
+    "crates/pollardai/src/redis.rs": "582356890612faaf726ce9077b2a7bb3d8543b4a1af0d00a7d4591ca0c4b8979",
+    "crates/pollardai/src/registry.rs": "0561acb64d9b18a1fef4dfaa0bbd6123b77fe8f19dc4d6ec0bc1f143b7d9dc7d",
+    "crates/pollardai/src/remote_worker.rs": "40acd856b12137a2a7c0464f496187b2956094ee5bc01f63f579ce3fa912217a",
+    "crates/pollardai/src/render.rs": "7210d38a7bff72fab94abfda7bb6dd5008b23941a3c6602208c0beb146591f42",
+    "crates/pollardai/src/revalidation.rs": "37e23119bf4c6a53be97e359be1ada1381c15fabf983fac38ac767eb89f168fd",
+    "crates/pollardai/src/runtime.rs": "4a6616cd69cba17171f1a79bdffcc8c4efc79a5c5eee4b7d20f0673a2883b8a5",
+    "crates/pollardai/src/seal.rs": "b13196e1018a1039704ebcc12b3d4c1de07bd54809d2fcb9e734bccabdb1c284",
+    "crates/pollardai/src/seal_custody.rs": "f21e3cf7688c82a4e4512b8dbc5b0dfcc58510836b394ec3072eb5d8dca78693",
+    "crates/pollardai/src/sqlite.rs": "0d613f35d63d53e4a6ba7312caf989f184834128f01d0bf00f86d3fa66b3aa7f",
+    "crates/pollardai/src/store.rs": "1f64bf4d31407fead1bd01ecb7e6e18f586863ec731bf716c4080714b0f1edfc",
+    "crates/pollardai/src/store_spec.rs": "c11cf7479dd14ccdc9eada0d724e7329f94ee8b8b67bd138a63f620dd6fda838",
+    "crates/pollardai/src/stream.rs": "9543e17ace248cfac9e67f725b79f4d3ff24f04e146e847b240f701d9e626852",
+    "crates/pollardai/src/tokenmaster.rs": "02159a8ffe2fa318894bee3a84071b6d6913c5d0056c49de30c07b31be974f57",
+    "evidence/rust-parity-1.6.0/arbitration_interop.py": "5cdbd3e257831025442ca3cf8b3b1132d7ec98c4ce30aef62eec84ece0806da2",
+    "evidence/rust-parity-1.6.0/audit_release.py": "a40564522181656f7f6fdff8a160576944138d990879f2d68a02be2ff8b83783",
+    "evidence/rust-parity-1.6.0/benchmark.py": "79fe5e8540222df2f21c3a7af36e30b5d16d80be56fb75b38c77be75f2e2b81b",
+    "evidence/rust-parity-1.6.0/benchmark_python.py": "8eff0b2edda65fb5fa02eca65a2bc37f76b7d576af6eddab4ac99cce3fa93429",
+    "evidence/rust-parity-1.6.0/document_interop.py": "970f7f2b27bb77b11a3ea1e9c4a00ad0d6a385847497e287942d7758fe24f2b7",
+    "evidence/rust-parity-1.6.0/kafka_interop.py": "7bd3fe29cec7fd1ebede437f362849857547e33c1a6983ea459e6405cf5ffe8a",
+    "evidence/rust-parity-1.6.0/postgres_interop.py": "99688cc46585cc631e4116da27042419af0eaa1914ce84cf57f0aa64ae41fbbb",
+    "evidence/rust-parity-1.6.0/prepare_baseline.py": "36e21ed3cbec72a029187db17c6db3a4269166ea7966a95c27c6e60199ad13a1",
+    "evidence/rust-parity-1.6.0/redis_interop.py": "f96d1e3b7d2dc1c9840dae64f3438859b18d7e21cd45d1b803f6636b8fe46372",
+    "evidence/rust-parity-1.6.0/remote_cli_smoke.py": "c45b7962cef7acdb508f3bf5bd14c55e7b35ab242ff5e5caa9d9f5ec2d232ceb",
+    "evidence/rust-parity-1.6.0/runtime_interop.py": "b7451e0da550214598d3a2879f6c384dab50530e598da79a679e1dc82b0571b1",
+    "evidence/rust-parity-1.6.0/sqlite_interop.py": "1d5092ae71e2a44a121bd2ee5752a6ce4ff30419513c6bbb3492ed269ad25971",
+    "evidence/rust-parity-1.6.0/storage_performance.py": "026ba639de5a2707bb0e7dea52d3332f072b935cb98f59bef403f41c500c8272",
+    "evidence/rust-parity-1.6.0/storage_performance_python.py": "89f73c305c6e69dbbddfd758b9b39b44edbfd3aa34f20490645da9c5516e0537",
+    "evidence/rust-parity-1.6.0/stream_memory.py": "29c75ed8ef8d1cec66bccbc59babc7014bfd9827e18fa210d2576f2405f1d449",
+    "evidence/rust-parity-1.6.0/stream_memory_python.py": "59d94dbdcce94ecc2abc3cf90aeb5e00c4aa488295b0115253e2d0549c528c86",
+    "evidence/rust-parity-1.6.0/test_validate_remote.py": "d1cb8fe15c80a18dae5ea666e7505c0585f56ef3876060bb759a4098ae76fc69",
+    "evidence/rust-parity-1.6.0/validate_consumer.py": "9c3fe26d6d070d00377e7b32e5ddcd7538463e8066619ae7b043659855394eee",
+    "evidence/rust-parity-1.6.0/validate_native.py": "b2a9b81f26857e0c1745c46fef3855268e1334cf966359961fa68f34bbc2ec70",
+    "evidence/rust-parity-1.6.0/validate_remote.py": "31bfe5880d5ed93dfea990049c32d8a2c10001f8d1911ecc0141b0af944440e7",
+    "evidence/rust-parity-1.6.0/verify_published.py": "ce4df7dfc3d3cbfba5ad925db047379b38013f55626f5dc5953144f8f51d9ba4"
+  },
+  "binary_sha256": {
+    ".benchmarks/rust-baseline/crates/pollardai/target/release/examples/performance.exe": "527c774b2daf6be839c7d4a1cb40a638c426b913149eb54b18317bf20128c84b",
+    "crates/pollardai/target/release/examples/performance.exe": "41fc1d51573897ebe9011dec9e848a10d45fb6e800e0583bed327fbbf5c36d5c"
+  },
+  "python_package_sha256": {
+    "pollard/__init__.py": "a82f5889efb14a4e9a29fd0846d62bf43196c7c590826d263ef86046f357abda",
+    "pollard/_canon.py": "fadd7d70ec8819d065c7e159f0c399b364c4c656fa6348c6ee7fae6dec38a300",
+    "pollard/adapters/__init__.py": "43a30271d85e3b2dabaa037295969b76c9b679d9cbc4300a0e20d5cda519c98e",
+    "pollard/adapters/_common.py": "4c9384f77575c71505d7b0eb2f70b3b322eb65bed5204c9a8ec49b3373d261eb",
+    "pollard/adapters/anthropic.py": "1cfa4226f26f105cbc7b79c8494b162bee1de126e7eb4753a62ea4d4bd4fb61c",
+    "pollard/adapters/bedrock.py": "9e2ac2cb833a2d6bbef02c92cc4c8134d8a206cec5f188c1e247fc801ac724e2",
+    "pollard/adapters/litellm.py": "977f216458cdf17f8a6a3e981ec032a5577ea5152cee96a02883b95f49adafe3",
+    "pollard/adapters/openai.py": "0ff0bf4dcfc82c90b1aff04115d9e8ea5271726f48492bd273a483c9fbfec86f",
+    "pollard/aio.py": "2876413e54042f6536a5f6697cc33de8f853e61458f693557d3ac439563c6e19",
+    "pollard/arbiter.py": "8cc87c89152b57bdb99eb9d93c574d8bef422b5709e805a73b92e45f10bfc04f",
+    "pollard/cli.py": "e6b96aee5fd66c3147c884b01dd0256f5e8ff597185e5742eddc586e702194e9",
+    "pollard/errors.py": "0f22b517f4179c5c9e05336bc7772899d247b7491e863875549e518c120aae51",
+    "pollard/estimators/__init__.py": "1c6f521cc2cc6431f1423818ab51ac6de5dc814b4bedc5bcc4d05ea8e683fef7",
+    "pollard/estimators/openai.py": "47e9aac46e95ed8cc736ccaca9c94312fead804c81c844ad00da7b48e601bf7f",
+    "pollard/governance.py": "4cfecf417e1224e86241bf1309a70e306e893f70a2dd376328f9368262dce153",
+    "pollard/governor.py": "fdb168f7a8a5c460434c3456a45922aa22a994159a60fff246f19a738809a5b5",
+    "pollard/hashing.py": "1123fb66160559cd86bb1d0acd3b5900e1f8a9170dc65f0c101b5be53c789eb1",
+    "pollard/mcp.py": "081e40b9b44043650e6c1f729d94b97333e5cdf73134d6114f70dbfa85bfba41",
+    "pollard/merge.py": "c955dfb9b6879429da4c2f5e54b50d234aa332523e3915d4dff4c0346ad3722a",
+    "pollard/meters/__init__.py": "eeef4320cac5e0dd2af335229c978a99f408dc53b7292c3598d988db834565b6",
+    "pollard/meters/energy.py": "2e981c967f9a540b7e5df09fb1a0c29e8810a16785b68170772ac48301284d98",
+    "pollard/meters/tokenmaster.py": "53ce51761b2a60da03e6ce0059aa3c2b1906e2a433b5c18142afe869ca1121d3",
+    "pollard/otel.py": "41fb2d679431e16689440e50c7f595cbc9b6756fc3851a3acfe2cd6f02a14d9b",
+    "pollard/policy.py": "3b37754d0298688dcd5522302b91efbd7c4f8bddd0d83ceaf7c129ccc79d3ed5",
+    "pollard/pytest_plugin.py": "870c589a0d55c5fe2c6401c3473235fc6dbd4a3e6c8357faf3131935cd47e181",
+    "pollard/redaction.py": "14ec01931361845516be47a4554cf01d4449a2c00379c9b264f44508941a4c11",
+    "pollard/registry.py": "75bd2cea8f95bc7400398a80e642bed4720ac4253461ff280643389b6632dfa9",
+    "pollard/replay.py": "faf77b92265e1ccc0c30e7f30e7be66f845ab65ccfe9f9670293a9634a576d62",
+    "pollard/revalidation.py": "4c979f3dc2b461b81e6971b281fa0ed1f46ceffbf93fc2c2fccc110fbfd7aed3",
+    "pollard/runtime.py": "5ecca0a7d96f71a2167cfff231b820cf9fc72738a98b9b5246eca08ba0492a4c",
+    "pollard/schema.py": "66eaf0de370c4f6fabf52f69279bd2719422d37fa65c877924f9a4841842ce17",
+    "pollard/seal.py": "1068f209f9e3feb19efc1fe2ac6f085f5aefcef9340eabf118ed006433c279f1",
+    "pollard/seal_custody.py": "a0a4997ee1adb7967319743c02948c1c7574ad82475ce3db5b109d0020ffe55a",
+    "pollard/store.py": "fc51a6aceec9ce916f2560c261c0e05f6cd2f5e3b9f9e41f02a4df28be9e30a3",
+    "pollard/stores/__init__.py": "64bb539461ffedea5d23b94e6e83773a1df970b70cdbb567999219ae56c6a2cd",
+    "pollard/stores/_transactional.py": "027872266ce78616763f31a21b3bee463c2258c410ac6dfadac970c46d37b5fd",
+    "pollard/stores/hashrope.py": "647017c81a9ce042c7840f2a2394d221f0253369d2b609daec2b904a741b84a9",
+    "pollard/stores/kafka.py": "b6be5143f3d6e3073a821de7c6c5973407964e9d3a5ee66306922b2a68b1a8b8",
+    "pollard/stores/mongodb.py": "a9fc80872615582859f7296480547be755695b13673f551c1d9072685d53c473",
+    "pollard/stores/neo4j.py": "21d004a5f51f7a7a4924c719a771908fb5318bbe30d6200794bc4044a606d3ed",
+    "pollard/stores/postgres.py": "b7e6436df558ecd97aaab96060e9acb8122eef47b7f4afcc834fb811722058ff",
+    "pollard/stores/redis.py": "697ed7dacd0240eb2cfa4fba694d13dcb226eba1fdb4f68e3457972bb25bf31a",
+    "pollard/stores/sqlite.py": "84fb468d01a726e8431ef99af376710beb9f84acf0131409315dc10ec3d8ea25",
+    "pollard/tree.py": "d67f5efd36103c217f2ce49d4a1f600212212f047a254397ba07d0c38755126a",
+    "pollard/verify.py": "a8b24798dc2bbd88d02639a17d445e933c10c50d871d1b7947183f6fb0d9fe58"
+  },
+  "python_package_root": "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\.benchmarks\\rust-python160\\package",
+  "baseline_commit": "51e3a245641044fc8b3d6a90fc49f3cbfcbf107d",
+  "baseline_source_verified": true,
+  "baseline_source_sha256": {
+    ".benchmarks/rust-baseline/crates/pollardai/Cargo.lock": "b0c7d0c4e0450a365864948e7df1cfb6ab8d2d5c830ab8cc426ae8dd838f41bc",
+    ".benchmarks/rust-baseline/crates/pollardai/Cargo.toml": "d11aa8d3f8dca36c01892829df2dc0c7181ac44a479cbccaec2eb0c1e78612fa",
+    ".benchmarks/rust-baseline/crates/pollardai/examples/performance.rs": "37034a5d125e1afdb305718d3ab9b18babef37057c26c3f2f947a3a904b8e793",
+    ".benchmarks/rust-baseline/crates/pollardai/src/identity.rs": "04f65df89d900593484dfd9f742f821783a3fb443d8bfc6067dfca92670908fe",
+    ".benchmarks/rust-baseline/crates/pollardai/src/lib.rs": "d2890de878bc9ed5fde83443c8440f1b0176d104927790165fbe38a7089f78b7",
+    ".benchmarks/rust-baseline/crates/pollardai/src/registry.rs": "39fcd7449233eb37e1cbbbdee8e090e335347c32d0d5d6181dd56c73498b39c6",
+    ".benchmarks/rust-baseline/crates/pollardai/src/runtime.rs": "6b6ebda50c96bd46261a2c7ba15720720b44791a6bde5f1c3f25cdcabc8cf06e",
+    ".benchmarks/rust-baseline/crates/pollardai/src/store.rs": "41c707023da99520000506a8e1bd11e8949ed8c99eb8170faf4e51a0b2b66174"
+  },
+  "platform": "Windows-11-10.0.26300-SP0",
+  "processor": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
+  "logical_cpus": 32,
+  "python": "3.12.2 (tags/v3.12.2:6abddd9, Feb  6 2024, 21:26:36) [MSC v.1937 64 bit (AMD64)]",
+  "method": {
+    "build": "release",
+    "warmups": 2,
+    "samples": 7,
+    "seed": 160,
+    "setup_and_startup_timed": false,
+    "offline": true,
+    "checksum_equality_required": true
+  },
+  "source_unchanged_during_run": true,
+  "results": [
+    {
+      "operation": "identity",
+      "size": 10000,
+      "engines": {
+        "rust-updated": {
+          "operation": "identity",
+          "size": 10000,
+          "samples_seconds": [
+            0.0028803,
+            0.0029933,
+            0.0028561,
+            0.0029972,
+            0.0028825,
+            0.0028709,
+            0.0029208
+          ],
+          "checksum": "6caa44c8002d884615d99ebfa8be8446f5349a84ec9eb807641a08be9fddedbe",
+          "checksums": [
+            "6caa44c8002d884615d99ebfa8be8446f5349a84ec9eb807641a08be9fddedbe",
+            "6caa44c8002d884615d99ebfa8be8446f5349a84ec9eb807641a08be9fddedbe",
+            "6caa44c8002d884615d99ebfa8be8446f5349a84ec9eb807641a08be9fddedbe",
+            "6caa44c8002d884615d99ebfa8be8446f5349a84ec9eb807641a08be9fddedbe",
+            "6caa44c8002d884615d99ebfa8be8446f5349a84ec9eb807641a08be9fddedbe",
+            "6caa44c8002d884615d99ebfa8be8446f5349a84ec9eb807641a08be9fddedbe",
+            "6caa44c8002d884615d99ebfa8be8446f5349a84ec9eb807641a08be9fddedbe"
+          ],
+          "warmups": 2,
+          "median_seconds": 0.0028825,
+          "min_seconds": 0.0028561,
+          "max_seconds": 0.0029972
+        },
+        "rust-0.1.0": {
+          "checksum": "6caa44c8002d884615d99ebfa8be8446f5349a84ec9eb807641a08be9fddedbe",
+          "checksums": [
+            "6caa44c8002d884615d99ebfa8be8446f5349a84ec9eb807641a08be9fddedbe",
+            "6caa44c8002d884615d99ebfa8be8446f5349a84ec9eb807641a08be9fddedbe",
+            "6caa44c8002d884615d99ebfa8be8446f5349a84ec9eb807641a08be9fddedbe",
+            "6caa44c8002d884615d99ebfa8be8446f5349a84ec9eb807641a08be9fddedbe",
+            "6caa44c8002d884615d99ebfa8be8446f5349a84ec9eb807641a08be9fddedbe",
+            "6caa44c8002d884615d99ebfa8be8446f5349a84ec9eb807641a08be9fddedbe",
+            "6caa44c8002d884615d99ebfa8be8446f5349a84ec9eb807641a08be9fddedbe"
+          ],
+          "operation": "identity",
+          "samples_seconds": [
+            0.0116793,
+            0.0115313,
+            0.0116564,
+            0.0117005,
+            0.0116952,
+            0.0118338,
+            0.0116666
+          ],
+          "size": 10000,
+          "warmups": 2,
+          "median_seconds": 0.0116793,
+          "min_seconds": 0.0115313,
+          "max_seconds": 0.0118338
+        },
+        "python-1.6.0": {
+          "operation": "identity",
+          "size": 10000,
+          "samples_seconds": [
+            0.04009189992211759,
+            0.040061800042167306,
+            0.04046530008781701,
+            0.03899170004297048,
+            0.03907749999780208,
+            0.040722299949266016,
+            0.04071580001618713
+          ],
+          "checksum": "6caa44c8002d884615d99ebfa8be8446f5349a84ec9eb807641a08be9fddedbe",
+          "checksums": [
+            "6caa44c8002d884615d99ebfa8be8446f5349a84ec9eb807641a08be9fddedbe",
+            "6caa44c8002d884615d99ebfa8be8446f5349a84ec9eb807641a08be9fddedbe",
+            "6caa44c8002d884615d99ebfa8be8446f5349a84ec9eb807641a08be9fddedbe",
+            "6caa44c8002d884615d99ebfa8be8446f5349a84ec9eb807641a08be9fddedbe",
+            "6caa44c8002d884615d99ebfa8be8446f5349a84ec9eb807641a08be9fddedbe",
+            "6caa44c8002d884615d99ebfa8be8446f5349a84ec9eb807641a08be9fddedbe",
+            "6caa44c8002d884615d99ebfa8be8446f5349a84ec9eb807641a08be9fddedbe"
+          ],
+          "warmups": 2,
+          "pollard_version": "1.6.0",
+          "pollard_file": "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\.benchmarks\\rust-python160\\package\\pollard\\__init__.py",
+          "median_seconds": 0.04009189992211759,
+          "min_seconds": 0.03899170004297048,
+          "max_seconds": 0.040722299949266016
+        }
+      },
+      "speedup_vs_python": 13.908725038028653,
+      "speedup_vs_rust_0_1_0": 4.051795316565482
+    },
+    {
+      "operation": "record",
+      "size": 100,
+      "engines": {
+        "rust-updated": {
+          "operation": "record",
+          "size": 100,
+          "samples_seconds": [
+            0.0031791,
+            0.0030574,
+            0.0030473,
+            0.003012,
+            0.0029862,
+            0.0029931,
+            0.0029356
+          ],
+          "checksum": "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+          "checksums": [
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02"
+          ],
+          "warmups": 2,
+          "median_seconds": 0.003012,
+          "min_seconds": 0.0029356,
+          "max_seconds": 0.0031791
+        },
+        "python-1.6.0": {
+          "operation": "record",
+          "size": 100,
+          "samples_seconds": [
+            0.058316699927672744,
+            0.05839929997455329,
+            0.057534600025974214,
+            0.05744620005134493,
+            0.05626209999900311,
+            0.05751329998020083,
+            0.058733300073072314
+          ],
+          "checksum": "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+          "checksums": [
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02"
+          ],
+          "warmups": 2,
+          "pollard_version": "1.6.0",
+          "pollard_file": "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\.benchmarks\\rust-python160\\package\\pollard\\__init__.py",
+          "median_seconds": 0.057534600025974214,
+          "min_seconds": 0.05626209999900311,
+          "max_seconds": 0.058733300073072314
+        },
+        "rust-0.1.0": {
+          "checksum": "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+          "checksums": [
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02"
+          ],
+          "operation": "record",
+          "samples_seconds": [
+            0.0233998,
+            0.0230618,
+            0.0229364,
+            0.0228,
+            0.0229772,
+            0.0227653,
+            0.0227621
+          ],
+          "size": 100,
+          "warmups": 2,
+          "median_seconds": 0.0229364,
+          "min_seconds": 0.0227621,
+          "max_seconds": 0.0233998
+        }
+      },
+      "speedup_vs_python": 19.101792837308835,
+      "speedup_vs_rust_0_1_0": 7.615006640106242
+    },
+    {
+      "operation": "record",
+      "size": 1000,
+      "engines": {
+        "python-1.6.0": {
+          "operation": "record",
+          "size": 1000,
+          "samples_seconds": [
+            5.159638500073925,
+            5.164279900025576,
+            5.187920899945311,
+            5.16392880002968,
+            5.144738500006497,
+            5.194065099931322,
+            5.175553300068714
+          ],
+          "checksum": "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+          "checksums": [
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6"
+          ],
+          "warmups": 2,
+          "pollard_version": "1.6.0",
+          "pollard_file": "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\.benchmarks\\rust-python160\\package\\pollard\\__init__.py",
+          "median_seconds": 5.164279900025576,
+          "min_seconds": 5.144738500006497,
+          "max_seconds": 5.194065099931322
+        },
+        "rust-0.1.0": {
+          "checksum": "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+          "checksums": [
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6"
+          ],
+          "operation": "record",
+          "samples_seconds": [
+            2.3086432,
+            2.1922061,
+            2.2112766,
+            2.1557727,
+            2.1748299,
+            2.1547052,
+            2.115583
+          ],
+          "size": 1000,
+          "warmups": 2,
+          "median_seconds": 2.1748299,
+          "min_seconds": 2.115583,
+          "max_seconds": 2.3086432
+        },
+        "rust-updated": {
+          "operation": "record",
+          "size": 1000,
+          "samples_seconds": [
+            0.0310572,
+            0.0320563,
+            0.0308145,
+            0.031031,
+            0.0308687,
+            0.0306675,
+            0.0307071
+          ],
+          "checksum": "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+          "checksums": [
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6"
+          ],
+          "warmups": 2,
+          "median_seconds": 0.0308687,
+          "min_seconds": 0.0306675,
+          "max_seconds": 0.0320563
+        }
+      },
+      "speedup_vs_python": 167.2982632901799,
+      "speedup_vs_rust_0_1_0": 70.45421089971396
+    },
+    {
+      "operation": "replay",
+      "size": 100,
+      "engines": {
+        "python-1.6.0": {
+          "operation": "replay",
+          "size": 100,
+          "samples_seconds": [
+            0.08413430000655353,
+            0.08375750004779547,
+            0.08405730000231415,
+            0.08508410002104938,
+            0.08585899998433888,
+            0.08468860003631562,
+            0.08535300008952618
+          ],
+          "checksum": "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+          "checksums": [
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02"
+          ],
+          "warmups": 2,
+          "pollard_version": "1.6.0",
+          "pollard_file": "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\.benchmarks\\rust-python160\\package\\pollard\\__init__.py",
+          "median_seconds": 0.08468860003631562,
+          "min_seconds": 0.08375750004779547,
+          "max_seconds": 0.08585899998433888
+        },
+        "rust-0.1.0": {
+          "checksum": "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+          "checksums": [
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02"
+          ],
+          "operation": "replay",
+          "samples_seconds": [
+            0.0166946,
+            0.0166691,
+            0.0176934,
+            0.0177044,
+            0.0173844,
+            0.0169477,
+            0.0176955
+          ],
+          "size": 100,
+          "warmups": 2,
+          "median_seconds": 0.0173844,
+          "min_seconds": 0.0166691,
+          "max_seconds": 0.0177044
+        },
+        "rust-updated": {
+          "operation": "replay",
+          "size": 100,
+          "samples_seconds": [
+            0.0010902,
+            0.0011534,
+            0.0011151,
+            0.0011674,
+            0.0011667,
+            0.0011835,
+            0.0011268
+          ],
+          "checksum": "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+          "checksums": [
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02"
+          ],
+          "warmups": 2,
+          "median_seconds": 0.0011534,
+          "min_seconds": 0.0010902,
+          "max_seconds": 0.0011835
+        }
+      },
+      "speedup_vs_python": 73.42517776687673,
+      "speedup_vs_rust_0_1_0": 15.072307959077511
+    },
+    {
+      "operation": "replay",
+      "size": 1000,
+      "engines": {
+        "rust-0.1.0": {
+          "checksum": "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+          "checksums": [
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6"
+          ],
+          "operation": "replay",
+          "samples_seconds": [
+            1.6956067,
+            1.7424431,
+            1.6789256,
+            1.7059663999999999,
+            1.7144342,
+            1.7011024,
+            1.7115138
+          ],
+          "size": 1000,
+          "warmups": 2,
+          "median_seconds": 1.7059663999999999,
+          "min_seconds": 1.6789256,
+          "max_seconds": 1.7424431
+        },
+        "python-1.6.0": {
+          "operation": "replay",
+          "size": 1000,
+          "samples_seconds": [
+            8.230724600027315,
+            8.261158099980094,
+            8.091299300082028,
+            7.940914900042117,
+            7.869359100004658,
+            8.062099599977955,
+            8.030371199944057
+          ],
+          "checksum": "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+          "checksums": [
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6"
+          ],
+          "warmups": 2,
+          "pollard_version": "1.6.0",
+          "pollard_file": "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\.benchmarks\\rust-python160\\package\\pollard\\__init__.py",
+          "median_seconds": 8.062099599977955,
+          "min_seconds": 7.869359100004658,
+          "max_seconds": 8.261158099980094
+        },
+        "rust-updated": {
+          "operation": "replay",
+          "size": 1000,
+          "samples_seconds": [
+            0.0119285,
+            0.0117,
+            0.0117314,
+            0.0119572,
+            0.0116085,
+            0.0114259,
+            0.0121645
+          ],
+          "checksum": "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+          "checksums": [
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6"
+          ],
+          "warmups": 2,
+          "median_seconds": 0.0117314,
+          "min_seconds": 0.0114259,
+          "max_seconds": 0.0121645
+        }
+      },
+      "speedup_vs_python": 687.2239971340126,
+      "speedup_vs_rust_0_1_0": 145.41882469270504
+    },
+    {
+      "operation": "hybrid",
+      "size": 100,
+      "engines": {
+        "python-1.6.0": {
+          "operation": "hybrid",
+          "size": 100,
+          "samples_seconds": [
+            0.007543999934569001,
+            0.00747169996611774,
+            0.007554799900390208,
+            0.007826299988664687,
+            0.007326000020839274,
+            0.007392499945126474,
+            0.00729239999782294
+          ],
+          "checksum": "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+          "checksums": [
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02"
+          ],
+          "warmups": 2,
+          "pollard_version": "1.6.0",
+          "pollard_file": "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\.benchmarks\\rust-python160\\package\\pollard\\__init__.py",
+          "median_seconds": 0.00747169996611774,
+          "min_seconds": 0.00729239999782294,
+          "max_seconds": 0.007826299988664687
+        },
+        "rust-0.1.0": {
+          "checksum": "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+          "checksums": [
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02"
+          ],
+          "operation": "hybrid",
+          "samples_seconds": [
+            0.0173813,
+            0.0170412,
+            0.0169717,
+            0.0178253,
+            0.0178138,
+            0.0176837,
+            0.0171112
+          ],
+          "size": 100,
+          "warmups": 2,
+          "median_seconds": 0.0173813,
+          "min_seconds": 0.0169717,
+          "max_seconds": 0.0178253
+        },
+        "rust-updated": {
+          "operation": "hybrid",
+          "size": 100,
+          "samples_seconds": [
+            0.0018498,
+            0.0018652,
+            0.0017887,
+            0.0018824,
+            0.0017075,
+            0.0017611,
+            0.0017664
+          ],
+          "checksum": "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+          "checksums": [
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02",
+            "f284c7bb50e7594327d6853c31047a4e6c334c3103ce183c9dba87ce52bc9a02"
+          ],
+          "warmups": 2,
+          "median_seconds": 0.0017887,
+          "min_seconds": 0.0017075,
+          "max_seconds": 0.0018824
+        }
+      },
+      "speedup_vs_python": 4.1771677565370045,
+      "speedup_vs_rust_0_1_0": 9.717280706658466
+    },
+    {
+      "operation": "hybrid",
+      "size": 1000,
+      "engines": {
+        "rust-updated": {
+          "operation": "hybrid",
+          "size": 1000,
+          "samples_seconds": [
+            0.0183131,
+            0.0181737,
+            0.0180154,
+            0.0184059,
+            0.0184304,
+            0.0186214,
+            0.018725
+          ],
+          "checksum": "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+          "checksums": [
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6"
+          ],
+          "warmups": 2,
+          "median_seconds": 0.0184059,
+          "min_seconds": 0.0180154,
+          "max_seconds": 0.018725
+        },
+        "python-1.6.0": {
+          "operation": "hybrid",
+          "size": 1000,
+          "samples_seconds": [
+            0.07056030002422631,
+            0.07201580004766583,
+            0.07713849993888289,
+            0.0717016999842599,
+            0.07239620003383607,
+            0.0711099999025464,
+            0.07099559996277094
+          ],
+          "checksum": "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+          "checksums": [
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6"
+          ],
+          "warmups": 2,
+          "pollard_version": "1.6.0",
+          "pollard_file": "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\.benchmarks\\rust-python160\\package\\pollard\\__init__.py",
+          "median_seconds": 0.0717016999842599,
+          "min_seconds": 0.07056030002422631,
+          "max_seconds": 0.07713849993888289
+        },
+        "rust-0.1.0": {
+          "checksum": "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+          "checksums": [
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6",
+            "97bfb3f7bc176b6694b438e037f5bbf105cafcaa14b44a6cadece957529a39b6"
+          ],
+          "operation": "hybrid",
+          "samples_seconds": [
+            1.7168465,
+            1.6480183,
+            1.6621682,
+            1.7258208000000002,
+            1.6887367,
+            1.6566640000000001,
+            1.693483
+          ],
+          "size": 1000,
+          "warmups": 2,
+          "median_seconds": 1.6887367,
+          "min_seconds": 1.6480183,
+          "max_seconds": 1.7258208000000002
+        }
+      },
+      "speedup_vs_python": 3.8955823939204226,
+      "speedup_vs_rust_0_1_0": 91.74974872187722
+    },
+    {
+      "operation": "walk",
+      "size": 1000,
+      "engines": {
+        "rust-updated": {
+          "operation": "walk",
+          "size": 1000,
+          "samples_seconds": [
+            0.000702,
+            0.0006591,
+            0.0006481,
+            0.0006871,
+            0.000659,
+            0.0006293,
+            0.0005864
+          ],
+          "checksum": "55706623b478ff48808fa42c721c3dfb0293953c8fd8b0428c77853b823d47da",
+          "checksums": [
+            "55706623b478ff48808fa42c721c3dfb0293953c8fd8b0428c77853b823d47da",
+            "55706623b478ff48808fa42c721c3dfb0293953c8fd8b0428c77853b823d47da",
+            "55706623b478ff48808fa42c721c3dfb0293953c8fd8b0428c77853b823d47da",
+            "55706623b478ff48808fa42c721c3dfb0293953c8fd8b0428c77853b823d47da",
+            "55706623b478ff48808fa42c721c3dfb0293953c8fd8b0428c77853b823d47da",
+            "55706623b478ff48808fa42c721c3dfb0293953c8fd8b0428c77853b823d47da",
+            "55706623b478ff48808fa42c721c3dfb0293953c8fd8b0428c77853b823d47da"
+          ],
+          "warmups": 2,
+          "median_seconds": 0.000659,
+          "min_seconds": 0.0005864,
+          "max_seconds": 0.000702
+        },
+        "python-1.6.0": {
+          "operation": "walk",
+          "size": 1000,
+          "samples_seconds": [
+            0.006286300020292401,
+            0.006239900016225874,
+            0.0060931999469175935,
+            0.0070306999841704965,
+            0.006152399932034314,
+            0.0061169000109657645,
+            0.00944809999782592
+          ],
+          "checksum": "55706623b478ff48808fa42c721c3dfb0293953c8fd8b0428c77853b823d47da",
+          "checksums": [
+            "55706623b478ff48808fa42c721c3dfb0293953c8fd8b0428c77853b823d47da",
+            "55706623b478ff48808fa42c721c3dfb0293953c8fd8b0428c77853b823d47da",
+            "55706623b478ff48808fa42c721c3dfb0293953c8fd8b0428c77853b823d47da",
+            "55706623b478ff48808fa42c721c3dfb0293953c8fd8b0428c77853b823d47da",
+            "55706623b478ff48808fa42c721c3dfb0293953c8fd8b0428c77853b823d47da",
+            "55706623b478ff48808fa42c721c3dfb0293953c8fd8b0428c77853b823d47da",
+            "55706623b478ff48808fa42c721c3dfb0293953c8fd8b0428c77853b823d47da"
+          ],
+          "warmups": 2,
+          "pollard_version": "1.6.0",
+          "pollard_file": "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\.benchmarks\\rust-python160\\package\\pollard\\__init__.py",
+          "median_seconds": 0.006239900016225874,
+          "min_seconds": 0.0060931999469175935,
+          "max_seconds": 0.00944809999782592
+        },
+        "rust-0.1.0": {
+          "checksum": "55706623b478ff48808fa42c721c3dfb0293953c8fd8b0428c77853b823d47da",
+          "checksums": [
+            "55706623b478ff48808fa42c721c3dfb0293953c8fd8b0428c77853b823d47da",
+            "55706623b478ff48808fa42c721c3dfb0293953c8fd8b0428c77853b823d47da",
+            "55706623b478ff48808fa42c721c3dfb0293953c8fd8b0428c77853b823d47da",
+            "55706623b478ff48808fa42c721c3dfb0293953c8fd8b0428c77853b823d47da",
+            "55706623b478ff48808fa42c721c3dfb0293953c8fd8b0428c77853b823d47da",
+            "55706623b478ff48808fa42c721c3dfb0293953c8fd8b0428c77853b823d47da",
+            "55706623b478ff48808fa42c721c3dfb0293953c8fd8b0428c77853b823d47da"
+          ],
+          "operation": "walk",
+          "samples_seconds": [
+            0.0043856,
+            0.0046081,
+            0.0042999,
+            0.0047261,
+            0.0045938,
+            0.0044956,
+            0.004886
+          ],
+          "size": 1000,
+          "warmups": 2,
+          "median_seconds": 0.0045938,
+          "min_seconds": 0.0042999,
+          "max_seconds": 0.004886
+        }
+      },
+      "speedup_vs_python": 9.468740540555197,
+      "speedup_vs_rust_0_1_0": 6.970864946889227
+    },
+    {
+      "operation": "walk",
+      "size": 10000,
+      "engines": {
+        "rust-updated": {
+          "operation": "walk",
+          "size": 10000,
+          "samples_seconds": [
+            0.008187,
+            0.0085475,
+            0.0081601,
+            0.0077239,
+            0.0080296,
+            0.0078818,
+            0.0079621
+          ],
+          "checksum": "5d021e87dd7e06cb4b96586b8e7d9896252b00253aee84cb4bea1e123ab87676",
+          "checksums": [
+            "5d021e87dd7e06cb4b96586b8e7d9896252b00253aee84cb4bea1e123ab87676",
+            "5d021e87dd7e06cb4b96586b8e7d9896252b00253aee84cb4bea1e123ab87676",
+            "5d021e87dd7e06cb4b96586b8e7d9896252b00253aee84cb4bea1e123ab87676",
+            "5d021e87dd7e06cb4b96586b8e7d9896252b00253aee84cb4bea1e123ab87676",
+            "5d021e87dd7e06cb4b96586b8e7d9896252b00253aee84cb4bea1e123ab87676",
+            "5d021e87dd7e06cb4b96586b8e7d9896252b00253aee84cb4bea1e123ab87676",
+            "5d021e87dd7e06cb4b96586b8e7d9896252b00253aee84cb4bea1e123ab87676"
+          ],
+          "warmups": 2,
+          "median_seconds": 0.0080296,
+          "min_seconds": 0.0077239,
+          "max_seconds": 0.0085475
+        },
+        "python-1.6.0": {
+          "operation": "walk",
+          "size": 10000,
+          "samples_seconds": [
+            0.07619970000814646,
+            0.0822817999869585,
+            0.07011089997831732,
+            0.07083770004101098,
+            0.07014189998153597,
+            0.06992869998794049,
+            0.06867379997856915
+          ],
+          "checksum": "5d021e87dd7e06cb4b96586b8e7d9896252b00253aee84cb4bea1e123ab87676",
+          "checksums": [
+            "5d021e87dd7e06cb4b96586b8e7d9896252b00253aee84cb4bea1e123ab87676",
+            "5d021e87dd7e06cb4b96586b8e7d9896252b00253aee84cb4bea1e123ab87676",
+            "5d021e87dd7e06cb4b96586b8e7d9896252b00253aee84cb4bea1e123ab87676",
+            "5d021e87dd7e06cb4b96586b8e7d9896252b00253aee84cb4bea1e123ab87676",
+            "5d021e87dd7e06cb4b96586b8e7d9896252b00253aee84cb4bea1e123ab87676",
+            "5d021e87dd7e06cb4b96586b8e7d9896252b00253aee84cb4bea1e123ab87676",
+            "5d021e87dd7e06cb4b96586b8e7d9896252b00253aee84cb4bea1e123ab87676"
+          ],
+          "warmups": 2,
+          "pollard_version": "1.6.0",
+          "pollard_file": "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\.benchmarks\\rust-python160\\package\\pollard\\__init__.py",
+          "median_seconds": 0.07014189998153597,
+          "min_seconds": 0.06867379997856915,
+          "max_seconds": 0.0822817999869585
+        },
+        "rust-0.1.0": {
+          "checksum": "5d021e87dd7e06cb4b96586b8e7d9896252b00253aee84cb4bea1e123ab87676",
+          "checksums": [
+            "5d021e87dd7e06cb4b96586b8e7d9896252b00253aee84cb4bea1e123ab87676",
+            "5d021e87dd7e06cb4b96586b8e7d9896252b00253aee84cb4bea1e123ab87676",
+            "5d021e87dd7e06cb4b96586b8e7d9896252b00253aee84cb4bea1e123ab87676",
+            "5d021e87dd7e06cb4b96586b8e7d9896252b00253aee84cb4bea1e123ab87676",
+            "5d021e87dd7e06cb4b96586b8e7d9896252b00253aee84cb4bea1e123ab87676",
+            "5d021e87dd7e06cb4b96586b8e7d9896252b00253aee84cb4bea1e123ab87676",
+            "5d021e87dd7e06cb4b96586b8e7d9896252b00253aee84cb4bea1e123ab87676"
+          ],
+          "operation": "walk",
+          "samples_seconds": [
+            0.6651147,
+            0.6355224,
+            0.6278837,
+            0.636744,
+            0.6449652,
+            0.6329251,
+            0.7529345
+          ],
+          "size": 10000,
+          "warmups": 2,
+          "median_seconds": 0.636744,
+          "min_seconds": 0.6278837,
+          "max_seconds": 0.7529345
+        }
+      },
+      "speedup_vs_python": 8.73541645680183,
+      "speedup_vs_rust_0_1_0": 79.2995915114078
+    }
+  ]
+}
