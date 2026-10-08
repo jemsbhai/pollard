@@ -102,6 +102,20 @@ test('completed or failed finalization cannot be rearmed through mutable metadat
   assert.throws(() => store.finalize(Node.make({ kind: 'model_call', parent: root.id, payload: { failed: true }, result: reply(), meta: { state: 'completed' } })), IntegrityError);
 });
 
+test('MemoryStore preserves the first result and records conflicting result evidence like Python', () => {
+  const store = new MemoryStore(), root = Node.make({ kind: 'root', parent: null, payload: { run: 'result-conflicts' } }); store.put(root);
+  const first = Node.make({ kind: 'model_call', parent: root.id, payload: { model: 'same' }, result: { text: 'first' }, meta: { state: 'completed' } });
+  const incoming = Node.make({ kind: first.kind, parent: first.parent, payload: first.payload, result: { text: 'second' }, meta: { state: 'pending' } });
+  store.put(first); store.put(incoming);
+  assert.equal(store.get(first.id).resultText, first.resultText);
+  assert.equal(store.get(first.id).meta.state, 'completed');
+  assert.deepEqual(store.get(first.id).meta.result_conflicts, [{ result_digest: incoming.resultDigest, result: incoming.result }]);
+  assert.throws(() => store.finalize(incoming), IntegrityError);
+  const pending = Node.make({ kind: 'tool_call', parent: root.id, payload: { tool: 'pending' }, meta: { state: 'pending' } }); store.claim(pending);
+  store.put(Node.make({ kind: pending.kind, parent: pending.parent, payload: pending.payload, result: { forged: true }, meta: { state: 'completed' } }));
+  assert.equal(store.get(pending.id).resultText, null); assert.equal(store.get(pending.id).meta.state, 'pending');
+});
+
 test('steps, tokens and depth reject before dispatch and retain refusal audit nodes', () => {
   for (const budget of [{ steps: 0 }, { tokens: 1 }, { depth: 0 }]) {
     let dispatched = 0;
@@ -111,13 +125,13 @@ test('steps, tokens and depth reject before dispatch and retain refusal audit no
     assert.equal(run.cursor.payload.blocked_payload_digest, digestPayload({ prompt: 'x' }));
     assert.equal(run.cursor.payload.reason, 'budget');
   }
-  for (const budget of [{ tokens: NaN }, { steps: true }, { depth: 1.5 }, { tokens: -1 }, { usd: 1 }]) assert.throws(() => new Runtime().run('bad-budget', { budget }));
+  for (const budget of [{ tokens: NaN }, { steps: true }, { depth: 1.5 }, { tokens: -1 }, { usd: Infinity }]) assert.throws(() => new Runtime().run('bad-budget', { budget }));
 });
 
 test('actual token overshoot preserves result and blocks later calls across run handles', () => {
   const runtime = new Runtime(); const run = runtime.run('overshoot', { budget: { tokens: 3 } });
   const first = run.modelCall({ model: 'first' }, () => reply(5), { tokenEstimate: 1 });
-  assert.equal(first.result.usage.input_tokens, 5); assert.deepEqual(run.report().spent, { steps: 1, tokens: 5 });
+  assert.equal(first.result.usage.input_tokens, 5); assert.equal(run.report().spent.steps, 1); assert.equal(run.report().spent.tokens, 5); assert.ok(run.report().spent.seconds >= 0);
   let dispatched = 0;
   assert.throws(() => run.modelCall({ model: 'second' }, () => { dispatched++; return reply(); }, { tokenEstimate: 0 }), BudgetExceeded);
   const restarted = runtime.run('overshoot', { budget: { tokens: 3 } });
@@ -125,9 +139,9 @@ test('actual token overshoot preserves result and blocks later calls across run 
   assert.equal(dispatched, 0);
 });
 
-test('token budgets require explicit estimates and permit explicit zero estimates', () => {
+test('token budgets accept missing estimates and permit explicit zero estimates', () => {
   const run = new Runtime().run('estimate-required', { budget: { tokens: 10 } });
-  assert.throws(() => run.modelCall({}, () => { throw Error('never'); }), /requires tokenEstimate/);
+  assert.equal(run.modelCall({}, () => reply()).result.text, 'hello');
   const zero = new Runtime().run('zero-estimate', { budget: { tokens: 0 } });
   assert.equal(zero.modelCall({}, () => reply(0), { tokenEstimate: 0 }).result.usage.input_tokens, 0);
   const invalid = new Runtime({ estimateTokens: () => 0.5 }).run('invalid-estimator');
@@ -150,14 +164,16 @@ test('options are snapshotted before estimators can mutate identity attempts', (
   assert.throws(() => run.modelCall({}, () => reply(), accessor), /accessor/);
 });
 
-test('missing, fractional, boolean, negative and overflow usage fail closed', () => {
+test('missing, fractional, boolean, negative and overflow usage settle conservative estimates', () => {
   for (const result of [{ text: 'missing' }, { usage: { input_tokens: 0.5, output_tokens: 1 } }, { usage: { input_tokens: true, output_tokens: 1 } }, { usage: { input_tokens: -1, output_tokens: 1 } }, { usage: { input_tokens: Number.MAX_SAFE_INTEGER, output_tokens: 1 } }]) {
     const runtime = new Runtime(); const run = runtime.run('invalid-usage', { budget: { tokens: 10 } });
-    assert.throws(() => run.modelCall({ model: 'one' }, () => result, { tokenEstimate: 2 }), UsageError);
-    assert.equal(run.cursor.meta.accounting_unknown, true);
+    run.modelCall({ model: 'one' }, () => result, { tokenEstimate: 2 });
+    assert.equal(run.cursor.meta.accounting_unknown, false);
+    assert.equal(run.cursor.meta.charges.tokens, 2);
+    assert.equal(run.cursor.meta.accounting_fallbacks.tokens.reason, 'missing_or_invalid_provider_usage');
     assert.equal(run.cursor.resultText !== null, true);
     let called = false;
-    assert.throws(() => runtime.run('invalid-usage', { budget: { tokens: 10 } }).modelCall({ model: 'two' }, () => { called = true; return reply(); }, { tokenEstimate: 0 }), BudgetExceeded);
+    assert.throws(() => runtime.run('invalid-usage', { budget: { tokens: 10 } }).modelCall({ model: 'two' }, () => { called = true; return reply(); }, { tokenEstimate: 9 }), BudgetExceeded);
     assert.equal(called, false);
   }
 });
