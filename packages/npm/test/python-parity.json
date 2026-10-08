@@ -1,0 +1,442 @@
+{
+  "python_release": "1.6.0",
+  "providers": [
+    {
+      "kind": "response",
+      "input": {
+        "output": [
+          {
+            "type": "message",
+            "content": [
+              {
+                "type": "output_text",
+                "text": "hello π"
+              }
+            ]
+          },
+          {
+            "type": "function_call",
+            "call_id": "a",
+            "name": "find",
+            "arguments": "{}"
+          }
+        ],
+        "usage": {
+          "input_tokens": 3,
+          "output_tokens": 4
+        }
+      },
+      "expected": {
+        "output": [
+          {
+            "type": "message",
+            "content": [
+              {
+                "type": "output_text",
+                "text": "hello π"
+              }
+            ]
+          },
+          {
+            "type": "function_call",
+            "call_id": "a",
+            "name": "find",
+            "arguments": "{}"
+          }
+        ],
+        "usage": {
+          "input_tokens": 3,
+          "output_tokens": 4
+        },
+        "provider_usage": {
+          "input_tokens": 3,
+          "output_tokens": 4
+        },
+        "text": "hello π",
+        "tool_calls": [
+          {
+            "call_id": "a",
+            "name": "find",
+            "arguments": "{}"
+          }
+        ]
+      }
+    },
+    {
+      "kind": "chat",
+      "input": {
+        "choices": [
+          {
+            "message": {
+              "content": "done",
+              "tool_calls": [
+                {
+                  "id": "x",
+                  "type": "function",
+                  "function": {
+                    "name": "find",
+                    "arguments": "{}"
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 10,
+          "completion_tokens": 2,
+          "prompt_tokens_details": {
+            "cached_tokens": 5
+          }
+        }
+      },
+      "expected": {
+        "choices": [
+          {
+            "message": {
+              "content": "done",
+              "tool_calls": [
+                {
+                  "id": "x",
+                  "type": "function",
+                  "function": {
+                    "name": "find",
+                    "arguments": "{}"
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "usage": {
+          "input_tokens": 10,
+          "output_tokens": 2
+        },
+        "provider_usage": {
+          "prompt_tokens": 10,
+          "completion_tokens": 2,
+          "prompt_tokens_details": {
+            "cached_tokens": 5
+          }
+        },
+        "text": "done",
+        "tool_calls": [
+          {
+            "id": "x",
+            "type": "function",
+            "function": {
+              "name": "find",
+              "arguments": "{}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "anthropic",
+      "input": {
+        "content": [
+          {
+            "type": "text",
+            "text": "ready"
+          },
+          {
+            "type": "tool_use",
+            "id": "a",
+            "name": "find",
+            "input": {
+              "q": "x"
+            }
+          }
+        ],
+        "usage": {
+          "input_tokens": 2,
+          "output_tokens": 3,
+          "cache_creation_input_tokens": 5,
+          "cache_read_input_tokens": 7
+        }
+      },
+      "expected": {
+        "content": [
+          {
+            "type": "text",
+            "text": "ready"
+          },
+          {
+            "type": "tool_use",
+            "id": "a",
+            "name": "find",
+            "input": {
+              "q": "x"
+            }
+          }
+        ],
+        "usage": {
+          "input_tokens": 14,
+          "output_tokens": 3
+        },
+        "provider_usage": {
+          "input_tokens": 2,
+          "output_tokens": 3,
+          "cache_creation_input_tokens": 5,
+          "cache_read_input_tokens": 7
+        },
+        "text": "ready",
+        "tool_calls": [
+          {
+            "id": "a",
+            "name": "find",
+            "input": {
+              "q": "x"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "bedrock",
+      "input": {
+        "output": {
+          "message": {
+            "content": [
+              {
+                "text": "ready"
+              },
+              {
+                "toolUse": {
+                  "toolUseId": "a",
+                  "name": "find",
+                  "input": {
+                    "q": "x"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "usage": {
+          "inputTokens": 2,
+          "outputTokens": 3,
+          "cacheReadInputTokens": 5,
+          "cacheWriteInputTokens": 7
+        }
+      },
+      "expected": {
+        "output": {
+          "message": {
+            "content": [
+              {
+                "text": "ready"
+              },
+              {
+                "toolUse": {
+                  "toolUseId": "a",
+                  "name": "find",
+                  "input": {
+                    "q": "x"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "usage": {
+          "input_tokens": 14,
+          "output_tokens": 3
+        },
+        "provider_usage": {
+          "inputTokens": 2,
+          "outputTokens": 3,
+          "cacheReadInputTokens": 5,
+          "cacheWriteInputTokens": 7
+        },
+        "text": "ready",
+        "tool_calls": [
+          {
+            "toolUseId": "a",
+            "name": "find",
+            "input": {
+              "q": "x"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "chat",
+      "input": {
+        "choices": [],
+        "usage": {
+          "prompt_tokens": -1,
+          "completion_tokens": 3
+        }
+      },
+      "expected": {
+        "choices": [],
+        "provider_usage": {
+          "prompt_tokens": -1,
+          "completion_tokens": 3
+        }
+      }
+    },
+    {
+      "kind": "anthropic",
+      "input": {
+        "usage": {
+          "input_tokens": 1,
+          "output_tokens": 2,
+          "cache_read_input_tokens": true
+        }
+      },
+      "expected": {
+        "provider_usage": {
+          "input_tokens": 1,
+          "output_tokens": 2,
+          "cache_read_input_tokens": true
+        }
+      }
+    },
+    {
+      "kind": "bedrock",
+      "input": {
+        "usage": {
+          "inputTokens": 1,
+          "outputTokens": 2,
+          "cacheReadInputTokens": -1
+        }
+      },
+      "expected": {
+        "provider_usage": {
+          "inputTokens": 1,
+          "outputTokens": 2,
+          "cacheReadInputTokens": -1
+        }
+      }
+    }
+  ],
+  "comparisons": [
+    {
+      "recorded": {
+        "text": "ok",
+        "id": "one",
+        "usage": {
+          "input_tokens": 2
+        }
+      },
+      "live": {
+        "text": "ok",
+        "id": "two",
+        "usage": {
+          "input_tokens": 3
+        }
+      },
+      "exact": {
+        "matched": false,
+        "difference_paths": [
+          "/id",
+          "/usage/input_tokens"
+        ],
+        "truncated": false
+      },
+      "normalized": {
+        "matched": true,
+        "difference_paths": [],
+        "truncated": false
+      }
+    },
+    {
+      "recorded": {
+        "text": "x",
+        "tool_calls": [
+          {
+            "id": "a",
+            "function": {
+              "name": "find",
+              "arguments": "{\"b\":2,\"a\":1}"
+            }
+          }
+        ]
+      },
+      "live": {
+        "text": "x",
+        "tool_calls": [
+          {
+            "id": "b",
+            "function": {
+              "name": "find",
+              "arguments": "{\"a\":1,\"b\":2}"
+            }
+          }
+        ]
+      },
+      "exact": {
+        "matched": false,
+        "difference_paths": [
+          "/tool_calls/0/function/arguments",
+          "/tool_calls/0/id"
+        ],
+        "truncated": false
+      },
+      "normalized": {
+        "matched": true,
+        "difference_paths": [],
+        "truncated": false
+      }
+    },
+    {
+      "recorded": {
+        "text": "a",
+        "data": {
+          "slash/key": 1
+        }
+      },
+      "live": {
+        "text": "b",
+        "data": {
+          "slash/key": 2
+        }
+      },
+      "exact": {
+        "matched": false,
+        "difference_paths": [
+          "/data/slash~1key",
+          "/text"
+        ],
+        "truncated": false
+      },
+      "normalized": {
+        "matched": false,
+        "difference_paths": [
+          "/text"
+        ],
+        "truncated": false
+      }
+    }
+  ],
+  "contract": {
+    "document": {
+      "format": "pollard/replay-contract/v1",
+      "provider": "mock",
+      "model_revision": "rev-1",
+      "application_revision": "app-1",
+      "environment": {
+        "region": "local"
+      }
+    },
+    "bound": {
+      "model": "mock",
+      "prompt": "hi",
+      "_pollard": {
+        "replay_contract": {
+          "format": "pollard/replay-contract/v1",
+          "provider": "mock",
+          "model_revision": "rev-1",
+          "application_revision": "app-1",
+          "environment": {
+            "region": "local"
+          }
+        }
+      }
+    }
+  }
+}

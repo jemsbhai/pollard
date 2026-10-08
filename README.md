@@ -3,13 +3,15 @@
 Governed execution trees for AI agents: budget it, gate it, replay it.
 
 Native Node.js/TypeScript and Rust packages use the name `pollardai` and have
-independent version lines. Rust 0.2.0 targets PyPI 1.6.0 runtime behavior,
+independent version lines. The Rust 0.2.0 source targets PyPI 1.6.0 runtime behavior,
 eight native storage backends, shared budgets, async streaming, audit operations,
 provider normalization, Tokenmaster profiles, MCP/OTel bridges and optional NVML
-sampling. The npm release remains 0.1.0. See the
-[native release status](https://github.com/jemsbhai/pollard/blob/main/docs/native-releases.md)
+sampling. The npm 0.2.0 source also expands streaming, persistence, distributed
+budgets, adapters, revalidation, governance and integrations. See the
+[native release status](https://github.com/jemsbhai/pollard/blob/main/docs/native-releases.md),
+[npm parity matrix](https://github.com/jemsbhai/pollard/blob/main/docs/npm-parity.md)
 and [Rust test and performance evidence](https://github.com/jemsbhai/pollard/tree/main/evidence/rust-parity-1.6.0)
-for measured compatibility and language boundaries.
+for measured compatibility, publication status and language boundaries.
 
 ## 90-Second Credential-Free Start
 

@@ -41,16 +41,18 @@ Each package includes its own usage examples and supported API.
 
 ## First-release scope
 
-The table below describes the published 0.1.0 archives. The Rust 0.2.0
-source includes PyPI 1.6.0 compatibility work for native runtime behavior,
-all eight native storage backends and shared reservations, async streaming,
-measurement/Tokenmaster meters, provider normalization, streaming revalidation,
-MCP/OTel bridges, optional NVML/tokenization, seals, custody, import/export,
-merge, and CLI rendering/remote inspection. See the release status above for publication evidence.
-Rust equivalents and language-specific integration boundaries are documented in the
-[Rust crate README](https://github.com/jemsbhai/pollard/blob/main/crates/pollardai/README.md)
-and [test and performance evidence](https://github.com/jemsbhai/pollard/tree/main/evidence/rust-parity-1.6.0)
-for its exact scope, known gaps, and reproducible measurements.
+The table below describes the published 0.1.0 archives. Both native source trees
+have since expanded against Python 1.6.0. The npm 0.2.0 capabilities and deliberate
+schema/integration differences are documented in the [npm parity matrix](npm-parity.md)
+and [npm README](../packages/npm/README.md); source version alone does not imply publication.
+
+Rust 0.2.0 adds all eight native storage backends and shared reservations, async
+streaming, measurement/Tokenmaster meters, provider normalization, streaming
+revalidation, MCP/OTel bridges, optional NVML/tokenization, seals, custody,
+import/export, merge and CLI rendering/remote inspection. See the release status
+above, [Rust crate README](../crates/pollardai/README.md), and
+[test and performance evidence](../evidence/rust-parity-1.6.0/README.md)
+for exact scope, native numeric limits and reproducible measurements.
 
 The first native releases provide an execution ledger that does not require
 Python or a model-provider account. Applications supply their own model and
