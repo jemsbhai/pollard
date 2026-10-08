@@ -2,18 +2,21 @@ use pollardai::*;
 use std::{
     path::PathBuf,
     process::Command,
+    sync::atomic::{AtomicU64, Ordering},
     time::{SystemTime, UNIX_EPOCH},
 };
+static NEXT_TEMP: AtomicU64 = AtomicU64::new(0);
 struct Temp(PathBuf);
 impl Temp {
     fn new() -> Self {
         let p = std::env::temp_dir().join(format!(
-            "pollard-rust-cli-{}-{}",
+            "pollard-rust-cli-{}-{}-{}",
             std::process::id(),
             SystemTime::now()
                 .duration_since(UNIX_EPOCH)
                 .unwrap()
-                .as_nanos()
+                .as_nanos(),
+            NEXT_TEMP.fetch_add(1, Ordering::Relaxed)
         ));
         std::fs::create_dir(&p).unwrap();
         Self(p)

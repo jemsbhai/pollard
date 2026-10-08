@@ -1761,5 +1761,182 @@
       "exact": "2.27725055589944414687175E-11",
       "representable": false
     }
+  ],
+  "cost_scale": [
+    {
+      "input_rate": "2.00",
+      "output_rate": "6.00",
+      "inputs": 1000000,
+      "outputs": 500000,
+      "text": "5.00"
+    },
+    {
+      "input_rate": "2.00",
+      "output_rate": "6.00",
+      "inputs": 0,
+      "outputs": 0,
+      "text": "0.00"
+    },
+    {
+      "input_rate": "2.00",
+      "output_rate": "6.00",
+      "inputs": 1,
+      "outputs": 0,
+      "text": "0.000002"
+    },
+    {
+      "input_rate": "2.00",
+      "output_rate": "6.00",
+      "inputs": 0,
+      "outputs": 1,
+      "text": "0.000006"
+    },
+    {
+      "input_rate": "2.00",
+      "output_rate": "6.00",
+      "inputs": 1234,
+      "outputs": 567,
+      "text": "0.00587"
+    },
+    {
+      "input_rate": "0.00000010",
+      "output_rate": "1.0000",
+      "inputs": 1000000,
+      "outputs": 500000,
+      "text": "0.50000010"
+    },
+    {
+      "input_rate": "0.00000010",
+      "output_rate": "1.0000",
+      "inputs": 0,
+      "outputs": 0,
+      "text": "0E-8"
+    },
+    {
+      "input_rate": "0.00000010",
+      "output_rate": "1.0000",
+      "inputs": 1,
+      "outputs": 0,
+      "text": "1E-13"
+    },
+    {
+      "input_rate": "0.00000010",
+      "output_rate": "1.0000",
+      "inputs": 0,
+      "outputs": 1,
+      "text": "0.00000100"
+    },
+    {
+      "input_rate": "0.00000010",
+      "output_rate": "1.0000",
+      "inputs": 1234,
+      "outputs": 567,
+      "text": "0.0005670001234"
+    },
+    {
+      "input_rate": "0.0",
+      "output_rate": "0.00",
+      "inputs": 1000000,
+      "outputs": 500000,
+      "text": "0.00"
+    },
+    {
+      "input_rate": "0.0",
+      "output_rate": "0.00",
+      "inputs": 0,
+      "outputs": 0,
+      "text": "0.00"
+    },
+    {
+      "input_rate": "0.0",
+      "output_rate": "0.00",
+      "inputs": 1,
+      "outputs": 0,
+      "text": "0.00"
+    },
+    {
+      "input_rate": "0.0",
+      "output_rate": "0.00",
+      "inputs": 0,
+      "outputs": 1,
+      "text": "0.00"
+    },
+    {
+      "input_rate": "0.0",
+      "output_rate": "0.00",
+      "inputs": 1234,
+      "outputs": 567,
+      "text": "0.00"
+    },
+    {
+      "input_rate": "1.2300",
+      "output_rate": "0",
+      "inputs": 1000000,
+      "outputs": 500000,
+      "text": "1.2300"
+    },
+    {
+      "input_rate": "1.2300",
+      "output_rate": "0",
+      "inputs": 0,
+      "outputs": 0,
+      "text": "0.0000"
+    },
+    {
+      "input_rate": "1.2300",
+      "output_rate": "0",
+      "inputs": 1,
+      "outputs": 0,
+      "text": "0.00000123"
+    },
+    {
+      "input_rate": "1.2300",
+      "output_rate": "0",
+      "inputs": 0,
+      "outputs": 1,
+      "text": "0.0000"
+    },
+    {
+      "input_rate": "1.2300",
+      "output_rate": "0",
+      "inputs": 1234,
+      "outputs": 567,
+      "text": "0.00151782"
+    },
+    {
+      "input_rate": "2",
+      "output_rate": "6",
+      "inputs": 1000000,
+      "outputs": 500000,
+      "text": "5"
+    },
+    {
+      "input_rate": "2",
+      "output_rate": "6",
+      "inputs": 0,
+      "outputs": 0,
+      "text": "0"
+    },
+    {
+      "input_rate": "2",
+      "output_rate": "6",
+      "inputs": 1,
+      "outputs": 0,
+      "text": "0.000002"
+    },
+    {
+      "input_rate": "2",
+      "output_rate": "6",
+      "inputs": 0,
+      "outputs": 1,
+      "text": "0.000006"
+    },
+    {
+      "input_rate": "2",
+      "output_rate": "6",
+      "inputs": 1234,
+      "outputs": 567,
+      "text": "0.00587"
+    }
   ]
 }

@@ -265,6 +265,14 @@ pub(crate) fn cost_per_million(terms: &[(u64, Decimal)]) -> Option<Decimal> {
         .map(|(_, rate)| rate.scale())
         .max()
         .unwrap_or(0);
+    // Decimal division retains the preferred input exponent when no extra
+    // fractional digits are needed (2.00 / 1_000_000 * 1_000_000 -> 2.00).
+    // Normalization alone would change the existing Python/public scale.
+    let retain_scale = |value: Decimal| {
+        let mut value = value.normalize();
+        value.rescale(value.scale().max(scale));
+        value
+    };
     let coefficient = terms.iter().try_fold(0i128, |sum, (count, rate)| {
         rate.mantissa()
             .checked_mul(i128::from(*count))
@@ -272,7 +280,7 @@ pub(crate) fn cost_per_million(terms: &[(u64, Decimal)]) -> Option<Decimal> {
             .and_then(|value| sum.checked_add(value))
     });
     if let Some(coefficient) = coefficient {
-        return from_coefficient(coefficient, scale + 6).map(|value| value.normalize());
+        return from_coefficient(coefficient, scale + 6).map(retain_scale);
     }
     let mut total = Wide::from_decimal(Decimal::ZERO);
     for (count, rate) in terms {
@@ -280,7 +288,7 @@ pub(crate) fn cost_per_million(terms: &[(u64, Decimal)]) -> Option<Decimal> {
             .add(Wide::from_decimal(Decimal::from(*count)).multiply(Wide::from_decimal(*rate)));
     }
     total.scale += 6;
-    total.finish().map(|value| value.normalize())
+    total.finish().map(retain_scale)
 }
 
 #[cfg(test)]

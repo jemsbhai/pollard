@@ -1,0 +1,8 @@
+   Compiling toml_edit v0.21.1
+   Compiling proc-macro-crate v3.1.0
+   Compiling num_enum_derive v0.7.6
+   Compiling num_enum v0.7.6
+   Compiling rdkafka-sys v4.10.0+2.12.1
+   Compiling rdkafka v0.39.0
+   Compiling pollardai v0.2.0 (C:\Users\User\.codex\worktrees\rust-pypi-parity\pollard\crates\pollardai)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 27.70s

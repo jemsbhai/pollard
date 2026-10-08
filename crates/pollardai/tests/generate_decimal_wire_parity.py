@@ -12,6 +12,7 @@ assert hashlib.sha256(wheel.read_bytes()).hexdigest() == sha
 sys.path.insert(0, str(wheel))
 import pollard
 from pollard.arbiter import BudgetReservation, WindowReservation
+from pollard.meters import CostMeter
 from pollard.stores._transactional import TransactionalKVStore, _reservation_request, _reservation_charges
 assert pollard.__version__ == "1.6.0" and str(wheel) in pollard.__file__
 
@@ -75,8 +76,14 @@ for input_rate, output_rate, inputs, outputs in [
         coefficient = int("".join(map(str, digits)))
         representable = exponent >= -28 and coefficient * 10**max(0, exponent) <= int(maximum)
     costs.append({"input_rate": input_rate, "output_rate": output_rate, "inputs": inputs, "outputs": outputs, "exact": str(exact), "representable": representable})
+scale_cases = []
+for input_rate, output_rate in [("2.00", "6.00"), ("0.00000010", "1.0000"), ("0.0", "0.00"), ("1.2300", "0"), ("2", "6")]:
+    meter = CostMeter({"test": {"input_per_1m": Decimal(input_rate), "output_per_1m": Decimal(output_rate)}})
+    for inputs, outputs in [(1_000_000, 500_000), (0, 0), (1, 0), (0, 1), (1234, 567)]:
+        actual = meter.charge("model_call", {"model": "test"}, {"usage": {"input_tokens": inputs, "output_tokens": outputs}}, {})
+        scale_cases.append({"input_rate": input_rate, "output_rate": output_rate, "inputs": inputs, "outputs": outputs, "text": str(actual)})
 output = {"provenance": {"pollard_version": "1.6.0", "wheel_sha256": sha, "generator": Path(__file__).name,
                          "cost_reference": "Python Decimal localcontext precision=200; exact mathematical reference, not default-context emulation"},
-          "requests": rows, "costs": costs}
+          "requests": rows, "costs": costs, "cost_scale": scale_cases}
 Path(__file__).with_name("pypi160_decimal_wire.json").write_text(json.dumps(output, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-print(f"generated {len(rows)} wire cases and {len(costs)} exact cost cases")
+print(f"generated {len(rows)} wire cases, {len(costs)} exact cost cases, {len(scale_cases)} frozen CostMeter scale cases")

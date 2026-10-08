@@ -1,0 +1,137 @@
+{
+  "status": "passed",
+  "backend": "mongodb",
+  "wheel_sha256": "569fb5f130a82c9be327b8dcbd285e3be063200bd9773ca15c5d6bb62edd627f",
+  "binary_sha256": "0170a504f992680a43d31254c0143d1fa1fadf454ae4557d872c779bbf94fc4f",
+  "sources_sha256": {
+    "src/adapters.rs": "3b2c206a81c099a11ecd64a538d32bd65f8ee3f84c10185b54773b391887ad2f",
+    "src/aio.rs": "bac10d6c7ecc45c06a4fbe80256baea10e401df5c0f81bfdf8dc98f3c05be431",
+    "src/decimal.rs": "fbed4a5932fc64ba80b687f84e361f019ef6d2fb7ee64fac2a36f82b98cfebe4",
+    "src/decimal_wire.rs": "79e9ba60d7fba9c90495fe22f2eab6c8ec9d43ea270aebfd931702479e633549",
+    "src/energy.rs": "1b5b61cf22847612de47c27a5904573a295f1563b79db456a5bcada66f510a7e",
+    "src/estimators.rs": "4dab7fcf285f7ef74906d636c9e65df76687f9e43cb0a7fd3995cdbbc8781f6b",
+    "src/hashrope.rs": "5628efeb4c730120d5105762b8fcb264b0fc0fa19446b44dbf2087b4eada4939",
+    "src/identity.rs": "fc6aeb01dff43e3e2218a176bb1d915b860680073ded3d7ec36234ccfeb490cc",
+    "src/kafka.rs": "e1eeada88b09bb11a294b6df622d7285e963c72d23fa4bb1a43706a68402ae3b",
+    "src/kv.rs": "db0ca1a9b56026dff96af4889e19ce8fd2b3efd26f2d72a3420ae20361d3dcfd",
+    "src/lib.rs": "48fa142df757093b6c40934c1d8c3e93752b20bac1d0a7e7026e6bfad2fddf83",
+    "src/mcp.rs": "c7d7fc84f6a7ffbcd04e58e93e72401dc88bea795c48702df17e1fb36ca8faa0",
+    "src/merge.rs": "8d079769df2bbc3c211d0cd019bb39cad1fbe30f28ac6b05150613bd635bca06",
+    "src/meters.rs": "9d85707c6f6733089e137fc12b354ad9dbb554d3d4008196c2fb57f27670ed50",
+    "src/mongodb.rs": "284d6207f9a1375e442265a031f1bd0704d997e6ec141aa44e66b71c23503d76",
+    "src/neo4j.rs": "29236cd8daffca6a2327c478886c46480ceb1dbf20a2a1dd7d451aef5b1af371",
+    "src/nvml.rs": "0148be0d09fa2021ffa4e018cc04bec4468916eecb57c8cb7a38d474e8c4e186",
+    "src/otel.rs": "37d0858e013b34f52a15623e618f6abd73aa4eaefb622fcb6d665064d5c1147f",
+    "src/postgres.rs": "7ed42a1afd5801b67f61e936a80147dfb6cb4ccfd5e8593800c5342a6e379925",
+    "src/python_display.rs": "859d9cb89b458a807a08fad965a0528056b6c9c03bb2ac81b166d832b2b18997",
+    "src/python_printable.rs": "5428029c831ca02b5b97c3ab49a34a276840a0a2bcc4dce40bf4bb670cc11080",
+    "src/redis.rs": "582356890612faaf726ce9077b2a7bb3d8543b4a1af0d00a7d4591ca0c4b8979",
+    "src/registry.rs": "0561acb64d9b18a1fef4dfaa0bbd6123b77fe8f19dc4d6ec0bc1f143b7d9dc7d",
+    "src/remote_worker.rs": "40acd856b12137a2a7c0464f496187b2956094ee5bc01f63f579ce3fa912217a",
+    "src/render.rs": "7210d38a7bff72fab94abfda7bb6dd5008b23941a3c6602208c0beb146591f42",
+    "src/revalidation.rs": "37e23119bf4c6a53be97e359be1ada1381c15fabf983fac38ac767eb89f168fd",
+    "src/runtime.rs": "80d0a515935067310d47e4dd09196885200b61e59fe795b948b57e971a368be8",
+    "src/seal.rs": "b13196e1018a1039704ebcc12b3d4c1de07bd54809d2fcb9e734bccabdb1c284",
+    "src/seal_custody.rs": "f21e3cf7688c82a4e4512b8dbc5b0dfcc58510836b394ec3072eb5d8dca78693",
+    "src/sqlite.rs": "d1c347a547139239580f158cdbe683824a7e51e5e27dbe281c85713bd73752c3",
+    "src/store.rs": "8123c43d920218379df08330c920a9cd3c7408e17c96a8fa45f77903c6dae540",
+    "src/store_spec.rs": "c11cf7479dd14ccdc9eada0d724e7329f94ee8b8b67bd138a63f620dd6fda838",
+    "src/stream.rs": "9543e17ace248cfac9e67f725b79f4d3ff24f04e146e847b240f701d9e626852",
+    "src/tokenmaster.rs": "02159a8ffe2fa318894bee3a84071b6d6913c5d0056c49de30c07b31be974f57",
+    "Cargo.toml": "a4dbe4a3eb3c847ffb719877ef323c5b6ddc161b915d4bd791d94a4adb52e453",
+    "Cargo.lock": "b2e37c2d5126ccecb0b2b70eae412837ae4e3d2af0709ae7a5ab37b4c123589a",
+    "examples/document_interop.rs": "8e8b40faa2f983071cb50b83cfd3cb378df78047ac3213ed48d6e563d2bf6435"
+  },
+  "python": "3.12.2 (tags/v3.12.2:6abddd9, Feb  6 2024, 21:26:36) [MSC v.1937 64 bit (AMD64)]",
+  "python_driver": "4.16.0",
+  "rust_driver": "2.8.2",
+  "cases": {
+    "python_clock_configuration": {
+      "required_option": null,
+      "default_clock_offset_seconds": -0.004682064056396484,
+      "aware_clock_offset_seconds": -0.003177165985107422,
+      "reason": "corrected source normalizes naive BSON UTC timestamps"
+    },
+    "exact_records": {
+      "python_seal": "0d7c238deb57ebf69a79e11873846dc8a3974cfdc7da01f228d49b59a28c3693",
+      "rust_node": "a4f12589eb419723c4697914074519fa715a5b9364b984dfb496732566dfe48f"
+    },
+    "budget": {
+      "live_python_reservation_refused": true,
+      "observed": [
+        {
+          "status": "refused",
+          "dispatched": false,
+          "root_id": "f73098a04dd24bcea64c5e39cb3cd4efec247ee5c26f7d945e022e177be4c93f",
+          "node_id": "098d7fdbbc48c1c7a20164579a0fef261fba95c55485e87ec20284bb1bcb9d8e"
+        }
+      ]
+    },
+    "window": {
+      "live_python_reservation_refused": true,
+      "observed": [
+        {
+          "status": "refused",
+          "dispatched": false,
+          "root_id": "39fd197e85fb9e934ada1dafca9745138ed103dac0ec7bb425c5d7f21ee36043",
+          "node_id": "24677417090296d8c8256ecc92a28a55cc8f64ad5ba3360cdaec438d3e52987f"
+        }
+      ]
+    },
+    "reverse_window": true,
+    "mixed_idempotent_settlement": true,
+    "scientific_decimal_wire_digest": true
+  },
+  "namespace_cleaned": true,
+  "cluster_failover_tested": false,
+  "python_origin": {
+    "kind": "corrected-source",
+    "source_sha256": {
+      "pollard/__init__.py": "a82f5889efb14a4e9a29fd0846d62bf43196c7c590826d263ef86046f357abda",
+      "pollard/_canon.py": "fadd7d70ec8819d065c7e159f0c399b364c4c656fa6348c6ee7fae6dec38a300",
+      "pollard/adapters/__init__.py": "43a30271d85e3b2dabaa037295969b76c9b679d9cbc4300a0e20d5cda519c98e",
+      "pollard/adapters/_common.py": "4c9384f77575c71505d7b0eb2f70b3b322eb65bed5204c9a8ec49b3373d261eb",
+      "pollard/adapters/anthropic.py": "1cfa4226f26f105cbc7b79c8494b162bee1de126e7eb4753a62ea4d4bd4fb61c",
+      "pollard/adapters/bedrock.py": "9e2ac2cb833a2d6bbef02c92cc4c8134d8a206cec5f188c1e247fc801ac724e2",
+      "pollard/adapters/litellm.py": "977f216458cdf17f8a6a3e981ec032a5577ea5152cee96a02883b95f49adafe3",
+      "pollard/adapters/openai.py": "0ff0bf4dcfc82c90b1aff04115d9e8ea5271726f48492bd273a483c9fbfec86f",
+      "pollard/aio.py": "2876413e54042f6536a5f6697cc33de8f853e61458f693557d3ac439563c6e19",
+      "pollard/arbiter.py": "8cc87c89152b57bdb99eb9d93c574d8bef422b5709e805a73b92e45f10bfc04f",
+      "pollard/cli.py": "e6b96aee5fd66c3147c884b01dd0256f5e8ff597185e5742eddc586e702194e9",
+      "pollard/errors.py": "0f22b517f4179c5c9e05336bc7772899d247b7491e863875549e518c120aae51",
+      "pollard/estimators/__init__.py": "1c6f521cc2cc6431f1423818ab51ac6de5dc814b4bedc5bcc4d05ea8e683fef7",
+      "pollard/estimators/openai.py": "47e9aac46e95ed8cc736ccaca9c94312fead804c81c844ad00da7b48e601bf7f",
+      "pollard/governance.py": "4cfecf417e1224e86241bf1309a70e306e893f70a2dd376328f9368262dce153",
+      "pollard/governor.py": "fdb168f7a8a5c460434c3456a45922aa22a994159a60fff246f19a738809a5b5",
+      "pollard/hashing.py": "1123fb66160559cd86bb1d0acd3b5900e1f8a9170dc65f0c101b5be53c789eb1",
+      "pollard/mcp.py": "081e40b9b44043650e6c1f729d94b97333e5cdf73134d6114f70dbfa85bfba41",
+      "pollard/merge.py": "c955dfb9b6879429da4c2f5e54b50d234aa332523e3915d4dff4c0346ad3722a",
+      "pollard/meters/__init__.py": "eeef4320cac5e0dd2af335229c978a99f408dc53b7292c3598d988db834565b6",
+      "pollard/meters/energy.py": "2e981c967f9a540b7e5df09fb1a0c29e8810a16785b68170772ac48301284d98",
+      "pollard/meters/tokenmaster.py": "53ce51761b2a60da03e6ce0059aa3c2b1906e2a433b5c18142afe869ca1121d3",
+      "pollard/otel.py": "41fb2d679431e16689440e50c7f595cbc9b6756fc3851a3acfe2cd6f02a14d9b",
+      "pollard/policy.py": "3b37754d0298688dcd5522302b91efbd7c4f8bddd0d83ceaf7c129ccc79d3ed5",
+      "pollard/pytest_plugin.py": "870c589a0d55c5fe2c6401c3473235fc6dbd4a3e6c8357faf3131935cd47e181",
+      "pollard/redaction.py": "14ec01931361845516be47a4554cf01d4449a2c00379c9b264f44508941a4c11",
+      "pollard/registry.py": "75bd2cea8f95bc7400398a80e642bed4720ac4253461ff280643389b6632dfa9",
+      "pollard/replay.py": "faf77b92265e1ccc0c30e7f30e7be66f845ab65ccfe9f9670293a9634a576d62",
+      "pollard/revalidation.py": "4c979f3dc2b461b81e6971b281fa0ed1f46ceffbf93fc2c2fccc110fbfd7aed3",
+      "pollard/runtime.py": "5ecca0a7d96f71a2167cfff231b820cf9fc72738a98b9b5246eca08ba0492a4c",
+      "pollard/schema.py": "66eaf0de370c4f6fabf52f69279bd2719422d37fa65c877924f9a4841842ce17",
+      "pollard/seal.py": "1068f209f9e3feb19efc1fe2ac6f085f5aefcef9340eabf118ed006433c279f1",
+      "pollard/seal_custody.py": "a0a4997ee1adb7967319743c02948c1c7574ad82475ce3db5b109d0020ffe55a",
+      "pollard/store.py": "fc51a6aceec9ce916f2560c261c0e05f6cd2f5e3b9f9e41f02a4df28be9e30a3",
+      "pollard/stores/__init__.py": "64bb539461ffedea5d23b94e6e83773a1df970b70cdbb567999219ae56c6a2cd",
+      "pollard/stores/_transactional.py": "027872266ce78616763f31a21b3bee463c2258c410ac6dfadac970c46d37b5fd",
+      "pollard/stores/hashrope.py": "647017c81a9ce042c7840f2a2394d221f0253369d2b609daec2b904a741b84a9",
+      "pollard/stores/kafka.py": "b6be5143f3d6e3073a821de7c6c5973407964e9d3a5ee66306922b2a68b1a8b8",
+      "pollard/stores/mongodb.py": "90d957d4f1bad80985a15f3dc61263d0d17ef6cccfd827c0f9f4135af3d79e6b",
+      "pollard/stores/neo4j.py": "21d004a5f51f7a7a4924c719a771908fb5318bbe30d6200794bc4044a606d3ed",
+      "pollard/stores/postgres.py": "b7e6436df558ecd97aaab96060e9acb8122eef47b7f4afcc834fb811722058ff",
+      "pollard/stores/redis.py": "697ed7dacd0240eb2cfa4fba694d13dcb226eba1fdb4f68e3457972bb25bf31a",
+      "pollard/stores/sqlite.py": "84fb468d01a726e8431ef99af376710beb9f84acf0131409315dc10ec3d8ea25",
+      "pollard/tree.py": "d67f5efd36103c217f2ce49d4a1f600212212f047a254397ba07d0c38755126a",
+      "pollard/verify.py": "a8b24798dc2bbd88d02639a17d445e933c10c50d871d1b7947183f6fb0d9fe58"
+    }
+  }
+}

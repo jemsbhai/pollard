@@ -213,3 +213,28 @@ fn public_exact_addition_and_subtraction_never_discard_low_digits() {
         Some(parse_decimal_exact("-0.9999999999999999999999999999").unwrap())
     );
 }
+
+#[test]
+fn cost_result_scale_matches_frozen_python_meter() {
+    let fixtures: Value = serde_json::from_str(include_str!("pypi160_decimal_wire.json")).unwrap();
+    for row in fixtures["cost_scale"].as_array().unwrap() {
+        let price = ModelPrice::new(
+            row["input_rate"].as_str().unwrap(),
+            row["output_rate"].as_str().unwrap(),
+        )
+        .unwrap();
+        let meter = CostMeter::new(BTreeMap::from([("test".into(), price)]));
+        let actual = meter
+            .charge_decimal(
+                NodeKind::ModelCall,
+                &json!({"model":"test"}),
+                &json!({"usage":{"input_tokens":row["inputs"],"output_tokens":row["outputs"]}}),
+            )
+            .unwrap();
+        assert_eq!(
+            kv::decimal_string(actual),
+            row["text"].as_str().unwrap(),
+            "{row}"
+        );
+    }
+}

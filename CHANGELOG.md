@@ -6,7 +6,27 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 
 ## [Unreleased]
 
-### Rust pollardai 0.2.0 compatibility release
+### Fixed
+
+- Correct MongoDB server-clock conversion in Python source so default naive BSON
+  datetimes are interpreted as UTC. The existing PyPI 1.6.0 wheel still requires
+  `tz_aware=True` for mixed-language lease/window accounting on non-UTC hosts.
+
+### Added
+
+- Add native npm and Rust `pollardai` 0.1.0 core packages with independent
+  versions, in-memory execution, integer budgets, registered tool gating, and
+  strict replay. Shared Python-generated vectors check the frozen node identity
+  and exact stored result digest. These packages do not yet include Python's
+  persistent stores, provider adapters, or full API surface.
+- Publish npm and Rust 0.1.0 on their public registries and both native archives
+  in the tagged GitHub release. Clean public-registry consumers verify both.
+- Add native package validation and a local release runbook. Package publishing
+  remains a maintainer-controlled local action.
+
+## [Rust 0.2.0] - 2026-10-08
+
+### Added
 
 - Expand the Rust crate against the verified PyPI 1.6.0 release:
   compatible duplicate/fallback behavior, async calls and streams, SQLite,
@@ -20,19 +40,17 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
   versions remain independent of the Python package version.
 - Align native CLI JSON tree fields with the released Python contract and add
   a wheel-generated comparison for JSON, ASCII and Unicode output.
-- Correct MongoDB server-clock conversion in Python source so default naive BSON
-  datetimes are interpreted as UTC. The existing PyPI 1.6.0 wheel still requires
-  `tz_aware=True` for mixed-language lease/window accounting on non-UTC hosts.
 
-- Add native npm and Rust `pollardai` 0.1.0 core packages with independent
-  versions, in-memory execution, integer budgets, registered tool gating, and
-  strict replay. Shared Python-generated vectors check the frozen node identity
-  and exact stored result digest. These packages do not yet include Python's
-  persistent stores, provider adapters, or full API surface.
-- Publish npm and Rust 0.1.0 on their public registries and both native archives
-  in the tagged GitHub release. Clean public-registry consumers verify both.
-- Add native package validation and a local release runbook. Package publishing
-  remains a maintainer-controlled local action.
+### Fixed
+
+- Preserve Python decimal exponent/scale and signed-zero fingerprints through
+  explicit text reservation APIs. Reject unrepresentable exact accounting results
+  without rounding significant digits.
+- Cache SQLite verification using local revisions and external commit tokens,
+  invalidating on changed data, unsupported schemas, triggers and uncertain writes.
+  Preserve ancestor verification on hybrid hits.
+- Resolve fresh downstream applications on Rust 1.74 without borrowing this
+  repository's Cargo.lock, including every optional feature on Linux.
 
 ## [npm 0.2.0] - 2026-10-08
 
@@ -54,7 +72,7 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 
 - Align default npm token accounting with Python's optional estimates and
   conservative fallback semantics while retaining duplicate refusal.
-  Rust remains at its separate 0.1.0 scope.
+  That change updates the npm package only.
 
 ## [1.6.0] - 2026-09-01
 

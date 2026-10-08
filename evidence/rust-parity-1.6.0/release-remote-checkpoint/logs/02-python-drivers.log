@@ -1,0 +1,32 @@
+Collecting psycopg==3.3.4 (from psycopg[binary]==3.3.4)
+  Using cached psycopg-3.3.4-py3-none-any.whl.metadata (4.3 kB)
+Collecting redis==7.2.1
+  Using cached redis-7.2.1-py3-none-any.whl.metadata (12 kB)
+Collecting confluent-kafka==2.15.0
+  Using cached confluent_kafka-2.15.0-cp312-cp312-win_amd64.whl.metadata (34 kB)
+Collecting pymongo==4.16.0
+  Using cached pymongo-4.16.0-cp312-cp312-win_amd64.whl.metadata (10.0 kB)
+Collecting neo4j==6.2.0
+  Using cached neo4j-6.2.0-py3-none-any.whl.metadata (5.3 kB)
+Collecting typing-extensions>=4.6 (from psycopg==3.3.4->psycopg[binary]==3.3.4)
+  Using cached typing_extensions-4.16.0-py3-none-any.whl.metadata (3.3 kB)
+Collecting tzdata (from psycopg==3.3.4->psycopg[binary]==3.3.4)
+  Using cached tzdata-2026.5-py2.py3-none-any.whl.metadata (1.4 kB)
+Collecting dnspython<3.0.0,>=2.6.1 (from pymongo==4.16.0)
+  Using cached dnspython-2.8.0-py3-none-any.whl.metadata (5.7 kB)
+Collecting pytz (from neo4j==6.2.0)
+  Using cached pytz-2026.5-py2.py3-none-any.whl.metadata (22 kB)
+Collecting psycopg-binary==3.3.4 (from psycopg[binary]==3.3.4)
+  Using cached psycopg_binary-3.3.4-cp312-cp312-win_amd64.whl.metadata (2.7 kB)
+Using cached psycopg-3.3.4-py3-none-any.whl (213 kB)
+Using cached redis-7.2.1-py3-none-any.whl (396 kB)
+Using cached confluent_kafka-2.15.0-cp312-cp312-win_amd64.whl (4.5 MB)
+Using cached pymongo-4.16.0-cp312-cp312-win_amd64.whl (907 kB)
+Using cached neo4j-6.2.0-py3-none-any.whl (327 kB)
+Using cached psycopg_binary-3.3.4-cp312-cp312-win_amd64.whl (3.6 MB)
+Using cached dnspython-2.8.0-py3-none-any.whl (331 kB)
+Using cached typing_extensions-4.16.0-py3-none-any.whl (45 kB)
+Using cached pytz-2026.5-py2.py3-none-any.whl (506 kB)
+Using cached tzdata-2026.5-py2.py3-none-any.whl (347 kB)
+Installing collected packages: pytz, tzdata, typing-extensions, redis, psycopg-binary, neo4j, dnspython, confluent-kafka, pymongo, psycopg
+Successfully installed confluent-kafka-2.15.0 dnspython-2.8.0 neo4j-6.2.0 psycopg-3.3.4 psycopg-binary-3.3.4 pymongo-4.16.0 pytz-2026.5 redis-7.2.1 typing-extensions-4.16.0 tzdata-2026.5
