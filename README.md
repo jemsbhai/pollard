@@ -3,9 +3,8 @@
 Governed execution trees for AI agents: budget it, gate it, replay it.
 
 Native Node.js/TypeScript and Rust core packages use the name `pollardai`
-and start at experimental version 0.1.0. Rust is published on crates.io;
-the npm archive is available in the GitHub release while npm registry
-authentication is pending. They preserve Pollard's node identity contract and provide
+and start at experimental version 0.1.0. Both are published on npm and
+crates.io. They preserve Pollard's node identity contract and provide
 in-memory execution, budgets, registry gating, and replay. The Python package
 continues to provide the complete integrations and persistent stores. See
 [native package scope and releases](https://github.com/jemsbhai/pollard/blob/main/docs/native-releases.md)

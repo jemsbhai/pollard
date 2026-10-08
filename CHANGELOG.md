@@ -13,8 +13,8 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
   strict replay. Shared Python-generated vectors check the frozen node identity
   and exact stored result digest. These packages do not yet include Python's
   persistent stores, provider adapters, or full API surface.
-- Publish Rust 0.1.0 on crates.io and both native archives in the tagged GitHub
-  release. The npm registry upload remains pending maintainer authentication.
+- Publish npm and Rust 0.1.0 on their public registries and both native archives
+  in the tagged GitHub release. Clean public-registry consumers verify both.
 - Add native package validation and a local release runbook. Package publishing
   remains a maintainer-controlled local action.
 

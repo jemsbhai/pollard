@@ -6,28 +6,24 @@ The native packages start at version 0.1.0 and have their own version line.
 
 ## Release status
 
-Rust 0.1.0 is published on
-[crates.io](https://crates.io/crates/pollardai/0.1.0). A clean public-registry
-consumer verified the released crate and its archive checksum.
-
-The tested npm archive is available in the
-[pollardai 0.1.0 GitHub release](https://github.com/jemsbhai/pollard/releases/tag/pollardai-v0.1.0).
-The npm registry upload was rejected and requires refreshed maintainer
-authentication. Until that upload succeeds, install the release archive:
+Both 0.1.0 packages are published:
+[npm](https://www.npmjs.com/package/pollardai/v/0.1.0) and
+[crates.io](https://crates.io/crates/pollardai/0.1.0). Clean public-registry
+consumers verified both released packages, their archive checksums, golden
+node identities, budget settlement, and strict replay.
 
 ```sh
-npm install https://github.com/jemsbhai/pollard/releases/download/pollardai-v0.1.0/pollardai-0.1.0.tgz
+npm install pollardai@0.1.0
 ```
-
-Rust installs from the public registry:
 
 ```sh
 cargo add pollardai
 ```
 
-After npm registry publication, `npm install pollardai` will install 0.1.0.
 Both package archives, checksums, and the checked source commit are recorded
-in the tagged GitHub release. The native source passed all 49 CI checks.
+in the
+[tagged GitHub release](https://github.com/jemsbhai/pollard/releases/tag/pollardai-v0.1.0).
+The native source passed all 49 CI checks.
 
 The npm source is in
 [packages/npm](https://github.com/jemsbhai/pollard/tree/main/packages/npm).
