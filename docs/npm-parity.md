@@ -1,16 +1,17 @@
 # npm parity with Python Pollard 1.6.0
 
-The npm 0.2.0 source targets the published PyPI `pollard==1.6.0` release,
+The npm 0.2.0 release targets the published PyPI `pollard==1.6.0` release,
 uploaded September 1, 2026. The reference wheel is
 `pollard-1.6.0-py3-none-any.whl`, SHA-256
 `569fb5f130a82c9be327b8dcbd285e3be063200bd9773ca15c5d6bb62edd627f`.
 All Python source files used as the implementation reference match this wheel.
 No unpublished changes from another checkout were used.
 
-The native package keeps its own version line, `pollardai`. Its last published
-version is 0.1.0; 0.2.0 requires the normal maintainer release process. The Rust
-port remains unchanged. This matrix describes source capabilities, not a claim
-that every Python import or storage format has an identical JavaScript API.
+The native package keeps its own version line, `pollardai`. npm 0.2.0 was
+published on October 8, 2026 and verified through a clean public-registry
+installation. The Rust port remains at 0.1.0. This matrix describes capabilities,
+not a claim that every Python import or storage format has an identical
+JavaScript API.
 
 | Python release capability | npm 0.2.0 implementation | Evidence / boundary |
 |---|---|---|
