@@ -1,8 +1,8 @@
 # Rust parity with PyPI Pollard 1.6.0
 
-This work targets the published **`pollard==1.6.0`** wheel, not an editable Python checkout. The native implementation lives in `crates/pollardai` at version 0.2.0. The public 0.1.0 archive does not contain these additions. Follow [the 0.2.0 release receipt](release-0.2.0.md) for publication and final validation status.
+This work targets the published **`pollard==1.6.0`** wheel, not an editable Python checkout. The native implementation lives in `crates/pollardai` at version 0.2.0. The public 0.1.0 archive does not contain these additions. Follow [the 0.2.0 release receipt](https://github.com/jemsbhai/pollard/blob/main/evidence/rust-parity-1.6.0/release-0.2.0.md) for publication and final validation status.
 
-The completed source passes 185 core tests, 205 tests with optional features,
+An earlier checkpoint passed 185 core tests, 205 tests with optional features,
 31 live backend tests, and Python/Rust interchange checks. In the 1,000-call
 MemoryStore workload, recording is 108.56× and strict replay 453.43× faster than
 Python; hybrid hits improve 2.45×. The 200,000-chunk test uses 94.64% less total
@@ -24,12 +24,12 @@ These are local workload measurements, not complete-agent speedups.
 
 - Final validation and benchmark JSON files include source SHA-256 maps, commands, toolchain versions and/or executable hashes. Benchmark workers verify the extracted wheel's contents and imported module path.
 
-`api-inventory.json`, `parity-checklist.json` and `behavior-fixtures.json` are the initial release audit. The checklist describes **baseline gaps**, not remaining gaps. Earlier `storage-validation.json`, `storage-source-sha256.json` and `validation-release.log` are intermediate checkpoints, superseded by the final matrix. The final matrix and backend evidence are the authority for current pass counts.
+`api-inventory.json`, `parity-checklist.json` and `behavior-fixtures.json` are the initial release audit. The checklist describes **baseline gaps**, not remaining gaps. Earlier `storage-validation.json`, `storage-source-sha256.json` and `validation-release.log` are intermediate checkpoints, superseded by the final matrix. The 0.2.0 release receipt identifies the current matrix and backend evidence; the earlier checkpoint remains available for comparison.
 
 Top-level backend validation files and the Linux Kafka TLS log are component checkpoints with their own provenance. The final `final-validation/validation.json` and `remote-validation/summary.json` bind the combined native/live checks to the completed source. Formatting and the final decimal fix happened after some earlier component snapshots.
 
 The tables and `final-validation` receipts below describe the earlier checkpoint.
-The [0.2.0 release receipt](release-0.2.0.md) supersedes its test counts, dependency
+The [0.2.0 release receipt](https://github.com/jemsbhai/pollard/blob/main/evidence/rust-parity-1.6.0/release-0.2.0.md) supersedes its test counts, dependency
 constraints and timing results after the final compatibility fixes.
 
 ## Implemented compatibility
@@ -82,11 +82,11 @@ Remote tests use dedicated local standalone services (MongoDB is a single-node r
 
 The completed-source matrix passed with unchanged source hashes. See
 
-[`final-validation/validation.json`](final-validation/validation.json),
+[`final-validation/validation.json`](https://github.com/jemsbhai/pollard/blob/main/evidence/rust-parity-1.6.0/final-validation/validation.json),
 
-[`remote-validation/summary.json`](remote-validation/summary.json) and the
+[`remote-validation/summary.json`](https://github.com/jemsbhai/pollard/blob/main/evidence/rust-parity-1.6.0/remote-validation/summary.json) and the
 
-[remote interpretation](remote-validation/interpretation.json).
+[remote interpretation](https://github.com/jemsbhai/pollard/blob/main/evidence/rust-parity-1.6.0/remote-validation/interpretation.json).
 
 | Check | Result |
 
@@ -190,7 +190,7 @@ python evidence/rust-parity-1.6.0/stream_memory.py
 
 ## Final performance results
 
-All values below are **batch medians on this one host**. Speedup is comparison time divided by updated Rust time; below 1 means Rust took longer. Raw samples and hashes are in [performance.json](performance.json), [storage-performance.json](storage-performance.json), and [stream-memory.json](stream-memory.json).
+All values below are **batch medians on this one host**. Speedup is comparison time divided by updated Rust time; below 1 means Rust took longer. Raw samples and hashes are in [performance.json](https://github.com/jemsbhai/pollard/blob/main/evidence/rust-parity-1.6.0/performance.json), [storage-performance.json](https://github.com/jemsbhai/pollard/blob/main/evidence/rust-parity-1.6.0/storage-performance.json), and [stream-memory.json](https://github.com/jemsbhai/pollard/blob/main/evidence/rust-parity-1.6.0/stream-memory.json).
 
 ### MemoryStore and identity
 

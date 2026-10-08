@@ -1,0 +1,37 @@
+{
+  "status": "passed",
+  "wheel_sha256": "569fb5f130a82c9be327b8dcbd285e3be063200bd9773ca15c5d6bb62edd627f",
+  "binary_sha256": "a353c9eb6245939217220e457b4a66da0620dd91b50365bbd52ae0835054b18f",
+  "python": "3.12.2 (tags/v3.12.2:6abddd9, Feb  6 2024, 21:26:36) [MSC v.1937 64 bit (AMD64)]",
+  "cases": {
+    "exact_records": {
+      "python_seal": "0d7c238deb57ebf69a79e11873846dc8a3974cfdc7da01f228d49b59a28c3693",
+      "rust_node": "a4f12589eb419723c4697914074519fa715a5b9364b984dfb496732566dfe48f"
+    },
+    "budget": {
+      "live_python_reservation_refused": true,
+      "observed": [
+        {
+          "status": "refused",
+          "dispatched": false,
+          "root_id": "f73098a04dd24bcea64c5e39cb3cd4efec247ee5c26f7d945e022e177be4c93f",
+          "node_id": "098d7fdbbc48c1c7a20164579a0fef261fba95c55485e87ec20284bb1bcb9d8e"
+        }
+      ]
+    },
+    "window": {
+      "live_python_reservation_refused": true,
+      "observed": [
+        {
+          "status": "refused",
+          "dispatched": false,
+          "root_id": "39fd197e85fb9e934ada1dafca9745138ed103dac0ec7bb425c5d7f21ee36043",
+          "node_id": "24677417090296d8c8256ecc92a28a55cc8f64ad5ba3360cdaec438d3e52987f"
+        }
+      ]
+    },
+    "reverse_window": true,
+    "mixed_idempotent_settlement": true
+  },
+  "schema_cleaned": true
+}

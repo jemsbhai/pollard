@@ -1,10 +1,10 @@
 {
-  "started_at": "2026-10-08T15:36:04.697272+00:00",
+  "started_at": "2026-10-08T15:43:22.069375+00:00",
   "platform": "Windows-11-10.0.26300-SP0",
   "python": "3.12.2 (tags/v3.12.2:6abddd9, Feb  6 2024, 21:26:36) [MSC v.1937 64 bit (AMD64)]",
-  "git_base": "51e3a245641044fc8b3d6a90fc49f3cbfcbf107d",
+  "git_base": "15e771aaca2d3e4b4b3fbe8aa833e121a5c5db3b",
   "source_sha256": {
-    ".github/workflows/native.yml": "f6c8af7b28eab17032644058c87dcb5ea69dbeabb552aca3e40cfbec0418615d",
+    ".github/workflows/native.yml": "1d519e675e2219ce91e988eaaa9a604e231232e8e4f8f04599f5aa299c0fa9ec",
     "crates/pollardai/Cargo.lock": "b2e37c2d5126ccecb0b2b70eae412837ae4e3d2af0709ae7a5ab37b4c123589a",
     "crates/pollardai/Cargo.toml": "a4dbe4a3eb3c847ffb719877ef323c5b6ddc161b915d4bd791d94a4adb52e453",
     "crates/pollardai/examples/arbitration_interop.rs": "6063a93db0122b8003a7a449a06112f64c42bcc6083d67ec3e5c8a6d2d77e582",
@@ -21,7 +21,7 @@
     "crates/pollardai/src/adapters.rs": "3b2c206a81c099a11ecd64a538d32bd65f8ee3f84c10185b54773b391887ad2f",
     "crates/pollardai/src/aio.rs": "bac10d6c7ecc45c06a4fbe80256baea10e401df5c0f81bfdf8dc98f3c05be431",
     "crates/pollardai/src/bin/pollard.rs": "48090e9644a7ebdb3c3517544d60f577403a6e0bdead30e1246fbd4091c883cb",
-    "crates/pollardai/src/decimal.rs": "4c529f6e4580141b1fb80a9196a6da692fe9b499641e0776b6eb55ae40eab42b",
+    "crates/pollardai/src/decimal.rs": "fbed4a5932fc64ba80b687f84e361f019ef6d2fb7ee64fac2a36f82b98cfebe4",
     "crates/pollardai/src/decimal_wire.rs": "79e9ba60d7fba9c90495fe22f2eab6c8ec9d43ea270aebfd931702479e633549",
     "crates/pollardai/src/energy.rs": "1b5b61cf22847612de47c27a5904573a295f1563b79db456a5bcada66f510a7e",
     "crates/pollardai/src/estimators.rs": "4dab7fcf285f7ef74906d636c9e65df76687f9e43cb0a7fd3995cdbbc8781f6b",
@@ -55,14 +55,14 @@
     "crates/pollardai/src/tokenmaster.rs": "02159a8ffe2fa318894bee3a84071b6d6913c5d0056c49de30c07b31be974f57",
     "crates/pollardai/tests/adapters_parity.rs": "e472f7c16d1286d1de277ef8778a3e7ba11350d9a6cae13095288b723dc25de8",
     "crates/pollardai/tests/async_stream.rs": "58207b68487de9a9f6efa912cdc1158a559cec18e518dd5b97fc6a7caa812f3d",
-    "crates/pollardai/tests/cli.rs": "b1ea7d98c9cd943479264b640dd4ce45d0721f7b0a809220de3ad1e382771c3d",
+    "crates/pollardai/tests/cli.rs": "c6b4f4d1e0b6728761ac3505dc4179c9976bd5fa46a7be3220b99e7c766393c0",
     "crates/pollardai/tests/core.rs": "f12f19c1ae1ccc855ea49d3cc5f7dc65753e8a9f2e5403b59414138a1d7a97e1",
-    "crates/pollardai/tests/decimal_exact.rs": "042d8b924a72addcf3b6c82876ee02fd0c0b6e7082ebbac91069d3b86b4e4b94",
+    "crates/pollardai/tests/decimal_exact.rs": "7398d6d31f07f1cd222df27e10f736aee8dcd295cf778c28256ded209bd2e7ec",
     "crates/pollardai/tests/display_parity.rs": "ae4bca7e900c2cf003450f70bb22354796b36f79569ef207cf5452a3b3aed66e",
     "crates/pollardai/tests/estimators.rs": "423c443e59a0543316d3c9057b90398dd94468b885939dcd14ce7e65e57b9534",
     "crates/pollardai/tests/generate_adapters_parity.py": "76ffc18041639b8657d94697386a775b34421d2d90b4b057100ab9f441ff1074",
     "crates/pollardai/tests/generate_cli_parity.py": "14b2592051d98ad1bd1c392290a33ad555f401c03ddd7b7a61ff4027b5b18b5c",
-    "crates/pollardai/tests/generate_decimal_wire_parity.py": "bcf6fee83c859c8ebc0c2a0a0f3f96836fa3817d4244ed2d19ca19ef1efd3f45",
+    "crates/pollardai/tests/generate_decimal_wire_parity.py": "49a0532bef7f31758c45a584d9f30438342dcf7923c84fe1cb12ca8e6ac17d04",
     "crates/pollardai/tests/generate_display_parity.py": "8174e20490472e2916a688c4ad3ad13e31f7831e77f1b0acb921e6b69958d465",
     "crates/pollardai/tests/generate_estimator_parity.py": "876ceedfa1be78274968e0cf95c8f641b5f95ec0e3e52672d1d18ba75ee3def3",
     "crates/pollardai/tests/generate_hashrope_parity.py": "04d3f80275ef7f4c4d00f5d611531e6f59cb0f5a113191db279a244e3e1f48f6",
@@ -85,7 +85,7 @@
     "crates/pollardai/tests/postgres_parity.rs": "e5feaea1445a0def15d4453ae3d8dd277dda23ecba836b5010d027913874146b",
     "crates/pollardai/tests/pypi160_adapters.json": "15394221111303890131a6a2499d9606375aa4119ec74dbf2d14b4e5880c6d83",
     "crates/pollardai/tests/pypi160_cli.json": "18da25ce418794ee08e65d469ff45ff7fd253b09e9bd2bb996b778ade646b5f1",
-    "crates/pollardai/tests/pypi160_decimal_wire.json": "54b52c9e2bb865423ea5cd9b410547e897b32bf73f01a8fdc69d470dcad49726",
+    "crates/pollardai/tests/pypi160_decimal_wire.json": "0f5f2d4eeeb7f883e06b18cbd8da51fb8c11defdc65ed9d2aa03f427fac1b916",
     "crates/pollardai/tests/pypi160_display.json": "592829d440ac73b7eab6b27e7c49215a58d2d08d92404cf712269f33da2f0073",
     "crates/pollardai/tests/pypi160_estimators.json": "1e2b9c2abf3a032955a3bbc67b7383d76faefe686f98668cdfbda4f37614fbcb",
     "crates/pollardai/tests/pypi160_hashrope.json": "b66a91bb03767886486960bdb293be170fce94a4e0a072841028f8dc862ff4e0",
@@ -145,7 +145,7 @@
         "--check"
       ],
       "exit_code": 0,
-      "seconds": 0.532612600014545,
+      "seconds": 0.5458167000324465,
       "log": "format.log",
       "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "test_summary": null
@@ -161,7 +161,7 @@
         "--check"
       ],
       "exit_code": 0,
-      "seconds": 0.4552401999826543,
+      "seconds": 0.4585668999934569,
       "log": "format-msrv.log",
       "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "test_summary": null
@@ -180,9 +180,9 @@
         "warnings"
       ],
       "exit_code": 0,
-      "seconds": 2.5405376000562683,
+      "seconds": 2.104725299985148,
       "log": "clippy-default.log",
-      "log_sha256": "3185f1fe1be88db54a494340ef71b781cde3f7b78705a9664e90c1dbc428b78e",
+      "log_sha256": "2beb28958ed05e532c64493002f3947eaf12fd350f9bd09a98cadd9b39dde2c7",
       "test_summary": null
     },
     {
@@ -200,9 +200,9 @@
         "warnings"
       ],
       "exit_code": 0,
-      "seconds": 3.411435700021684,
+      "seconds": 3.1106471000239253,
       "log": "clippy-msrv.log",
-      "log_sha256": "131d007027cb5fd4e9fd14f5434ae5c89faf9926a4de3fa97203b50284b27813",
+      "log_sha256": "f86d4bc95b3bc00f6b06bf0ab0b03fa71b4d404d270e8853019ae7e2543e8233",
       "test_summary": null
     },
     {
@@ -221,9 +221,9 @@
         "warnings"
       ],
       "exit_code": 0,
-      "seconds": 19.363993000006303,
+      "seconds": 3.367964100034442,
       "log": "clippy-optional.log",
-      "log_sha256": "7dabf4b20a8413f2823921f9c80a72aa2b77d815febf75a67a84b13c5a2e660e",
+      "log_sha256": "7a31f1af189836ebabeba891f9582ad8a63b16f1c2ad9c0afe90baf33b102e9f",
       "test_summary": null
     },
     {
@@ -243,9 +243,9 @@
         "warnings"
       ],
       "exit_code": 0,
-      "seconds": 19.51850150001701,
+      "seconds": 4.256792700034566,
       "log": "clippy-optional-msrv.log",
-      "log_sha256": "809b612858e0d83fb2111e3fb5f35801b79f37b003ad726f42a9c0b4f9461a92",
+      "log_sha256": "dc090390599bf702156e14eca002af519ccec20925f38f1ffcd2d594815b5926",
       "test_summary": null
     },
     {
@@ -257,19 +257,198 @@
         "crates/pollardai/Cargo.toml",
         "--locked"
       ],
-      "exit_code": 101,
-      "seconds": 53.13031989999581,
+      "exit_code": 0,
+      "seconds": 9.087068900000304,
       "log": "test-stable.log",
-      "log_sha256": "372ee798ade514b9b771680e4fd0a3c95372e5ba42a419ccc3e861507dd7aa23",
+      "log_sha256": "46536b5f7f811489f42b2a0e16dc9ac84d303035b57fa7ca73b4d306bf67f8a4",
       "test_summary": {
-        "passed": 95,
-        "failed": 1,
+        "passed": 206,
+        "failed": 0,
+        "ignored": 0
+      }
+    },
+    {
+      "name": "test-msrv",
+      "command": [
+        "cargo",
+        "+1.74.0",
+        "test",
+        "--manifest-path",
+        "crates/pollardai/Cargo.toml",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "seconds": 110.95246390003012,
+      "log": "test-msrv.log",
+      "log_sha256": "5220bbcc1f36323397a6c9104325857c91026c997bb9d9346159999e689db19e",
+      "test_summary": {
+        "passed": 206,
+        "failed": 0,
+        "ignored": 0
+      }
+    },
+    {
+      "name": "test-release",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "--manifest-path",
+        "crates/pollardai/Cargo.toml",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "seconds": 96.23923190002097,
+      "log": "test-release.log",
+      "log_sha256": "e638314f45e2f93837db3f95e071dde116fc593b5694ac50d0dbf32791cb2307",
+      "test_summary": {
+        "passed": 206,
+        "failed": 0,
+        "ignored": 0
+      }
+    },
+    {
+      "name": "test-optional",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "crates/pollardai/Cargo.toml",
+        "--locked",
+        "--features",
+        "postgres,redis-tls,mongodb,neo4j,kafka,nvml,estimate-openai"
+      ],
+      "exit_code": 0,
+      "seconds": 277.2296711000381,
+      "log": "test-optional.log",
+      "log_sha256": "053db141553b6681f8d5797ce4ecb2c49652df30fd41c09edf0e8fa2aee5a9bd",
+      "test_summary": {
+        "passed": 226,
+        "failed": 0,
+        "ignored": 33
+      }
+    },
+    {
+      "name": "test-optional-msrv",
+      "command": [
+        "cargo",
+        "+1.74.0",
+        "test",
+        "--manifest-path",
+        "crates/pollardai/Cargo.toml",
+        "--locked",
+        "--features",
+        "postgres,redis-tls,mongodb,neo4j,kafka,nvml,estimate-openai"
+      ],
+      "exit_code": 0,
+      "seconds": 302.4525317000225,
+      "log": "test-optional-msrv.log",
+      "log_sha256": "f343509ac99ccd511b3edd8950e52c5bbc8c112d3b3b1518580f16414fedeb66",
+      "test_summary": {
+        "passed": 226,
+        "failed": 0,
+        "ignored": 33
+      }
+    },
+    {
+      "name": "package",
+      "command": [
+        "cargo",
+        "package",
+        "--manifest-path",
+        "crates/pollardai/Cargo.toml",
+        "--locked",
+        "--allow-dirty"
+      ],
+      "exit_code": 0,
+      "seconds": 12.488057700102217,
+      "log": "package.log",
+      "log_sha256": "98939127d422126cd2e5b4d2f1be03856d7b716760e97988ea8865ea4c11cf7f",
+      "test_summary": null
+    },
+    {
+      "name": "interop-sqlite",
+      "command": [
+        "C:\\Users\\User\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\evidence\\rust-parity-1.6.0\\sqlite_interop.py",
+        "--wheel",
+        "C:\\Users\\User\\AppData\\Local\\Temp\\pollard-release-audit-20261008\\pollard-1.6.0-py3-none-any.whl",
+        "--crate",
+        "crates/pollardai",
+        "--output-dir",
+        ".benchmarks/final-sqlite-interop-6c0f5e8ad459"
+      ],
+      "exit_code": 0,
+      "seconds": 6.34873189998325,
+      "log": "interop-sqlite.log",
+      "log_sha256": "9f0111d52790142c61b89052ed8ad038a231f55c6f44d38c6dde4d8325bf1a27",
+      "test_summary": null
+    },
+    {
+      "name": "interop-arbitration",
+      "command": [
+        "C:\\Users\\User\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\evidence\\rust-parity-1.6.0\\arbitration_interop.py",
+        "--wheel",
+        "C:\\Users\\User\\AppData\\Local\\Temp\\pollard-release-audit-20261008\\pollard-1.6.0-py3-none-any.whl",
+        "--crate",
+        "crates/pollardai",
+        "--output-dir",
+        ".benchmarks/final-arbitration-interop-6c0f5e8ad459"
+      ],
+      "exit_code": 0,
+      "seconds": 5.512794299982488,
+      "log": "interop-arbitration.log",
+      "log_sha256": "78d6cff6a95a6999687d0990b37486120557b005622ded46f7004bb8355df746",
+      "test_summary": null
+    },
+    {
+      "name": "interop-runtime",
+      "command": [
+        "C:\\Users\\User\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "C:\\Users\\User\\.codex\\worktrees\\rust-pypi-parity\\pollard\\evidence\\rust-parity-1.6.0\\runtime_interop.py",
+        "--wheel",
+        "C:\\Users\\User\\AppData\\Local\\Temp\\pollard-release-audit-20261008\\pollard-1.6.0-py3-none-any.whl",
+        "--crate",
+        "crates/pollardai",
+        "--output-dir",
+        ".benchmarks/final-runtime-interop-6c0f5e8ad459"
+      ],
+      "exit_code": 0,
+      "seconds": 6.70936310000252,
+      "log": "interop-runtime.log",
+      "log_sha256": "4157cbc64b2ec8dac1e6df71a056211c92ba6da782c604dd5d8b5503883496bc",
+      "test_summary": null
+    },
+    {
+      "name": "nvml-hardware",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "crates/pollardai/Cargo.toml",
+        "--locked",
+        "--features",
+        "nvml",
+        "--test",
+        "nvml",
+        "--",
+        "--ignored",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 12.226530599989928,
+      "log": "nvml-hardware.log",
+      "log_sha256": "3a4d404078d525a42bfd2e042735bfd5566fcdbca317ba24a4d233b630de550e",
+      "test_summary": {
+        "passed": 1,
+        "failed": 0,
         "ignored": 0
       }
     }
   ],
   "scope": "Native local validation; separate live-service runner and TLS Linux log. Ignored tests are excluded from pass counts.",
-  "finished_at": "2026-10-08T15:37:44.061568+00:00",
+  "finished_at": "2026-10-08T15:57:38.171696+00:00",
   "source_unchanged_during_run": true,
-  "all_checks_passed": false
+  "all_checks_passed": true
 }

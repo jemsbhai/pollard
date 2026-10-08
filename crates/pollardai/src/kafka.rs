@@ -768,7 +768,7 @@ impl Store for KafkaStore {
         Ok(s.view
             .log
             .iter()
-            .flat_map(|value| value.iter().copied().chain([b'\n']))
+            .flat_map(|value| value.iter().copied().chain(*b"\n"))
             .collect())
     }
     fn drop_nodes(&mut self, ids: &BTreeSet<String>) -> Result<()> {

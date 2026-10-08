@@ -90,7 +90,7 @@ The `adapters` module normalizes OpenAI Responses/Chat, Anthropic, Bedrock and L
 | `estimate-openai` | Embedded OpenAI-family BPE token estimator |
 | `nvml` | Explicit NVIDIA NVML energy sampling |
 
-The default build includes Memory, SQLite and HashRope. Kafka builds require CMake and a C/C++ toolchain. `kafka-tls` also requires the vendored OpenSSL build prerequisites (including Perl); it is validated on Linux with Rust 1.74. `nvml` compiles without a GPU but actual sampling requires the local NVIDIA driver/library. Live TLS authentication, replica failover and hardware across vendors have not been tested.
+The default build includes Memory, SQLite and HashRope. Kafka builds require CMake and a C/C++ toolchain; Linux builds also need curl development headers. `kafka-tls` also requires the vendored OpenSSL build prerequisites (including Perl); it is validated on Linux with Rust 1.74. `nvml` compiles without a GPU but actual sampling requires the local NVIDIA driver/library. Live TLS authentication, replica failover and hardware across vendors have not been tested.
 
 ## CLI
 

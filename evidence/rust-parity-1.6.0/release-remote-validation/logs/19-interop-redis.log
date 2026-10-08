@@ -1,0 +1,15 @@
+{
+  "namespace": "python-rust-redis-2574ee12f3a849e183505f2018d44adc",
+  "wheel_sha256": "569fb5f130a82c9be327b8dcbd285e3be063200bd9773ca15c5d6bb62edd627f",
+  "decimal_text_cases": 11,
+  "checks": [
+    "python_to_rust_nodes",
+    "rust_to_python_nodes",
+    "shared_budget_refusal",
+    "cross_language_idempotent_reservation",
+    "exact_decimal_settlement_retry",
+    "different_charge_refusal",
+    "permanent_release_tombstone",
+    "bidirectional_decimal_text_retries"
+  ]
+}

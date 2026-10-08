@@ -1,0 +1,20 @@
+{
+  "status": "passed",
+  "wheel_sha256": "569fb5f130a82c9be327b8dcbd285e3be063200bd9773ca15c5d6bb62edd627f",
+  "python": "3.12.2 (tags/v3.12.2:6abddd9, Feb  6 2024, 21:26:36) [MSC v.1937 64 bit (AMD64)]",
+  "rust": {
+    "python_active_blocked_rust": true,
+    "python_reservation_settled_by_rust": true,
+    "rust_settled_usd": "0.1",
+    "rust_window_active": true
+  },
+  "checks": [
+    "Rust refused active Python budget reservation",
+    "Rust settled Python reservation exactly once",
+    "Python observed Rust-settled budget charge",
+    "Mixed-language decimal charges sum exactly to 0.3",
+    "Python renewed shared reservation lease",
+    "Python refused active Rust window reservation",
+    "Python settled Rust window reservation and retained its sliding-window charge"
+  ]
+}

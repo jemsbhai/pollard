@@ -3,7 +3,7 @@
 # read-only at /source. Build products and package installations stay in it.
 set -eu
 apt-get update
-apt-get install -y --no-install-recommends cmake pkg-config
+apt-get install -y --no-install-recommends cmake pkg-config libcurl4-openssl-dev perl
 mkdir -p /work
 tar -C /source/crates/pollardai --exclude=target -cf - . | tar -C /work -xf -
 cd /work

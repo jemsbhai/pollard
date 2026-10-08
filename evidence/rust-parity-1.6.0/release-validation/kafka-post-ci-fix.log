@@ -1,0 +1,18 @@
+   Compiling pollardai v0.2.0 (C:\Users\User\.codex\worktrees\rust-pypi-parity\pollard\crates\pollardai)
+    Finished test [unoptimized + debuginfo] target(s) in 23.14s
+     Running unittests src\lib.rs (crates\pollardai\target\debug\deps\pollardai-de619f846f2aa905.exe)
+
+running 10 tests
+test kafka::tests::kafka_requires_full_history_topic_config_and_existing_before_producer ... ok
+test kafka::tests::kafka_uncertain_ack_recovers_and_unobserved_commands_fail_explicitly ... ok
+test kafka::tests::kafka_logical_missing_parent_outcome_does_not_poison_later_valid_records ... ok
+test kafka::tests::kafka_wire_bytes_match_pypi_160_oracle ... ok
+test kafka::tests::kafka_staging_publishes_only_settlement_and_only_transient_nodes_can_drop ... ok
+test kafka::tests::kafka_envelopes_reject_noncanonical_tampered_or_unscoped_messages ... ok
+test kafka::tests::kafka_readonly_freezes_snapshot_and_reconnect_is_atomic_with_prefix_check ... ok
+test kafka::tests::kafka_detects_truncated_watermarks_offset_gaps_and_wrong_partition ... ok
+test kafka::tests::kafka_roundtrip_idempotency_conflicts_and_ordered_metadata ... ok
+test kafka::tests::kafka_acknowledged_replay_failure_reconnects_before_success ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 9 filtered out; finished in 0.01s
+

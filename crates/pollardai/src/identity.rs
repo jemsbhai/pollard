@@ -69,7 +69,7 @@ fn write(value: &Value, out: &mut Vec<u8>, identity: bool) -> Result<()> {
         Value::Object(obj) => {
             out.push(b'{');
             let mut entries: Vec<_> = obj.iter().collect();
-            entries.sort_unstable_by(|(left, _), (right, _)| left.cmp(right));
+            entries.sort_unstable_by_key(|(key, _)| *key);
             for (index, (key, value)) in entries.into_iter().enumerate() {
                 if index != 0 {
                     out.push(b',');

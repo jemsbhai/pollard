@@ -148,7 +148,7 @@ jobs:
           toolchain: ${{ matrix.toolchain }}
           components: clippy
       - name: Native TLS and Kafka build prerequisites
-        run: sudo apt-get update && sudo apt-get install -y cmake pkg-config libssl-dev perl
+        run: sudo apt-get update && sudo apt-get install -y cmake pkg-config libssl-dev libcurl4-openssl-dev perl
       - name: Strict optional-feature lint
         run: cargo clippy --manifest-path crates/pollardai/Cargo.toml --locked --all-features --all-targets -- -D warnings
       - name: Optional-feature unit and fault tests
@@ -172,7 +172,7 @@ jobs:
           toolchain: "1.74.0"
       - name: Native build prerequisites
         if: matrix.features == 'all'
-        run: sudo apt-get update && sudo apt-get install -y cmake pkg-config libssl-dev perl
+        run: sudo apt-get update && sudo apt-get install -y cmake pkg-config libssl-dev libcurl4-openssl-dev perl
       - name: Resolve and run a new downstream application
         run: >-
           python evidence/rust-parity-1.6.0/validate_consumer.py
@@ -203,7 +203,7 @@ jobs:
         with:
           toolchain: stable
       - name: Native build prerequisites
-        run: sudo apt-get update && sudo apt-get install -y cmake pkg-config libssl-dev perl
+        run: sudo apt-get update && sudo apt-get install -y cmake pkg-config libssl-dev libcurl4-openssl-dev perl
       - name: Disposable-service ownership and failure guards
         run: python -m unittest discover -s evidence/rust-parity-1.6.0 -p test_validate_remote.py -v
       - name: Validate isolated PostgreSQL, Redis, Kafka, MongoDB and Neo4j

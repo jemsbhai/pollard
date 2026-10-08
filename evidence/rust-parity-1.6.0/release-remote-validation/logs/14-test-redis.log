@@ -1,0 +1,16 @@
+   Compiling pollardai v0.2.0 (C:\Users\User\.codex\worktrees\rust-pypi-parity\pollard\crates\pollardai)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 43.65s
+     Running tests\redis_store.rs (crates\pollardai\target\debug\deps\redis_store-36b28a42c9a664bb.exe)
+
+running 8 tests
+test redis_crud_raw_result_conflicts_and_runtime_replay ... ok
+test redis_independent_clients_arbitrate_exactly_once ... ok
+test redis_lost_connection_reconnects_and_bad_utf8_fails_closed ... ok
+test redis_lost_exec_reply_retries_committed_reservation_and_settlement ... ok
+test redis_metadata_updates_keep_every_concurrent_patch ... ok
+test redis_readonly_missing_namespace_and_schema_loss_never_repair ... ok
+test redis_rejects_url_decoding_overrides_before_connection ... ok
+test redis_revision_overflow_and_wrong_bucket_types_never_partially_commit ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.51s
+

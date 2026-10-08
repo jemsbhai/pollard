@@ -1,0 +1,14 @@
+   Compiling pollardai v0.2.0 (C:\Users\User\.codex\worktrees\rust-pypi-parity\pollard\crates\pollardai)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.30s
+     Running tests\neo4j_parity.rs (crates\pollardai\target\debug\deps\neo4j_parity-204e9d85d3502ec7.exe)
+
+running 6 tests
+test exact_decimal_reservations_retry_expiry_and_tombstones ... ok
+test independent_routed_connections_contend_on_one_window ... ok
+test missing_constraint_is_never_silently_repaired ... ok
+test native_routed_records_manifests_seals_bookmarks_and_rollback ... ok
+test readonly_corrupt_identity_and_coordinator_fail_closed ... ok
+test runtime_shared_budget_and_replay_never_redispatch ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.95s
+

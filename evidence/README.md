@@ -140,7 +140,7 @@ final integrated wheel produces a provenance-checked raw result.
 
 ## Rust parity with PyPI 1.6.0
 
-The [native parity report](rust-parity-1.6.0/README.md) records the compatibility
+The [native parity report](https://github.com/jemsbhai/pollard/blob/main/evidence/rust-parity-1.6.0/README.md) records the compatibility
 matrix, live backend checks, Rust1.74 support, exact release oracle and
 reproducible timing/memory experiments. This is separate from EXP-007. Raw
 samples and source/executable hashes accompany measured ratios and regressions;
