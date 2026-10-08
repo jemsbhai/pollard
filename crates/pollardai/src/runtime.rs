@@ -533,7 +533,8 @@ impl Runtime {
                 nodes.push(node);
             }
             // External commits can race individual SELECTs. Never cache or use a
-            // prefix assembled across revisions; repeated contention fails closed.
+            // prefix assembled across revisions. Sustained contention falls back
+            // to a backend snapshot rather than treating valid writes as tampering.
             if self.store.borrow().cache_revision() != revision {
                 self.store.synchronize_index();
                 continue;
@@ -548,9 +549,33 @@ impl Runtime {
             }
             return Ok(result);
         }
+        *self.store.0.index.borrow_mut() = RuntimeIndex::default();
+        if let Some(nodes) = self.ancestry_snapshot(id)? {
+            // Never assign a historical snapshot to the current live revision.
+            return Ok(nodes.into_iter().next().expect("snapshot is nonempty"));
+        }
         Err(Error::Integrity(
             "recording changed repeatedly during verification".into(),
         ))
+    }
+
+    fn ancestry_snapshot(&self, id: &str) -> Result<Option<Vec<Node>>> {
+        let Some(nodes) = self.store.borrow().ancestry_snapshot(id)? else {
+            return Ok(None);
+        };
+        let mut expected = Some(id);
+        let mut seen = BTreeSet::new();
+        for node in &nodes {
+            if expected != Some(node.id.as_str()) || !seen.insert(&node.id) {
+                return Err(Error::Integrity("invalid ancestry snapshot".into()));
+            }
+            node.validate()?;
+            expected = node.parent.as_deref();
+        }
+        if expected.is_some() || nodes.is_empty() {
+            return Err(Error::Integrity("incomplete ancestry snapshot".into()));
+        }
+        Ok(Some(nodes))
     }
 
     fn structural(&self, candidate: Node) -> Result<Node> {
@@ -1431,6 +1456,26 @@ impl Run {
             }
             return Ok(total);
         }
+        *self.runtime.store.0.index.borrow_mut() = RuntimeIndex::default();
+        if let Some(nodes) = self.runtime.store.borrow().subtree_snapshot(anchor)? {
+            let mut seen = BTreeSet::new();
+            let mut total = MeterCharges::new();
+            for node in &nodes {
+                if (seen.is_empty() && node.id != anchor)
+                    || (!seen.is_empty()
+                        && !node.parent.as_ref().is_some_and(|id| seen.contains(id)))
+                    || !seen.insert(node.id.clone())
+                {
+                    return Err(Error::Integrity("invalid subtree snapshot".into()));
+                }
+                node.validate()?;
+                add_amounts(&mut total, &meter_charges_from_meta(&node.meta)?)?;
+            }
+            if nodes.is_empty() {
+                return Err(Error::Integrity("incomplete subtree snapshot".into()));
+            }
+            return Ok(total);
+        }
         Err(Error::Integrity(
             "recording changed repeatedly during accounting".into(),
         ))
@@ -1445,6 +1490,11 @@ impl Run {
             if let Some((_, _, depth)) = self.runtime.store.0.index.borrow().ancestry.get(node_id) {
                 return Ok(*depth);
             }
+        }
+
+        if let Some(nodes) = self.runtime.ancestry_snapshot(node_id)? {
+            return u64::try_from(nodes.len() - 1)
+                .map_err(|_| Error::Integrity("depth overflow".into()));
         }
 
         let mut current = Some(node_id.to_owned());

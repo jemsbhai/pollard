@@ -55,6 +55,10 @@ struct ObservedStore {
     after_get: Option<Hook>,
     after_patch: Option<Hook>,
     cache_available: Rc<Cell<bool>>,
+    snapshots_available: bool,
+    ancestry_snapshots: Rc<Cell<usize>>,
+    subtree_snapshots: Rc<Cell<usize>>,
+    after_subtree_snapshot: Option<Hook>,
 }
 impl ObservedStore {
     fn new(db: &Database) -> Self {
@@ -64,6 +68,10 @@ impl ObservedStore {
             after_get: None,
             after_patch: None,
             cache_available: Rc::new(Cell::new(true)),
+            snapshots_available: true,
+            ancestry_snapshots: Rc::new(Cell::new(0)),
+            subtree_snapshots: Rc::new(Cell::new(0)),
+            after_subtree_snapshot: None,
         }
     }
 }
@@ -100,6 +108,25 @@ impl Store for ObservedStore {
     }
 }
 impl RecordingStore for ObservedStore {
+    fn ancestry_snapshot(&self, id: &str) -> Result<Option<Vec<Node>>> {
+        if !self.snapshots_available {
+            return Ok(None);
+        }
+        self.ancestry_snapshots
+            .set(self.ancestry_snapshots.get() + 1);
+        self.store.ancestry_snapshot(id)
+    }
+    fn subtree_snapshot(&self, root: &str) -> Result<Option<Vec<Node>>> {
+        if !self.snapshots_available {
+            return Ok(None);
+        }
+        self.subtree_snapshots.set(self.subtree_snapshots.get() + 1);
+        let snapshot = self.store.subtree_snapshot(root)?;
+        if let Some(hook) = &self.after_subtree_snapshot {
+            hook(root);
+        }
+        Ok(snapshot)
+    }
     fn finalize(&mut self, node: Node) -> Result<()> {
         self.store.finalize(node)
     }
@@ -398,4 +425,155 @@ fn failed_write_invalidates_local_token_without_changing_records() {
     assert_eq!(before.external, after.external);
     assert_eq!(store.walk(&root).unwrap().len(), 2);
     assert!(verify_subtree(&store, &root).ok);
+}
+
+fn churn_on_read(db: &Database, enabled: Rc<Cell<bool>>) -> Hook {
+    let path = db.0.clone();
+    Rc::new(move |_| {
+        if enabled.get() {
+            rusqlite::Connection::open(&path)
+                .unwrap()
+                .execute_batch("INSERT INTO kv(k,v) VALUES('snapshot_churn','1') ON CONFLICT(k) DO UPDATE SET v=CAST(CAST(v AS INTEGER)+1 AS TEXT)")
+                .unwrap();
+        }
+    })
+}
+
+#[test]
+fn sustained_commits_fall_back_to_snapshots_without_caching_historical_data() {
+    let db = Database::new();
+    let (root, ids) = setup(&db, 3);
+    let mut store = ObservedStore::new(&db);
+    let enabled = Rc::new(Cell::new(true));
+    store.after_get = Some(churn_on_read(&db, enabled.clone()));
+    store.after_subtree_snapshot = Some(mutate_once(
+        &db,
+        root.clone(),
+        ids[0].clone(),
+        "UPDATE nodes SET meta='{\"charges\":{\"steps\":9}}' WHERE id=?1",
+    ));
+    let ancestry_snapshots = store.ancestry_snapshots.clone();
+    let subtree_snapshots = store.subtree_snapshots.clone();
+    let runtime = Runtime::new(store, ReplayMode::Replay);
+    let mut run = runtime
+        .run(
+            "cache",
+            Some(Budget {
+                depth: Some(4),
+                ..Default::default()
+            }),
+            0,
+        )
+        .unwrap();
+    run.model_call(payload(0), CallOptions::default(), |_| panic!("dispatch"))
+        .unwrap();
+    assert!(ancestry_snapshots.get() > 0);
+    assert_eq!(run.report().unwrap().spent["steps"], 3.0);
+    assert_eq!(subtree_snapshots.get(), 1);
+    enabled.set(false);
+    assert_eq!(run.report().unwrap().spent["steps"], 11.0);
+    db.sql("UPDATE nodes SET payload='{}' WHERE id=?1", &root);
+    assert!(run
+        .model_call(payload(1), CallOptions::default(), |_| panic!(
+            "tampered dispatch"
+        ))
+        .is_err());
+}
+
+#[test]
+fn snapshot_fallback_still_rejects_tampering_and_missing_ancestors() {
+    for remove in [false, true] {
+        let db = Database::new();
+        let (root, _) = setup(&db, 2);
+        let mut store = ObservedStore::new(&db);
+        let reads = Rc::new(Cell::new(0));
+        let calls = reads.clone();
+        let path = db.0.clone();
+        store.after_get = Some(Rc::new(move |_| {
+            calls.set(calls.get() + 1);
+            let connection = rusqlite::Connection::open(&path).unwrap();
+            connection
+                .execute_batch("INSERT INTO kv(k,v) VALUES('snapshot_churn','1') ON CONFLICT(k) DO UPDATE SET v=CAST(CAST(v AS INTEGER)+1 AS TEXT)")
+                .unwrap();
+            if calls.get() == 3 {
+                connection
+                    .execute(
+                        if remove {
+                            "DELETE FROM nodes WHERE id=?1"
+                        } else {
+                            "UPDATE nodes SET payload='{}' WHERE id=?1"
+                        },
+                        [&root],
+                    )
+                    .unwrap();
+            }
+        }));
+        let snapshots = store.ancestry_snapshots.clone();
+        let runtime = Runtime::new(store, ReplayMode::Replay);
+        assert!(runtime.run("cache", None, 0).is_err());
+        assert_eq!(snapshots.get(), 1);
+        assert_eq!(reads.get(), 3);
+    }
+}
+
+#[test]
+fn backend_without_snapshots_keeps_failing_closed_under_continuous_changes() {
+    let db = Database::new();
+    setup(&db, 1);
+    let mut store = ObservedStore::new(&db);
+    store.snapshots_available = false;
+    store.after_get = Some(churn_on_read(&db, Rc::new(Cell::new(true))));
+    let runtime = Runtime::new(store, ReplayMode::Replay);
+    assert!(matches!(
+        runtime.run("cache", None, 0),
+        Err(Error::Integrity(_))
+    ));
+}
+
+#[test]
+fn sqlite_snapshot_checks_external_ancestry_and_releases_failed_transactions() {
+    let db = Database::new();
+    let (root, ids) = setup(&db, 2);
+    let store = SQLiteStore::open_read_only(&db.0).unwrap();
+    assert_eq!(store.ancestry_snapshot(&ids[1]).unwrap().unwrap().len(), 3);
+    assert_eq!(store.subtree_snapshot(&ids[0]).unwrap().unwrap().len(), 2);
+    db.sql("UPDATE nodes SET payload='{}' WHERE id=?1", &root);
+    assert!(store.subtree_snapshot(&ids[0]).is_err());
+    assert!(store.ancestry_snapshot(&ids[1]).is_err());
+    assert!(
+        store.cache_revision().is_some(),
+        "failed snapshot left an open transaction"
+    );
+}
+
+#[test]
+fn depth_budget_uses_verified_snapshot_when_concurrent_commits_prevent_caching() {
+    let db = Database::new();
+    setup(&db, 2);
+    let mut store = ObservedStore::new(&db);
+    store.after_get = Some(churn_on_read(&db, Rc::new(Cell::new(true))));
+    let snapshots = store.ancestry_snapshots.clone();
+    let runtime = Runtime::new(store, ReplayMode::Hybrid);
+    let mut run = runtime
+        .run(
+            "cache",
+            Some(Budget {
+                depth: Some(2),
+                ..Default::default()
+            }),
+            0,
+        )
+        .unwrap();
+    for i in 0..2 {
+        run.model_call(payload(i), CallOptions::default(), |_| {
+            panic!("replay dispatched")
+        })
+        .unwrap();
+    }
+    let before = snapshots.get();
+    assert!(matches!(
+        run.model_call(payload(2), CallOptions::default(), |_| panic!("depth refusal dispatched")),
+        Err(Error::BudgetExceeded { meter, .. }) if meter == "depth"
+    ));
+    assert!(snapshots.get() > before);
 }

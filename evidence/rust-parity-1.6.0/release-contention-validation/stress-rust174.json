@@ -1,0 +1,10 @@
+{
+  "toolchain": "1.74.0",
+  "test": "sqlite_runtime_arbitrates_concurrent_dispatches_and_shared_window",
+  "iterations": 20,
+  "workers_per_scenario": 8,
+  "scenarios_per_iteration": 2,
+  "status": "passed",
+  "seconds": 11.336865425109863,
+  "binary_sha256": "a6a81ca354db3400b072fa1da0105205ef291423c0ad8117ded0ea5f0353289f"
+}

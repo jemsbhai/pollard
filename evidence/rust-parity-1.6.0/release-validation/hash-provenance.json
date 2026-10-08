@@ -1,0 +1,282 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-10-08T16:15:45.231264+00:00",
+  "captured_git_head": "8176e3a3277039fcfcac9d1d665ec802a7118697",
+  "original_receipt": "evidence/rust-parity-1.6.0/release-validation/validation.json",
+  "original_receipt_working_sha256": "54baf9fe4125e4216f9e224dc1f96bd52d134519f5b80aa5a91c3a7dfb028e18",
+  "purpose": "Preserve original validation hashes and distinguish platform line endings from post-validation source edits. This is provenance, not a replacement validation result.",
+  "hash_definition": "SHA-256 of raw file bytes; lf_sha256 replaces only CRLF with LF before hashing.",
+  "evidence_artifact_policy": "Evidence .log and .json files are stored with Git -text, preserving the raw bytes hashed by receipts. Code, manifests, and crate fixtures retain their existing Git text normalization.",
+  "source_paths_checked": 129,
+  "line_ending_only_source_mappings": [
+    {
+      "path": "crates/pollardai/Cargo.toml",
+      "recorded_raw_sha256": "a4dbe4a3eb3c847ffb719877ef323c5b6ddc161b915d4bd791d94a4adb52e453",
+      "current_working_raw_sha256": "a4dbe4a3eb3c847ffb719877ef323c5b6ddc161b915d4bd791d94a4adb52e453",
+      "current_working_lf_sha256": "6571ee27ad40a54b123402a418eae77bdb1bd11778d82cefd3f5cf86d70d7dab",
+      "captured_index_sha256": "6571ee27ad40a54b123402a418eae77bdb1bd11778d82cefd3f5cf86d70d7dab",
+      "captured_index_git_blob": "6e7a77ba5ac1d63d4bfc5444569b17c884876dd9",
+      "working_crlf_count": 59,
+      "classification": "recorded_windows_bytes_match; Git index differs only by CRLF-to-LF normalization"
+    },
+    {
+      "path": "crates/pollardai/src/neo4j.rs",
+      "recorded_raw_sha256": "29236cd8daffca6a2327c478886c46480ceb1dbf20a2a1dd7d451aef5b1af371",
+      "current_working_raw_sha256": "29236cd8daffca6a2327c478886c46480ceb1dbf20a2a1dd7d451aef5b1af371",
+      "current_working_lf_sha256": "42406fff2cbaf1e655489e4472d4d976750ad724d6bbb47243bccc885669b839",
+      "captured_index_sha256": "42406fff2cbaf1e655489e4472d4d976750ad724d6bbb47243bccc885669b839",
+      "captured_index_git_blob": "e9c60d3ffc8b534552a4a0d3a7a31c7f3459d0a2",
+      "working_crlf_count": 507,
+      "classification": "recorded_windows_bytes_match; Git index differs only by CRLF-to-LF normalization"
+    },
+    {
+      "path": "crates/pollardai/tests/pypi160_adapters.json",
+      "recorded_raw_sha256": "15394221111303890131a6a2499d9606375aa4119ec74dbf2d14b4e5880c6d83",
+      "current_working_raw_sha256": "15394221111303890131a6a2499d9606375aa4119ec74dbf2d14b4e5880c6d83",
+      "current_working_lf_sha256": "f7357729094dfd3c195f98d2f0fbb9bf43c0598de205ccb5bbbe127fb773d17e",
+      "captured_index_sha256": "f7357729094dfd3c195f98d2f0fbb9bf43c0598de205ccb5bbbe127fb773d17e",
+      "captured_index_git_blob": "542de5be6af7c7de8ce94ca90351d3b76ace5382",
+      "working_crlf_count": 9448,
+      "classification": "recorded_windows_bytes_match; Git index differs only by CRLF-to-LF normalization"
+    },
+    {
+      "path": "crates/pollardai/tests/pypi160_cli.json",
+      "recorded_raw_sha256": "18da25ce418794ee08e65d469ff45ff7fd253b09e9bd2bb996b778ade646b5f1",
+      "current_working_raw_sha256": "18da25ce418794ee08e65d469ff45ff7fd253b09e9bd2bb996b778ade646b5f1",
+      "current_working_lf_sha256": "78d05192afbcb1730912e0123be8a8de0f746b6287ae4f4c21ef910ee49e1cd2",
+      "captured_index_sha256": "78d05192afbcb1730912e0123be8a8de0f746b6287ae4f4c21ef910ee49e1cd2",
+      "captured_index_git_blob": "ed06b3f5e816dc6162184ee68c3c428d046d0027",
+      "working_crlf_count": 544,
+      "classification": "recorded_windows_bytes_match; Git index differs only by CRLF-to-LF normalization"
+    },
+    {
+      "path": "crates/pollardai/tests/pypi160_decimal_wire.json",
+      "recorded_raw_sha256": "0f5f2d4eeeb7f883e06b18cbd8da51fb8c11defdc65ed9d2aa03f427fac1b916",
+      "current_working_raw_sha256": "0f5f2d4eeeb7f883e06b18cbd8da51fb8c11defdc65ed9d2aa03f427fac1b916",
+      "current_working_lf_sha256": "959bb1672eb5dca35b6a32d3a0b8f8e229d6a4c89de949d7bbb8f73759b5884e",
+      "captured_index_sha256": "959bb1672eb5dca35b6a32d3a0b8f8e229d6a4c89de949d7bbb8f73759b5884e",
+      "captured_index_git_blob": "4d9533a9b3711c3eb542b1cef31908e436620720",
+      "working_crlf_count": 1942,
+      "classification": "recorded_windows_bytes_match; Git index differs only by CRLF-to-LF normalization"
+    },
+    {
+      "path": "crates/pollardai/tests/pypi160_display.json",
+      "recorded_raw_sha256": "592829d440ac73b7eab6b27e7c49215a58d2d08d92404cf712269f33da2f0073",
+      "current_working_raw_sha256": "592829d440ac73b7eab6b27e7c49215a58d2d08d92404cf712269f33da2f0073",
+      "current_working_lf_sha256": "10ac768afc9bc2b3425ebd07c32f1d49cd2217248ee73921eaab6dcb03ad404b",
+      "captured_index_sha256": "10ac768afc9bc2b3425ebd07c32f1d49cd2217248ee73921eaab6dcb03ad404b",
+      "captured_index_git_blob": "74330af4cc65a62110a2443da6b00d83d0a99b16",
+      "working_crlf_count": 364,
+      "classification": "recorded_windows_bytes_match; Git index differs only by CRLF-to-LF normalization"
+    },
+    {
+      "path": "crates/pollardai/tests/pypi160_estimators.json",
+      "recorded_raw_sha256": "1e2b9c2abf3a032955a3bbc67b7383d76faefe686f98668cdfbda4f37614fbcb",
+      "current_working_raw_sha256": "1e2b9c2abf3a032955a3bbc67b7383d76faefe686f98668cdfbda4f37614fbcb",
+      "current_working_lf_sha256": "1c348112b271dddd4c1b88dfefe40c473167dd6ac15497fbb9a1011c6b6fe921",
+      "captured_index_sha256": "1c348112b271dddd4c1b88dfefe40c473167dd6ac15497fbb9a1011c6b6fe921",
+      "captured_index_git_blob": "4822b7d29250435b5869c3fd852d90b83398a201",
+      "working_crlf_count": 2544,
+      "classification": "recorded_windows_bytes_match; Git index differs only by CRLF-to-LF normalization"
+    },
+    {
+      "path": "crates/pollardai/tests/pypi160_hashrope.json",
+      "recorded_raw_sha256": "b66a91bb03767886486960bdb293be170fce94a4e0a072841028f8dc862ff4e0",
+      "current_working_raw_sha256": "b66a91bb03767886486960bdb293be170fce94a4e0a072841028f8dc862ff4e0",
+      "current_working_lf_sha256": "3315947c0b8c97c022de8349237d369fe175320a7c3450abc5192743917c9bf1",
+      "captured_index_sha256": "3315947c0b8c97c022de8349237d369fe175320a7c3450abc5192743917c9bf1",
+      "captured_index_git_blob": "59d2d927a9182811599bb64f6554b9f71f4c0e1a",
+      "working_crlf_count": 345,
+      "classification": "recorded_windows_bytes_match; Git index differs only by CRLF-to-LF normalization"
+    },
+    {
+      "path": "crates/pollardai/tests/pypi160_identity_registry.json",
+      "recorded_raw_sha256": "5812c6ff4ce76d867a54e43d06e18259be013c91b6868937b69c7dc75c02e721",
+      "current_working_raw_sha256": "5812c6ff4ce76d867a54e43d06e18259be013c91b6868937b69c7dc75c02e721",
+      "current_working_lf_sha256": "a43b863b866ac517afa7144f640a62598219be376e7cbe924a4f68bd3fd27fb4",
+      "captured_index_sha256": "a43b863b866ac517afa7144f640a62598219be376e7cbe924a4f68bd3fd27fb4",
+      "captured_index_git_blob": "31d0de6a08055b207ab2661b8c9dd4f83d6f4675",
+      "working_crlf_count": 8578,
+      "classification": "recorded_windows_bytes_match; Git index differs only by CRLF-to-LF normalization"
+    },
+    {
+      "path": "crates/pollardai/tests/pypi160_integrations.json",
+      "recorded_raw_sha256": "588233efe36d7b97a6a24ec57446e916facb18c3ae68ede539ee8a746c7cc58a",
+      "current_working_raw_sha256": "588233efe36d7b97a6a24ec57446e916facb18c3ae68ede539ee8a746c7cc58a",
+      "current_working_lf_sha256": "30172ffec358f740f2ce2ad1bc936799b7b83e800d261d9b593e70cddb362f30",
+      "captured_index_sha256": "30172ffec358f740f2ce2ad1bc936799b7b83e800d261d9b593e70cddb362f30",
+      "captured_index_git_blob": "3a726f2c2f50ee5d7ac21a31f3aebadb978ca0bd",
+      "working_crlf_count": 1543,
+      "classification": "recorded_windows_bytes_match; Git index differs only by CRLF-to-LF normalization"
+    },
+    {
+      "path": "crates/pollardai/tests/pypi160_kafka.json",
+      "recorded_raw_sha256": "1728d4fe97163fe511c169bf4ead96b9a06e909d4c5dbd05628b6f3ca415198c",
+      "current_working_raw_sha256": "1728d4fe97163fe511c169bf4ead96b9a06e909d4c5dbd05628b6f3ca415198c",
+      "current_working_lf_sha256": "7989699b06dff80e79e4c4e1996709d498a9f1e90c154ac7dbb133172fab8857",
+      "captured_index_sha256": "7989699b06dff80e79e4c4e1996709d498a9f1e90c154ac7dbb133172fab8857",
+      "captured_index_git_blob": "e235cfc7eccc541f406380def9a2fa3892a2348d",
+      "working_crlf_count": 59,
+      "classification": "recorded_windows_bytes_match; Git index differs only by CRLF-to-LF normalization"
+    },
+    {
+      "path": "crates/pollardai/tests/pypi160_kv.json",
+      "recorded_raw_sha256": "72471eaf6356223421ea7cdb86734fafe215f44f6a8dd8f3e987cac574107eb7",
+      "current_working_raw_sha256": "72471eaf6356223421ea7cdb86734fafe215f44f6a8dd8f3e987cac574107eb7",
+      "current_working_lf_sha256": "da08d6ae259b9a97c76ed7279f6364f00260cf8459d2c2781a87d3579a69aeda",
+      "captured_index_sha256": "da08d6ae259b9a97c76ed7279f6364f00260cf8459d2c2781a87d3579a69aeda",
+      "captured_index_git_blob": "9fc36fa4fc6ed2d0b8a996f7c971643a3859f24e",
+      "working_crlf_count": 923,
+      "classification": "recorded_windows_bytes_match; Git index differs only by CRLF-to-LF normalization"
+    },
+    {
+      "path": "crates/pollardai/tests/pypi160_revalidation.json",
+      "recorded_raw_sha256": "5348efdc7bed0b6ef0d373bee1b7a31f0f6fc9f43892282cc5539a313866921a",
+      "current_working_raw_sha256": "5348efdc7bed0b6ef0d373bee1b7a31f0f6fc9f43892282cc5539a313866921a",
+      "current_working_lf_sha256": "0ed66f9faecd46572dcfcaea8cf27177c46baeddc7e662c12022a7e9a013fe47",
+      "captured_index_sha256": "0ed66f9faecd46572dcfcaea8cf27177c46baeddc7e662c12022a7e9a013fe47",
+      "captured_index_git_blob": "b72246da33dd28668ddd9e2f429f100116bf5b48",
+      "working_crlf_count": 5516,
+      "classification": "recorded_windows_bytes_match; Git index differs only by CRLF-to-LF normalization"
+    },
+    {
+      "path": "crates/pollardai/tests/pypi160_tokenmaster020.json",
+      "recorded_raw_sha256": "387215abfe31c20b9be733badb8d28b392f33f9a2a24b78b7339a5f4a5593a2d",
+      "current_working_raw_sha256": "387215abfe31c20b9be733badb8d28b392f33f9a2a24b78b7339a5f4a5593a2d",
+      "current_working_lf_sha256": "be332e47e090eddd228079c3513313a08d868154e1c84d8aa255bfd7aca4c926",
+      "captured_index_sha256": "be332e47e090eddd228079c3513313a08d868154e1c84d8aa255bfd7aca4c926",
+      "captured_index_git_blob": "3e221a3e67be137c94db2ee3c1dc7386290d3255",
+      "working_crlf_count": 10700,
+      "classification": "recorded_windows_bytes_match; Git index differs only by CRLF-to-LF normalization"
+    },
+    {
+      "path": "crates/pollardai/tests/python_behavior.json",
+      "recorded_raw_sha256": "5281bf2f667ae22b809d2517efd6abacb83a4b7ab343b20217391530823b325b",
+      "current_working_raw_sha256": "5281bf2f667ae22b809d2517efd6abacb83a4b7ab343b20217391530823b325b",
+      "current_working_lf_sha256": "fd85d45c5f045fa5d6f7481a744f60632dd4c3fb2b98d4dc9811255797f4cd3e",
+      "captured_index_sha256": "fd85d45c5f045fa5d6f7481a744f60632dd4c3fb2b98d4dc9811255797f4cd3e",
+      "captured_index_git_blob": "aaafc210b7218b2d071f826ec19563780162cfde",
+      "working_crlf_count": 309,
+      "classification": "recorded_windows_bytes_match; Git index differs only by CRLF-to-LF normalization"
+    },
+    {
+      "path": "crates/pollardai/tests/python_first_run.json",
+      "recorded_raw_sha256": "ee6095e66b17e936c1277aa3c1d2d8a46f3674148e880c6edfc98372e196ff19",
+      "current_working_raw_sha256": "ee6095e66b17e936c1277aa3c1d2d8a46f3674148e880c6edfc98372e196ff19",
+      "current_working_lf_sha256": "87c709d32d20cf249101d136b5580c5d9b404e5120725251916dfab95ba234f5",
+      "captured_index_sha256": "87c709d32d20cf249101d136b5580c5d9b404e5120725251916dfab95ba234f5",
+      "captured_index_git_blob": "984ba0aa77bcc86599aaf3b4ad2bcacdc74fcf89",
+      "working_crlf_count": 51,
+      "classification": "recorded_windows_bytes_match; Git index differs only by CRLF-to-LF normalization"
+    },
+    {
+      "path": "crates/pollardai/tests/seal_custody.rs",
+      "recorded_raw_sha256": "f905d67c01a71409b30b6759c51a9cf4c952d3d7cb2a62eca8372322366331e9",
+      "current_working_raw_sha256": "f905d67c01a71409b30b6759c51a9cf4c952d3d7cb2a62eca8372322366331e9",
+      "current_working_lf_sha256": "ff482a7051fdcff5eda35b71dad92572bb13460806f6a3e25fe1af876822a35f",
+      "captured_index_sha256": "ff482a7051fdcff5eda35b71dad92572bb13460806f6a3e25fe1af876822a35f",
+      "captured_index_git_blob": "7c461886fceed5576ea711af6339c819884b4efb",
+      "working_crlf_count": 154,
+      "classification": "recorded_windows_bytes_match; Git index differs only by CRLF-to-LF normalization"
+    },
+    {
+      "path": "crates/pollardai/tests/storage_parity.rs",
+      "recorded_raw_sha256": "2e6108ca96959bbb46bb0afdf2f0606bed89b834631ded262564808ed4efad10",
+      "current_working_raw_sha256": "2e6108ca96959bbb46bb0afdf2f0606bed89b834631ded262564808ed4efad10",
+      "current_working_lf_sha256": "cd008227fda2fd419918fbc17029e651e9967d2ca1b29ac96f6a3744dfeb4ca6",
+      "captured_index_sha256": "cd008227fda2fd419918fbc17029e651e9967d2ca1b29ac96f6a3744dfeb4ca6",
+      "captured_index_git_blob": "d66f4764cc0128dbcc552459597b9a730afd0b77",
+      "working_crlf_count": 560,
+      "classification": "recorded_windows_bytes_match; Git index differs only by CRLF-to-LF normalization"
+    },
+    {
+      "path": "evidence/rust-parity-1.6.0/document_interop.py",
+      "recorded_raw_sha256": "970f7f2b27bb77b11a3ea1e9c4a00ad0d6a385847497e287942d7758fe24f2b7",
+      "current_working_raw_sha256": "970f7f2b27bb77b11a3ea1e9c4a00ad0d6a385847497e287942d7758fe24f2b7",
+      "current_working_lf_sha256": "5cd2fe1bbbba38b4cc4c6117c7a4873289726286871f229c84092bb96522d305",
+      "captured_index_sha256": "5cd2fe1bbbba38b4cc4c6117c7a4873289726286871f229c84092bb96522d305",
+      "captured_index_git_blob": "ee770d2a4627a2dca42ef8ce39a2a6535183bac3",
+      "working_crlf_count": 111,
+      "classification": "recorded_windows_bytes_match; Git index differs only by CRLF-to-LF normalization"
+    }
+  ],
+  "later_source_changes": [
+    {
+      "path": ".github/workflows/native.yml",
+      "recorded_raw_sha256": "1d519e675e2219ce91e988eaaa9a604e231232e8e4f8f04599f5aa299c0fa9ec",
+      "current_working_raw_sha256": "21b9a46a87271229f817e57fe269076a5751530d0ea3dea26590f191573d3f34",
+      "current_working_lf_sha256": "a60c5c1944d7cfa8a86bf8317781d60fa48feb21f059d7b4c5d930a5687c8fae",
+      "captured_index_sha256": "a60c5c1944d7cfa8a86bf8317781d60fa48feb21f059d7b4c5d930a5687c8fae",
+      "captured_index_git_blob": "16b2110eaf5f7990f6c42e66ca1a02fdfdad7053",
+      "working_crlf_count": 221,
+      "classification": "later_source_change; line-ending-only normalization does not establish equality to the recorded source",
+      "current_working_lf_matches_index": true
+    },
+    {
+      "path": "crates/pollardai/src/identity.rs",
+      "recorded_raw_sha256": "fc6aeb01dff43e3e2218a176bb1d915b860680073ded3d7ec36234ccfeb490cc",
+      "current_working_raw_sha256": "462a656aa3d8c1d7fc81ccb21a4741a75cc0b5084c5598d797b068e367fda6dc",
+      "current_working_lf_sha256": "462a656aa3d8c1d7fc81ccb21a4741a75cc0b5084c5598d797b068e367fda6dc",
+      "captured_index_sha256": "462a656aa3d8c1d7fc81ccb21a4741a75cc0b5084c5598d797b068e367fda6dc",
+      "captured_index_git_blob": "c5e9c777be79f6002f568fbadc1cc987bee6f83e",
+      "working_crlf_count": 0,
+      "classification": "later_source_change; line-ending-only normalization does not establish equality to the recorded source",
+      "current_working_lf_matches_index": true
+    },
+    {
+      "path": "crates/pollardai/src/kafka.rs",
+      "recorded_raw_sha256": "e1eeada88b09bb11a294b6df622d7285e963c72d23fa4bb1a43706a68402ae3b",
+      "current_working_raw_sha256": "e14563834f2681045b6cb651e8a3db3d972ecfefd775ad1b1ee7242c9e66aec0",
+      "current_working_lf_sha256": "e14563834f2681045b6cb651e8a3db3d972ecfefd775ad1b1ee7242c9e66aec0",
+      "captured_index_sha256": "e14563834f2681045b6cb651e8a3db3d972ecfefd775ad1b1ee7242c9e66aec0",
+      "captured_index_git_blob": "7d05d84be438bc2103aca1ceec3ee34b1d4b2ccc",
+      "working_crlf_count": 0,
+      "classification": "later_source_change; line-ending-only normalization does not establish equality to the recorded source",
+      "current_working_lf_matches_index": true
+    },
+    {
+      "path": "crates/pollardai/src/runtime.rs",
+      "recorded_raw_sha256": "80d0a515935067310d47e4dd09196885200b61e59fe795b948b57e971a368be8",
+      "current_working_raw_sha256": "654184a1bc01689ad0ecc4acad51d4a1eae98ce172ac5021f1c36502f157f968",
+      "current_working_lf_sha256": "654184a1bc01689ad0ecc4acad51d4a1eae98ce172ac5021f1c36502f157f968",
+      "captured_index_sha256": "80d0a515935067310d47e4dd09196885200b61e59fe795b948b57e971a368be8",
+      "captured_index_git_blob": "a010ad2940be9c2a1eca7980e88f1e0e3433ce88",
+      "working_crlf_count": 0,
+      "classification": "later_source_change; line-ending-only normalization does not establish equality to the recorded source",
+      "current_working_lf_matches_index": false
+    },
+    {
+      "path": "crates/pollardai/src/sqlite.rs",
+      "recorded_raw_sha256": "d1c347a547139239580f158cdbe683824a7e51e5e27dbe281c85713bd73752c3",
+      "current_working_raw_sha256": "ff0524b09f4ea1623cfecc4d5ea2cb26a8b82d396fb81f1c00ef26c800af64b0",
+      "current_working_lf_sha256": "ff0524b09f4ea1623cfecc4d5ea2cb26a8b82d396fb81f1c00ef26c800af64b0",
+      "captured_index_sha256": "d1c347a547139239580f158cdbe683824a7e51e5e27dbe281c85713bd73752c3",
+      "captured_index_git_blob": "8d0b6fee6c72bdf2ca78fac9e3d9058e2637cbe2",
+      "working_crlf_count": 0,
+      "classification": "later_source_change; line-ending-only normalization does not establish equality to the recorded source",
+      "current_working_lf_matches_index": false
+    },
+    {
+      "path": "crates/pollardai/src/store.rs",
+      "recorded_raw_sha256": "8123c43d920218379df08330c920a9cd3c7408e17c96a8fa45f77903c6dae540",
+      "current_working_raw_sha256": "a89acf341c5b232a162137a57c45a6b8c71349805ce74ced79aceeb0cdc312e0",
+      "current_working_lf_sha256": "a89acf341c5b232a162137a57c45a6b8c71349805ce74ced79aceeb0cdc312e0",
+      "captured_index_sha256": "8123c43d920218379df08330c920a9cd3c7408e17c96a8fa45f77903c6dae540",
+      "captured_index_git_blob": "51d0002644dfda4ef0fa23ff1ca885944b05302a",
+      "working_crlf_count": 0,
+      "classification": "later_source_change; line-ending-only normalization does not establish equality to the recorded source",
+      "current_working_lf_matches_index": false
+    }
+  ],
+  "later_change_note": "The native workflow, identity.rs, and kafka.rs received later CI corrections. Other listed paths, if present, are post-validation edits captured during the concurrency fix. These changes require separately identified follow-up validation; this document does not assert that the old matrix tested them.",
+  "immutable_receipts": "No historical receipt, source hash, test outcome, or timing value was rewritten.",
+  "artifact_log_verification": {
+    "receipt_directories": [
+      "final-validation",
+      "release-validation"
+    ],
+    "logs_checked": 32,
+    "all_recorded_sha256_match_working_and_staged_bytes": true,
+    "method": "Read original checks[].log_sha256, hash working bytes and git cat-file index blob bytes after evidence-only -text renormalization."
+  }
+}

@@ -48,7 +48,9 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
   without rounding significant digits.
 - Cache SQLite verification using local revisions and external commit tokens,
   invalidating on changed data, unsupported schemas, triggers and uncertain writes.
-  Preserve ancestor verification on hybrid hits.
+  Preserve ancestor verification on hybrid hits. Fall back to a consistent read
+  snapshot under sustained concurrent writes so ordinary shared-budget contention
+  does not become an integrity error.
 - Resolve fresh downstream applications on Rust 1.74 without borrowing this
   repository's Cargo.lock, including every optional feature on Linux.
 

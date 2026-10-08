@@ -236,6 +236,20 @@ pub trait RecordingStore: Store {
             None
         }
     }
+    /// Return a detached, consistent read of the requested node followed by all
+    /// ancestors, ending at a root. All payload blobs must share that snapshot.
+    /// None means the backend cannot provide a snapshot; runtime verification
+    /// then retains its fail-closed behavior under sustained concurrent changes.
+    fn ancestry_snapshot(&self, _id: &str) -> Result<Option<Vec<Node>>> {
+        Ok(None)
+    }
+    /// Return a detached, consistent read of the complete subtree rooted here,
+    /// with the requested root first and each parent preceding its children.
+    /// The root's external ancestry must also be verified in the same snapshot.
+    /// Snapshot reads must not leave a transaction open after success or failure.
+    fn subtree_snapshot(&self, _root: &str) -> Result<Option<Vec<Node>>> {
+        Ok(None)
+    }
     fn supports_reservations(&self) -> bool {
         false
     }

@@ -79,6 +79,10 @@ def main() -> None:
     (consumer / "src/main.rs").write_text(SOURCE, encoding="utf-8")
     checks = []
     for toolchain in ["+1.74.0", "+stable"]:
+        rustc_version = subprocess.check_output(
+            ["rustc", toolchain, "--version"], text=True).strip()
+        cargo_version = subprocess.check_output(
+            ["cargo", toolchain, "--version"], text=True).strip()
         command = ["cargo", toolchain, "run"]
         if toolchain == "+stable":
             command += ["--locked"]
@@ -90,6 +94,7 @@ def main() -> None:
         log = output / ("consumer-" + toolchain.lstrip("+") + ".log")
         log.write_text(result.stdout + result.stderr, encoding="utf-8")
         checks.append({"command": command, "exit_code": result.returncode,
+                       "rustc": rustc_version, "cargo": cargo_version,
                        "log_sha256": hashlib.sha256(log.read_bytes()).hexdigest()})
         if result.returncode:
             raise RuntimeError(log.read_text(encoding="utf-8"))

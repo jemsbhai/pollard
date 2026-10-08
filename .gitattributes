@@ -1,2 +1,6 @@
 # EXP-006 manifest hashes commit to the exact recorded artifact bytes.
 evidence/EXP-006/** -text whitespace=cr-at-eol
+
+# Rust release receipts hash the exact recorded log and JSON bytes.
+evidence/rust-parity-1.6.0/**/*.log -text whitespace=cr-at-eol
+evidence/rust-parity-1.6.0/**/*.json -text whitespace=cr-at-eol

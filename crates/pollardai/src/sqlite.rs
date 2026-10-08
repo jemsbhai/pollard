@@ -464,6 +464,32 @@ impl SQLiteStore {
             }
         }
     }
+    fn read_snapshot<T>(&self, read: impl FnOnce(&Self) -> Result<T>) -> Result<T> {
+        // The RAII transaction rolls back on errors and panics. A deferred read
+        // transaction works on read-only handles and does not block WAL writers.
+        let transaction = self.connection.unchecked_transaction().map_err(db_error)?;
+        let value = read(self)?;
+        transaction.commit().map_err(db_error)?;
+        Ok(value)
+    }
+    fn ancestry_nodes(&self, id: &str) -> Result<Vec<Node>> {
+        let mut nodes = Vec::new();
+        let mut seen = BTreeSet::new();
+        let mut next = Some(id.to_owned());
+        while let Some(id) = next {
+            if !seen.insert(id.clone()) {
+                return Err(Error::Integrity("cycle in ancestry".into()));
+            }
+            let node = self.get(&id)?;
+            if node.id != id {
+                return Err(Error::Integrity("lookup key differs from node id".into()));
+            }
+            node.validate()?;
+            next = node.parent.clone();
+            nodes.push(node);
+        }
+        Ok(nodes)
+    }
     fn get_optional(&self, id: &str) -> Result<Option<Node>> {
         type Row = (
             String,
@@ -825,6 +851,17 @@ impl Store for LockedSQLite<'_> {
 }
 
 impl RecordingStore for SQLiteStore {
+    fn ancestry_snapshot(&self, id: &str) -> Result<Option<Vec<Node>>> {
+        self.read_snapshot(|store| store.ancestry_nodes(id))
+            .map(Some)
+    }
+    fn subtree_snapshot(&self, root: &str) -> Result<Option<Vec<Node>>> {
+        self.read_snapshot(|store| {
+            store.ancestry_nodes(root)?;
+            store.walk(root)
+        })
+        .map(Some)
+    }
     fn cache_revision(&self) -> Option<crate::StoreRevision> {
         // data_version is connection-local and changes on commits by every other
         // connection, including raw SQL and lease renewal. Never persist or compare
@@ -1043,4 +1080,67 @@ fn sum_decimals(values: Vec<String>) -> Result<Decimal> {
         crate::decimal::exact_add(total, parse_decimal(value)?)
             .ok_or_else(|| Error::Integrity("stored charges overflow".into()))
     })
+}
+
+#[cfg(test)]
+mod snapshot_tests {
+    use super::*;
+
+    #[test]
+    fn snapshot_hydrates_blobs_at_one_revision_and_preserves_caller_transactions() {
+        let path = std::env::temp_dir().join(format!(
+            "pollard-snapshot-{}-{}.db",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        let mut store = SQLiteStore::open(&path).unwrap();
+        let node = Node::make(
+            NodeKind::Root,
+            None,
+            0,
+            json!({"body":"snapshot".repeat(300)}),
+            None,
+            json!({}),
+        )
+        .unwrap();
+        store.put(node.clone()).unwrap();
+        let writer = Connection::open(&path).unwrap();
+        store
+            .read_snapshot(|snapshot| {
+                // The first SELECT pins the WAL snapshot before a real external
+                // commit corrupts an interned blob used by the following read.
+                assert!(snapshot.try_exists(&node.id)?);
+                writer
+                    .execute("UPDATE blobs SET value='tampered'", [])
+                    .unwrap();
+                assert_eq!(snapshot.get(&node.id)?.payload, node.payload);
+                Ok(())
+            })
+            .unwrap();
+        assert!(store.get(&node.id).is_err());
+        assert!(store.cache_revision().is_some());
+
+        // A rejected nested snapshot must not roll back a caller's transaction.
+        store
+            .connection
+            .execute_batch("BEGIN; INSERT INTO kv(k,v) VALUES('caller','retained');")
+            .unwrap();
+        assert!(store.ancestry_snapshot(&node.id).is_err());
+        assert!(!store.connection.is_autocommit());
+        let retained: String = store
+            .connection
+            .query_row("SELECT v FROM kv WHERE k='caller'", [], |row| row.get(0))
+            .unwrap();
+        assert_eq!(retained, "retained");
+        store.connection.execute_batch("ROLLBACK").unwrap();
+        assert!(store.connection.is_autocommit());
+        drop(writer);
+        drop(store);
+        for suffix in ["", "-wal", "-shm"] {
+            let _ = std::fs::remove_file(format!("{}{suffix}", path.display()));
+        }
+    }
 }
