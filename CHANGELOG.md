@@ -11,7 +11,7 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 - Add native npm and Rust `pollardai` 0.1.0 core packages with independent
   versions, in-memory execution, integer budgets, registered tool gating, and
   strict replay. Shared Python-generated vectors check the frozen node identity
-  and exact stored result digest. These packages do not yet include Python's
+  and exact stored result digest. These initial versions excluded Python's
   persistent stores, provider adapters, or full API surface.
 - Publish npm and Rust 0.1.0 on their public registries and both native archives
   in the tagged GitHub release. Clean public-registry consumers verify both.
@@ -30,10 +30,6 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 - Retry temporary Kafka leader-routing failures within the watermark read's
   existing timeout. Authentication, missing topics and history validation
   errors still fail closed; deterministic tests cover retries and exhaustion.
-- Wait for a confirmed Kafka consumer group assignment before opening an npm
-  audit store. Bound retries of eligible startup failures, preserve terminal
-  replay and uncertain-write failures, and retain safe error codes in worker
-  diagnostics.
 
 ## [npm 0.2.0] - 2026-10-08
 
@@ -56,6 +52,13 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 - Align default npm token accounting with Python's optional estimates and
   conservative fallback semantics while retaining duplicate refusal.
   Rust remains at its separate 0.1.0 scope.
+
+### Fixed
+
+- Wait for a confirmed Kafka consumer group assignment before opening an npm
+  audit store. Bound retries of eligible startup failures, preserve terminal
+  replay and uncertain-write failures, and retain safe error codes in worker
+  diagnostics.
 
 ## [1.6.0] - 2026-09-01
 
