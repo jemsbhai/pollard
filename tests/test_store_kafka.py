@@ -102,6 +102,43 @@ class _FakeKafkaMessage:
         return self._value
 
 
+class _FakeKafkaError:
+    LEADER_NOT_AVAILABLE = 5
+    NOT_LEADER_FOR_PARTITION = 6
+    UNKNOWN_TOPIC_OR_PART = 3
+    TOPIC_AUTHORIZATION_FAILED = 29
+    SASL_AUTHENTICATION_FAILED = 58
+    OFFSET_OUT_OF_RANGE = 1
+
+    def __init__(self, code: int, *, fatal: bool = False) -> None:
+        self._code = code
+        self._fatal = fatal
+
+    def code(self) -> int:
+        return self._code
+
+    def fatal(self) -> bool:
+        return self._fatal
+
+    def retriable(self) -> bool:
+        # Plain watermark errors leave this false even for transient leaders;
+        # other calls may mark a missing topic retriable. Neither controls us.
+        return self._code == self.UNKNOWN_TOPIC_OR_PART
+
+
+class _KafkaClock:
+    def __init__(self) -> None:
+        self.now = 0.0
+        self.sleeps: list[float] = []
+
+    def monotonic(self) -> float:
+        return self.now
+
+    def sleep(self, seconds: float) -> None:
+        self.sleeps.append(seconds)
+        self.now += seconds
+
+
 class _KafkaHarness:
     def __init__(self, *, topic: str = "audit") -> None:
         self.topic = topic
@@ -112,6 +149,8 @@ class _KafkaHarness:
         self.fail_producer_creation = False
         self.fail_watermark_indices: set[int] = set()
         self.fail_poll_indices: set[int] = set()
+        self.watermark_effects: list[BaseException | tuple[int, int]] = []
+        self.watermark_timeouts: list[float] = []
 
     def append_node(self, node: Node, *, store_id: str = "team") -> None:
         event, _operation_id = kafka_module._event(
@@ -162,11 +201,20 @@ def _install_fake_kafka(
         def get_watermark_offsets(
             self,
             _partition: object,
-            **_kwargs: object,
+            *,
+            timeout: float,
+            cached: bool,
         ) -> tuple[int, int]:
+            assert cached is False
+            harness.watermark_timeouts.append(timeout)
             self.watermark_calls += 1
             if self.index in harness.fail_watermark_indices:
                 raise OSError("replacement watermark failure")
+            if harness.watermark_effects:
+                effect = harness.watermark_effects.pop(0)
+                if isinstance(effect, BaseException):
+                    raise effect
+                return effect
             return 0, len(harness.messages)
 
         def poll(self, _timeout: float) -> _FakeKafkaMessage | None:
@@ -190,7 +238,7 @@ def _install_fake_kafka(
 
     class Future:
         def result(self, *, timeout: float) -> dict[str, str]:
-            assert timeout == 30
+            assert timeout > 0
             return {
                 "cleanup.policy": "delete",
                 "retention.ms": "-1",
@@ -202,7 +250,7 @@ def _install_fake_kafka(
             harness.admin_configs.append(dict(config))
 
         def list_topics(self, *, timeout: float) -> object:
-            assert timeout == 30
+            assert timeout > 0
             return SimpleNamespace(
                 topics={
                     harness.topic: SimpleNamespace(
@@ -218,7 +266,7 @@ def _install_fake_kafka(
             *,
             request_timeout: float,
         ) -> dict[object, Future]:
-            assert request_timeout == 30
+            assert request_timeout > 0
             assert len(resources) == 1
             return {resources[0]: Future()}
 
@@ -228,6 +276,7 @@ def _install_fake_kafka(
         TopicPartition=lambda *args: args,
         OFFSET_BEGINNING=-2,
         KafkaException=RuntimeError,
+        KafkaError=_FakeKafkaError,
     )
     fake_admin = SimpleNamespace(
         AdminClient=AdminClient,
@@ -244,6 +293,143 @@ def _install_fake_kafka(
 
     monkeypatch.setattr(kafka_module, "import_module", import_fake)
     return harness
+
+
+@pytest.mark.parametrize("read_only", [False, True], ids=["writer", "observer"])
+@pytest.mark.parametrize("code", [5, 6], ids=["leader-unavailable", "not-leader"])
+def test_kafka_watermarks_retry_leader_changes_before_replay(
+    monkeypatch: pytest.MonkeyPatch,
+    read_only: bool,
+    code: int,
+) -> None:
+    harness = _install_fake_kafka(monkeypatch)
+    clock = _KafkaClock()
+    monkeypatch.setattr(kafka_module, "time", clock)
+    root = Node.make(kind=NodeKind.ROOT, parent=None, payload={"run": "leader-change"})
+    harness.append_node(root)
+    harness.watermark_effects = [RuntimeError(_FakeKafkaError(code)) for _ in range(2)]
+
+    with KafkaStore(
+        {"bootstrap.servers": "unused"},
+        topic="audit",
+        store_id="team",
+        read_only=read_only,
+    ) as store:
+        assert harness.watermark_timeouts == pytest.approx([30, 29.95, 29.85])
+        assert clock.sleeps == pytest.approx([0.05, 0.1])
+        assert store._next_offset == 1
+        assert store._nodes[root.id] == root
+        assert harness.consumers[0].poll_calls == 1
+        assert len(harness.producers) == (0 if read_only else 1)
+
+
+def test_kafka_watermark_retry_deadline_closes_failed_constructor(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    harness = _install_fake_kafka(monkeypatch)
+    clock = _KafkaClock()
+    monkeypatch.setattr(kafka_module, "time", clock)
+    errors = [RuntimeError(_FakeKafkaError(6)) for _ in range(4)]
+    harness.watermark_effects = list(errors)
+
+    with pytest.raises(IntegrityError, match=r"watermarks.*timeout") as failure:
+        KafkaStore(
+            {"bootstrap.servers": "unused"},
+            topic="audit",
+            timeout=0.2,
+        )
+
+    assert failure.value.__cause__ is errors[2]
+    assert harness.watermark_timeouts == pytest.approx([0.2, 0.15, 0.05])
+    assert clock.sleeps == pytest.approx([0.05, 0.1, 0.05])
+    assert clock.now == pytest.approx(0.2)
+    assert len(harness.watermark_effects) == 1
+    assert harness.consumers[0].closed
+    assert harness.consumers[0].poll_calls == 0
+    assert harness.producers == []
+
+
+def test_kafka_watermark_query_time_is_charged_to_retry_deadline(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _install_fake_kafka(monkeypatch)
+    clock = _KafkaClock()
+    monkeypatch.setattr(kafka_module, "time", clock)
+    error = RuntimeError(_FakeKafkaError(6))
+    calls: list[float] = []
+
+    with KafkaStore({"bootstrap.servers": "unused"}, topic="audit", timeout=0.2) as store:
+        def expire_query(_partition: object, *, timeout: float, cached: bool) -> None:
+            assert cached is False
+            calls.append(timeout)
+            clock.now += timeout
+            raise error
+
+        monkeypatch.setattr(store._consumer, "get_watermark_offsets", expire_query)
+        with pytest.raises(IntegrityError, match=r"watermarks.*timeout") as failure:
+            store.roots()
+
+        assert failure.value.__cause__ is error
+        assert calls == [0.2]
+        assert clock.sleeps == []
+        assert store._next_offset == 0
+        assert store._nodes == {}
+
+
+@pytest.mark.parametrize(
+    "error",
+    [
+        RuntimeError(_FakeKafkaError(_FakeKafkaError.UNKNOWN_TOPIC_OR_PART)),
+        RuntimeError(_FakeKafkaError(_FakeKafkaError.TOPIC_AUTHORIZATION_FAILED)),
+        RuntimeError(_FakeKafkaError(_FakeKafkaError.SASL_AUTHENTICATION_FAILED)),
+        RuntimeError(_FakeKafkaError(_FakeKafkaError.OFFSET_OUT_OF_RANGE)),
+        RuntimeError(_FakeKafkaError(6, fatal=True)),
+        RuntimeError("not a Kafka error"),
+        OSError("offline"),
+    ],
+    ids=["missing-topic", "authorization", "authentication", "offset", "fatal", "unknown", "io"],
+)
+def test_kafka_watermark_terminal_errors_are_not_retried(
+    monkeypatch: pytest.MonkeyPatch,
+    error: BaseException,
+) -> None:
+    harness = _install_fake_kafka(monkeypatch)
+    clock = _KafkaClock()
+    monkeypatch.setattr(kafka_module, "time", clock)
+    harness.watermark_effects = [RuntimeError(_FakeKafkaError(6)), error]
+
+    with pytest.raises(IntegrityError, match="watermarks") as failure:
+        KafkaStore({"bootstrap.servers": "unused"}, topic="audit")
+
+    assert failure.value.__cause__ is error
+    assert harness.watermark_timeouts == pytest.approx([30, 29.95])
+    assert clock.sleeps == [0.05]
+    assert harness.consumers[0].closed
+    assert harness.consumers[0].poll_calls == 0
+    assert harness.producers == []
+
+
+@pytest.mark.parametrize(
+    ("watermarks", "message"),
+    [((1, 1), "history was truncated"), ((0, -1), "behind the replay cursor")],
+)
+def test_kafka_watermark_recovery_still_rejects_damaged_history(
+    monkeypatch: pytest.MonkeyPatch,
+    watermarks: tuple[int, int],
+    message: str,
+) -> None:
+    harness = _install_fake_kafka(monkeypatch)
+    clock = _KafkaClock()
+    monkeypatch.setattr(kafka_module, "time", clock)
+    harness.watermark_effects = [RuntimeError(_FakeKafkaError(6)), watermarks]
+
+    with pytest.raises(IntegrityError, match=message):
+        KafkaStore({"bootstrap.servers": "unused"}, topic="audit")
+
+    assert harness.consumers[0].watermark_calls == 2
+    assert harness.consumers[0].poll_calls == 0
+    assert harness.consumers[0].closed
+    assert harness.producers == []
 
 
 @pytest.mark.parametrize(

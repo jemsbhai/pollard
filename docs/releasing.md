@@ -203,8 +203,10 @@ git show --no-patch --decorate vX.Y.Z
 git push origin vX.Y.Z
 ```
 
-Wait for tag CI. Create a non-draft GitHub release from local release notes and
-attach the already-built wheel and source archive:
+Tags reuse the successful CI checks on the exact merged `main` source commit;
+tag pushes do not launch another validation run. Confirm the tag resolves to
+that checked commit. Create a non-draft GitHub release from local release notes
+and attach the already-built wheel and source archive:
 
 ```powershell
 gh release create vX.Y.Z dist\* `

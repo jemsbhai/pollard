@@ -2621,7 +2621,11 @@ def _bare_kafka_store() -> KafkaStore:
     store._nodes = {}
     store._children = {}
     store._outcomes = {}
-    backend._kafka = SimpleNamespace(TopicPartition=lambda *_args: object())
+    backend._kafka = SimpleNamespace(
+        TopicPartition=lambda *_args: object(),
+        KafkaException=RuntimeError,
+        KafkaError=ValueError,
+    )
     return store
 
 

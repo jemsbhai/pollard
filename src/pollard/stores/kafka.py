@@ -544,14 +544,50 @@ class KafkaStore:
     def _sync_current(self) -> None:
         if self.read_only and self._snapshot_high_offset is not None:
             return
-        try:
-            low, high = self._consumer.get_watermark_offsets(
-                self._kafka.TopicPartition(self.topic, 0),
-                timeout=self.timeout,
-                cached=False,
-            )
-        except BaseException as exc:
-            raise IntegrityError("Kafka watermarks could not be confirmed") from exc
+        deadline = time.monotonic() + self.timeout
+        last_error: BaseException | None = None
+        delay = 0.05
+        while True:
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                raise IntegrityError(
+                    "Kafka watermarks could not be confirmed before timeout"
+                ) from last_error
+            try:
+                low, high = self._consumer.get_watermark_offsets(
+                    self._kafka.TopicPartition(self.topic, 0),
+                    timeout=remaining,
+                    cached=False,
+                )
+                break
+            except BaseException as exc:
+                # ListOffsets can expose a stale leader even after metadata is
+                # visible. librdkafka invalidates that metadata; retry only the
+                # read, using the same deadline and never cached watermarks.
+                # The watermark API does not reliably set retriable(). Keep
+                # missing-topic, authentication and all other errors terminal.
+                error = (
+                    exc.args[0]
+                    if isinstance(exc, self._kafka.KafkaException) and exc.args
+                    else None
+                )
+                if (
+                    not isinstance(error, self._kafka.KafkaError)
+                    or error.fatal()
+                    or error.code()
+                    not in (
+                        self._kafka.KafkaError.LEADER_NOT_AVAILABLE,
+                        self._kafka.KafkaError.NOT_LEADER_FOR_PARTITION,
+                    )
+                ):
+                    raise IntegrityError(
+                        "Kafka watermarks could not be confirmed"
+                    ) from exc
+                last_error = exc
+                remaining = deadline - time.monotonic()
+                if remaining > 0:
+                    time.sleep(min(delay, remaining))
+                    delay = min(delay * 2, 0.5)
         low_offset, high_offset = int(low), int(high)
         if low_offset != 0:
             raise IntegrityError(
