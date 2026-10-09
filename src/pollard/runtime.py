@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import time
 import warnings
-from collections.abc import Callable, Iterator
+from collections.abc import Callable, Iterator, Sequence
 from contextlib import suppress
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -76,8 +76,10 @@ from .revalidation import (
     make_revalidation_failure_evidence,
     make_revalidation_payload,
 )
+from .scopes import SharedBudget, bind_window
 from .store import MemoryStore, Store
 from .stores import SQLiteStore
+from .team_context import AgentIdentity
 from .tree import Node, NodeKind
 
 DeltaCallback = Callable[[dict[str, Any]], None]
@@ -192,6 +194,7 @@ class Runtime:
         refuse_duplicate_recordings: bool = False,
         on_node: NodeCallback | None = None,
         reservation_lease_seconds: int | float = 60,
+        shared_budgets: Sequence[SharedBudget] = (),
     ) -> None:
         if (
             isinstance(reservation_lease_seconds, bool)
@@ -210,6 +213,33 @@ class Runtime:
         self.refuse_duplicate_recordings = refuse_duplicate_recordings
         self.on_node = on_node
         self.reservation_lease_seconds = float(reservation_lease_seconds)
+        self.shared_budgets = tuple(shared_budgets)
+        if any(not isinstance(scope, SharedBudget) for scope in self.shared_budgets):
+            raise TypeError("shared_budgets must contain SharedBudget objects")
+        names = [scope.name for scope in self.shared_budgets]
+        if len(set(names)) != len(names):
+            raise ValueError("shared budget names must be unique")
+
+    def _validate_shared_configuration(self) -> None:
+        windows = [m for m in self.meters if isinstance(m, WindowMeter) and m.scope is not None]
+        if not self.shared_budgets and not windows:
+            return
+        if self.mode != ReplayMode.REPLAY and not isinstance(self.store, TransactionalArbiter):
+            raise TypeError("named budgets and windows require a transactional store")
+        for scope in self.shared_budgets:
+            scope.bind(self.store, mode=self.mode)
+        for window in windows:
+            bind_window(self.store, window, mode=self.mode)
+
+    def _run_scopes(self, root_id: str, budget: Budget | None) -> list[_BudgetScope]:
+        self._validate_shared_configuration()
+        scopes = [
+            _BudgetScope(budget=scope.budget, anchor_id=scope.scope_id)
+            for scope in self.shared_budgets
+        ]
+        if budget is not None:
+            scopes.append(_BudgetScope(budget=budget, anchor_id=root_id))
+        return scopes
 
     def _put(self, node: Node) -> Node:
         if self.mode == ReplayMode.REPLAY:
@@ -235,7 +265,7 @@ class Runtime:
         else:
             root = self._put(root) if not self.store.exists(root.id) else self.store.get(root.id)
         self._bind_registry(root.id)
-        scopes = [] if budget is None else [_BudgetScope(budget=budget, anchor_id=root.id)]
+        scopes = self._run_scopes(root.id, budget)
         return Run(
             runtime=self,
             root_id=root.id,
@@ -252,7 +282,7 @@ class Runtime:
             else self.store.get(root.id)
         )
         self._bind_registry(stored_root.id)
-        scopes = [] if budget is None else [_BudgetScope(budget=budget, anchor_id=stored_root.id)]
+        scopes = self._run_scopes(stored_root.id, budget)
         return Run(
             runtime=self,
             root_id=stored_root.id,
@@ -283,6 +313,9 @@ class Run:
         cursor_id: str,
         label: str,
         budget_scopes: list[_BudgetScope],
+        agent_identity: AgentIdentity | None = None,
+        agent_anchor_id: str | None = None,
+        team_validator: Callable[[], None] | None = None,
     ) -> None:
         self._runtime = runtime
         self.root_id = root_id
@@ -291,6 +324,81 @@ class Run:
         self._budget_scopes = budget_scopes
         self._avoided: dict[str, float] = {}
         self._pending_tool_calls: dict[str, _PendingToolCall] = {}
+        self._agent_identity = agent_identity
+        self._agent_anchor_id = (
+            agent_anchor_id if agent_anchor_id is not None
+            else cursor_id if agent_identity is not None else None
+        )
+        self._team_validator = team_validator
+
+    @property
+    def agent_identity(self) -> AgentIdentity | None:
+        return self._agent_identity
+
+    def _check_tool_authority(self, name: str, args: dict[str, IdentityValue]) -> None:
+        self._validate_agent_cursor()
+        identity = self.agent_identity
+        if identity is None or identity.allowed_tools is None:
+            return
+        registry = self._runtime.registry
+        if registry is None:
+            self._refuse_policy("delegated tool permissions require a registry", {"tool": name})
+        if name not in identity.allowed_tools:
+            # Do not copy unknown or denied arguments into a refusal. A schema
+            # might be unavailable and those arguments can contain credentials.
+            self._refuse_policy(
+                "tool is outside delegated permissions",
+                {"tool": name, "agent_id": identity.agent_id, "task_id": identity.task_id},
+            )
+
+    def _validate_agent_cursor(self) -> None:
+        if self._team_validator is not None:
+            self._team_validator()
+        if self._agent_anchor_id is None:
+            return
+        current: str | None = self.cursor_id
+        seen: set[str] = set()
+        while current is not None and current not in seen:
+            seen.add(current)
+            node = self.store.get(current)
+            wrapper = node.payload.get("_pollard")
+            if isinstance(wrapper, dict) and "team_agent" in wrapper:
+                event = wrapper["team_agent"]
+                expected = None if self.agent_identity is None else self.agent_identity.to_dict()
+                if (
+                    current != self._agent_anchor_id
+                    or not isinstance(event, dict)
+                    or event.get("identity") != expected
+                ):
+                    raise IntegrityError("agent cursor crosses another delegation")
+            if current == self._agent_anchor_id:
+                return
+            current = node.parent
+        raise IntegrityError("agent cursor is outside its delegated subtree")
+
+    def _check_durable_approvals(self, spec: ActionSpec, args: dict[str, IdentityValue]) -> None:
+        if self._runtime.mode == ReplayMode.REPLAY:
+            return
+        registry = self._runtime.registry
+        for policy in self._runtime.policies:
+            if getattr(policy, "_pollard_durable_approval", False) is not True:
+                continue
+            decision = policy.decide(
+                PolicyContext(
+                    spec=spec,
+                    args=args,
+                    cursor_id=self.cursor_id,
+                    run_label=self.label,
+                    counters=self.report()["spent"],
+                    agent_identity=self.agent_identity,
+                    registry_digest=None if registry is None else registry.registry_digest,
+                )
+            )
+            if decision != Decision.ALLOW:
+                self._refuse_policy(
+                    "durable approval is required for this action",
+                    {"tool": spec.name, "version": spec.version, "args": spec.redact_args(args)},
+                )
 
     @property
     def store(self) -> Store:
@@ -371,6 +479,7 @@ class Run:
         version: str | None = None,
         attempt: int = 0,
     ) -> Node:
+        self._check_tool_authority(name, args)
         if self._runtime.registry is not None:
             return self._registered_tool_call(name, args, version=version, attempt=attempt)
         if fn is None:
@@ -380,8 +489,10 @@ class Run:
 
     def confirm(self, token: str) -> Node:
         pending = self._pending_tool_calls.pop(token)
+        self._check_tool_authority(pending.spec.name, pending.args)
         if self.cursor_id != pending.parent_id:
             raise ValueError("cannot confirm after cursor moved")
+        self._check_durable_approvals(pending.spec, pending.args)
         if pending.spec.handler is None:
             self._refuse_policy("registered action has no handler", pending.payload)
         return self._call(
@@ -426,6 +537,9 @@ class Run:
             cursor_id=anchor.id,
             label=self.label,
             budget_scopes=scopes,
+            agent_identity=self.agent_identity,
+            agent_anchor_id=self._agent_anchor_id,
+            team_validator=self._team_validator,
         )
         return RunBranch(parent=self, child=child)
 
@@ -894,7 +1008,10 @@ class Run:
         ):
             recorded = self._recorded_node(NodeKind.TOOL_CALL, payload, attempt)
             assert recorded is None
+        self._check_durable_approvals(spec, args)
         for policy in self._runtime.policies:
+            if getattr(policy, "_pollard_durable_approval", False) is True:
+                continue
             decision = policy.decide(
                 PolicyContext(
                     spec=spec,
@@ -902,6 +1019,8 @@ class Run:
                     cursor_id=self.cursor_id,
                     run_label=self.label,
                     counters=self.report()["spent"],
+                    agent_identity=self.agent_identity,
+                    registry_digest=registry.registry_digest,
                 )
             )
             if decision == Decision.ALLOW:
@@ -1007,6 +1126,7 @@ class Run:
         *,
         on_delta: DeltaCallback | None = None,
     ) -> Node | None:
+        self._validate_agent_cursor()
         node = recorded_node_or_missing(
             mode=self._runtime.mode,
             store=self.store,
@@ -1039,6 +1159,8 @@ class Run:
     def _precheck(
         self, kind: str, payload: dict[str, IdentityValue]
     ) -> _Reservation | None:
+        self._validate_agent_cursor()
+        self._runtime._validate_shared_configuration()
         estimates, approximate = self._estimates(kind, payload)
         for scope in self._budget_scopes:
             check = check_budget(
@@ -1270,10 +1392,13 @@ class Run:
             store._pollard_release(reservation.reservation_id)
 
     def _ensure_ancestor(self, node_id: str) -> None:
+        self._validate_agent_cursor()
         current: str | None = self.cursor_id
         while current is not None:
             if current == node_id:
                 return
+            if current == self._agent_anchor_id:
+                break
             current = self.store.get(current).parent
         raise ValueError(f"{node_id} is not an ancestor of the cursor")
 

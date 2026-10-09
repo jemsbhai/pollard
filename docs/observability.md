@@ -11,6 +11,26 @@ Redis, MongoDB, Neo4j, or Kafka logical store as a destination. `import` and
 
 ## List and inspect runs
 
+For teams recorded with Python 1.6.1, two additional read commands are available:
+
+```powershell
+pollard team-report team.db <root-id>
+pollard team-report team.db <root-id> --json
+pollard verify-dependencies team.db <root-id> --json
+```
+
+The team report groups recorded work by agent, task, and role without counting
+nested delegates twice. It includes unattributed work, refusals, usage, charges,
+and dependency findings. Dependency verification checks referenced result
+digests as well as same-run membership and ancestry. Both commands use the
+existing observational store selectors and omit prompt/result content.
+
+Exit status 0 means the report passed its integrity checks, 1 means findings
+were reported, and 2 means a command or backend error. Accounting uses retained
+metadata. Summed call duration is not end-to-end team latency. See the
+[team guide](https://github.com/jemsbhai/pollard/blob/main/docs/teams.md) for
+examples and the report fields.
+
 ```powershell
 pollard runs runs.db
 pollard runs worker-a.db worker-b.db

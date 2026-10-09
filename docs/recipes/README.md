@@ -15,6 +15,17 @@ Pydantic refund workflow has no live mode.
 Run commands from the repository root. Install the repository in editable form
 while changing the recipes, or replace `-e` with a released Pollard version.
 
+For a planner with several workers, see the
+[agent-team guide](https://github.com/jemsbhai/pollard/blob/main/docs/teams.md).
+It includes complete offline examples, individual tool permissions, shared
+budgets, result references, async execution, worker context transport, and
+checkpoint recovery with durable tool approvals. Keep the framework's scheduler and route each assignment's
+model and tool calls through its own Pollard agent.
+
+The `pydantic-ai` extra installs `pydantic-ai-slim[openai]`. This includes the
+OpenAI integration used by these recipes without pulling in unrelated default
+integrations that require a different MCP major version.
+
 ## Safety and cost contract
 
 The provider-backed recipes and explicit `--live` paths are live. The four

@@ -4,16 +4,50 @@ All notable changes to pollard will be documented in this file.
 
 The format is based on Keep a Changelog, and this project follows Semantic Versioning.
 
-## [Unreleased]
+## [1.6.1] - 2026-10-09
+
+### Added
+
+- Add `Team` and `TeamAgent` for separate worker cursors, recorded agent/task
+  identity, nested limits, and delegated tool permissions. Runtime and policy
+  configuration is recorded and checked before execution; custom components
+  declare safe configuration through `pollard_team_config()`.
+- Add serializable `DelegationContext` and exact-cursor `AgentCheckpoint`
+  records. Attachment verifies the recorded identity, ancestry, permissions,
+  and inherited budget scopes before constructing a worker.
+- Add `SharedBudget` and named `WindowMeter` scopes across independent roots
+  in one transactional store. Conflicting configuration under a scope name
+  fails before dispatch. Existing root-scoped windows keep their original keys.
+- Add result references, dependency and handoff notes, and dependency
+  verification without changing the 1.x node identity or Store protocol.
+- Add durable approval requests and decisions bound to an actor, action,
+  registry, and argument digest. `ApprovalPolicy` requires a stored approval
+  and prevents process-local confirmation from bypassing that requirement.
+- Add team accounting by agent, task, and role, plus `team-report` and
+  `verify-dependencies` inspection commands. Nested work is counted once and
+  unattributed work remains visible.
+- Add a detailed team guide and four offline examples covering nested
+  delegation, concurrent workers, outcome comparisons, and approval after a
+  worker restart. Examples use local functions with synthetic usage.
+
+### Changed
+
+- Install the OpenAI-specific `pydantic-ai-slim` extra for the Pydantic AI
+  recipes. This avoids the unrelated MCP 2 dependency pulled by the full
+  framework bundle while retaining Pollard's MCP 1 integration.
+- Keep the native behavior oracle pinned to Python 1.6.0 when checking later
+  Python releases. The check compares behavior independently of release-label
+  metadata; deliberate fixture regeneration still records the current version.
 
 ### Fixed
 
-- Correct MongoDB server-clock conversion in Python source so default naive BSON
-  datetimes are interpreted as UTC. The existing PyPI 1.6.0 wheel still requires
-  `tz_aware=True` for mixed-language lease/window accounting on non-UTC hosts.
-- Retry temporary Kafka leader-routing failures within the watermark read's
-  existing timeout. Authentication, missing topics and history validation
-  errors still fail closed; deterministic tests cover retries and exhaustion.
+- Correct MongoDB server-clock conversion so naive BSON datetimes are treated
+  as UTC, including mixed-language lease and window accounting on non-UTC hosts.
+- Retry temporary Kafka leader-routing failures within the existing watermark
+  timeout. Authentication, missing topics, and invalid history still fail closed.
+
+## [Unreleased]
+
 ### Added
 
 - Add native npm and Rust `pollardai` 0.1.0 core packages with independent

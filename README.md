@@ -102,6 +102,59 @@ What you get:
   SQLite, PostgreSQL, Redis, MongoDB, or Neo4j, and merge disconnected stores
   later. Kafka provides ordered audit and replay storage without shared limits.
 
+## Teams And Delegation
+
+Pollard 1.6.1 gives each agent a separate cursor, a recorded task identity, and
+inherited budget scopes. Delegated tool permissions can be narrowed as work
+passes to another agent. Your application chooses the workers and schedules
+them; Pollard governs their model and tool calls.
+
+This complete example uses fixed local functions and makes no network request:
+
+```python
+from pollard import Budget, ResultReference, Runtime, Team, record_dependency, team_report
+from pollard.meters import StepMeter
+
+runtime = Runtime(meters=[StepMeter()])
+team = Team(runtime, "document-review", budget=Budget(steps=3))
+writer = team.agent("writer", task_id="draft", budget=Budget(steps=1))
+draft = writer.run.model_call(
+    {"task": "draft the release note"},
+    fn=lambda _: {"text": "The release adds recorded team delegation."},
+)
+reviewer = team.agent("reviewer", task_id="review", budget=Budget(steps=1))
+record_dependency(reviewer.run, [ResultReference.from_node(draft)])
+review = reviewer.run.model_call(
+    {"draft": draft.result["text"]},
+    fn=lambda _: {"accepted": True},
+)
+print(review.result["accepted"])
+print(team_report(runtime.store, team.root_id).totals.governed_calls)
+```
+
+The output is `True` followed by `2`. The dependency note binds the review path
+to the recorded draft and its result digest.
+
+Workers on separate processes or hosts can serialize a `DelegationContext` and
+attach it through a compatible `Team`. `AgentCheckpoint` restores a specific
+worker cursor and its inherited scopes. `SharedBudget` and named `WindowMeter`
+scopes can govern independent task roots using one transactional store.
+`ApprovalPolicy` can read a reviewed action after a process restart.
+
+The [team guide](https://github.com/jemsbhai/pollard/blob/main/docs/teams.md)
+covers nested delegation, async agents, multiple processes, remote stores,
+durable approvals, replay, and outcome comparisons. It includes four complete
+offline examples. Team reports are also available from the CLI:
+
+```powershell
+pollard team-report team.db <root-id> --json
+pollard verify-dependencies team.db <root-id> --json
+```
+
+Team identities are caller declarations. A checkpoint does not reserve a job
+or prove that an interrupted external action did not complete. Use your task
+scheduler and provider idempotency mechanism when retrying side effects.
+
 ## First Live Provider Integration
 
 Install the OpenAI adapter with the same virtual environment when you are ready

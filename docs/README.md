@@ -10,6 +10,7 @@ failure boundaries, and complete commands needed to operate or review Pollard.
 | Goal | Document |
 |---|---|
 | Run a credential-free example | [Offline examples](https://github.com/jemsbhai/pollard/blob/main/examples/README.md) |
+| Give agent teams identities, shared limits, tool permissions, handoffs, and recovery contexts | [Agent teams](https://github.com/jemsbhai/pollard/blob/main/docs/teams.md) |
 | Use OpenAI, Anthropic, Azure, Bedrock, another cloud, or an agent framework | [Live recipes](https://github.com/jemsbhai/pollard/blob/main/docs/recipes/README.md) |
 | Choose a direct cloud adapter or LiteLLM route | [Cloud-hosted providers](https://github.com/jemsbhai/pollard/blob/main/docs/cloud-providers.md) |
 | Review provider failure classifications, conservative accounting, and the cloud ledger | [Provider boundary hardening](https://github.com/jemsbhai/pollard/blob/main/docs/provider-boundary-hardening.md) |
@@ -46,7 +47,7 @@ credentials, retries, provider account limits, and the safety of side effects.
 
 The repository separates three kinds of runnable material:
 
-- `examples/01_*` through `08_*` and `10_*` through `14_*` are small, offline
+- `examples/01_*` through `08_*` and `10_*` through `18_*` are small, offline
   walkthroughs.
 - `examples/exp_*` are controlled evidence runners with their own protocols and
   prerequisites. They do not call hosted model providers.

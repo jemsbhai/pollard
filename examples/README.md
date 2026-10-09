@@ -2,7 +2,7 @@
 
 The examples are runnable programs, not fragments. Run them from the repository
 root with Python 3.10 or newer. Walkthroughs `01` through `08` and `10` through
-`14` use deterministic local functions and temporary or in-memory stores; they
+`18` use deterministic local functions and temporary or in-memory stores; they
 need no API key, cloud account, model download, or network connection.
 Walkthrough `09` is opt-in and contacts only the database or broker selected by
 the operator.
@@ -37,6 +37,10 @@ Pollard core remains dependency-free.
 | `12_dry_run_confirmation.py` | A side effect is suppressed during preview and paused for an explicit confirmation token before execution | None | Three lifecycle flags showing preview, pause, and execution |
 | `13_async_workflow.py` | Async model and tool functions share the same governed budget and audit tree | None | Model text, transformed tool text, and settled charges |
 | `14_revalidate_recording.py` | A golden result is compared with a separately stored live observation without changing the recording | None | A structured report whose semantic match is true and exact match is false |
+| `15_agent_team.py` | Planner, three specialists, and reviewer have separate identities, inherited limits, tool permissions, and recorded dependencies | None | Matching strict replay, zero replay dispatches, denied publish, nested limit refusal, and per-agent report |
+| `16_distributed_team.py` | Four workers attach JSON contexts through independent SQLite connections and share an exact three-step cap | Temporary files removed on exit | Three accepted calls, one refusal, distinct cursors, and successful checkpoint restoration |
+| `17_team_comparison.py` | One worker and three workers perform the same deterministic task under recorded accounting | None | Equal task correctness, one versus three calls, 23 versus 33 synthetic tokens, and local elapsed measurements |
+| `18_durable_approval.py` | Exact tool approval and checkpoint survive reconstruction of the worker runtime | Temporary database and JSON files removed on exit | Pause before approval, one approved handler call, one dummy receipt, and a read-only report |
 
 Run them individually:
 
@@ -54,6 +58,10 @@ python examples\11_sensitive_fields.py
 python examples\12_dry_run_confirmation.py
 python examples\13_async_workflow.py
 python examples\14_revalidate_recording.py
+python examples\15_agent_team.py
+python examples\16_distributed_team.py
+python examples\17_team_comparison.py
+python examples\18_durable_approval.py
 ```
 
 These commands make no provider request and incur 0 USD of hosted-model spend.
@@ -146,6 +154,51 @@ under a newer contract. The normalized comparator treats unchanged text as a
 semantic match while `exact_match` remains false because response identity and
 usage changed. The live result and value-free comparison evidence are new nodes;
 the golden node remains byte-for-byte unchanged.
+
+### Agent team and strict replay
+
+`15_agent_team.py` gives a planner seven steps for its own work and three
+delegated specialists. Each specialist reads fixed facts and produces one
+model-shaped result. A separate reviewer consumes references to those results
+under the team's eight-step cap. Its publish attempt is denied before the
+handler runs, and an extra planner call is refused after the inherited limit
+is used. Completed calls and dependency notes repeat in strict replay with
+model and tool sentinels that fail if dispatched. The exhausted-budget probe is
+record-only because it has no completed model result to replay.
+
+### Independent workers and recovery
+
+`16_distributed_team.py` serializes four assignments as JSON and attaches each
+through its own SQLite connection. The workers start together and compete for
+three exact steps. The result reports three callable executions and one
+refusal, with a distinct initial cursor for each assignment. Each worker also
+serializes and restores its exact checkpoint. Threads exercise separate
+connections here; the
+[team guide](https://github.com/jemsbhai/pollard/blob/main/docs/teams.md#move-an-assignment-between-workers)
+explains process and remote-store integration.
+
+### One worker versus three
+
+`17_team_comparison.py` selects marked rows from fixed data using one worker
+and then three concurrent workers. It reports an exact-match outcome check,
+recorded calls and synthetic token usage, and actual local elapsed time. The
+three-worker path repeats a fixed per-call input overhead, so it uses more
+declared tokens for the same result. The script is an accounting demonstration;
+it makes no claim about model capability or a speed benefit. No assertion
+depends on measured timing. The
+[comparison guide](https://github.com/jemsbhai/pollard/blob/main/docs/teams.md#compare-team-value-against-a-single-agent)
+explains how to replace this fixed task with an application evaluation.
+
+### Durable approval and worker reconstruction
+
+`18_durable_approval.py` writes an exact approval request and agent checkpoint
+to JSON, closes the worker's connection, records an authorized-reviewer decision
+through a separate connection, and constructs a fresh worker runtime. The
+restored worker reads the stored approval before invoking its registered action.
+The dummy action uses a stable application operation ID and produces one local
+receipt. No message is delivered and no external system is changed. The
+[approval guide](https://github.com/jemsbhai/pollard/blob/main/docs/teams.md#persist-an-approval-across-worker-restarts)
+explains reviewer authentication and external idempotency responsibilities.
 
 ## Configured distributed-store walkthrough
 

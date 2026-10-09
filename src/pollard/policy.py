@@ -8,6 +8,7 @@ from typing import Protocol
 
 from ._canon import IdentityValue
 from .registry import ActionSpec
+from .team_context import AgentIdentity
 
 
 class Decision(str, Enum):
@@ -23,6 +24,8 @@ class PolicyContext:
     cursor_id: str
     run_label: str
     counters: dict[str, float]
+    agent_identity: AgentIdentity | None = None
+    registry_digest: str | None = None
 
 
 class Policy(Protocol):

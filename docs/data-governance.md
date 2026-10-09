@@ -7,6 +7,20 @@ data.
 
 ## What The Ledger Stores
 
+Team manifests and delegation notes retain declared agent/task names, roles,
+tool permission lists, budget scope references, and safe runtime configuration.
+Custom `pollard_team_config()` hooks must return non-secret configuration.
+Dependency notes retain node IDs and result digests. Approval requests retain
+an argument digest, action/registry digests, and the declared actor; decision
+notes retain the declared reviewer and decision. Checkpoints retain exact
+cursor and scope references. Treat these fields as retained application data.
+
+These new records use ordinary identity payloads and are covered by the
+existing node and subtree integrity rules. They do not authenticate a worker
+or reviewer. Shared budget/window configuration roots and mutable arbiter
+tables are separate from a team's execution subtree. A subtree export alone
+cannot restore an organization's live quotas.
+
 Each node stores:
 
 - Identity fields: parent id, kind, attempt, and the identity payload.

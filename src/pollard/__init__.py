@@ -7,10 +7,19 @@ from importlib import import_module
 from types import ModuleType
 from typing import TYPE_CHECKING, Any
 
-__version__ = "1.6.0"
+__version__ = "1.6.1"
 
 if TYPE_CHECKING:
     from .aio import AsyncRun, AsyncRuntime
+    from .approvals import ApprovalPolicy, ApprovalRequest, decide_approval, request_approval
+    from .dependencies import (
+        DependencyFinding,
+        DependencyReport,
+        ResultReference,
+        record_dependency,
+        record_handoff,
+        verify_dependencies,
+    )
     from .errors import (
         BudgetExceeded,
         CallCleanupError,
@@ -52,6 +61,7 @@ if TYPE_CHECKING:
         RevalidationReport,
     )
     from .runtime import Run, Runtime
+    from .scopes import SharedBudget
     from .seal import SealEntry, SealReport, seal
     from .seal_custody import SealCustodyRecord, SQLiteSealSink
     from .store import MemoryStore, Store
@@ -64,10 +74,32 @@ if TYPE_CHECKING:
         RedisStore,
         SQLiteStore,
     )
+    from .team_context import AgentCheckpoint, AgentIdentity, BudgetContext, DelegationContext
+    from .team_reports import TeamReport, team_report
+    from .teams import Team, TeamAgent
     from .tree import Node, NodeKind
     from .verify import VerifyFinding, VerifyReport, verify
 
 _EXPORTS = {
+    "AgentCheckpoint": ("pollard.team_context", "AgentCheckpoint"),
+    "AgentIdentity": ("pollard.team_context", "AgentIdentity"),
+    "ApprovalPolicy": ("pollard.approvals", "ApprovalPolicy"),
+    "ApprovalRequest": ("pollard.approvals", "ApprovalRequest"),
+    "BudgetContext": ("pollard.team_context", "BudgetContext"),
+    "DelegationContext": ("pollard.team_context", "DelegationContext"),
+    "DependencyFinding": ("pollard.dependencies", "DependencyFinding"),
+    "DependencyReport": ("pollard.dependencies", "DependencyReport"),
+    "ResultReference": ("pollard.dependencies", "ResultReference"),
+    "SharedBudget": ("pollard.scopes", "SharedBudget"),
+    "Team": ("pollard.teams", "Team"),
+    "TeamAgent": ("pollard.teams", "TeamAgent"),
+    "TeamReport": ("pollard.team_reports", "TeamReport"),
+    "decide_approval": ("pollard.approvals", "decide_approval"),
+    "request_approval": ("pollard.approvals", "request_approval"),
+    "record_dependency": ("pollard.dependencies", "record_dependency"),
+    "record_handoff": ("pollard.dependencies", "record_handoff"),
+    "team_report": ("pollard.team_reports", "team_report"),
+    "verify_dependencies": ("pollard.dependencies", "verify_dependencies"),
     "ActionSpec": ("pollard.registry", "ActionSpec"),
     "AsyncRun": ("pollard.aio", "AsyncRun"),
     "AsyncRuntime": ("pollard.aio", "AsyncRuntime"),
@@ -143,13 +175,21 @@ _EXPORTS = {
 
 __all__ = [
     "ActionSpec",
+    "AgentCheckpoint",
+    "AgentIdentity",
+    "ApprovalPolicy",
+    "ApprovalRequest",
     "AsyncRun",
     "AsyncRuntime",
     "Budget",
+    "BudgetContext",
     "BudgetExceeded",
     "CallCleanupError",
     "ConfirmationRequired",
     "Decision",
+    "DelegationContext",
+    "DependencyFinding",
+    "DependencyReport",
     "DuplicateRecording",
     "ExactResultComparator",
     "ExportReport",
@@ -178,6 +218,7 @@ __all__ = [
     "ReplayMode",
     "ReservationLeaseLost",
     "ReservationUncertain",
+    "ResultReference",
     "RevalidationComparator",
     "RevalidationComparison",
     "RevalidationReport",
@@ -189,12 +230,17 @@ __all__ = [
     "SealEntry",
     "SealReport",
     "SettlementUncertain",
+    "SharedBudget",
     "Store",
+    "Team",
+    "TeamAgent",
+    "TeamReport",
     "UnsupportedSchema",
     "VerifyFinding",
     "VerifyReport",
     "WindowMeter",
     "__version__",
+    "decide_approval",
     "export_subtree",
     "gc",
     "import_subtree",
@@ -202,9 +248,14 @@ __all__ = [
     "mark_post_dispatch_outcome_unknown",
     "merge",
     "recompute_charges",
+    "record_dependency",
+    "record_handoff",
     "redact",
+    "request_approval",
     "seal",
+    "team_report",
     "verify",
+    "verify_dependencies",
 ]
 
 

@@ -307,6 +307,7 @@ class WindowMeter:
         window_seconds: int | float,
         *,
         meter: Meter | None = None,
+        scope: str | None = None,
     ) -> None:
         if not isinstance(name, str) or not name:
             raise ValueError("window meter name must be a non-empty string")
@@ -319,6 +320,11 @@ class WindowMeter:
         ):
             raise ValueError("window_seconds must be positive")
         self.name = name
+        if scope is not None and (
+            not isinstance(scope, str) or not scope.strip() or scope != scope.strip()
+        ):
+            raise ValueError("window scope must be a non-empty name without surrounding whitespace")
+        self.scope = scope
         self.limit = Decimal(str(limit))
         self.window_seconds = float(window_seconds)
         if meter is not None:
@@ -346,6 +352,13 @@ class WindowMeter:
         return self._meter.precheck_estimate(node_kind, payload)
 
     def ledger_key(self, root_id: str) -> str:
+        if self.scope is not None:
+            document = json.dumps(
+                {"pollard_shared_window": 1, "scope": self.scope, "name": self.name},
+                sort_keys=True,
+                separators=(",", ":"),
+            )
+            return hashlib.sha256(document.encode("utf-8")).hexdigest()
         document = json.dumps(
             {
                 "root_id": root_id,

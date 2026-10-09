@@ -162,12 +162,31 @@ def main() -> int:
     parser.add_argument("--check", action="store_true")
     options = parser.parse_args()
     path = ROOT / "packages/npm/test/python-parity.json"
-    text = json.dumps(generate(), ensure_ascii=False, indent=2) + "\n"
+    generated = generate()
     if options.check:
-        if not path.exists() or path.read_text(encoding="utf-8") != text:
+        try:
+            recorded_text = path.read_text(encoding="utf-8")
+            recorded = json.loads(recorded_text)
+        except (OSError, ValueError) as exc:
+            print(f"cannot read npm parity reference: {type(exc).__name__}", file=sys.stderr)
+            return 1
+        reference_release = recorded.get("python_release") if isinstance(recorded, dict) else None
+        if not isinstance(reference_release, str) or not reference_release:
+            print("npm parity reference has no Python release", file=sys.stderr)
+            return 1
+        print(
+            f"Checking running Python {generated['python_release']} behavior against "
+            f"recorded Python {reference_release} reference."
+        )
+        # Keep the original oracle's provenance while comparing every behavior
+        # field and the existing canonical fixture formatting. Never write here.
+        compared = {**generated, "python_release": reference_release}
+        text = json.dumps(compared, ensure_ascii=False, indent=2) + "\n"
+        if recorded_text != text:
             print("npm parity fixture differs from the Python reference", file=sys.stderr)
             return 1
     else:
+        text = json.dumps(generated, ensure_ascii=False, indent=2) + "\n"
         path.write_text(text, encoding="utf-8")
     return 0
 
