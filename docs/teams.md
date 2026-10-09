@@ -190,6 +190,7 @@ provider's account quota.
 Pass `allowed_tools` to the team or an individual assignment. A delegated
 assignment may keep or narrow its inherited list, but cannot widen it. An empty
 tuple permits no tools. An omitted value inherits the parent restriction.
+The team ceiling also applies to the coordinator's `team.run` and its branches.
 Restricted assignments require a registry so action names resolve to known
 specifications before execution.
 

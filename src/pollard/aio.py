@@ -243,6 +243,7 @@ class AsyncRun(Run):
             agent_identity=self.agent_identity,
             agent_anchor_id=self._agent_anchor_id,
             team_validator=self._team_validator,
+            tool_ceiling=self._tool_ceiling,
         )
         return AsyncRunBranch(parent=self, child=child)
 

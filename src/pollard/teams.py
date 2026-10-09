@@ -170,6 +170,7 @@ class Team:
             cursor_id=root.id,
             label=label,
             budget_scopes=runtime._run_scopes(root.id, budget),
+            tool_ceiling=allowed_tools,
         )
         self.root_id = root.id
         self._initial_scopes = _scope_contexts(self.run._budget_scopes)
@@ -334,6 +335,7 @@ class Team:
             agent_identity=identity,
             agent_anchor_id=anchor.id,
             team_validator=self._check_configuration,
+            tool_ceiling=self.allowed_tools,
         )
         return TeamAgent(self, child, anchor.id, identity)
 
@@ -431,6 +433,7 @@ class Team:
             agent_identity=context.identity,
             agent_anchor_id=context.delegation_id,
             team_validator=self._check_configuration,
+            tool_ceiling=self.allowed_tools,
         )
         return TeamAgent(self, child, context.delegation_id, context.identity)
 

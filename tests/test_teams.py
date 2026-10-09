@@ -594,3 +594,97 @@ def test_coordinator_branches_remain_usable_in_record_and_replay() -> None:
     with replay.run.branch(attempt=3) as branch:
         actual = branch.model_call({"input": "plan"}, fn=lambda _: pytest.fail("replay dispatched"))
     assert actual.id == expected.id
+
+
+@pytest.mark.parametrize("branched", [False, True])
+@pytest.mark.parametrize("allowed_tools", [(), ("read",)])
+def test_coordinator_obeys_team_tool_ceiling_in_record_and_replay(
+    branched: bool, allowed_tools: tuple[str, ...]
+) -> None:
+    store = MemoryStore()
+    calls: list[bool] = []
+    actions = Registry(
+        [
+            ActionSpec(
+                name,
+                "1",
+                name,
+                {"type": "object"},
+                False,
+                lambda _: calls.append(True) or {"ok": True},
+            )
+            for name in ("read", "write")
+        ]
+    )
+    recorded_ids: list[list[str]] = []
+    for mode in ("record", "replay"):
+        team = Team(
+            Runtime(store, registry=actions, meters=[StepMeter()], mode=mode),
+            "mission",
+            allowed_tools=allowed_tools,
+        )
+        coordinator = team.run.branch(attempt=3).child if branched else team.run
+        before = len(calls)
+        with pytest.raises(PolicyViolation, match="team permissions"):
+            coordinator.tool_call("write", {})
+        assert len(calls) == before
+        ids = [coordinator.cursor_id]
+        if allowed_tools:
+            read = coordinator.tool_call("read", {})
+            assert read.result == {"ok": True}
+            ids.append(read.id)
+        else:
+            with pytest.raises(PolicyViolation, match="team permissions"):
+                coordinator.tool_call("read", {})
+            ids.append(coordinator.cursor_id)
+        recorded_ids.append(ids)
+        assert calls == ([True] if allowed_tools else [])
+    assert recorded_ids[0] == recorded_ids[1]
+
+
+@pytest.mark.parametrize("branched", [False, True])
+@pytest.mark.parametrize("allowed_tools", [(), ("read",)])
+def test_async_coordinator_obeys_team_tool_ceiling_in_record_and_replay(
+    branched: bool, allowed_tools: tuple[str, ...]
+) -> None:
+    async def scenario() -> None:
+        store = MemoryStore()
+        calls: list[bool] = []
+
+        async def handler(_args: object) -> dict[str, bool]:
+            calls.append(True)
+            return {"ok": True}
+
+        actions = Registry(
+            [
+                ActionSpec(name, "1", name, {"type": "object"}, False, handler)
+                for name in ("read", "write")
+            ]
+        )
+        recorded_ids: list[list[str]] = []
+        for mode in ("record", "replay"):
+            team = Team(
+                AsyncRuntime(store, registry=actions, meters=[StepMeter()], mode=mode),
+                "mission",
+                allowed_tools=allowed_tools,
+            )
+            coordinator = team.run.branch(attempt=3).child if branched else team.run
+            assert isinstance(coordinator, AsyncRun)
+            before = len(calls)
+            with pytest.raises(PolicyViolation, match="team permissions"):
+                await coordinator.atool_call("write", {})
+            assert len(calls) == before
+            ids = [coordinator.cursor_id]
+            if allowed_tools:
+                read = await coordinator.atool_call("read", {})
+                assert read.result == {"ok": True}
+                ids.append(read.id)
+            else:
+                with pytest.raises(PolicyViolation, match="team permissions"):
+                    await coordinator.atool_call("read", {})
+                ids.append(coordinator.cursor_id)
+            recorded_ids.append(ids)
+            assert calls == ([True] if allowed_tools else [])
+        assert recorded_ids[0] == recorded_ids[1]
+
+    asyncio.run(scenario())

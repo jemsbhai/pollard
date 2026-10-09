@@ -316,6 +316,7 @@ class Run:
         agent_identity: AgentIdentity | None = None,
         agent_anchor_id: str | None = None,
         team_validator: Callable[[], None] | None = None,
+        tool_ceiling: tuple[str, ...] | None = None,
     ) -> None:
         self._runtime = runtime
         self.root_id = root_id
@@ -330,6 +331,7 @@ class Run:
             else cursor_id if agent_identity is not None else None
         )
         self._team_validator = team_validator
+        self._tool_ceiling = tool_ceiling
 
     @property
     def agent_identity(self) -> AgentIdentity | None:
@@ -338,17 +340,27 @@ class Run:
     def _check_tool_authority(self, name: str, args: dict[str, IdentityValue]) -> None:
         self._validate_agent_cursor()
         identity = self.agent_identity
-        if identity is None or identity.allowed_tools is None:
+        allowed_tools = self._tool_ceiling
+        if identity is not None and identity.allowed_tools is not None:
+            allowed_tools = (
+                identity.allowed_tools if allowed_tools is None
+                else tuple(tool for tool in identity.allowed_tools if tool in allowed_tools)
+            )
+        if allowed_tools is None:
             return
         registry = self._runtime.registry
         if registry is None:
-            self._refuse_policy("delegated tool permissions require a registry", {"tool": name})
-        if name not in identity.allowed_tools:
+            self._refuse_policy("tool permissions require a registry", {"tool": name})
+        if name not in allowed_tools:
             # Do not copy unknown or denied arguments into a refusal. A schema
             # might be unavailable and those arguments can contain credentials.
+            blocked: dict[str, IdentityValue] = {"tool": name}
+            if identity is not None:
+                blocked.update({"agent_id": identity.agent_id, "task_id": identity.task_id})
             self._refuse_policy(
-                "tool is outside delegated permissions",
-                {"tool": name, "agent_id": identity.agent_id, "task_id": identity.task_id},
+                "tool is outside team permissions" if identity is None
+                else "tool is outside delegated permissions",
+                blocked,
             )
 
     def _validate_agent_cursor(self) -> None:
@@ -540,6 +552,7 @@ class Run:
             agent_identity=self.agent_identity,
             agent_anchor_id=self._agent_anchor_id,
             team_validator=self._team_validator,
+            tool_ceiling=self._tool_ceiling,
         )
         return RunBranch(parent=self, child=child)
 

@@ -790,6 +790,7 @@ delegation, context attachment, and checkpoints perform synchronous store work.
 
 `allowed_tools` is a tuple of registered action names or `None`. `None` on a
 child inherits its parent's permissions. An empty tuple permits no tools.
+The team ceiling applies to the coordinator's `team.run` and its branches too.
 Explicit child permissions must be a subset of the parent set. A restricted
 actor requires a registry, and a denied action records a policy refusal before
 calling a handler. Names omitted from a delegation do not grant permission.
