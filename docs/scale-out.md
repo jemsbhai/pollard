@@ -81,6 +81,19 @@ same data classification as the original payload.
 
 ## Shared Budget Reservations
 
+Python 1.6.1 adds `Team` for transferring worker identity and inherited scopes
+between compatible runtimes. The [team guide](https://github.com/jemsbhai/pollard/blob/main/docs/teams.md)
+includes complete thread, process, and remote-store examples. Give every active
+worker a separate cursor. The same store ID alone does not make separate run
+roots share a limit.
+
+Use `Runtime(shared_budgets=[SharedBudget("account/period", Budget(steps=1000))])`
+when independent task roots must draw from one additive limit. A named
+`WindowMeter("requests", 60, 60, scope="provider-account")` spans independent
+roots for the same reason. These names bind fixed configurations in the
+selected transactional store. Workers with conflicting limits fail before
+dispatch. A new accounting period or changed limit needs a new budget name.
+
 On a transactional store, each governed model or tool call uses three steps:
 
 1. Precheck atomically reserves each known estimate against every active budget
@@ -155,6 +168,7 @@ runtime = Runtime(
 
 Window scope is the run root plus the meter configuration. Resuming the same
 run preserves the window, and workers on the same root see each other's events.
+A non-null `scope` selects the named cross-root behavior described above.
 A window refusal uses `reason="window"` and records `window_seconds` in its
 identity payload.
 

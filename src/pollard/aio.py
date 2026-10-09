@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import time
-from collections.abc import AsyncIterator, Awaitable, Callable, Iterator
+from collections.abc import AsyncIterator, Awaitable, Callable, Iterator, Sequence
 from datetime import datetime, timezone
 from inspect import isawaitable
 from pathlib import Path
@@ -45,6 +45,7 @@ from .runtime import (
     _stop_lease,
     _stop_measurements,
 )
+from .scopes import SharedBudget
 from .store import Store
 from .tree import Node, NodeKind
 
@@ -69,6 +70,7 @@ class AsyncRuntime(Runtime):
         refuse_duplicate_recordings: bool = False,
         on_node: NodeCallback | None = None,
         reservation_lease_seconds: int | float = 60,
+        shared_budgets: Sequence[SharedBudget] = (),
     ) -> None:
         super().__init__(
             store,
@@ -80,6 +82,7 @@ class AsyncRuntime(Runtime):
             refuse_duplicate_recordings=refuse_duplicate_recordings,
             on_node=on_node,
             reservation_lease_seconds=reservation_lease_seconds,
+            shared_budgets=shared_budgets,
         )
 
     def run(self, label: str, *, budget: Budget | None = None, attempt: int = 0) -> AsyncRun:
@@ -89,7 +92,7 @@ class AsyncRuntime(Runtime):
         else:
             root = self._put(root) if not self.store.exists(root.id) else self.store.get(root.id)
         self._bind_registry(root.id)
-        scopes = [] if budget is None else [_BudgetScope(budget=budget, anchor_id=root.id)]
+        scopes = self._run_scopes(root.id, budget)
         return AsyncRun(
             runtime=self,
             root_id=root.id,
@@ -106,7 +109,7 @@ class AsyncRuntime(Runtime):
             else self.store.get(root.id)
         )
         self._bind_registry(stored_root.id)
-        scopes = [] if budget is None else [_BudgetScope(budget=budget, anchor_id=stored_root.id)]
+        scopes = self._run_scopes(stored_root.id, budget)
         return AsyncRun(
             runtime=self,
             root_id=stored_root.id,
@@ -193,6 +196,7 @@ class AsyncRun(Run):
         version: str | None = None,
         attempt: int = 0,
     ) -> Node:
+        self._check_tool_authority(name, args)
         if self._runtime.registry is not None:
             return await self._aregistered_tool_call(name, args, version=version, attempt=attempt)
         if fn is None:
@@ -202,8 +206,10 @@ class AsyncRun(Run):
 
     async def aconfirm(self, token: str) -> Node:
         pending = self._pending_tool_calls.pop(token)
+        self._check_tool_authority(pending.spec.name, pending.args)
         if self.cursor_id != pending.parent_id:
             raise ValueError("cannot confirm after cursor moved")
+        self._check_durable_approvals(pending.spec, pending.args)
         if pending.spec.handler is None:
             self._refuse_policy("registered action has no handler", pending.payload)
         return await self._acall(
@@ -234,6 +240,10 @@ class AsyncRun(Run):
             cursor_id=anchor.id,
             label=self.label,
             budget_scopes=scopes,
+            agent_identity=self.agent_identity,
+            agent_anchor_id=self._agent_anchor_id,
+            team_validator=self._team_validator,
+            tool_ceiling=self._tool_ceiling,
         )
         return AsyncRunBranch(parent=self, child=child)
 
@@ -449,7 +459,10 @@ class AsyncRun(Run):
         ):
             recorded = self._recorded_node(NodeKind.TOOL_CALL, payload, attempt)
             assert recorded is None
+        self._check_durable_approvals(spec, args)
         for policy in self._runtime.policies:
+            if getattr(policy, "_pollard_durable_approval", False) is True:
+                continue
             decision = policy.decide(
                 PolicyContext(
                     spec=spec,
@@ -457,6 +470,8 @@ class AsyncRun(Run):
                     cursor_id=self.cursor_id,
                     run_label=self.label,
                     counters=self.report()["spent"],
+                    agent_identity=self.agent_identity,
+                    registry_digest=registry.registry_digest,
                 )
             )
             if decision == Decision.ALLOW:

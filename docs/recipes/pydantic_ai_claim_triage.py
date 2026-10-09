@@ -170,7 +170,7 @@ async def _run(args: argparse.Namespace) -> dict[str, Any]:
             model_settings = to_jsonable_python(request_context.model_settings)
             payload = {
                 "framework": "pydantic-ai",
-                "framework_version": version("pydantic-ai"),
+                "framework_version": version("pydantic-ai-slim"),
                 "integration": "pollard-capability-v1",
                 "model": request_context.model.model_id,
                 "messages": _strip_volatile(messages),

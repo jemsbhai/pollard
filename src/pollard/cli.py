@@ -116,6 +116,20 @@ def _parser() -> argparse.ArgumentParser:
     report.add_argument("--json", action="store_true", help="emit machine-readable JSON")
     report.set_defaults(handler=_report)
 
+    team_summary = subparsers.add_parser("team-report", help="attribute a team's recorded work")
+    team_summary.add_argument("db", help=store_help)
+    team_summary.add_argument("root_id")
+    team_summary.add_argument("--json", action="store_true", help="emit machine-readable JSON")
+    team_summary.set_defaults(handler=_team_report)
+
+    dependencies = subparsers.add_parser(
+        "verify-dependencies", help="verify recorded result references and handoffs"
+    )
+    dependencies.add_argument("db", help=store_help)
+    dependencies.add_argument("root_id")
+    dependencies.add_argument("--json", action="store_true", help="emit machine-readable JSON")
+    dependencies.set_defaults(handler=_verify_dependencies)
+
     check = subparsers.add_parser("verify", help="verify stored identities and results")
     check.add_argument("db", help=store_help)
     check.add_argument("root_id", nargs="?")
@@ -220,6 +234,39 @@ def _show(args: argparse.Namespace) -> int:
             )
         )
     return 0
+
+
+def _team_report(args: argparse.Namespace) -> int:
+    from .team_reports import team_report
+
+    with _open_store(args.db, create=False) as store:
+        report = team_report(store, args.root_id)
+    if args.json:
+        _emit(report.to_dict(), json_output=True)
+    else:
+        print(f"Team {args.root_id}: {report.totals.governed_calls} governed calls")
+        for agent in report.agents:
+            print(
+                f"{agent.agent_id} / {agent.task_id}: "
+                f"{agent.metrics.governed_calls} calls, {agent.metrics.refusals} refusals"
+            )
+        print(f"Unattributed: {report.unattributed.governed_calls} calls")
+        print(f"Integrity: {'ok' if report.ok else 'failed'}")
+    return 0 if report.ok else 1
+
+
+def _verify_dependencies(args: argparse.Namespace) -> int:
+    from .dependencies import verify_dependencies
+
+    with _open_store(args.db, create=False) as store:
+        report = verify_dependencies(store, args.root_id)
+    if args.json:
+        _emit(report.to_dict(), json_output=True)
+    else:
+        print(f"Dependencies: {'ok' if report.ok else 'failed'}")
+        for finding in report.findings:
+            print(f"{finding.node_id}: {finding.message}")
+    return 0 if report.ok else 1
 
 
 def _report(args: argparse.Namespace) -> int:

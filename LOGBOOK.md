@@ -1097,3 +1097,35 @@ and publication are separate from the completed 0.2.0 checks. See the
 for final CI, source, archive and registry verification. npm 0.2.0 and the PyPI
 1.6.0 release remain independent; the Python MongoDB source fix is not a new
 PyPI upload.
+
+## 2026-10-09 Python 1.6.1 Team Governance Validation
+
+This release adds explicit team assignments, inherited budgets and tool
+permissions, named quotas across task roots, result dependencies, durable
+approval records, checkpoints, and per-agent reports. Team scheduling, message
+delivery, authenticated identity, and external idempotency remain application
+responsibilities. npm and Rust retain their independent release versions.
+
+Four new offline examples exercise these paths with local functions:
+
+- Example 15 records a planner, three specialists, and a reviewer. Its eight
+  completed calls comprise five model calls and three tool calls, with 20
+  synthetic tokens. Two refused probes make no dispatch. Strict replay returns
+  the recorded results with zero model or tool dispatches.
+- Example 16 gives four independent SQLite clients the same three-call limit.
+  Three workers complete and one is refused. Serialized contexts and exact
+  cursor checkpoints survive closing and reopening the store.
+- Example 17 compares one worker with three on fixed local inputs. Both return
+  the expected answer; the single worker uses one call and 23 synthetic tokens,
+  while the team uses three calls and 33 synthetic tokens. This checks accounting
+  and outcomes. It is not evidence of provider quality, cost, or speed benefits.
+- Example 18 reconstructs a worker after restart, reads a retained approval,
+  and performs one dummy external action using a stable operation ID.
+
+Targeted tests cover conflicting scope configuration, concurrent reservations,
+delegation and cursor tampering, inherited permissions, configuration drift,
+approval reuse, stale confirmation tokens, and report attribution. The guide's
+complete programs also run as tests, including the process-pool example.
+The EXP-006 verifier reads all 49 retained nodes with no network access or live
+dispatch. Release gates and public artifact receipts are recorded in the
+[Python 1.6.1 release](https://github.com/jemsbhai/pollard/releases/tag/v1.6.1).

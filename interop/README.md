@@ -56,3 +56,18 @@ Registry input secrets are visibly fake fixture strings. Successful registered
 tool nodes commit to redacted audit arguments, while handlers receive the
 original arguments. Handlers are excluded from spec digests. The registry
 digest hashes its sorted spec-digest list regardless of registration order.
+
+## Provider and comparator reference
+
+`generate_npm_parity.py --check` compares current Python provider normalization,
+comparison, and replay-contract behavior with the committed npm reference. It
+prints both the running Python version and the version that originally created
+the reference. During this read-only check, only `python_release` metadata is
+normalized to the recorded version; every behavior field and fixture formatting
+still has to match. A Python patch release therefore does not relabel the frozen
+1.6.0 reference or require changing the native packages' versions.
+
+Running `python interop/generate_npm_parity.py` without `--check` deliberately
+regenerates the reference using the current Python version. Review that change
+and update the native reference assertions when intentionally replacing the
+oracle. The release check never rewrites the fixture.

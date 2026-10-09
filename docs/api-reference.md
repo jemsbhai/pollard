@@ -50,6 +50,7 @@ Runtime(
     refuse_duplicate_recordings=False,
     on_node=None,
     reservation_lease_seconds=60,
+    shared_budgets=(),
 )
 ```
 
@@ -73,6 +74,9 @@ Runtime(
   callback error becomes a warning and does not discard the node.
 - `reservation_lease_seconds`: positive lease used by transactional stores for
   shared budget and window reservations.
+- `shared_budgets`: sequence of `SharedBudget` declarations. These named,
+  additive scopes span independent roots in the same transactional store.
+  Reusing a name with different limits raises `IntegrityError`.
 
 `Runtime.run(label, budget=None, attempt=0)` creates or opens the deterministic
 run root and returns a cursor at that root. `Runtime.resume(...)` requires that
@@ -83,6 +87,11 @@ returns `AsyncRun`; store operations remain synchronous while model and tool
 step functions may be async or async-streaming.
 
 ## Run cursor
+
+For a delegated worker, `run.agent_identity` returns its `AgentIdentity`.
+Branches inherit the identity, permitted tools, and parent budget scopes.
+Rollback stays within the worker's delegation anchor. Moving a worker cursor
+into another delegation fails before model or tool dispatch.
 
 Every step is a child of `run.cursor_id`. A successful call advances that
 cursor. A refusal also records a child and advances the cursor before raising.
@@ -752,3 +761,219 @@ asynchronous cancellation. If a completed result has missing or invalid usage,
 a meter marked with `precheck_is_estimate` settles its reservation estimate and
 the node records `accounting_fallbacks`; valid provider usage remains
 authoritative.
+
+## Team execution
+
+The following additions are available in Python 1.6.1. Existing run identities,
+store protocols, and step-function contracts retain their 1.x behavior. The
+[team guide](https://github.com/jemsbhai/pollard/blob/main/docs/teams.md) contains
+complete runnable programs, including multiple processes and durable approvals.
+
+```python
+Team(runtime, label, *, budget=None, allowed_tools=None, attempt=0)
+team.agent(agent_id, *, task_id, role=None, budget=None, allowed_tools=None)
+agent.delegate(agent_id, *, task_id, role=None, budget=None, allowed_tools=None)
+agent.context() -> DelegationContext
+team.attach(context) -> TeamAgent
+agent.checkpoint() -> AgentCheckpoint
+team.restore(checkpoint) -> TeamAgent
+```
+
+`Team` records an immutable configuration for one root. Reopening the same
+team requires matching limits, registry, permitted tools, and meter/policy
+configuration. Ordinary `Runtime` calls retain their existing defaults.
+
+`TeamAgent.run` is an independent `Run`, or an `AsyncRun` when the team uses
+`AsyncRuntime`. Call `model_call`, `tool_call`, and `note` through that cursor.
+Use `amodel_call` and `atool_call` for asynchronous functions. Team construction,
+delegation, context attachment, and checkpoints perform synchronous store work.
+
+`allowed_tools` is a tuple of registered action names or `None`. `None` on a
+child inherits its parent's permissions. An empty tuple permits no tools.
+The team ceiling applies to the coordinator's `team.run` and its branches too.
+Explicit child permissions must be a subset of the parent set. A restricted
+actor requires a registry, and a denied action records a policy refusal before
+calling a handler. Names omitted from a delegation do not grant permission.
+
+Each child inherits all active scopes. Its optional `budget` adds a local
+scope. Limits are ceilings rather than prepaid allocations or scheduling
+priorities. A delegated worker cannot roll back above its recorded anchor or
+move its cursor into another worker's delegation. Give each active worker its
+own cursor and suitable backend connection.
+
+### Context and checkpoint records
+
+| Type | Fields and use |
+|---|---|
+| `AgentIdentity` | `team_id`, `agent_id`, `task_id`, optional `role`, and optional `allowed_tools`. These are declared identities and capability ceilings. |
+| `BudgetContext` | `anchor_id` and an immutable tuple of meter names and decimal-string limits. Contains no mutable reservation state. |
+| `DelegationContext` | Root, manifest, delegation, and exact cursor IDs; `AgentIdentity`; inherited `BudgetContext` records; configuration digest. |
+| `AgentCheckpoint` | An immutable checkpoint note and its recorded `DelegationContext`. Restores one worker's exact position. |
+
+These records provide `to_dict()` and `from_dict()`. JSON transport retains
+decimal limits as strings. `attach` and `restore` accept either their typed
+record or its dictionary. They verify the retained ancestry and recorded
+authority before constructing a worker. Removing a scope, changing an actor,
+changing capabilities, or substituting another cursor fails validation.
+
+For example, after sending the dictionary through your task queue:
+
+```python
+import json
+
+wire_message = json.dumps(worker.context().to_dict())
+received = json.loads(wire_message)
+attached = compatible_team.attach(received)
+assert attached.run.cursor_id == worker.run.cursor_id
+```
+
+`compatible_team` must use the same store namespace and the original team
+configuration. Context dictionaries are not signed credentials. The queue,
+worker authentication, store access, job ownership, and transport encryption
+belong to the application.
+
+Custom policies and meters supply `pollard_team_config()` when Pollard cannot
+describe their configuration through its built-in safe field list. The hook
+returns stable identity-safe data. It must omit credentials, database clients,
+mutable counters, and other process-local state. Pollard records the returned
+configuration in the team manifest and checks it before governed execution.
+
+### Named scopes across roots
+
+```python
+SharedBudget(name, budget)
+WindowMeter(name, limit, window_seconds, *, meter=None, scope=None)
+```
+
+`SharedBudget` accepts one or more finite additive limits. `depth` is rejected
+because depth belongs to an execution path. Pass declarations through
+`Runtime(shared_budgets=[...])` or `AsyncRuntime(shared_budgets=[...])`:
+
+```python
+from pollard import Budget, Runtime, SharedBudget, SQLiteStore, WindowMeter
+from pollard.meters import StepMeter
+
+with SQLiteStore("organization.db") as store:
+    runtime = Runtime(
+        store,
+        shared_budgets=[SharedBudget("support/october", Budget(steps=1000))],
+        meters=[StepMeter(), WindowMeter("requests", 60, 60, scope="support-api")],
+    )
+    first = runtime.run("ticket-1", budget=Budget(steps=10))
+    second = runtime.run("ticket-2", budget=Budget(steps=10))
+    first.model_call({"ticket": 1}, fn=lambda _: {"text": "first"})
+    second.model_call({"ticket": 2}, fn=lambda _: {"text": "second"})
+```
+
+Both calls consume their local ticket limit, the shared 1000-step limit, and
+the shared request window. Separate workers must declare the same scopes using
+the same transactional backend and logical store ID. A name's first binding
+fixes its configuration; mismatched declarations raise `IntegrityError`.
+Choose a new name for a changed limit or a new accounting period.
+
+With `scope=None`, `WindowMeter` retains its original root-scoped key. A named
+window uses a common key across roots and verifies its limit, duration, and
+wrapped meter configuration. Named budgets and windows require transactional
+arbitration for live execution. Strict replay can read retained configuration
+from a compatible Store without reserving capacity.
+
+`SharedBudget.scope_id` identifies the stored configuration root, and
+`SharedBudget.bind(store, mode=...)` creates or verifies that binding. Named
+scope configurations are separate roots. A single team subtree export does
+not include those roots or live accounting state; preserve the required roots
+and transactional tables when transferring a store for continuation.
+
+### Result dependencies and handoffs
+
+```python
+ResultReference.from_node(node)
+record_dependency(run, references, *, relation="consumes", recipient=None,
+                  task_id=None, label=None, attempt=0)
+record_handoff(run, references, *, recipient, task_id=None, label=None, attempt=0)
+verify_dependencies(store, root_id) -> DependencyReport
+```
+
+`ResultReference(node_id, result_digest)` binds a completed model or tool call
+to its recorded result. Notes without results and dry-run placeholders are not
+completed result references. `to_dict()` returns both digest fields.
+
+Dependency helpers validate their references, require membership in the same
+run, and append an immutable note to the receiving cursor. References may
+cross sibling branches. Repeated identical references are stored once, and
+conflicting digests for one node are rejected. The helpers record evidence;
+they do not deliver messages or schedule agents.
+
+`DependencyReport` contains `root_id`, `checked_notes`, `references`, and
+`findings`. Its `ok` property is true when findings are empty. Each
+`DependencyFinding` contains a note ID, code, message, and optional target ID.
+`to_dict()` is suitable for JSON output. Missing targets, changed result
+digests, invalid ancestry, and malformed or cross-run references are findings.
+
+### Durable approvals
+
+```python
+ApprovalPolicy(store, *, side_effects_only=True)
+request_approval(run, name, args, *, version=None, attempt=0) -> ApprovalRequest
+decide_approval(store, request, *, approved, reviewer) -> Node
+```
+
+Install `ApprovalPolicy` in `Runtime.policies` to require a retained decision.
+By default it applies to actions whose registry specification declares side
+effects. Set `side_effects_only=False` to cover every registered action.
+
+`request_approval` validates arguments and records an immutable request without
+executing the handler. The request commits a digest of the redacted arguments,
+the action and registry digests, the run root, and the current actor.
+`ApprovalRequest.to_dict()` and `from_dict()` allow the review system to retain
+and return the same request. Its `id` is also a stable value that can be passed
+to an external service as an idempotency key.
+
+`decide_approval` is a mutating administrative operation. `reviewer` names the
+caller-declared reviewer. The decision is bound to the exact request. Repeating
+the same decision is idempotent; changing it or its reviewer is refused. Use a
+new request when the action or decision changes.
+
+Absent, rejected, mismatched, or already-used approval returns a denial. Call
+`request_approval` explicitly to begin a review. A valid retained approval can
+be read after restoring the worker's checkpoint. The runtime checks durable
+approval policies before accepting an unrelated process-local confirmation and
+again before executing its token. Existing `run.confirm` behavior for other
+policies is unchanged.
+
+`PolicyContext` now includes optional `agent_identity` and `registry_digest`
+fields. A custom policy may inspect these declarations. `ApprovalPolicy` has a
+stable `pollard_team_config()` hook and does not serialize its Store client.
+Strict replay does not evaluate live approval policies or execute handlers.
+
+Approval checks refuse sequential reuse after a recorded model/tool call or
+post-dispatch failure below the request. They are not distributed task claims.
+Two workers can race before either records a result. Preserve provider
+idempotency and scheduler ownership when executing external side effects.
+
+### Team reports and CLI
+
+```python
+team_report(store, root_id) -> TeamReport
+```
+
+`TeamReport` exposes `totals`, `agents`, `unattributed`, `unattributed_node_ids`,
+`orphaned_node_ids`, `dependencies`, `findings`, and `ok`. `to_dict()` includes
+those fields and interpretation notes. Each agent entry identifies its team,
+agent, task, and role, followed by metrics for its own work. Nested delegates
+are counted once under their nearest actor anchor.
+
+Metrics include governed model/tool calls, refusals, dry runs, post-dispatch
+failures, recorded charges, provider usage fields, dependency references,
+handoffs, and summed call duration. Overlapping usage fields are reported
+independently. Summed call duration is not elapsed team time. The report does
+not infer whether additional agents improved the result.
+
+```powershell
+pollard team-report team.db <root-id> --json
+pollard verify-dependencies team.db <root-id> --json
+```
+
+Both commands accept the existing observational store selectors and avoid
+displaying prompt or result content. They return exit status 0 for valid
+reports, 1 for integrity findings, and 2 for command or backend errors. Omit
+`--json` for a compact text report.
