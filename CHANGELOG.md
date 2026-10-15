@@ -19,6 +19,12 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
   fingerprints, inherited Codex settings, and replay/side-effect limitations.
   Include a synthetic offline walkthrough and protocol/CLI regression tests.
 
+### Fixed
+
+- Constrain the optional native MongoDB/PostgreSQL dependency `tokio-util` to
+  0.7.19 so fresh Rust consumers retain the declared Rust 1.74 compatibility.
+  Version 0.7.20 requires Rust 1.85. Native package versions remain unchanged.
+
 ## [1.6.1] - 2026-10-09
 
 ### Added

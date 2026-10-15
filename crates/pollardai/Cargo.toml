@@ -23,6 +23,8 @@ rusqlite = { version = "0.31", features = ["bundled"] }
 rust_decimal = { version = "1.36", default-features = false, features = ["std"] }
 postgres = { version = "=0.19.9", optional = true }
 tokio-postgres = { version = "=0.7.12", optional = true }
+# tokio-util 0.7.20 raises its MSRV beyond this crate's Rust 1.74 support.
+tokio-util = { version = "=0.7.19", optional = true }
 postgres-types = { version = "=0.2.8", optional = true }
 postgres-protocol = { version = "=0.6.8", optional = true }
 rdkafka = { version = "=0.39.0", default-features = false, features = ["cmake-build"], optional = true }
@@ -55,12 +57,12 @@ ipconfig = { version = "=0.3.2", optional = true }
 
 [features]
 default = []
-postgres = ["dep:postgres", "dep:tokio-postgres", "dep:postgres-types", "dep:postgres-protocol"]
+postgres = ["dep:postgres", "dep:tokio-postgres", "dep:tokio-util", "dep:postgres-types", "dep:postgres-protocol"]
 kafka = ["dep:rdkafka", "dep:rdkafka-sys", "dep:futures-executor"]
 kafka-tls = ["kafka", "rdkafka/ssl-vendored", "dep:openssl-sys"]
 redis = ["dep:redis", "dep:url"]
 redis-tls = ["redis", "redis/tls-native-tls", "dep:native-tls"]
-mongodb = ["dep:mongodb", "dep:tokio", "dep:time", "dep:url", "dep:uuid", "dep:zeroize", "dep:ipconfig", "dep:powerfmt"]
+mongodb = ["dep:mongodb", "dep:tokio", "dep:tokio-util", "dep:time", "dep:url", "dep:uuid", "dep:zeroize", "dep:ipconfig", "dep:powerfmt"]
 neo4j = ["dep:neo4j-driver", "dep:zeroize", "dep:jobserver"]
 nvml = ["dep:nvml-wrapper"]
 estimate-openai = ["dep:tiktoken-rs"]

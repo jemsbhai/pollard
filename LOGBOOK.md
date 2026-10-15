@@ -1161,3 +1161,8 @@ with zero network access and zero live model/tool calls.
 Full release gates, source commit, CI checks, public artifacts, hashes, and
 registry verification are recorded in the
 [Python 1.6.2 release](https://github.com/jemsbhai/pollard/releases/tag/v1.6.2).
+
+The full local all-backend suite passed with 1,324 tests, 9 skips, and 92.04%
+coverage. CI also exposed upstream native dependency drift: `tokio-util`
+0.7.20 increased its Rust requirement to 1.85. The MongoDB/PostgreSQL feature
+constraints retain 0.7.19, preserving Pollard's declared Rust 1.74 support.
