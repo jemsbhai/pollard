@@ -41,6 +41,7 @@ Pollard core remains dependency-free.
 | `16_distributed_team.py` | Four workers attach JSON contexts through independent SQLite connections and share an exact three-step cap | Temporary files removed on exit | Three accepted calls, one refusal, distinct cursors, and successful checkpoint restoration |
 | `17_team_comparison.py` | One worker and three workers perform the same deterministic task under recorded accounting | None | Equal task correctness, one versus three calls, 23 versus 33 synthetic tokens, and local elapsed measurements |
 | `18_durable_approval.py` | Exact tool approval and checkpoint survive reconstruction of the worker runtime | Temporary database and JSON files removed on exit | Pause before approval, one approved handler call, one dummy receipt, and a read-only report |
+| `19_codex_recording.py` | Synthetic Codex result recording and strict replay without launching a model | None | Matching replay, zero Codex launches, and 20 synthetic tokens |
 
 Run them individually:
 

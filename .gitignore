@@ -22,6 +22,7 @@ target/
 *.key
 *secrets*
 runs.db
+codex-runs.db
 openai-tool-loop.db
 anthropic-tool-loop.db
 langgraph-node.db

@@ -10,6 +10,7 @@ failure boundaries, and complete commands needed to operate or review Pollard.
 | Goal | Document |
 |---|---|
 | Run a credential-free example | [Offline examples](https://github.com/jemsbhai/pollard/blob/main/examples/README.md) |
+| Install Codex support, run a governed coding task, or replay its result | [Codex CLI integration](https://github.com/jemsbhai/pollard/blob/main/docs/codex-cli.md) |
 | Give agent teams identities, shared limits, tool permissions, handoffs, and recovery contexts | [Agent teams](https://github.com/jemsbhai/pollard/blob/main/docs/teams.md) |
 | Use OpenAI, Anthropic, Azure, Bedrock, another cloud, or an agent framework | [Live recipes](https://github.com/jemsbhai/pollard/blob/main/docs/recipes/README.md) |
 | Choose a direct cloud adapter or LiteLLM route | [Cloud-hosted providers](https://github.com/jemsbhai/pollard/blob/main/docs/cloud-providers.md) |

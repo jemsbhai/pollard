@@ -243,6 +243,7 @@ Install only the integrations used by the application:
 | Need | Install | Boundary |
 |---|---|---|
 | OpenAI API or Azure OpenAI v1 with an API key | `pollard[openai]` | Responses and Chat Completions, sync or async, streaming or complete |
+| Codex CLI tasks | `pollard[codex]` | Pinned native CLI, `pollard-codex` launcher, whole-task recording, usage accounting, and replay |
 | Azure OpenAI v1 with Microsoft Entra ID | `pollard[azure-openai]` | OpenAI adapter plus the Azure Identity token provider |
 | Anthropic API | `pollard[anthropic]` | Messages, sync or async, streaming or complete, optional live token count |
 | Amazon Bedrock | `pollard[bedrock]` | Converse and ConverseStream, optional CountTokens precheck |
@@ -273,6 +274,24 @@ The LangChain incident-response, LangChain support-policy RAG, Pydantic refund,
 and pydantic-ai claim-triage recipes use deterministic local paths by default.
 Only an explicit `--live` flag on either LangChain recipe or the pydantic-ai
 recipe enables hosted inference.
+
+## Codex CLI
+
+```powershell
+python -m pip install "pollard[codex]"
+pollard-codex login
+pollard-codex run --prompt "Review this repository without editing files." --cwd . --workspace-fingerprint "snapshot-001-config-001" --run-label review-001
+```
+
+This launches a live Codex task using the caller's account and may consume
+account usage or incur charges. One task is one Pollard step, with recorded
+answer and usage, a read-only sandbox by default, and bounded process execution.
+Use `--mode replay` with the same arguments to return the stored answer without
+launching Codex. The required fingerprint is caller-owned and must identify the
+repository state and relevant Codex configuration. Replay does not restore
+files, and task-level budgets do not gate Codex's internal tool/model calls.
+See [Codex CLI integration](https://github.com/jemsbhai/pollard/blob/main/docs/codex-cli.md)
+for installation, Python usage, retries, and accounting boundaries.
 
 ## Streaming And Estimates
 
