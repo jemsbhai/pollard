@@ -3,7 +3,7 @@ from pollard import DuplicateRecording, Store
 
 
 def test_version() -> None:
-    assert pollard.__version__ == "1.6.1"
+    assert pollard.__version__ == "1.6.2"
 
 
 def test_store_protocol_is_public() -> None:

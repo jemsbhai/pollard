@@ -4,6 +4,21 @@ All notable changes to pollard will be documented in this file.
 
 The format is based on Keep a Changelog, and this project follows Semantic Versioning.
 
+## [1.6.2] - 2026-10-15
+
+### Added
+
+- Add optional `pollard[codex]` support with the official native Codex CLI
+  runtime pinned to 0.162.1. Core installation remains dependency-free.
+- Add `make_codex_exec_fn` for fresh non-interactive Codex tasks with stdin
+  prompts, explicit sandbox selection, bounded timeout and output capture,
+  normalized usage, and conservative post-dispatch failure accounting.
+- Add `pollard-codex` commands for login, status, version, and governed task
+  execution with SQLite recording, duplicate refusal, and strict replay.
+- Document whole-task accounting, caller-owned workspace/configuration
+  fingerprints, inherited Codex settings, and replay/side-effect limitations.
+  Include a synthetic offline walkthrough and protocol/CLI regression tests.
+
 ## [1.6.1] - 2026-10-09
 
 ### Added

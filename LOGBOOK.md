@@ -1129,3 +1129,35 @@ complete programs also run as tests, including the process-pool example.
 The EXP-006 verifier reads all 49 retained nodes with no network access or live
 dispatch. Release gates and public artifact receipts are recorded in the
 [Python 1.6.1 release](https://github.com/jemsbhai/pollard/releases/tag/v1.6.1).
+
+## 2026-10-15 Python 1.6.2 Codex CLI Integration
+
+The optional `codex` extra installs the official Codex CLI runtime 0.162.1.
+`make_codex_exec_fn` records one fresh CLI task per Pollard model step, and
+`pollard-codex` provides login, status, version, and governed run commands.
+Core dependencies, existing adapters, node identities, and the independently
+versioned native packages remain unchanged.
+
+The adapter uses stdin prompts, a read-only sandbox by default, independent
+process execution, timeout and output limits, and conservative accounting after
+uncertain dispatch. Recorded results retain final answer and usage without raw
+reasoning, tool output, or stderr. Workspace/configuration fingerprints remain
+caller-owned. Replay returns a result and does not restore files or sessions.
+
+An independent review corrected a pre-launch Unicode validation edge case,
+Windows cleanup executable resolution, and Windows piped stdin/stdout encoding.
+The 62 focused adapter/CLI tests exercise real local subprocess fixtures,
+record/replay, duplicate refusal, budget refusal, failure settlement, Unicode,
+and the installed runtime's credential-free version check.
+
+A separate live read-only smoke task in an empty temporary Git repository used
+the existing Codex account and model `gpt-6.1-sol`. The final answer matched its
+fixed marker. Codex reported 20,937 input and 10 output tokens; Pollard recorded
+one step and 20,947 tokens, then replayed the same result without dispatch.
+This confirms this environment's integration, not a cost or performance claim.
+The account's billing remains authoritative. The EXP-006 verifier also passed
+with zero network access and zero live model/tool calls.
+
+Full release gates, source commit, CI checks, public artifacts, hashes, and
+registry verification are recorded in the
+[Python 1.6.2 release](https://github.com/jemsbhai/pollard/releases/tag/v1.6.2).

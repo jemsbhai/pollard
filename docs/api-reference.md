@@ -708,6 +708,7 @@ currently wraps the synchronous boto3 client.
 | Module | Public integration functions |
 |---|---|
 | `pollard.adapters.openai` | Responses and Chat Completions, sync and async |
+| `pollard.adapters.codex` | `make_codex_exec_fn`, `codex_executable`, `codex_environment`, and `CodexExecError` for bounded CLI tasks |
 | `pollard.adapters.anthropic` | Messages, sync and async, including live input-token estimator on the sync callable |
 | `pollard.adapters.bedrock` | Synchronous boto3 Converse and ConverseStream, optional CountTokens |
 | `pollard.adapters.litellm` | Completion and async completion wrappers |
@@ -725,6 +726,13 @@ errors for terminal provider events or streams that close without their
 required terminal event.
 
 ## Exceptions
+
+The optional Codex CLI integration is documented in
+[Codex CLI integration](https://github.com/jemsbhai/pollard/blob/main/docs/codex-cli.md).
+It includes `pollard-codex login`, `status`, `version`, and governed `run`
+commands. Each invocation is one step; internal Codex actions remain outside
+Pollard's per-step accounting. `CodexExecError` derives from `RuntimeError`,
+matching the provider adapters' terminal-error convention.
 
 All Pollard exceptions derive from `PollardError`:
 
