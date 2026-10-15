@@ -162,6 +162,9 @@ def make_codex_exec_fn(
         if model is not None:
             args.extend(["--model", model])
         args.append("-")
+        creation_flags = 0
+        if sys.platform == "win32":
+            creation_flags = subprocess.CREATE_NEW_PROCESS_GROUP
         try:
             process = subprocess.Popen(
                 args,
@@ -173,7 +176,7 @@ def make_codex_exec_fn(
                 shell=False,
                 bufsize=0,
                 start_new_session=os.name != "nt",
-                creationflags=subprocess.CREATE_NEW_PROCESS_GROUP if os.name == "nt" else 0,
+                creationflags=creation_flags,
             )
         except OSError:
             raise CodexExecError(
