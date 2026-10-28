@@ -21,12 +21,24 @@ Run: ``pollard-mcp`` (stdio transport).
 
 from __future__ import annotations
 
+import argparse
+import asyncio
 import json
+import os
 import subprocess
 import sys
+from collections.abc import Sequence
 from typing import Any
+from uuid import uuid4
 
-from mcp.server.fastmcp import FastMCP
+try:
+    from mcp.server.fastmcp import FastMCP
+except ModuleNotFoundError as exc:
+    if exc.name != "mcp":
+        raise
+    raise ImportError('The MCP server requires: pip install "pollard[mcp]"') from exc
+
+from pydantic import StrictInt
 
 mcp = FastMCP("pollard")
 
@@ -38,7 +50,7 @@ async def governed_mcp_call(
     arguments: dict[str, Any] | None = None,
     stdio: bool = False,
     server_args: list[str] | None = None,
-    budget_steps: int = 3,
+    budget_steps: StrictInt = 3,
     database: str = "pollard-mcp.db",
 ) -> str:
     """Call one tool on an upstream MCP server through Pollard governance.
@@ -46,6 +58,8 @@ async def governed_mcp_call(
     The upstream server's tools are discovered and wrapped in a Pollard
     registry; the call then runs inside a budgeted, recorded execution tree.
     Returns the tool result plus the run root id for later inspection.
+    Each invocation is a fresh live call with its own step budget, including
+    repeated calls with identical arguments. It never implicitly replays.
 
     upstream: streamable-HTTP URL of the upstream MCP server, or, when
         stdio=True, the command that launches it locally.
@@ -56,24 +70,30 @@ async def governed_mcp_call(
     from .governor import Budget
     from .mcp import registry_from_mcp
     from .meters import StepMeter
+    from .stores import SQLiteStore
 
+    if isinstance(budget_steps, bool) or not isinstance(budget_steps, int):
+        raise TypeError("budget_steps must be a nonnegative integer")
+    budget = Budget(steps=budget_steps)
+    budget.limits()
     args = arguments or {}
 
     async def _governed(session: Any) -> str:
         await session.initialize()
         registry = await registry_from_mcp(session)
-        runtime = AsyncRuntime(database, registry=registry, meters=[StepMeter()], mode="hybrid")
-        async with runtime.run("mcp-registry", budget=Budget(steps=budget_steps)) as run:
-            node = await run.atool_call(tool, args, version="mcp")
-            return json.dumps(
-                {
-                    "result": node.result,
-                    "root_id": run.root_id,
-                    "inspect": f"pollard show {database} {run.root_id}",
-                },
-                indent=2,
-                sort_keys=True,
-            )
+        with SQLiteStore(database) as store:
+            runtime = AsyncRuntime(store, registry=registry, meters=[StepMeter()], mode="record")
+            async with runtime.run(f"mcp-call-{uuid4().hex}", budget=budget) as run:
+                node = await run.atool_call(tool, args, version="mcp")
+                return json.dumps(
+                    {
+                        "result": node.result,
+                        "root_id": run.root_id,
+                        "inspect": f'pollard show "{database}" {run.root_id}',
+                    },
+                    indent=2,
+                    sort_keys=True,
+                )
 
     if stdio:
         from mcp import StdioServerParameters
@@ -97,48 +117,61 @@ async def governed_mcp_call(
 
 def _cli(*argv: str) -> str:
     try:
-        proc = subprocess.run(["pollard", *argv], capture_output=True, text=True, timeout=120)
-    except FileNotFoundError:
-        return "pollard CLI not found on PATH; install pollard to use this tool"
+        proc = subprocess.run(
+            [sys.executable, "-m", "pollard.cli", argv[0], "--json", "--", *argv[1:]],
+            stdin=subprocess.DEVNULL,
+            capture_output=True,
+            encoding="utf-8",
+            env={**os.environ, "PYTHONIOENCODING": "utf-8"},
+            timeout=120,
+        )
+    except subprocess.TimeoutExpired as exc:
+        raise RuntimeError("pollard inspection timed out after 120 seconds") from exc
     out = proc.stdout.strip()
     err = proc.stderr.strip()
     if proc.returncode != 0:
-        return f"pollard {' '.join(argv)} failed ({proc.returncode}): {err or out}"
+        raise RuntimeError(f"pollard {argv[0]} failed ({proc.returncode}): {err or out}")
     return out or "(no output)"
 
 
 @mcp.tool()
-def list_runs(database: str = "pollard-mcp.db") -> str:
+async def list_runs(database: str = "pollard-mcp.db") -> str:
     """List the run roots recorded in a Pollard store."""
-    return _cli("runs", database)
+    return await asyncio.to_thread(_cli, "runs", database)
 
 
 @mcp.tool()
-def show_run(database: str, root_id: str) -> str:
+async def show_run(database: str, root_id: str) -> str:
     """Render a stored Pollard run tree by root id."""
-    return _cli("show", database, root_id)
+    return await asyncio.to_thread(_cli, "show", database, root_id)
 
 
 @mcp.tool()
-def run_report(database: str, root_id: str) -> str:
+async def run_report(database: str, root_id: str) -> str:
     """Summarize spent and avoided charges for one recorded run."""
-    return _cli("report", database, root_id)
+    return await asyncio.to_thread(_cli, "report", database, root_id)
 
 
 @mcp.tool()
-def verify_store(database: str = "pollard-mcp.db") -> str:
+async def verify_store(database: str = "pollard-mcp.db") -> str:
     """Verify stored identities and results in a Pollard store."""
-    return _cli("verify", database)
+    return await asyncio.to_thread(_cli, "verify", database)
 
 
-def main() -> None:
-    if "--self-test" in sys.argv:
-        # Import-level smoke check without starting the transport.
-        names = [t for t in dir(mcp) if not t.startswith("_")]
-        print("pollard-mcp module OK; FastMCP app:", type(mcp).__name__)
-        print("entry points present:", "main" in names or True)
+def main(argv: Sequence[str] | None = None) -> None:
+    parser = argparse.ArgumentParser(description=__doc__, prog="pollard-mcp")
+    parser.add_argument(
+        "--self-test", action="store_true", help="validate tool registration and exit"
+    )
+    args = parser.parse_args(argv)
+    if args.self_test:
+        names = sorted(tool.name for tool in asyncio.run(mcp.list_tools()))
+        expected = ["governed_mcp_call", "list_runs", "run_report", "show_run", "verify_store"]
+        if names != expected:
+            raise RuntimeError(f"unexpected MCP tool registration: {names}")
+        print(json.dumps({"server": "pollard", "tools": names}))
         return
-    mcp.run()
+    mcp.run(transport="stdio")
 
 
 if __name__ == "__main__":

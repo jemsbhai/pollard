@@ -4,6 +4,25 @@ All notable changes to pollard will be documented in this file.
 
 The format is based on Keep a Changelog, and this project follows Semantic Versioning.
 
+## [Unreleased]
+
+### Added
+
+- Add the optional `pollard-mcp` stdio server with governed upstream calls,
+  stored-run inspection, tool-registration validation, and protocol tests.
+
+### Fixed
+
+- Give each MCP server call a fresh recording and budget, preventing results
+  from being reused across upstreams or budgets leaking across requests.
+  Close SQLite connections on all exit paths and run inspection through the
+  current Python installation with positional arguments and MCP error reporting.
+- Keep MongoDB CI services on Ubuntu 24.04 runners to avoid incompatible newer
+  kernels and wait for the database listener before shell probes to avoid an
+  initialization race. Constrain Tokio to retain fresh Rust 1.74 consumer support.
+- Make the async SQLite lease-renewal test synchronize on confirmed renewal
+  instead of depending on short wall-clock sleeps on busy Windows runners.
+
 ## [1.6.2] - 2026-10-15
 
 ### Added

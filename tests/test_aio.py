@@ -1,5 +1,8 @@
 import asyncio
+import time
 from decimal import Decimal
+from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -83,19 +86,45 @@ class AsyncTrackingArbiter(MemoryStore):
         return True
 
 
-def test_async_running_call_renews_sqlite_reservation(tmp_path) -> None:  # type: ignore[no-untyped-def]
+def test_async_running_call_renews_sqlite_reservation(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     async def scenario() -> None:
         path = tmp_path / "async-renewal.db"
         started = asyncio.Event()
+        renewed = asyncio.Event()
+        finish = asyncio.Event()
         executed: list[str] = []
+        loop = asyncio.get_running_loop()
+        clock = [100.0]
+
+        # Control both lease clocks, but retain the real heartbeat thread and
+        # SQLite renewal transaction. A busy runner must not expire the fixture's
+        # one-second lease before the contender has a chance to inspect it.
+        monkeypatch.setattr("pollard.stores.sqlite.time", SimpleNamespace(time=lambda: clock[0]))
+        monkeypatch.setattr(
+            "pollard.runtime.time",
+            SimpleNamespace(monotonic=lambda: clock[0], perf_counter=time.perf_counter),
+        )
 
         async def slow_call(_payload: dict[str, object]) -> dict[str, bool]:
             started.set()
-            await asyncio.sleep(2.2)
+            await finish.wait()
             executed.append("first")
             return {"ok": True}
 
         with SQLiteStore(path) as first_store:
+            renew = first_store._pollard_renew
+
+            def observe_renewal(reservation_id: str, lease_seconds: float) -> bool:
+                renewed_at = clock[0]
+                result = renew(reservation_id, lease_seconds)
+                if result and renewed_at > 100.0:
+                    loop.call_soon_threadsafe(renewed.set)
+                return result
+
+            monkeypatch.setattr(first_store, "_pollard_renew", observe_renewal)
             first_run = AsyncRuntime(
                 first_store,
                 meters=[WindowMeter("requests", 1, 60)],
@@ -104,22 +133,31 @@ def test_async_running_call_renews_sqlite_reservation(tmp_path) -> None:  # type
             pending = asyncio.create_task(
                 first_run.amodel_call({"model": "slow"}, fn=slow_call)
             )
-            await asyncio.wait_for(started.wait(), timeout=5)
-            await asyncio.sleep(1.4)
-            with SQLiteStore(path) as second_store:
-                second_run = Runtime(
-                    second_store,
-                    meters=[WindowMeter("requests", 1, 60)],
-                    reservation_lease_seconds=1.0,
-                ).run("async-renewal")
-                with pytest.raises(BudgetExceeded):
-                    second_run.model_call(
-                        {"model": "second"},
-                        attempt=1,
-                        fn=lambda _payload: executed.append("second")
-                        or {"ok": True},
-                    )
-            await asyncio.wait_for(pending, timeout=10)
+            try:
+                await asyncio.wait_for(started.wait(), timeout=10)
+                clock[0] = 100.5
+                await asyncio.wait_for(renewed.wait(), timeout=10)
+                # The initial lease expired at 101; the observed renewal extends
+                # it to 101.5. The provider cannot finish until after this check.
+                clock[0] = 101.25
+                assert not pending.done()
+                assert executed == []
+                with SQLiteStore(path) as second_store:
+                    second_run = Runtime(
+                        second_store,
+                        meters=[WindowMeter("requests", 1, 60)],
+                        reservation_lease_seconds=1.0,
+                    ).run("async-renewal")
+                    with pytest.raises(BudgetExceeded):
+                        second_run.model_call(
+                            {"model": "second"},
+                            attempt=1,
+                            fn=lambda _payload: executed.append("second")
+                            or {"ok": True},
+                        )
+            finally:
+                finish.set()
+                await asyncio.wait_for(pending, timeout=10)
 
         assert executed == ["first"]
 

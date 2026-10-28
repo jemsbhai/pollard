@@ -56,6 +56,22 @@ class RemoteRunnerTests(unittest.TestCase):
             self.runner.start_service("redis")
         self.assertEqual(self.runner.created_names, ["pollard-parity-owned-run-redis"])
 
+    def test_mongodb_does_not_launch_shell_before_entrypoint_finishes(self):
+        name = "pollard-parity-owned-run-mongodb"
+        self.runner.run = Mock()
+        self.runner.docker_probe = Mock(return_value=subprocess.CompletedProcess([], 0,
+            json.dumps([{"Id": "mongo-id", "Image": "mongo-image",
+                         "Config": {"Labels": {OWNERSHIP_LABEL: "owned-run"}}}])))
+        self.runner.wait_ready = Mock(side_effect=RuntimeError("listener not ready"))
+        with patch("validate_remote.free_port", return_value=12345), self.assertRaisesRegex(RuntimeError, "listener not ready"):
+            self.runner.start_service("mongodb")
+        self.runner.wait_ready.assert_called_once_with("mongodb",
+            ["exec", name, "bash", "-c", ": >/dev/tcp/127.0.0.1/27017"])
+        # An early failure must never launch mongosh, which creates and removes
+        # files underneath the entrypoint's recursive ownership traversal.
+        self.assertEqual(self.runner.run.call_count, 1)
+        self.assertNotIn("mongosh", self.runner.run.call_args.args[1])
+
     def test_rejects_corrupt_or_unpinned_wheel(self):
         path = Path(self.directory.name) / WHEEL_NAME
         path.write_bytes(b"untrusted wheel")

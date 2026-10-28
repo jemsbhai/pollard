@@ -192,7 +192,10 @@ class Runner:
         elif service == "mongodb":
             arguments = ["--replSet", "rs0", "--bind_ip_all", "--wiredTigerCacheSizeGB", "0.25"]
             self.env["POLLARD_TEST_MONGO_URI"] = f"mongodb://127.0.0.1:{port}/?replicaSet=rs0&directConnection=true"
-            ready = ["exec", name, "mongosh", "--quiet", "--eval", "quit(db.adminCommand({ping:1}).ok ? 0 : 1)"]
+            # The image recursively chowns /data/db before starting mongod.
+            # mongosh writes transient files there, so do not launch it until
+            # the listener proves that ownership setup has finished.
+            ready = ["exec", name, "bash", "-c", ": >/dev/tcp/127.0.0.1/27017"]
         else:
             options = ["-e", f"NEO4J_AUTH=neo4j/{password}", "-e", f"NEO4J_server_bolt_advertised__address=127.0.0.1:{port}",
                        "-e", "NEO4J_server_memory_heap_initial__size=256m", "-e", "NEO4J_server_memory_heap_max__size=512m",

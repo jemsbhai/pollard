@@ -252,7 +252,7 @@ Install only the integrations used by the application:
 | LangChain | `pollard[langchain]` | Offline incident-response and support-policy RAG workflows with typed output and replay; optional OpenAI live modes |
 | Pydantic models | `pollard[pydantic]` | Model-generated registry schema with dry-run, confirmation, redaction, and replay |
 | pydantic-ai | `pollard[pydantic-ai]` | Typed claim agent with governed model requests and registered tool execution |
-| MCP | `pollard[mcp]` | Discover MCP tools and expose them through a Pollard registry |
+| MCP | `pollard[mcp]` | Discover MCP tools and expose them through a Pollard registry; the checkout also includes the [stdio MCP server](https://github.com/jemsbhai/pollard/blob/main/docs/mcp-server.md) |
 | Shared PostgreSQL store | `pollard[pg]` | Transactional multi-process and multi-host coordination |
 | Shared Redis store | `pollard[redis]` | Exact shared coordination with Redis persistence and no-eviction prerequisites |
 | Shared MongoDB store | `pollard[mongodb]` | Exact shared coordination on a replica set or sharded deployment |
