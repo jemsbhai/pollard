@@ -25,6 +25,18 @@ independent main or manual checks. Linux, Windows and macOS coverage is retained
 The native fixture job checks workflow syntax and expressions with a pinned,
 checksum-verified actionlint binary before running compatibility fixtures.
 
+The three jobs that start MongoDB use `ubuntu-24.04`. MongoDB's startup
+guard rejects newer runner kernels affected by
+[SERVER-121912](https://jira.mongodb.org/browse/SERVER-121912), even inside
+Docker. Keep these jobs on a compatible host kernel; changing the container
+image alone does not change that kernel. Other Linux jobs continue to use
+`ubuntu-latest`. Revisit the runner constraint after checking the pinned
+MongoDB images against the replacement runner's kernel.
+
+MongoDB probes wait for its TCP listener before invoking `mongosh`. The shell
+writes temporary files under `/data/db`, which can otherwise race the image
+entrypoint's recursive ownership setup and abort the container before startup.
+
 When a job has no runner and no executed steps, inspect its check annotations.
 GitHub's "job was not acquired" error indicates hosted-runner capacity, not a
 test result. Rerun only the affected jobs after capacity becomes available:

@@ -68,7 +68,8 @@ jobs:
 
   node-remote:
     name: Native Node distributed stores
-    runs-on: ubuntu-latest
+    # MongoDB requires the supported 24.04 kernel (SERVER-121912).
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     defaults:
       run:
@@ -209,7 +210,8 @@ jobs:
 
   rust-live-remotes:
     name: Live native backends and Python release 1.6.0 interoperability
-    runs-on: ubuntu-latest
+    # MongoDB requires the supported 24.04 kernel (SERVER-121912).
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v7

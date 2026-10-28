@@ -32,6 +32,7 @@ pydantic-refund.db
 pydantic-ai-claim.db
 pydantic-ai.db
 mcp-registry.db
+pollard-mcp.db
 *.db-wal
 *.db-shm
 !tests/pollard_recordings/

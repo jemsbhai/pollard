@@ -180,7 +180,9 @@ jobs:
 
   remote-stores:
     name: All remote stores and coverage on Python 3.13
-    runs-on: ubuntu-latest
+    # MongoDB rejects the Linux 6.19 through 7.0.13 kernels used by newer runners.
+    # Keep this job on the supported 24.04 kernel (SERVER-121912).
+    runs-on: ubuntu-24.04
     env:
       POLLARD_TEST_POSTGRES_DSN: postgresql://postgres:pollard@localhost:15432/pollard
       POLLARD_TEST_REDIS_URL: redis://localhost:16379/0
@@ -228,11 +230,18 @@ jobs:
 
       - name: Initialize and confirm services
         run: |
+          mongo_ready=false
           for attempt in {1..30}; do
-            if docker exec pollard-ci-mongo mongosh --quiet \
-              --eval "db.adminCommand('ping').ok"; then break; fi
+            # Wait for entrypoint ownership setup before mongosh writes its
+            # configuration below /data/db and races the recursive chown.
+            if docker exec pollard-ci-mongo bash -c \
+              ': >/dev/tcp/127.0.0.1/27017'; then mongo_ready=true; break; fi
             sleep 1
           done
+          if [ "$mongo_ready" != true ]; then
+            docker logs pollard-ci-mongo
+            exit 1
+          fi
           docker exec pollard-ci-mongo mongosh --quiet --eval \
             "rs.initiate({_id:'rs0',members:[{_id:0,host:'host.docker.internal:27018'}]})"
           python - <<'PY'
