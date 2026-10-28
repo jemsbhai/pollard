@@ -4,6 +4,7 @@ import asyncio
 import json
 import subprocess
 import sys
+import sysconfig
 from pathlib import Path
 
 from mcp import ClientSession, StdioServerParameters
@@ -88,7 +89,7 @@ def test_stdio_server_records_fresh_calls_and_inspects_them(tmp_path: Path) -> N
 
 
 def test_installed_entry_point_self_test_and_help(tmp_path: Path) -> None:
-    executable = Path(sys.executable).parent / (
+    executable = Path(sysconfig.get_path("scripts")) / (
         "pollard-mcp.exe" if sys.platform == "win32" else "pollard-mcp"
     )
     for argument in ("--self-test", "--help"):
