@@ -25,13 +25,24 @@ independent main or manual checks. Linux, Windows and macOS coverage is retained
 The native fixture job checks workflow syntax and expressions with a pinned,
 checksum-verified actionlint binary before running compatibility fixtures.
 
-The three jobs that start MongoDB use `ubuntu-24.04`. MongoDB's startup
-guard rejects newer runner kernels affected by
-[SERVER-121912](https://jira.mongodb.org/browse/SERVER-121912), even inside
-Docker. Keep these jobs on a compatible host kernel; changing the container
-image alone does not change that kernel. Other Linux jobs continue to use
-`ubuntu-latest`. Revisit the runner constraint after checking the pinned
-MongoDB images against the replacement runner's kernel.
+The Python remote-store coverage and Node distributed-store jobs temporarily
+use `ubuntu-22.04` for MongoDB 8. The November 2026 Ubuntu 24.04 runner image
+uses kernel `7.0.0-1017-azure`, which the current `mongo:8.0` image (8.0.34)
+rejects under its [SERVER-121912](https://jira.mongodb.org/browse/SERVER-121912)
+startup guard. The Ubuntu 22.04 runner's 6.8 kernel passes that guard. Docker
+shares the host kernel, so changing only the container's Ubuntu release does
+not avoid the problem. The Rust live-backend job uses a pinned MongoDB 7
+image that passes on `ubuntu-24.04`; other Linux jobs use `ubuntu-latest`.
+
+MongoDB 8.0.37 corrects Ubuntu kernel-version detection in
+[SERVER-131779](https://jira.mongodb.org/browse/SERVER-131779). As of November
+11, the official `mongo:8.0` image still resolves to 8.0.34. Once an official
+image with that fix is published, validate MongoDB startup, replica-primary
+readiness, and both complete remote-store jobs on Ubuntu 24.04 before removing
+the temporary runner constraint. Complete that migration before Ubuntu 22.04
+[runner brownouts begin on March 23, 2027](https://github.com/actions/runner-images/issues/14254);
+the runner retires on April 17, 2027. Keep MongoDB 8 coverage and the startup
+guard enabled.
 
 MongoDB probes wait for its TCP listener before invoking `mongosh`. The shell
 writes temporary files under `/data/db`, which can otherwise race the image
