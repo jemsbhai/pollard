@@ -69,7 +69,7 @@ jobs:
   node-remote:
     name: Native Node distributed stores
     # MongoDB 8.0.34 rejects Ubuntu 24.04's newer Azure kernel (SERVER-131779).
-    # Use the 22.04 kernel until the published MongoDB 8 image includes the fix.
+    # Use the 22.04 kernel until the available MongoDB 8 image includes the fix.
     # See README.md for the validation and runner-retirement requirements.
     runs-on: ubuntu-22.04
     timeout-minutes: 20
