@@ -180,9 +180,10 @@ jobs:
 
   remote-stores:
     name: All remote stores and coverage on Python 3.13
-    # MongoDB rejects the Linux 6.19 through 7.0.13 kernels used by newer runners.
-    # Keep this job on the supported 24.04 kernel (SERVER-121912).
-    runs-on: ubuntu-24.04
+    # MongoDB 8.0.34 rejects Ubuntu 24.04's newer Azure kernel (SERVER-131779).
+    # Use the 22.04 kernel until the available MongoDB 8 image includes the fix.
+    # See README.md for the validation and runner-retirement requirements.
+    runs-on: ubuntu-22.04
     env:
       POLLARD_TEST_POSTGRES_DSN: postgresql://postgres:pollard@localhost:15432/pollard
       POLLARD_TEST_REDIS_URL: redis://localhost:16379/0

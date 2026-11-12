@@ -68,8 +68,10 @@ jobs:
 
   node-remote:
     name: Native Node distributed stores
-    # MongoDB requires the supported 24.04 kernel (SERVER-121912).
-    runs-on: ubuntu-24.04
+    # MongoDB 8.0.34 rejects Ubuntu 24.04's newer Azure kernel (SERVER-131779).
+    # Use the 22.04 kernel until the available MongoDB 8 image includes the fix.
+    # See README.md for the validation and runner-retirement requirements.
+    runs-on: ubuntu-22.04
     timeout-minutes: 20
     defaults:
       run:
@@ -210,7 +212,7 @@ jobs:
 
   rust-live-remotes:
     name: Live native backends and Python release 1.6.0 interoperability
-    # MongoDB requires the supported 24.04 kernel (SERVER-121912).
+    # The pinned MongoDB 7 interoperability image passes on Ubuntu 24.04.
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     steps:
